@@ -1,4 +1,6 @@
 pytesseract
-
-
 opencv-contrib-python
+
+
+spacy
+langdetect

@@ -1,15 +1,9 @@
 pytesseract
-opencv-contrib-python
-numpy==1.26.4
-
-spacy
+Pillow
 langdetect
+spacy
 
-pdf2image==1.17.0 
-pyzbar==0.1.9 
-spacy-langdetect==0.1.2 
-pillow==10.2.0
-matplotlib
+numpy
 
-pymupdf 
-tqdm
+pdf2image
+PyPDF2

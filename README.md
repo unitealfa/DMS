@@ -11,3 +11,7 @@ partie 2 :Pipeline SpaCy de base & Tokenisation
 instalation des langue :
 python -m spacy download en_core_web_sm fr_core_news_sm
 
+
+solution ML tres avancer 
+github : https://github.com/FelixHertlein/inv3d-model
+documentation https://arxiv.org/pdf/2508.06988    

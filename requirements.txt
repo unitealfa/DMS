@@ -11,3 +11,8 @@ PyPDF2
 
 
 sentence-transformers
+
+
+
+elasticsearch
+elasticsearch==7.10.1

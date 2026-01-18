@@ -15,5 +15,3 @@ python -m spacy download en_core_web_sm fr_core_news_sm
 telecharger elasticsearch : https://www.elastic.co/downloads/past-releases/elasticsearch-7-10-2 
 puis lance le mais moi jais cree un .bat pour automatiser le truc si tu veut lutiliser mon .bat modifer ou tu as decompresser exemplel : C:\Users\moura\Downloads\elasticsearch-7.10.2-windows-x86_64\elasticsearch-7.10.2 
 
-
-separt comment ajouter des truc pour rechercher se que tu veut /////////////////////////////

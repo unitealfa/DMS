@@ -1,0 +1,38 @@
+{
+  "ruleset_id": "CONTRAT_V1",
+  "extractors": {
+    "date_signature": {
+      "rule_id": "CTR_DATE_SIGNATURE",
+      "pattern": "(?:date\\s+de\\s+signature|signature\\s+date)\\s*[:\\-]?\\s*(\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})",
+      "value_type": "date"
+    },
+    "date_entree_vigueur": {
+      "rule_id": "CTR_DATE_EFFET",
+      "pattern": "(?:date\\s+d['?]entree\\s+en\\s+vigueur|date\\s+d['?]effet|effective\\s+date)\\s*[:\\-]?\\s*(\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})",
+      "value_type": "date"
+    },
+    "duree": {
+      "rule_id": "CTR_DUREE",
+      "pattern": "(?:duree|duration|term)\\s*[:\\-]?\\s*([0-9]+\\s*(?:mois|ans|year|month)s?)",
+      "value_type": "text"
+    },
+    "objet": {
+      "rule_id": "CTR_OBJET",
+      "pattern": "(?:objet\\s+du\\s+contrat|purpose\\s+of\\s+the\\s+agreement)\\s*[:\\-]?\\s*(.+)",
+      "value_type": "text",
+      "flags": [
+        "MULTILINE"
+      ],
+      "use_lines": true
+    },
+    "parties": {
+      "rule_id": "CTR_PARTIES",
+      "pattern": "(?:entre\\s+les\\s+parties|between\\s+the\\s+parties)[:\\-]?\\s*(.+)",
+      "value_type": "text",
+      "flags": [
+        "MULTILINE"
+      ],
+      "use_lines": true
+    }
+  }
+}

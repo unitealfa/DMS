@@ -1,0 +1,55 @@
+{
+  "ruleset_id": "FACTURE_V1",
+  "extractors": {
+    "montant_a_payer_ttc": {
+      "rule_id": "INV_R001_MONTANT_A_PAYER_TTC",
+      "pattern": "montant\\s+a\\s+payer\\s+ttc\\s*[:\\]\\[]?\\s*([0-9][0-9\\s,\\.]{2,})",
+      "value_type": "amount"
+    },
+    "montant_a_payer": {
+      "rule_id": "INV_R002_MONTANT_A_PAYER",
+      "pattern": "montant\\s+a\\s+payer\\s*[:\\]\\[]?\\s*([0-9][0-9\\s,\\.]{2,})",
+      "value_type": "amount"
+    },
+    "timbre": {
+      "rule_id": "INV_R003_TIMBRE",
+      "pattern": "(timbre|rimbre)\\s*[:\\]\\[]?\\s*([0-9][0-9\\s,\\.]{2,})",
+      "value_type": "amount"
+    },
+    "total_ttc": {
+      "rule_id": "INV_R004_TOTAL_TTC",
+      "pattern": "total\\s+ttc\\s*[:\\]\\[]?\\s*([0-9][0-9\\s,\\.]{2,})",
+      "value_type": "amount"
+    },
+    "date": {
+      "rule_id": "INV_R005_DATE",
+      "pattern": "\\b(\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})\\b",
+      "value_type": "date"
+    },
+    "numero_facture": {
+      "rule_id": "INV_R006_NUMERO_FACTURE",
+      "pattern": "(numero\\s+facture|n[°o]\\s*facture|invoice\\s+number)\\s*[:\\]\\[]?\\s*([a-z0-9\\-\\/]+)",
+      "value_type": "text"
+    },
+    "date_echeance": {
+      "rule_id": "INV_R008_DATE_ECHEANCE",
+      "pattern": "date\\s+echeance\\s*[:\\]\\-]?\\s*(\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})",
+      "value_type": "date"
+    },
+    "date_facture_header": {
+      "rule_id": "INV_R009_DATE_FACTURE_HEADER",
+      "pattern": "code\\s+cl(?:i)?ent\\s+numero\\s+([a-z0-9]+)\\s+(\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})\\s+(\\d{2,})",
+      "value_type": "date"
+    },
+    "line_item": {
+      "rule_id": "INV_R010_LINE_ITEMS",
+      "pattern": "^(?P<ref>[a-z]\\d{3,4})\\s+(?P<desc>.+?)\\s+(?P<qty>\\d{1,6})\\s+(?P<unit>\\d+(?:[.,]\\d+)?)\\s+(?P<val>\\d{1,3}(?:,\\d{3})*(?:\\.\\d{2})|\\d+(?:\\.\\d{2}))\\s*$",
+      "value_type": "line_items",
+      "flags": [
+        "MULTILINE"
+      ],
+      "use_lines": true,
+      "many": true
+    }
+  }
+}

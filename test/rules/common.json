@@ -1,0 +1,14 @@
+{
+  "ruleset_id": "COMMON_V1",
+  "extractors": {
+    "telephone": {
+      "rule_id": "INV_R007_TELEPHONE",
+      "pattern": "(?:tel|tél|telephone|téléphone)\\s*[:\\]\\-]?\\s*([+\\(]?\\d[\\d\\-\\s\\(\\)]{6,}\\d)"
+    },
+    "date_generic": {
+      "rule_id": "COMMON_DATE_GENERIC",
+      "pattern": "\\b(\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})\\b",
+      "value_type": "date"
+    }
+  }
+}

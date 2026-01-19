@@ -1,6 +1,8 @@
 {
   "ruleset_id": "BON_DE_COMMANDE_V1",
   "extractors": {
+
+
     "po_number": {
       "rule_id": "PO_NUM_01",
       "pattern": "(?i)(purchase\\s*order|bon\\s*de\\s*commande)\\s*(no\\.|#|n\\u00b0)?\\s*[:\\-]?\\s*([A-Z0-9\\-]+)",
@@ -30,5 +32,7 @@
       "type": "number",
       "flags": ["IGNORECASE"]
     }
+
+    
   }
 }

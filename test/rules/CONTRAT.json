@@ -1,6 +1,8 @@
 {
   "ruleset_id": "CONTRAT_V1",
   "extractors": {
+
+
     "contract_number": {
       "rule_id": "CTR_NUM_01",
       "pattern": "(?i)(contract\\s*(no\\.|#)|contrat\\s*(n\\u00b0|no\\.|#))\\s*[:\\-]?\\s*([A-Z0-9\\-]+)",
@@ -38,5 +40,7 @@
       "flags": ["IGNORECASE", "MULTILINE"],
       "surface": "lines"
     }
+
+    
   }
 }

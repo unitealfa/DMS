@@ -1,6 +1,7 @@
 {
   "ruleset_id": "COMMON_V1",
   "extractors": {
+
     "doc_date": {
       "rule_id": "CMN_DATE_01",
       "pattern": "\\b(\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})\\b",
@@ -9,11 +10,11 @@
       "flags": ["MULTILINE"]
     },
     "email": {
-      "rule_id": "CMN_EMAIL_01",
-      "pattern": "([A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,})",
-      "group": 1,
-      "type": "text",
-      "flags": ["IGNORECASE"]
+    "rule_id": "CMN_EMAIL_01",
+    "pattern": "\\b([A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,})\\b",
+    "group": 1,
+    "type": "text",
+    "flags": ["IGNORECASE"]
     },
     "telephone": {
       "rule_id": "CMN_PHONE_01",
@@ -22,5 +23,7 @@
       "type": "phone",
       "flags": ["IGNORECASE"]
     }
+
+
   }
 }

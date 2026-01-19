@@ -1,14 +1,26 @@
 {
   "ruleset_id": "COMMON_V1",
   "extractors": {
-    "telephone": {
-      "rule_id": "INV_R007_TELEPHONE",
-      "pattern": "(?:tel|tél|telephone|téléphone)\\s*[:\\]\\-]?\\s*([+\\(]?\\d[\\d\\-\\s\\(\\)]{6,}\\d)"
-    },
-    "date_generic": {
-      "rule_id": "COMMON_DATE_GENERIC",
+    "doc_date": {
+      "rule_id": "CMN_DATE_01",
       "pattern": "\\b(\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})\\b",
-      "value_type": "date"
+      "group": 1,
+      "type": "date",
+      "flags": ["MULTILINE"]
+    },
+    "email": {
+      "rule_id": "CMN_EMAIL_01",
+      "pattern": "([A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,})",
+      "group": 1,
+      "type": "text",
+      "flags": ["IGNORECASE"]
+    },
+    "telephone": {
+      "rule_id": "CMN_PHONE_01",
+      "pattern": "(?:tel|telephone|phone)\\s*[:\\-]?\\s*([+\\(]?\\d[\\d\\-\\s\\(\\)]{6,}\\d)",
+      "group": 1,
+      "type": "phone",
+      "flags": ["IGNORECASE"]
     }
   }
 }

@@ -1,35 +1,34 @@
 {
   "ruleset_id": "BON_DE_COMMANDE_V1",
   "extractors": {
-    "numero_commande": {
-      "rule_id": "PO_NUMERO",
-      "pattern": "(?:bon\\s+de\\s+commande|purchase\\s+order|commande|order)\\s*(?:n[?o]|num(?:ero)?|no|#)?\\s*[:\\-]?\\s*([A-Z0-9\\-\\/]+)",
-      "value_type": "text"
+    "po_number": {
+      "rule_id": "PO_NUM_01",
+      "pattern": "(?i)(purchase\\s*order|bon\\s*de\\s*commande)\\s*(no\\.|#|n\\u00b0)?\\s*[:\\-]?\\s*([A-Z0-9\\-]+)",
+      "group": 3,
+      "type": "text",
+      "flags": ["IGNORECASE"]
     },
-    "date_commande": {
-      "rule_id": "PO_DATE_COMMANDE",
-      "pattern": "date\\s+(?:de\\s+)?commande\\s*[:\\-]?\\s*(\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})",
-      "value_type": "date"
+    "order_date": {
+      "rule_id": "PO_DATE_01",
+      "pattern": "(?i)(order\\s*date|date\\s*de\\s*commande)\\s*[:\\-]?\\s*(\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})",
+      "group": 2,
+      "type": "date",
+      "flags": ["IGNORECASE"]
     },
-    "total_ht": {
-      "rule_id": "PO_TOTAL_HT",
-      "pattern": "total\\s+ht\\s*[:\\]\\[]?\\s*([0-9][0-9\\s,\\.]{2,})",
-      "value_type": "amount"
+    "supplier": {
+      "rule_id": "PO_SUP_01",
+      "pattern": "(?i)(supplier|fournisseur)\\s*[:\\-]?\\s*(.+)",
+      "group": 2,
+      "type": "text",
+      "flags": ["IGNORECASE", "MULTILINE"],
+      "surface": "lines"
     },
-    "total_ttc": {
-      "rule_id": "PO_TOTAL_TTC",
-      "pattern": "total\\s+ttc\\s*[:\\]\\[]?\\s*([0-9][0-9\\s,\\.]{2,})",
-      "value_type": "amount"
-    },
-    "line_item": {
-      "rule_id": "PO_LINE_ITEMS",
-      "pattern": "^(?P<ref>[a-zA-Z]\\d{3,4})\\s+(?P<desc>.+?)\\s+(?P<qty>\\d{1,6})\\s+(?P<unit>\\d+(?:[.,]\\d+)?)\\s+(?P<val>\\d{1,3}(?:,\\d{3})*(?:\\.\\d{2})|\\d+(?:\\.\\d{2}))\\s*$",
-      "value_type": "line_items",
-      "flags": [
-        "MULTILINE"
-      ],
-      "use_lines": true,
-      "many": true
+    "total_amount": {
+      "rule_id": "PO_TOTAL_01",
+      "pattern": "(?i)(total|montant\\s+total|total\\s+ttc)\\s*[:\\-]?\\s*([0-9][0-9\\s.,]+)",
+      "group": 2,
+      "type": "number",
+      "flags": ["IGNORECASE"]
     }
   }
 }

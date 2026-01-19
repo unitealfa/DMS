@@ -1,0 +1,11 @@
+{
+  "min_ocr_avg_conf": 75,
+  "min_ocr_words": 40,
+  "max_abs_skew_deg": 5.0,
+  "min_text_density": 120,
+  "light_page": {
+    "max_ocr_words": 40,
+    "max_text_density": 80
+  },
+  "doc_review_ratio": 0.6
+}

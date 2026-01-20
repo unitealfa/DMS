@@ -1,97 +1,148 @@
 [{
 	"resource": "/c:/Users/moura/OneDrive/Bureau/DMS/test/test.ipynb",
 	"owner": "Pylance",
-	"severity": 8,
-	"message": "\"(\" was not closed",
+	"code": {
+		"value": "reportUndefinedVariable",
+		"target": {
+			"$mid": 1,
+			"path": "/microsoft/pylance-release/blob/main/docs/diagnostics/reportUndefinedVariable.md",
+			"scheme": "https",
+			"authority": "github.com"
+		}
+	},
+	"severity": 4,
+	"message": "\"test_query\" is not defined",
 	"source": "Pylance",
-	"startLineNumber": 258,
-	"startColumn": 24,
-	"endLineNumber": 258,
-	"endColumn": 25,
+	"startLineNumber": 275,
+	"startColumn": 52,
+	"endLineNumber": 275,
+	"endColumn": 62,
 	"modelVersionId": 1,
 	"origin": "extHost1"
 },{
 	"resource": "/c:/Users/moura/OneDrive/Bureau/DMS/test/test.ipynb",
 	"owner": "Pylance",
-	"severity": 8,
-	"message": "String literal is unterminated",
+	"code": {
+		"value": "reportUndefinedVariable",
+		"target": {
+			"$mid": 1,
+			"path": "/microsoft/pylance-release/blob/main/docs/diagnostics/reportUndefinedVariable.md",
+			"scheme": "https",
+			"authority": "github.com"
+		}
+	},
+	"severity": 4,
+	"message": "\"test_query\" is not defined",
 	"source": "Pylance",
-	"startLineNumber": 258,
-	"startColumn": 25,
-	"endLineNumber": 258,
-	"endColumn": 28,
+	"startLineNumber": 275,
+	"startColumn": 76,
+	"endLineNumber": 275,
+	"endColumn": 86,
 	"modelVersionId": 1,
 	"origin": "extHost1"
 },{
 	"resource": "/c:/Users/moura/OneDrive/Bureau/DMS/test/test.ipynb",
 	"owner": "Pylance",
-	"severity": 8,
-	"message": "Expected expression",
+	"code": {
+		"value": "reportUndefinedVariable",
+		"target": {
+			"$mid": 1,
+			"path": "/microsoft/pylance-release/blob/main/docs/diagnostics/reportUndefinedVariable.md",
+			"scheme": "https",
+			"authority": "github.com"
+		}
+	},
+	"severity": 4,
+	"message": "\"test_query\" is not defined",
 	"source": "Pylance",
-	"startLineNumber": 259,
-	"startColumn": 2,
-	"endLineNumber": 259,
-	"endColumn": 3,
+	"startLineNumber": 278,
+	"startColumn": 17,
+	"endLineNumber": 278,
+	"endColumn": 27,
 	"modelVersionId": 1,
 	"origin": "extHost1"
 },{
 	"resource": "/c:/Users/moura/OneDrive/Bureau/DMS/test/test.ipynb",
 	"owner": "Pylance",
-	"severity": 8,
-	"message": "Statements must be separated by newlines or semicolons",
+	"code": {
+		"value": "reportUndefinedVariable",
+		"target": {
+			"$mid": 1,
+			"path": "/microsoft/pylance-release/blob/main/docs/diagnostics/reportUndefinedVariable.md",
+			"scheme": "https",
+			"authority": "github.com"
+		}
+	},
+	"severity": 4,
+	"message": "\"test_query\" is not defined",
 	"source": "Pylance",
-	"startLineNumber": 589,
-	"startColumn": 1,
-	"endLineNumber": 589,
-	"endColumn": 1,
+	"startLineNumber": 280,
+	"startColumn": 28,
+	"endLineNumber": 280,
+	"endColumn": 38,
 	"modelVersionId": 1,
 	"origin": "extHost1"
 },{
 	"resource": "/c:/Users/moura/OneDrive/Bureau/DMS/test/test.ipynb",
 	"owner": "Pylance",
-	"severity": 8,
-	"message": "\"(\" was not closed",
+	"code": {
+		"value": "reportUndefinedVariable",
+		"target": {
+			"$mid": 1,
+			"path": "/microsoft/pylance-release/blob/main/docs/diagnostics/reportUndefinedVariable.md",
+			"scheme": "https",
+			"authority": "github.com"
+		}
+	},
+	"severity": 4,
+	"message": "\"test_query\" is not defined",
 	"source": "Pylance",
-	"startLineNumber": 364,
-	"startColumn": 24,
-	"endLineNumber": 364,
-	"endColumn": 25,
+	"startLineNumber": 667,
+	"startColumn": 45,
+	"endLineNumber": 667,
+	"endColumn": 55,
 	"modelVersionId": 1,
 	"origin": "extHost1"
 },{
 	"resource": "/c:/Users/moura/OneDrive/Bureau/DMS/test/test.ipynb",
 	"owner": "Pylance",
-	"severity": 8,
-	"message": "String literal is unterminated",
+	"code": {
+		"value": "reportUndefinedVariable",
+		"target": {
+			"$mid": 1,
+			"path": "/microsoft/pylance-release/blob/main/docs/diagnostics/reportUndefinedVariable.md",
+			"scheme": "https",
+			"authority": "github.com"
+		}
+	},
+	"severity": 4,
+	"message": "\"test_query\" is not defined",
 	"source": "Pylance",
-	"startLineNumber": 364,
-	"startColumn": 25,
-	"endLineNumber": 364,
-	"endColumn": 28,
+	"startLineNumber": 667,
+	"startColumn": 66,
+	"endLineNumber": 667,
+	"endColumn": 76,
 	"modelVersionId": 1,
 	"origin": "extHost1"
 },{
 	"resource": "/c:/Users/moura/OneDrive/Bureau/DMS/test/test.ipynb",
 	"owner": "Pylance",
-	"severity": 8,
-	"message": "Expected expression",
+	"code": {
+		"value": "reportUndefinedVariable",
+		"target": {
+			"$mid": 1,
+			"path": "/microsoft/pylance-release/blob/main/docs/diagnostics/reportUndefinedVariable.md",
+			"scheme": "https",
+			"authority": "github.com"
+		}
+	},
+	"severity": 4,
+	"message": "\"test_query\" is not defined",
 	"source": "Pylance",
-	"startLineNumber": 365,
-	"startColumn": 2,
-	"endLineNumber": 365,
-	"endColumn": 3,
-	"modelVersionId": 1,
-	"origin": "extHost1"
-},{
-	"resource": "/c:/Users/moura/OneDrive/Bureau/DMS/test/test.ipynb",
-	"owner": "Pylance",
-	"severity": 8,
-	"message": "Statements must be separated by newlines or semicolons",
-	"source": "Pylance",
-	"startLineNumber": 624,
-	"startColumn": 1,
-	"endLineNumber": 624,
-	"endColumn": 1,
+	"startLineNumber": 668,
+	"startColumn": 16,
+	"endLineNumber": 668,
+	"endColumn": 26,
 	"modelVersionId": 1,
 	"origin": "extHost1"
 }]

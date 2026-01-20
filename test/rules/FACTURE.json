@@ -4,21 +4,21 @@
 
 
     "invoice_number": {
-      "rule_id": "INV_NUM_01",
+      "rule_id": "FAC_NUM_01",
       "pattern": "(?i)(invoice\\s*no\\.|invoice\\s*number|facture\\s*(no\\.|n\\u00b0))\\s*[:\\-]?\\s*([A-Z0-9\\-]+)",
       "group": 3,
       "type": "text",
       "flags": ["IGNORECASE"]
     },
     "invoice_date": {
-      "rule_id": "INV_DATE_01",
+      "rule_id": "FAC_DATE_01",
       "pattern": "(?i)(invoice\\s*date|date\\s*facture)\\s*[:\\-]?\\s*(\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})",
       "group": 2,
       "type": "date",
       "flags": ["IGNORECASE"]
     },
     "supplier": {
-      "rule_id": "INV_SUP_01",
+      "rule_id": "FAC_SUP_01",
       "pattern": "(?i)(supplier|fournisseur)\\s*[:\\-]?\\s*(.+)",
       "group": 2,
       "type": "text",
@@ -26,14 +26,14 @@
       "surface": "lines"
     },
     "total_amount": {
-      "rule_id": "INV_TOTAL_01",
+      "rule_id": "FAC_TOTAL_01",
       "pattern": "(?i)(total\\s+ttc|total\\s+amount|total)\\s*[:\\-]?\\s*([0-9][0-9\\s.,]+)",
       "group": 2,
       "type": "number",
       "flags": ["IGNORECASE"]
     },
     "tax_amount": {
-      "rule_id": "INV_TAX_01",
+      "rule_id": "FAC_TAX_01",
       "pattern": "(?i)(tva|tax)\\s*[:\\-]?\\s*([0-9][0-9\\s.,]+)",
       "group": 2,
       "type": "number",

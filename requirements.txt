@@ -2,15 +2,9 @@ pytesseract
 Pillow
 langdetect
 spacy
-
 numpy
-
 pdf2image
 PyPDF2
-
-
-
 sentence-transformers
-
-
 elasticsearch==7.10.1
+

@@ -24,13 +24,19 @@
     },
     "telephone": {
       "rule_id": "CMN_PHONE_01",
-      "pattern": "(?<!\\d)(\\+213[ -]\\d{2}[ -]\\d{7}|\\d{3}[ -]\\d{3}[ -]\\d{4}|\\d[ -]\\d{3}[ -]\\d{3}[ -]\\d{4})(?!\\d)",
+      "pattern": "(?<!\\d)(\\+?\\d{1,4}(?:[\\s\\-()]+\\d{1,4}){2,})(?!\\d)",
       "group": 1,
       "type": "phone",
       "flags": [
         "IGNORECASE"
       ],
-      "many": true
+      "many": true,
+      "min_digits": 8,
+      "max_digits": 15,
+      "max_group_len": 4,
+      "require_separator": true,
+      "min_groups": 3,
+      "min_groups_small_digits": 4
     }
   }
 }

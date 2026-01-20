@@ -1,29 +1,36 @@
 {
   "ruleset_id": "COMMON_V1",
   "extractors": {
-
     "doc_date": {
       "rule_id": "CMN_DATE_01",
-      "pattern": "\\b(\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})\\b",
+      "pattern": "\\b((?:\\d{4}[\\/.-](?:0?[1-9]|1[0-2])[\\/.-](?:0?[1-9]|[12]\\d|3[01]))|(?:(?:0?[1-9]|[12]\\d|3[01])[\\/.-](?:0?[1-9]|1[0-2])[\\/.-]\\d{2,4})|(?:(?:0?[1-9]|1[0-2])[\\/.-](?:0?[1-9]|[12]\\d|3[01])[\\/.-]\\d{2,4})|(?:(?:0?[1-9]|[12]\\d|3[01])\\s+(?:janv?\\.?(?:ier)?|january|févr?\\.?(?:ier)?|february|mars|march|avr?\\.?(?:il)?|april|mai|may|juin|june|juil?\\.?(?:let)?|july|ao[uû]t|august|sept?\\.?(?:embre)?|september|oct?\\.?(?:obre)?|october|nov?\\.?(?:embre)?|november|déc?\\.?(?:embre)?|december)\\s+\\d{2,4})|(?:(?:janv?\\.?(?:ier)?|january|févr?\\.?(?:ier)?|february|mars|march|avr?\\.?(?:il)?|april|mai|may|juin|june|juil?\\.?(?:let)?|july|ao[uû]t|august|sept?\\.?(?:embre)?|september|oct?\\.?(?:obre)?|october|nov?\\.?(?:embre)?|november|déc?\\.?(?:embre)?|december)\\s+(?:0?[1-9]|[12]\\d|3[01])(?:,)?\\s+\\d{2,4}))\\b",
       "group": 1,
       "type": "date",
-      "flags": ["MULTILINE"]
+      "flags": [
+        "MULTILINE",
+        "IGNORECASE"
+      ],
+      "many": true
     },
     "email": {
-    "rule_id": "CMN_EMAIL_01",
-    "pattern": "\\b([A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,})\\b",
-    "group": 1,
-    "type": "text",
-    "flags": ["IGNORECASE"]
+      "rule_id": "CMN_EMAIL_01",
+      "group": 1,
+      "type": "email",
+      "flags": [
+        "IGNORECASE"
+      ],
+      "pattern": "(?i)(?<![A-Z0-9._%+-])((?:[A-Z0-9._%+-]+)\\(?@(?:[A-Z0-9-]+(?:\\.[A-Z0-9-]+)*\\.[A-Z]{2,63}))(?![A-Z0-9._%+-])",
+      "many": true
     },
     "telephone": {
       "rule_id": "CMN_PHONE_01",
-      "pattern": "(?:tel|telephone|phone)\\s*[:\\-]?\\s*([+\\(]?\\d[\\d\\-\\s\\(\\)]{6,}\\d)",
+      "pattern": "(?<!\\d)(\\+213[ -]\\d{2}[ -]\\d{7}|\\d{3}[ -]\\d{3}[ -]\\d{4}|\\d[ -]\\d{3}[ -]\\d{3}[ -]\\d{4})(?!\\d)",
       "group": 1,
       "type": "phone",
-      "flags": ["IGNORECASE"]
+      "flags": [
+        "IGNORECASE"
+      ],
+      "many": true
     }
-
-
   }
 }

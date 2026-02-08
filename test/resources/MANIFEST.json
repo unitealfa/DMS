@@ -1,0 +1,24 @@
+{
+  "offline": true,
+  "cache_dir": "C:\\Users\\moura\\OneDrive\\Bureau\\DMS\\test\\resources\\_cache",
+  "generated": {
+    "gazetteers": {
+      "en": {
+        "PER": 1810,
+        "ORG": 1158,
+        "LOC": 135489
+      },
+      "fr": {
+        "PER": 256,
+        "ORG": 8,
+        "LOC": 135524
+      },
+      "ar": {
+        "PER": 0,
+        "ORG": 3,
+        "LOC": 135535
+      }
+    }
+  },
+  "wikidata_cache_used": false
+}

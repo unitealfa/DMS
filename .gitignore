@@ -1,0 +1,14 @@
+# Ignore large resource files and generated documents
+test/resources/
+test/documents/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python envs
+venv/
+env/
+
+# OS files
+Thumbs.db
+*.log

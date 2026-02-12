@@ -1,6 +1,6 @@
-# Ignore large resource files and generated documents
-test/resources/
-test/documents/
+# Ignore large generated documents by default (can be tracked with LFS)
+# test/resources/
+# test/documents/
 
 # Jupyter
 .ipynb_checkpoints/

@@ -10,3 +10,18 @@ elasticsearch==7.10.1
 pypdf
 requests
 openpyxl 
+
+
+
+import sys
+
+print("PYTHON:", sys.executable)
+
+# Installer dans EXACTEMENT ce Python
+!"{sys.executable}" -m pip install --upgrade pip
+!"{sys.executable}" -m pip install --upgrade camel-tools
+
+# Vérif
+!"{sys.executable}" -m pip show camel-tools
+
+

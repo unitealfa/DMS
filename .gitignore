@@ -8,7 +8,7 @@
 # Python envs
 venv/
 env/
-
+.venv/
 # OS files
 Thumbs.db
 *.log

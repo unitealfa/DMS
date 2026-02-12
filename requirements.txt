@@ -25,3 +25,31 @@ print("PYTHON:", sys.executable)
 !"{sys.executable}" -m pip show camel-tools
 
 
+
+
+
+py -3.11 -m pip install --upgrade --target .\.pylibs simplemma
+py -3.11 -m pip install --upgrade --target .\.pylibs torch transformers tokenizers
+
+
+
+simplemma
+
+cd C:\Users\moura\OneDrive\Bureau\DMS
+
+# 1) Crée le dossier local
+New-Item -ItemType Directory -Force .\.pylibs | Out-Null
+
+# 2) Désactive la config pip (sinon --user revient)
+$env:PIP_CONFIG_FILE="NUL"
+Remove-Item Env:PIP_USER -ErrorAction SilentlyContinue
+
+# 3) Installe dans .pylibs
+py -3.11 -m pip install --upgrade --target .\.pylibs simplemma
+py -3.11 -m pip install --upgrade --target .\.pylibs torch transformers tokenizers
+
+# 4) Test rapide (sans Jupyter)
+py -3.11 -c "import sys; sys.path.insert(0, r'.\.pylibs'); import simplemma; import transformers; import tokenizers; print('OK', simplemma.__version__, transformers.__version__, tokenizers.__version__)"
+
+# 5) Nettoyage env (optionnel)
+Remove-Item Env:PIP_CONFIG_FILE -ErrorAction SilentlyContinue

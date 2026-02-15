@@ -211,11 +211,11 @@ def tokenize_with_spans(text: str) -> List[Tok]:
 # 4) POS heuristique FR
 # ============================================================
 DET = {
-    "le","la","les","un","une","des","du","de","au","aux","ce","cet","cette","ces",
+    "le","la","les","un","une","des","du","au","aux","ce","cet","cette","ces",
     "mon","ma","mes","ton","ta","tes","son","sa","ses","notre","nos","votre","vos","leur","leurs"
 }
 PREP = {
-    "à","a","de","dans","en","sur","sous","chez","vers","avec","sans","pour","par","entre","contre",
+    "à","de","dans","en","sur","sous","chez","vers","avec","sans","pour","par","entre","contre",
     "selon","depuis","pendant","outre","via"
 }
 CONJ = {"et","ou","mais","donc","or","ni","car","que"}
@@ -223,8 +223,8 @@ PRON = {
     "je","tu","il","elle","on","nous","vous","ils","elles",
     "me","te","se","lui","leur","y","en","ce","ça","cela","qui","quoi","dont","où"
 }
-PART = {"ne","pas","plus","jamais","rien","aucun","aucune","non"}
-ADV = {"très","trop","bien","mal","ici","là","hier","aujourd'hui","aujourd’hui","demain","souvent","parfois","déjà","encore"}
+PART = {"ne","pas","jamais","rien","aucun","aucune","non"}  # "plus" géré par contexte
+ADV = {"très","trop","bien","mal","ici","là","hier","aujourd'hui","aujourd’hui","demain","souvent","parfois","déjà","encore","moins","davantage","ainsi"}
 
 CLITIC_POS_LEMMA = {
     "d'": ("IN",  "de"),
@@ -252,6 +252,32 @@ AUX_FORMS = {
 
 NEG_MARKERS = {"ne","n'","pas","plus","jamais"}
 
+# Formes verbales fréquentes (irrégu/présent) pour éviter NN par défaut (ex: "veut", "peut", etc.)
+COMMON_VERB_FORMS = {
+    # vouloir
+    "veux","veut","voulons","voulez","veulent",
+    # pouvoir
+    "peux","peut","pouvons","pouvez","peuvent",
+    # devoir
+    "dois","doit","devons","devez","doivent",
+    # faire
+    "fais","fait","faisons","faites","font",
+    # dire
+    "dis","dit","disons","dites","disent",
+    # aller (en plus d'IRREG_VERB)
+    "vais","vas","va","allons","allez","vont",
+    # venir
+    "viens","vient","venons","venez","viennent",
+    # savoir / voir
+    "sais","sait","savons","savez","savent",
+    "vois","voit","voyons","voyez","voient",
+    # prendre / mettre
+    "prends","prend","prenons","prenez","prennent",
+    "mets","met","mettons","mettez","mettent",
+    # écrire (utile pour ton exemple)
+    "écris","écrit","écrivons","écrivez","écrivent",
+}
+
 def guess_pos(token: str, prev_tok: Optional[str], next_tok: Optional[str], prev_pos: Optional[str]) -> str:
     t = token or ""
     tn = _norm_apo(t)
@@ -272,6 +298,16 @@ def guess_pos(token: str, prev_tok: Optional[str], next_tok: Optional[str], prev
             if n2 in AUX_FORMS:
                 return "PRP"
         return CLITIC_POS_LEMMA[tl][0]
+
+    # Gestion contextuelle de "plus" (négation vs comparatif)
+    if tl == "plus":
+        if prev_tok and _norm_apo(prev_tok).lower() in {"ne","n'","n’"}:
+            return "RP"
+        return "RB"
+
+    # Auxiliaires et verbes fréquents (AVANT PREP/DET pour éviter "a" -> IN)
+    if tl in AUX_FORMS or tl in COMMON_VERB_FORMS:
+        return "VB"
 
     if tl in DET:
         return "DT"
@@ -573,35 +609,64 @@ def ner_rules_spans(text: str, toks: List[Tok]) -> List[Tuple[int,int,str]]:
 # ============================================================
 def improve_pos_with_ner(toks: List[Tok], pos: List[str], labels: List[str]) -> List[str]:
     """
-    1) Si token est dans entité PERS/ORG/LOC/MISC => POS=NNP
-    2) Si token est dans entité DATE => POS=CD si numérique, sinon NNP (mois/jour)
-    3) Lexique intra-phrase: si un token alphabetique apparait en entité,
-       on force aussi NNP quand il réapparait avec label O.
+    Amélioration POS globale (sans "tout passer en NNP"):
+
+    - On force NNP uniquement pour les tokens plausibles comme "noms propres / identifiants"
+      (capitalisés, acronymes, traits d'union, alphanum).
+    - On NE force PAS NNP pour les mots-outils (de, des, et, la, etc.) même s'ils sont dans une entité
+      (ex: "Université des Sciences..." où "des"/"et"/"de" doivent rester DT/CC/IN).
+    - DATE: CD si numérique, sinon NNP (mois/jour).
+    - Lexique intra-phrase: on propage seulement les tokens "plausibles NNP".
     """
     out = pos[:]
 
-    # lexique intra-phrase (surface lower) venant du NER
+    def _tok_lower(i: int) -> str:
+        return _norm_apo(toks[i].text).lower()
+
+    def _is_function_word(tl: str) -> bool:
+        # mots-outils qu'on ne veut jamais forcer en NNP
+        return (tl in DET) or (tl in PREP) or (tl in CONJ) or (tl in PRON) or (tl in PART) or (tl in CLITIC_POS_LEMMA)
+
+    def _looks_like_proper(i: int) -> bool:
+        t = toks[i].text
+        tl = _tok_lower(i)
+        if not _has_letters(t):
+            return False
+        if _is_function_word(tl):
+            return False
+        if _is_capitalized_word(t) or _is_acronym(t) or _is_hyphenated_word(t):
+            return True
+        # alphanum / identifiants (A-9981, 550e..., etc.)
+        if re.search(r"\d", t) and re.search(r"[A-Za-zÀ-ÖØ-öø-ÿ]", t):
+            return True
+        return False
+
+    # lexique intra-phrase (surface lower) venant du NER, mais filtré
     ent_lex = set()
     for i, lab in enumerate(labels):
         if lab == "O":
             continue
         typ = lab[2:] if len(lab) > 2 and lab[1] == "-" else lab
         if typ in ("PERS","ORG","LOC","MISC"):
-            if _has_letters(toks[i].text):
-                ent_lex.add(_norm_apo(toks[i].text).lower())
+            if _looks_like_proper(i):
+                ent_lex.add(_tok_lower(i))
 
     for i, lab in enumerate(labels):
         t = toks[i].text
+        tl = _tok_lower(i)
+
         if lab == "O":
-            # re-application via lexique
-            tl = _norm_apo(t).lower()
-            if tl in ent_lex and _has_letters(t):
+            # re-application via lexique (filtrée)
+            if tl in ent_lex and _looks_like_proper(i):
                 out[i] = "NNP"
             continue
 
         typ = lab[2:] if lab[1] == "-" else lab
         if typ in ("PERS","ORG","LOC","MISC"):
-            out[i] = "NNP"
+            # on ne force NNP que si ça ressemble vraiment à un nom propre/identifiant
+            if _looks_like_proper(i):
+                out[i] = "NNP"
+            # sinon on garde le POS initial (DT/IN/CC/etc.)
         elif typ == "DATE":
             if _is_number(t):
                 out[i] = "CD"

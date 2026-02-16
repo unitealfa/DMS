@@ -96,7 +96,12 @@ class Tok:
     hint_pos: Optional[str] = None
     hint_lemma: Optional[str] = None
 
-PUNCT_RE = re.compile(r"""^[“”"‘’'()\[\]{}…,:;.!?]$""")
+# === PONCTUATION ET SYMBOLES: TOUJOURS tag PUNCT + lemma ∅ ===
+# Standard: . , ; : ! ? ( ) [ ] { } < > " '
+# Guillemets: " ' " '
+# Tirets: — – -
+# Symboles: … @ / \ | & = + * ^ ~ ` %
+PUNCT_RE = re.compile(r"^[\"\"\"'''()\[\]{}…,:;.!?@/|&=+*^~`%\\\-–—]$")
 
 def _is_punct(t: str) -> bool:
     return bool(PUNCT_RE.match(t))

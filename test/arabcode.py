@@ -60,7 +60,13 @@ AR_BASE = r"\u0621-\u063A\u0641-\u064A\u066E-\u066F\u0671-\u06D3\u06FA-\u06FC"
 AR_DIAC = r"\u064B-\u065F\u0670\u0640"  # harakat + shadda + superscript alef + tatweel
 AR_WORD = rf"(?:[{AR_BASE}][{AR_DIAC}]*)+"
 
-PUNCT_SET = set(list(".,;:!?()[]{}<>\"'“”‘’«»…—–-")) | {"،", "؛", "؟", "٪", "%", "ـ", "/", "\\", "|", "@", "…"}
+# === PONCTUATION ET SYMBOLES: TOUJOURS tag PUNCT + lemma ∅ ===
+# Standard: . , ; : ! ? ( ) [ ] { } < > " '
+# Guillemets: " ' " ' « »
+# Tirets: — – -
+# Arabe: ، ؛ ؟ ٪
+# Symboles: @ / \ | … ـ % & = + * ^ ~ `
+PUNCT_SET = set(list(".,;:!?()[]{}<>\"'""''«»…—–-")) | {"،", "؛", "؟", "٪", "%", "ـ", "/", "\\", "|", "@", "…", "&", "=", "+", "*", "^", "~", "`"}
 TOKEN_RE = re.compile(rf"({AR_WORD}|[0-9]+|[A-Za-z]+(?:['’\-][A-Za-z]+)*|[^\s])", re.UNICODE)
 
 def simple_tokenize(text: str) -> List[str]:

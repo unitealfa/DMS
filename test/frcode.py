@@ -67,8 +67,13 @@ NUMBER_RE   = r"""\b\d+(?:[.,]\d+)?\b"""
 BASE_WORD = r"[A-Za-zÀ-ÖØ-öø-ÿ]+"
 ACRONYM   = r"[A-Z]{2,10}"
 WORD = rf"{BASE_WORD}(?:(?:[’']{BASE_WORD})|(?:-(?:{BASE_WORD}|{ACRONYM})))*"
-
-PUNCT_RE = r"""[“”"«»()\[\]{}…,:;.!?¿¡]"""
+# === PONCTUATION ET SYMBOLES: TOUJOURS tag PUNCT + lemma ∅ ===
+# Standard: . , ; : ! ? ( ) [ ] { } < > " ' ¿ ¡
+# Guillemets: « »
+# Tirets: — – -
+# Symboles: … @ / \ | & = + * ^ ~ ` %
+# Spéciaux: • ·
+PUNCT_RE = "[\"\"\"«»()\\[\\]{}…,:;.!?¿¡@/|&=+*^~`%\\\\\\-–—•·]"
 DASH_RE  = r"""[–—-]"""
 BULLET_RE = r"""[•·]"""
 

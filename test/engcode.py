@@ -744,13 +744,8 @@ def split_input_into_sentences(s: str) -> List[str]:
     if not s:
         return []
 
-    dq = re.findall(r"\"([^\"]+)\"", s)
-    gu = re.findall(r"«([^»]+)»", s)
-    parts = [p.strip() for p in (dq + gu) if p.strip()]
-    if parts:
-        return parts
-
-    parts = re.split(r"(?<=[\.\!\?])\s+", s)
+    # Split sur les points, points d'exclamation, points d'interrogation uniquement
+    parts = re.split(r"[\.\!\?]+", s)
     return [p.strip() for p in parts if p.strip()]
 
 # ----------------------------

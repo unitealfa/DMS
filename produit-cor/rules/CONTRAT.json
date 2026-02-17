@@ -1,0 +1,46 @@
+{
+  "ruleset_id": "CONTRAT_V1",
+  "extractors": {
+
+
+    "contract_number": {
+      "rule_id": "CTR_NUM_01",
+      "pattern": "(?i)(contract\\s*(no\\.|#)|contrat\\s*(n\\u00b0|no\\.|#))\\s*[:\\-]?\\s*([A-Z0-9\\-]+)",
+      "group": 4,
+      "type": "text",
+      "flags": ["IGNORECASE"]
+    },
+    "contract_date": {
+      "rule_id": "CTR_DATE_01",
+      "pattern": "(?i)(date|dated|date\\s+du\\s+contrat)\\s*[:\\-]?\\s*(\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})",
+      "group": 2,
+      "type": "date",
+      "flags": ["IGNORECASE"]
+    },
+    "effective_date": {
+      "rule_id": "CTR_DATE_EFF_01",
+      "pattern": "(?i)(effective\\s+date|date\\s+d['\\\"]?effet|date\\s+d['\\\"]?entree\\s+en\\s+vigueur)\\s*[:\\-]?\\s*(\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})",
+      "group": 2,
+      "type": "date",
+      "flags": ["IGNORECASE"]
+    },
+    "party_supplier": {
+      "rule_id": "CTR_PARTY_01",
+      "pattern": "(?i)(supplier|fournisseur)\\s*[:\\-]?\\s*(.+)",
+      "group": 2,
+      "type": "text",
+      "flags": ["IGNORECASE", "MULTILINE"],
+      "surface": "lines"
+    },
+    "contract_object": {
+      "rule_id": "CTR_OBJ_01",
+      "pattern": "(?i)(objet\\s+du\\s+contrat|purpose\\s+of\\s+the\\s+agreement)\\s*[:\\-]?\\s*(.+)",
+      "group": 2,
+      "type": "text",
+      "flags": ["IGNORECASE", "MULTILINE"],
+      "surface": "lines"
+    }
+
+    
+  }
+}

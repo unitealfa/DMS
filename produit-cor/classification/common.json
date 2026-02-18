@@ -1,0 +1,16 @@
+{
+  "doc_type": "COMMON",
+  "version": "v1",
+  "weights": {
+    "strong": 5,
+    "medium": 2,
+    "weak": 1
+  },
+  "global_penalties": {
+    "negative": -2,
+    "strong_negative": -5
+  },
+  "threshold": 6,
+  "margin": 3,
+  "tie_breaker": "priority"
+}

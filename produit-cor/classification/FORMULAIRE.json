@@ -1,0 +1,29 @@
+{
+  "doc_type": "FORMULAIRE",
+  "version": "v1",
+  "priority": 40,
+  "keywords": {
+    "strong": [
+      "FORMULAIRE",
+      "FORM",
+      "TO BE COMPLETED",
+      "PLEASE FILL"
+    ],
+    "medium": [
+      "CHECKBOX",
+      "SIGNATURE",
+      "DATE",
+      "FIELD"
+    ],
+    "weak": [
+      "NOM",
+      "PRENOM",
+      "ADDRESS"
+    ],
+    "negative": [
+      "INVOICE",
+      "PURCHASE ORDER",
+      "CONTRAT"
+    ]
+  }
+}

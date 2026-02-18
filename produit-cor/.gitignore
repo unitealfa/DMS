@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+
+# Byte-compiled / optimized
+*.pyc
+*.pyo
+
+# Editor directories and files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs and outputs
+*.log
+outputgeneralterminal.txt
+
+# Documents / temporary files
+~$*
+.~lock*
+
+# Compiled binaries and objects
+*.exe
+*.dll
+*.so
+*.dylib
+*.o
+*.obj
+*.lib
+main.exe
+
+# OneDrive
+OneDriveTemp/
+
+# Cache / databases
+*.sqlite3
+*.db
+
+
+
+codex.txt.txt

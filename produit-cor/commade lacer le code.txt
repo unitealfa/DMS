@@ -1,0 +1,40 @@
+structurer tout les info des document dasn une sortie json
+
+
+
+
+1. Étape 1 seule (prétraitement)
+
+  python orchestre.py --upto pretraitement-de-docs "documents/testword.docx, documents/
+  testexcel.xlsx, documents/signettab.png, documents/image2tab.webp, documents/francais.docx, documents/arab.docx, test/
+  documents/englais.docx, documents/testexcel.xlsx"
+
+  2. Étapes 1‑2
+
+  python orchestre.py --upto si-image-pretraiter-sinonpass-le-doc "documents/
+  testword.docx, documents/testexcel.xlsx, documents/signettab.png, documents/image2tab.webp, documents/francais.docx,
+  documents/arab.docx, test/documents/englais.docx, documents/testexcel.xlsx"
+
+  3. Étapes 1‑3
+
+  python orchestre.py --upto output-txt "documents/testword.docx, documents/
+  testexcel.xlsx, documents/signettab.png, documents/image2tab.webp, documents/francais.docx, documents/arab.docx, test/
+  documents/englais.docx, documents/testexcel.xlsx"
+
+  4. Étapes 1‑4
+
+  python orchestre.py --upto tokenisation-layout "documents/testword.docx, documents/
+  testexcel.xlsx, documents/signettab.png, documents/image2tab.webp, documents/francais.docx, documents/arab.docx, test/
+  documents/englais.docx, documents/testexcel.xlsx"
+
+  5. Étapes 1‑5
+
+  python orchestre.py --upto atripusion-gramatical-en-utilisant-les3ficherla "documents/
+  testword.docx, documents/testexcel.xlsx, documents/signettab.png, documents/image2tab.webp, documents/francais.docx,
+  documents/arab.docx, test/documents/englais.docx, documents/testexcel.xlsx"
+
+  6. Étapes 1‑6 (pipeline complet)
+
+  python orchestre.py --upto clasification "documents/testword.docx, documents/
+  testexcel.xlsx, documents/signettab.png, documents/image2tab.webp, documents/francais.docx, documents/arab.docx, test/
+  documents/englais.docx, documents/testexcel.xlsx"

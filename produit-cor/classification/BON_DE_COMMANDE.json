@@ -1,0 +1,31 @@
+{
+  "doc_type": "BON_DE_COMMANDE",
+  "version": "v1",
+  "priority": 70,
+  "keywords": {
+    "strong": [
+      "BON DE COMMANDE",
+      "PURCHASE ORDER",
+      "PO NUMBER",
+      "PO #",
+      "ORDER DATE"
+    ],
+    "medium": [
+      "BILL TO",
+      "SHIP TO",
+      "LINE ITEMS",
+      "ORDERED BY",
+      "DELIVERY DATE"
+    ],
+    "weak": [
+      "QUANTITY",
+      "UNIT PRICE",
+      "TOTAL"
+    ],
+    "negative": [
+      "CONTRAT",
+      "AGREEMENT",
+      "THIS CONTRACT"
+    ]
+  }
+}

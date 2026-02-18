@@ -1,0 +1,27 @@
+{
+  "doc_type": "ARTICLE",
+  "version": "v1",
+  "priority": 10,
+  "keywords": {
+    "strong": [
+      "ARTICLE",
+      "LINE ITEM",
+      "ITEM"
+    ],
+    "medium": [
+      "REFERENCE",
+      "DESCRIPTION",
+      "QUANTITY",
+      "UNIT PRICE"
+    ],
+    "weak": [
+      "TOTAL",
+      "AMOUNT"
+    ],
+    "negative": [
+      "CONTRAT",
+      "INVOICE",
+      "PURCHASE ORDER"
+    ]
+  }
+}

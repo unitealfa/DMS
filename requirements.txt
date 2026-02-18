@@ -51,5 +51,3 @@ py -3.11 -m pip install --upgrade --target .\.pylibs torch transformers tokenize
 # 4) Test rapide (sans Jupyter)
 py -3.11 -c "import sys; sys.path.insert(0, r'.\.pylibs'); import simplemma; import transformers; import tokenizers; print('OK', simplemma.__version__, transformers.__version__, tokenizers.__version__)"
 
-# 5) Nettoyage env (optionnel)
-Remove-Item Env:PIP_CONFIG_FILE -ErrorAction SilentlyContinue

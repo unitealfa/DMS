@@ -5,6 +5,7 @@ from typing import Any, List, Optional
 
 from .components import (
     ClassificationComponent,
+    RuleExtractionComponent,
     GrammarComponent,
     OCRPreprocessComponent,
     OutputTxtComponent,
@@ -24,6 +25,7 @@ class PipelineOrchestrator:
             TokenisationLayoutComponent("tokenisation-layout", COMPONENT_DIR / "tokenisation-layout.py"),
             GrammarComponent("atripusion-gramatical-en-utilisant-les3ficherla", COMPONENT_DIR / "atrribution-gramatical" / "atripusion-gramatical-en-utilisant-les3ficherla.py"),
             ClassificationComponent("clasification", COMPONENT_DIR / "clasification.py"),
+            RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction-regles.py"),
         ]
 
     def list_steps(self) -> List[str]:

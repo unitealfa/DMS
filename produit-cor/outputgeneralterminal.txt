@@ -1,0 +1,1699 @@
+[Component: pretraitement-de-docs]
+Type: list
+Summary: 1 fichiers | text=1 | image=0
+Output: [{'content': 'text',
+  'ext': '.docx',
+  'label': 'Word document (DOCX)',
+  'mime': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'path': 'documents/test-regex3langue.docx'}]
+
+[skip] content='text' -> C:\Users\moura\OneDrive\Bureau\produit-cor\documents\test-regex3langue.docx
+[info] Aucun fichier à OCR (image_only). Tout ce que tu as donné est détecté comme 'text'.
+[Component: si-image-pretraiter-sinonpass-le-doc]
+Type: dict
+Summary: text=1, image=0, docs_prepped=1
+Output: {'DOCS': [{'filename': 'test-regex3langue.docx',
+           'page_count_total': 0,
+           'pages': [],
+           'source_files': ['C:\\Users\\moura\\OneDrive\\Bureau\\produit-cor\\documents\\test-regex3langue.docx']}],
+ 'IMAGE_ONLY_FILES': [],
+ 'TEXT_FILES': ['C:\\Users\\moura\\OneDrive\\Bureau\\produit-cor\\documents\\test-regex3langue.docx']}
+
+[doc] test-regex3langue.docx | content=image_only | extraction=ocr:tesseract | pages=1
+
+------------------------------------------------------------------------------------------------------------------------
+
+[doc] test-regex3langue.docx | content=text | extraction=native:docx:xml | pages=1
+[page 1/1]
+1. Adresses E-mail
+L'objectif est d'éliminer les formats qui n'ont pas de domaine valide ou qui contiennent des caractères interdits.
+Valides :
+test.user@gmail.com
+support123@entreprise.dz
+jean-pierre.durand@service-public.fr
+Pièges (À NE PAS EXTRAIRE) :
+@gmail.com (Pas d'utilisateur)
+user@nomdedomaine (Pas d'extension .com/.fr...)
+mon..email@test.com (Deux points consécutifs sont interdits)
+email@test@test.com (Deux symboles @)
+"email"@example.com (Parfois valide mais souvent considéré comme un piège en Regex simple)
+
+2. Numéros de téléphone (Format Algérie)
+L'objectif est de vérifier la longueur et l'indicatif.
+Valides :
+0550123456 (Mobile Ooredoo)
++213 661 00 11 22 (International)
+00213 770 99 88 77 (Format long)
+Pièges (À NE PAS EXTRAIRE) :
+055012345 (Trop court, 9 chiffres)
+05501234567 (Trop long, 11 chiffres)
+1234567890 (Ne commence ni par 0 ni par +213)
+05-50-AZ-34-56 (Contient des lettres)
+
+3. URLs (Liens Web)
+L'objectif est de distinguer un lien d'un simple nom de fichier ou d'un texte.
+Valides :
+https://www.google.com
+http://dz-express.com
+www.monsite.dz
+Pièges (À NE PAS EXTRAIRE) :
+http:// (Vide)
+ww.monsite.com (Seulement deux 'w')
+image.png (C'est un fichier, pas une URL complète)
+https://espace..vide.com (Double point dans l'URL)
+
+4. Dates
+L'objectif est de gérer les séparateurs et les limites (ex: pas de mois 13).
+Valides :
+12/05/2023
+01-01-2024
+31/12/1999
+Pièges (À NE PAS EXTRAIRE) :
+32/01/2023 (Le jour 32 n'existe pas)
+15/13/2022 (Le mois 13 n'existe pas)
+1/1/24 (Souvent rejeté si on cherche le format DD/MM/YYYY)
+2023/12/12 (Format inversé, si ta Regex cherche le format FR)
+
+5. Devises (DZD, EUR, USD)
+L'objectif est d'extraire le montant ET le code monétaire.
+Valides :
+1500.50 DZD
+250 EUR
+10$ USD
+Pièges (À NE PAS EXTRAIRE) :
+1500 DZD4 (Chiffre collé au code)
+EUR (Code seul sans montant)
+1.2.3 USD (Format de nombre invalide)
+------------------------------------------------------------------------------------------------------------------------
+
+[Component: output-txt]
+Type: list
+Summary: 2 docs | pages=2
+Output: [{'content': 'image_only',
+  'doc_id': None,
+  'extraction': 'ocr:tesseract',
+  'filename': 'test-regex3langue.docx',
+  'page_count_total': 1,
+  'pages_text': [],
+  'text': ''},
+ {'content': 'text',
+  'doc_id': '32ac25cb-c410-459e-a882-57ac65c0c8e9',
+  'extraction': 'native:docx:xml',
+  'filename': 'test-regex3langue.docx',
+  'page_count_total': 1,
+  'pages_text': ['1. Adresses E-mail\n'
+                 "L'objectif est d'éliminer les formats qui n'ont pas de domaine valide ou qui "
+                 'contiennent des caractères interdits.\n'
+                 'Valides :\n'
+                 'test.user@gmail.com\n'
+                 'support123@entreprise.dz\n'
+                 'jean-pierre.durand@service-public.fr\n'
+                 'Pièges (À NE PAS EXTRAIRE) :\n'
+                 "@gmail.com\xa0(Pas d'utilisateur)\n"
+                 "user@nomdedomaine\xa0(Pas d'extension .com/.fr...)\n"
+                 'mon..email@test.com\xa0(Deux points consécutifs sont interdits)\n'
+                 'email@test@test.com\xa0(Deux symboles @)\n'
+                 '"email"@example.com\xa0(Parfois valide mais souvent considéré comme un piège en '
+                 'Regex simple)\n'
+                 '\n'
+                 '2. Numéros de téléphone (Format Algérie)\n'
+                 "L'objectif est de vérifier la longueur et l'indicatif.\n"
+                 'Valides :\n'
+                 '0550123456\xa0(Mobile Ooredoo)\n'
+                 '+213 661 00 11 22\xa0(International)\n'
+                 '00213 770 99 88 77\xa0(Format long)\n'
+                 'Pièges (À NE PAS EXTRAIRE) :\n'
+                 '055012345\xa0(Trop court, 9 chiffres)\n'
+                 '05501234567\xa0(Trop long, 11 chiffres)\n'
+                 '1234567890\xa0(Ne commence ni par 0 ni par +213)\n'
+                 '05-50-AZ-34-56\xa0(Contient des lettres)\n'
+                 '\n'
+                 '3. URLs (Liens Web)\n'
+                 "L'objectif est de distinguer un lien d'un simple nom de fichier ou d'un texte.\n"
+                 'Valides :\n'
+                 'https://www.google.com\n'
+                 'http://dz-express.com\n'
+                 'www.monsite.dz\n'
+                 'Pièges (À NE PAS EXTRAIRE) :\n'
+                 'http://\xa0(Vide)\n'
+                 "ww.monsite.com\xa0(Seulement deux 'w')\n"
+                 "image.png\xa0(C'est un fichier, pas une URL complète)\n"
+                 "https://espace..vide.com\xa0(Double point dans l'URL)\n"
+                 '\n'
+                 '4. Dates\n'
+                 "L'objectif est de gérer les séparateurs et les limites (ex: pas de mois 13).\n"
+                 'Valides :\n'
+                 '12/05/2023\n'
+                 '01-01-2024\n'
+                 '31/12/1999\n'
+                 'Pièges (À NE PAS EXTRAIRE) :\n'
+                 "32/01/2023\xa0(Le jour 32 n'existe pas)\n"
+                 "15/13/2022\xa0(Le mois 13 n'existe pas)\n"
+                 '1/1/24\xa0(Souvent rejeté si on cherche le format\xa0DD/MM/YYYY)\n'
+                 '2023/12/12\xa0(Format inversé, si ta Regex cherche le format FR)\n'
+                 '\n'
+                 '5. Devises (DZD, EUR, USD)\n'
+                 "L'objectif est d'extraire le montant ET le code monétaire.\n"
+                 'Valides :\n'
+                 '1500.50 DZD\n'
+                 '250 EUR\n'
+                 '10$ USD\n'
+                 'Pièges (À NE PAS EXTRAIRE) :\n'
+                 '1500 DZD4\xa0(Chiffre collé au code)\n'
+                 'EUR\xa0(Code seul sans montant)\n'
+                 '1.2.3 USD\xa0(Format de nombre invalide)\n'],
+  'text': '1. Adresses E-mail\n'
+          "L'objectif est d'éliminer les formats qui n'ont pas de domaine valide ou qui "
+          'contiennent des caractères interdits.\n'
+          'Valides :\n'
+          'test.user@gmail.com\n'
+          'support123@entreprise.dz\n'
+          'jean-pierre.durand@service-public.fr\n'
+          'Pièges (À NE PAS EXTRAIRE) :\n'
+          "@gmail.com\xa0(Pas d'utilisateur)\n"
+          "user@nomdedomaine\xa0(Pas d'extension .com/.fr...)\n"
+          'mon..email@test.com\xa0(Deux points consécutifs sont interdits)\n'
+          'email@test@test.com\xa0(Deux symboles @)\n'
+          '"email"@example.com\xa0(Parfois valide mais souvent considéré comme un piège en Regex '
+          'simple)\n'
+          '\n'
+          '2. Numéros de téléphone (Format Algérie)\n'
+          "L'objectif est de vérifier la longueur et l'indicatif.\n"
+          'Valides :\n'
+          '0550123456\xa0(Mobile Ooredoo)\n'
+          '+213 661 00 11 22\xa0(International)\n'
+          '00213 770 99 88 77\xa0(Format long)\n'
+          'Pièges (À NE PAS EXTRAIRE) :\n'
+          '055012345\xa0(Trop court, 9 chiffres)\n'
+          '05501234567\xa0(Trop long, 11 chiffres)\n'
+          '1234567890\xa0(Ne commence ni par 0 ni par +213)\n'
+          '05-50-AZ-34-56\xa0(Contient des lettres)\n'
+          '\n'
+          '3. URLs (Liens Web)\n'
+          "L'objectif est de distinguer un lien d'un simple nom de fichier ou d'un texte.\n"
+          'Valides :\n'
+          'https://www.google.com\n'
+          'http://dz-express.com\n'
+          'www.monsite.dz\n'
+          'Pièges (À NE PAS EXTRAIRE) :\n'
+          'http://\xa0(Vide)\n'
+          "ww.monsite.com\xa0(Seulement deux 'w')\n"
+          "image.png\xa0(C'est un fichier, pas une URL complète)\n"
+          "https://espace..vide.com\xa0(Double point dans l'URL)\n"
+          '\n'
+          '4. Dates\n'
+          "L'objectif est de gérer les séparateurs et les limites (ex: pas de mois 13).\n"
+          'Valides :\n'
+          '12/05/2023\n'
+          '01-01-2024\n'
+          '31/12/1999\n'
+          'Pièges (À NE PAS EXTRAIRE) :\n'
+          "32/01/2023\xa0(Le jour 32 n'existe pas)\n"
+          "15/13/2022\xa0(Le mois 13 n'existe pas)\n"
+          '1/1/24\xa0(Souvent rejeté si on cherche le format\xa0DD/MM/YYYY)\n'
+          '2023/12/12\xa0(Format inversé, si ta Regex cherche le format FR)\n'
+          '\n'
+          '5. Devises (DZD, EUR, USD)\n'
+          "L'objectif est d'extraire le montant ET le code monétaire.\n"
+          'Valides :\n'
+          '1500.50 DZD\n'
+          '250 EUR\n'
+          '10$ USD\n'
+          'Pièges (À NE PAS EXTRAIRE) :\n'
+          '1500 DZD4\xa0(Chiffre collé au code)\n'
+          'EUR\xa0(Code seul sans montant)\n'
+          '1.2.3 USD\xa0(Format de nombre invalide)\n'}]
+
+========================================================================================================================
+[doc] test-regex3langue.docx
+  doc_id       : None
+  content      : image_only
+  extraction   : ocr:tesseract
+  pages_total  : 0
+  chars_total  : 0
+  recompose_ok : True
+  paths:
+    - (unknown)
+------------------------------------------------------------------------------------------------------------------------
+========================================================================================================================
+[doc] test-regex3langue.docx
+  doc_id       : 32ac25cb-c410-459e-a882-57ac65c0c8e9
+  content      : text
+  extraction   : native:docx:xml
+  pages_total  : 1
+  chars_total  : 1872
+  recompose_ok : False
+  paths:
+    - C:\Users\moura\OneDrive\Bureau\produit-cor\documents\test-regex3langue.docx
+------------------------------------------------------------------------------------------------------------------------
+[page 1/1] source_path=C:\Users\moura\OneDrive\Bureau\produit-cor\documents\test-regex3langue.docx
+  lang         : fr
+  chars        : 1872
+------------------------------------------------------------------------------------------------------------------------
+  sentences_layout: 9 chunks total | sentences=9 | noise=0 | showing 9/9 (filter_is_sentence=True, fallback=False, min_nonspace=12)
+------------------------------------------------------------------------------------------------------------------------
+[sent 1/9] page=1 start=0 end=525 line=1 col=0 chars=525 nonspace=464 is_noise=False is_sentence=True layout=plain
+1. Adresses E-mail
+L'objectif est d'éliminer les formats qui n'ont pas de domaine valide ou qui contiennent des caractères interdits.
+Valides :
+test.user@gmail.com
+support123@entreprise.dz
+jean-pierre.durand@service-public.fr
+Pièges (À NE PAS EXTRAIRE) :
+@gmail.com (Pas d'utilisateur)
+user@nomdedomaine (Pas d'extension .com/.fr...)
+mon..email@test.com (Deux points consécutifs sont interdits)
+email@test@test.com (Deux symboles @)
+"email"@example.com (Parfois valide mais souvent considéré comme un piège en Regex simple)
+
+--------------------------------------------------------------------------------
+[sent 2/9] page=1 start=525 end=912 line=14 col=0 chars=387 nonspace=325 is_noise=False is_sentence=True layout=plain
+2. Numéros de téléphone (Format Algérie)
+L'objectif est de vérifier la longueur et l'indicatif.
+Valides :
+0550123456 (Mobile Ooredoo)
++213 661 00 11 22 (International)
+00213 770 99 88 77 (Format long)
+Pièges (À NE PAS EXTRAIRE) :
+055012345 (Trop court, 9 chiffres)
+05501234567 (Trop long, 11 chiffres)
+1234567890 (Ne commence ni par 0 ni par +213)
+05-50-AZ-34-56 (Contient des lettres)
+
+--------------------------------------------------------------------------------
+[sent 3/9] page=1 start=912 end=1264 line=26 col=0 chars=352 nonspace=303 is_noise=False is_sentence=True layout=plain
+3. URLs (Liens Web)
+L'objectif est de distinguer un lien d'un simple nom de fichier ou d'un texte.
+Valides :
+https://www.google.com
+http://dz-express.com
+www.monsite.dz
+Pièges (À NE PAS EXTRAIRE) :
+http:// (Vide)
+ww.monsite.com (Seulement deux 'w')
+image.png (C'est un fichier, pas une URL complète)
+https://espace..vide.com (Double point dans l'URL)
+
+--------------------------------------------------------------------------------
+[sent 4/9] page=1 start=1264 end=1618 line=38 col=0 chars=354 nonspace=295 is_noise=False is_sentence=True layout=plain
+4. Dates
+L'objectif est de gérer les séparateurs et les limites (ex: pas de mois 13).
+Valides :
+12/05/2023
+01-01-2024
+31/12/1999
+Pièges (À NE PAS EXTRAIRE) :
+32/01/2023 (Le jour 32 n'existe pas)
+15/13/2022 (Le mois 13 n'existe pas)
+1/1/24 (Souvent rejeté si on cherche le format DD/MM/YYYY)
+2023/12/12 (Format inversé, si ta Regex cherche le format FR)
+
+--------------------------------------------------------------------------------
+[sent 5/9] page=1 start=1618 end=1645 line=50 col=0 chars=27 nonspace=22 is_noise=False is_sentence=True layout=plain
+5. Devises (DZD, EUR, USD)
+--------------------------------------------------------------------------------
+[sent 6/9] page=1 start=1645 end=1704 line=51 col=0 chars=59 nonspace=50 is_noise=False is_sentence=True layout=table
+L'objectif est d'extraire le montant ET le code monétaire.
+--------------------------------------------------------------------------------
+[sent 7/9] page=1 start=1704 end=1805 line=52 col=0 chars=101 nonspace=81 is_noise=False is_sentence=True layout=plain
+Valides :
+1500.50 DZD
+250 EUR
+10$ USD
+Pièges (À NE PAS EXTRAIRE) :
+1500 DZD4 (Chiffre collé au code)
+--------------------------------------------------------------------------------
+[sent 8/9] page=1 start=1805 end=1834 line=58 col=0 chars=29 nonspace=24 is_noise=False is_sentence=True layout=table
+EUR (Code seul sans montant)
+--------------------------------------------------------------------------------
+[sent 9/9] page=1 start=1834 end=1872 line=59 col=0 chars=38 nonspace=32 is_noise=False is_sentence=True layout=plain
+1.2.3 USD (Format de nombre invalide)
+--------------------------------------------------------------------------------
+
+[Component: tokenisation-layout]
+Type: list
+Summary: 2 docs | sentences=9
+Output: [{'chars_total': 0,
+  'content': 'image_only',
+  'doc_id': None,
+  'extraction': 'ocr:tesseract',
+  'filename': 'test-regex3langue.docx',
+  'page_count_total': 0,
+  'pages': [],
+  'paths': [],
+  'recompose_ok': True},
+ {'chars_total': 1872,
+  'content': 'text',
+  'doc_id': '32ac25cb-c410-459e-a882-57ac65c0c8e9',
+  'extraction': 'native:docx:xml',
+  'filename': 'test-regex3langue.docx',
+  'page_count_total': 1,
+  'pages': [{'chars': 1872,
+             'lang': 'fr',
+             'page_index': 1,
+             'page_text': '1. Adresses E-mail\n'
+                          "L'objectif est d'éliminer les formats qui n'ont pas de domaine valide "
+                          'ou qui contiennent des caractères interdits.\n'
+                          'Valides :\n'
+                          'test.user@gmail.com\n'
+                          'support123@entreprise.dz\n'
+                          'jean-pierre.durand@service-public.fr\n'
+                          'Pièges (À NE PAS EXTRAIRE) :\n'
+                          "@gmail.com\xa0(Pas d'utilisateur)\n"
+                          "user@nomdedomaine\xa0(Pas d'extension .com/.fr...)\n"
+                          'mon..email@test.com\xa0(Deux points consécutifs sont interdits)\n'
+                          'email@test@test.com\xa0(Deux symboles @)\n'
+                          '"email"@example.com\xa0(Parfois valide mais souvent considéré comme un '
+                          'piège en Regex simple)\n'
+                          '\n'
+                          '2. Numéros de téléphone (Format Algérie)\n'
+                          "L'objectif est de vérifier la longueur et l'indicatif.\n"
+                          'Valides :\n'
+                          '0550123456\xa0(Mobile Ooredoo)\n'
+                          '+213 661 00 11 22\xa0(International)\n'
+                          '00213 770 99 88 77\xa0(Format long)\n'
+                          'Pièges (À NE PAS EXTRAIRE) :\n'
+                          '055012345\xa0(Trop court, 9 chiffres)\n'
+                          '05501234567\xa0(Trop long, 11 chiffres)\n'
+                          '1234567890\xa0(Ne commence ni par 0 ni par +213)\n'
+                          '05-50-AZ-34-56\xa0(Contient des lettres)\n'
+                          '\n'
+                          '3. URLs (Liens Web)\n'
+                          "L'objectif est de distinguer un lien d'un simple nom de fichier ou d'un "
+                          'texte.\n'
+                          'Valides :\n'
+                          'https://www.google.com\n'
+                          'http://dz-express.com\n'
+                          'www.monsite.dz\n'
+                          'Pièges (À NE PAS EXTRAIRE) :\n'
+                          'http://\xa0(Vide)\n'
+                          "ww.monsite.com\xa0(Seulement deux 'w')\n"
+                          "image.png\xa0(C'est un fichier, pas une URL complète)\n"
+                          "https://espace..vide.com\xa0(Double point dans l'URL)\n"
+                          '\n'
+                          '4. Dates\n'
+                          "L'objectif est de gérer les séparateurs et les limites (ex: pas de mois "
+                          '13).\n'
+                          'Valides :\n'
+                          '12/05/2023\n'
+                          '01-01-2024\n'
+                          '31/12/1999\n'
+                          'Pièges (À NE PAS EXTRAIRE) :\n'
+                          "32/01/2023\xa0(Le jour 32 n'existe pas)\n"
+                          "15/13/2022\xa0(Le mois 13 n'existe pas)\n"
+                          '1/1/24\xa0(Souvent rejeté si on cherche le format\xa0DD/MM/YYYY)\n'
+                          '2023/12/12\xa0(Format inversé, si ta Regex cherche le format FR)\n'
+                          '\n'
+                          '5. Devises (DZD, EUR, USD)\n'
+                          "L'objectif est d'extraire le montant ET le code monétaire.\n"
+                          'Valides :\n'
+                          '1500.50 DZD\n'
+                          '250 EUR\n'
+                          '10$ USD\n'
+                          'Pièges (À NE PAS EXTRAIRE) :\n'
+                          '1500 DZD4\xa0(Chiffre collé au code)\n'
+                          'EUR\xa0(Code seul sans montant)\n'
+                          '1.2.3 USD\xa0(Format de nombre invalide)\n',
+             'recompose_ok': False,
+             'sentences_layout': [{'chars': 525,
+                                   'col': 0,
+                                   'col_index': None,
+                                   'end': 525,
+                                   'header_cells': None,
+                                   'header_rows': None,
+                                   'header_source': None,
+                                   'is_noise': False,
+                                   'is_sentence': True,
+                                   'layout_kind': 'plain',
+                                   'line': 1,
+                                   'nonspace': 464,
+                                   'spans': [(0, 525)],
+                                   'start': 0,
+                                   'table_rows': None,
+                                   'text': '1. Adresses E-mail\n'
+                                           "L'objectif est d'éliminer les formats qui n'ont pas de "
+                                           'domaine valide ou qui contiennent des caractères '
+                                           'interdits.\n'
+                                           'Valides :\n'
+                                           'test.user@gmail.com\n'
+                                           'support123@entreprise.dz\n'
+                                           'jean-pierre.durand@service-public.fr\n'
+                                           'Pièges (À NE PAS EXTRAIRE) :\n'
+                                           "@gmail.com\xa0(Pas d'utilisateur)\n"
+                                           "user@nomdedomaine\xa0(Pas d'extension .com/.fr...)\n"
+                                           'mon..email@test.com\xa0(Deux points consécutifs sont '
+                                           'interdits)\n'
+                                           'email@test@test.com\xa0(Deux symboles @)\n'
+                                           '"email"@example.com\xa0(Parfois valide mais souvent '
+                                           'considéré comme un piège en Regex simple)\n'
+                                           '\n'},
+                                  {'chars': 387,
+                                   'col': 0,
+                                   'col_index': None,
+                                   'end': 912,
+                                   'header_cells': None,
+                                   'header_rows': None,
+                                   'header_source': None,
+                                   'is_noise': False,
+                                   'is_sentence': True,
+                                   'layout_kind': 'plain',
+                                   'line': 14,
+                                   'nonspace': 325,
+                                   'spans': [(525, 912)],
+                                   'start': 525,
+                                   'table_rows': None,
+                                   'text': '2. Numéros de téléphone (Format Algérie)\n'
+                                           "L'objectif est de vérifier la longueur et "
+                                           "l'indicatif.\n"
+                                           'Valides :\n'
+                                           '0550123456\xa0(Mobile Ooredoo)\n'
+                                           '+213 661 00 11 22\xa0(International)\n'
+                                           '00213 770 99 88 77\xa0(Format long)\n'
+                                           'Pièges (À NE PAS EXTRAIRE) :\n'
+                                           '055012345\xa0(Trop court, 9 chiffres)\n'
+                                           '05501234567\xa0(Trop long, 11 chiffres)\n'
+                                           '1234567890\xa0(Ne commence ni par 0 ni par +213)\n'
+                                           '05-50-AZ-34-56\xa0(Contient des lettres)\n'
+                                           '\n'},
+                                  {'chars': 352,
+                                   'col': 0,
+                                   'col_index': None,
+                                   'end': 1264,
+                                   'header_cells': None,
+                                   'header_rows': None,
+                                   'header_source': None,
+                                   'is_noise': False,
+                                   'is_sentence': True,
+                                   'layout_kind': 'plain',
+                                   'line': 26,
+                                   'nonspace': 303,
+                                   'spans': [(912, 1264)],
+                                   'start': 912,
+                                   'table_rows': None,
+                                   'text': '3. URLs (Liens Web)\n'
+                                           "L'objectif est de distinguer un lien d'un simple nom "
+                                           "de fichier ou d'un texte.\n"
+                                           'Valides :\n'
+                                           'https://www.google.com\n'
+                                           'http://dz-express.com\n'
+                                           'www.monsite.dz\n'
+                                           'Pièges (À NE PAS EXTRAIRE) :\n'
+                                           'http://\xa0(Vide)\n'
+                                           "ww.monsite.com\xa0(Seulement deux 'w')\n"
+                                           "image.png\xa0(C'est un fichier, pas une URL complète)\n"
+                                           "https://espace..vide.com\xa0(Double point dans l'URL)\n"
+                                           '\n'},
+                                  {'chars': 354,
+                                   'col': 0,
+                                   'col_index': None,
+                                   'end': 1618,
+                                   'header_cells': None,
+                                   'header_rows': None,
+                                   'header_source': None,
+                                   'is_noise': False,
+                                   'is_sentence': True,
+                                   'layout_kind': 'plain',
+                                   'line': 38,
+                                   'nonspace': 295,
+                                   'spans': [(1264, 1618)],
+                                   'start': 1264,
+                                   'table_rows': None,
+                                   'text': '4. Dates\n'
+                                           "L'objectif est de gérer les séparateurs et les limites "
+                                           '(ex: pas de mois 13).\n'
+                                           'Valides :\n'
+                                           '12/05/2023\n'
+                                           '01-01-2024\n'
+                                           '31/12/1999\n'
+                                           'Pièges (À NE PAS EXTRAIRE) :\n'
+                                           "32/01/2023\xa0(Le jour 32 n'existe pas)\n"
+                                           "15/13/2022\xa0(Le mois 13 n'existe pas)\n"
+                                           '1/1/24\xa0(Souvent rejeté si on cherche le format\xa0'
+                                           'DD/MM/YYYY)\n'
+                                           '2023/12/12\xa0(Format inversé, si ta Regex cherche le '
+                                           'format FR)\n'
+                                           '\n'},
+                                  {'chars': 27,
+                                   'col': 0,
+                                   'col_index': None,
+                                   'end': 1645,
+                                   'header_cells': None,
+                                   'header_rows': None,
+                                   'header_source': None,
+                                   'is_noise': False,
+                                   'is_sentence': True,
+                                   'layout_kind': 'plain',
+                                   'line': 50,
+                                   'nonspace': 22,
+                                   'spans': [(1618, 1645)],
+                                   'start': 1618,
+                                   'table_rows': None,
+                                   'text': '5. Devises (DZD, EUR, USD)\n'},
+                                  {'chars': 59,
+                                   'col': 0,
+                                   'col_index': None,
+                                   'end': 1704,
+                                   'header_cells': None,
+                                   'header_rows': [{'spans': [(1645, 1704)],
+                                                    'text': "L'objectif est d'extraire le montant "
+                                                            'ET le code monétaire.\n'}],
+                                   'header_source': None,
+                                   'is_noise': False,
+                                   'is_sentence': True,
+                                   'layout_kind': 'table',
+                                   'line': 51,
+                                   'nonspace': 50,
+                                   'spans': [(1645, 1704)],
+                                   'start': 1645,
+                                   'table_rows': [{'spans': [(1645, 1704)],
+                                                   'text': "L'objectif est d'extraire le montant "
+                                                           'ET le code monétaire.\n'}],
+                                   'text': "L'objectif est d'extraire le montant ET le code "
+                                           'monétaire.\n'},
+                                  {'chars': 101,
+                                   'col': 0,
+                                   'col_index': None,
+                                   'end': 1805,
+                                   'header_cells': None,
+                                   'header_rows': None,
+                                   'header_source': None,
+                                   'is_noise': False,
+                                   'is_sentence': True,
+                                   'layout_kind': 'plain',
+                                   'line': 52,
+                                   'nonspace': 81,
+                                   'spans': [(1704, 1805)],
+                                   'start': 1704,
+                                   'table_rows': None,
+                                   'text': 'Valides :\n'
+                                           '1500.50 DZD\n'
+                                           '250 EUR\n'
+                                           '10$ USD\n'
+                                           'Pièges (À NE PAS EXTRAIRE) :\n'
+                                           '1500 DZD4\xa0(Chiffre collé au code)\n'},
+                                  {'chars': 29,
+                                   'col': 0,
+                                   'col_index': None,
+                                   'end': 1834,
+                                   'header_cells': None,
+                                   'header_rows': [{'spans': [(1805, 1834)],
+                                                    'text': 'EUR\xa0(Code seul sans montant)\n'}],
+                                   'header_source': None,
+                                   'is_noise': False,
+                                   'is_sentence': True,
+                                   'layout_kind': 'table',
+                                   'line': 58,
+                                   'nonspace': 24,
+                                   'spans': [(1805, 1834)],
+                                   'start': 1805,
+                                   'table_rows': [{'spans': [(1805, 1834)],
+                                                   'text': 'EUR\xa0(Code seul sans montant)\n'}],
+                                   'text': 'EUR\xa0(Code seul sans montant)\n'},
+                                  {'chars': 38,
+                                   'col': 0,
+                                   'col_index': None,
+                                   'end': 1872,
+                                   'header_cells': None,
+                                   'header_rows': None,
+                                   'header_source': None,
+                                   'is_noise': False,
+                                   'is_sentence': True,
+                                   'layout_kind': 'plain',
+                                   'line': 59,
+                                   'nonspace': 32,
+                                   'spans': [(1834, 1872)],
+                                   'start': 1834,
+                                   'table_rows': None,
+                                   'text': '1.2.3 USD\xa0(Format de nombre invalide)\n'}],
+             'source_path': 'C:\\Users\\moura\\OneDrive\\Bureau\\produit-cor\\documents\\test-regex3langue.docx'}],
+  'paths': ['C:\\Users\\moura\\OneDrive\\Bureau\\produit-cor\\documents\\test-regex3langue.docx'],
+  'recompose_ok': False}]
+
+Python kernel: C:\Users\moura\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe
+Local deps dir: (absent)
+Python kernel: C:\Users\moura\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe
+Local deps dir: (absent)
+Python: C:\Users\moura\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe
+Local deps: (absent)
+Type an Arabic sentence (empty line to stop). You can paste ONE sentence or MANY quoted sentences.
+Python kernel: C:\Users\moura\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe
+Local deps dir: (absent)
+Python kernel: C:\Users\moura\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe
+Local deps dir: (absent)
+Python: C:\Users\moura\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe
+Local deps: (absent)
+Type an Arabic sentence (empty line to stop). You can paste ONE sentence or MANY quoted sentences.
+
+========================================================================================================================
+RUN EN (engcode.py)
+========================================================================================================================
+
+========================================================================================================================
+RUN FR (frcode.py)
+========================================================================================================================
+
+##########################################################################################
+DOC=test-regex3langue.docx | page=1 | sent=0 | lang=fr
+##########################################################################################
+==========================================================================================
+INPUT: 1. Adresses E-mail
+L'objectif est d'éliminer les formats qui n'ont pas de domaine valide ou qui contiennent des caractères interdits.
+Valides :
+test.user@gmail.com
+support123@entreprise.dz
+jean-pierre.durand@service-public.fr
+Pièges (À NE PAS EXTRAIRE) :
+@gmail.com (Pas d'utilisateur)
+user@nomdedomaine (Pas d'extension .com/.fr...)
+mon..email@test.com (Deux points consécutifs sont interdits)
+email@test@test.com (Deux symboles @)
+"email"@example.com (Parfois valide mais souvent considéré comme un piège en Regex simple)
+                               1  CD      lemma=1
+                               .  PUNCT   lemma=∅
+                        Adresses  NNP     lemma=adresse
+                          E-mail  NNP     lemma=E-mail
+                              L'  DT      lemma=le
+                        objectif  JJ      lemma=objectif
+                             est  VB      lemma=être
+                              d'  IN      lemma=de
+                        éliminer  VB      lemma=éliminer
+                             les  DT      lemma=le
+                         formats  NN      lemma=format
+                             qui  PRP     lemma=qui
+                              n'  RP      lemma=ne
+                             ont  VB      lemma=avoir
+                             pas  RP      lemma=pas
+                              de  IN      lemma=de
+                         domaine  NN      lemma=domaine
+                          valide  NN      lemma=valide
+                              ou  CC      lemma=ou
+                             qui  PRP     lemma=qui
+                     contiennent  VB      lemma=contenir
+                             des  DT      lemma=un
+                      caractères  NN      lemma=caractère
+                       interdits  NN      lemma=interdit
+                               .  PUNCT   lemma=∅
+                         Valides  NNP     lemma=valider
+                               :  PUNCT   lemma=∅
+             test.user@gmail.com  NNP     lemma=test.user@gmail.com
+        support123@entreprise.dz  NNP     lemma=support123@entreprise.dz
+jean-pierre.durand@service-public.fr  NNP     lemma=jean-pierre.durand@service-public.fr
+                          Pièges  NNP     lemma=piège
+                               (  PUNCT   lemma=∅
+                               À  IN      lemma=à
+                              NE  RP      lemma=ne
+                             PAS  RP      lemma=PAS
+                        EXTRAIRE  NNP     lemma=extraire
+                               )  PUNCT   lemma=∅
+                               :  PUNCT   lemma=∅
+                               @  PUNCT   lemma=∅
+                           gmail  NN      lemma=gmail
+                               .  PUNCT   lemma=∅
+                             com  NN      lemma=com
+                               (  PUNCT   lemma=∅
+                             Pas  RP      lemma=Pas
+                              d'  IN      lemma=de
+                     utilisateur  NN      lemma=utilisateur
+                               )  PUNCT   lemma=∅
+                            user  VB      lemma=user
+                               @  PUNCT   lemma=∅
+                    nomdedomaine  NN      lemma=nomdedomaine
+                               (  PUNCT   lemma=∅
+                             Pas  RP      lemma=Pas
+                              d'  IN      lemma=de
+                       extension  NN      lemma=extension
+                               .  PUNCT   lemma=∅
+                             com  NN      lemma=com
+                               /  PUNCT   lemma=∅
+                               .  PUNCT   lemma=∅
+                              fr  NN      lemma=fr
+                               .  PUNCT   lemma=∅
+                               .  PUNCT   lemma=∅
+                               .  PUNCT   lemma=∅
+                               )  PUNCT   lemma=∅
+             mon..email@test.com  NNP     lemma=mon..email@test.com
+                               (  PUNCT   lemma=∅
+                            Deux  NNP     lemma=deux
+                          points  NN      lemma=point
+                     consécutifs  NN      lemma=consécutif
+                            sont  VB      lemma=être
+                       interdits  NN      lemma=interdit
+                               )  PUNCT   lemma=∅
+                           email  NN      lemma=email
+                               @  PUNCT   lemma=∅
+                   test@test.com  NNP     lemma=test@test.com
+                               (  PUNCT   lemma=∅
+                            Deux  NNP     lemma=deux
+                        symboles  NN      lemma=symbole
+                               @  PUNCT   lemma=∅
+                               )  PUNCT   lemma=∅
+                               "  PUNCT   lemma=∅
+                           email  NN      lemma=email
+                               "  PUNCT   lemma=∅
+                               @  PUNCT   lemma=∅
+                         example  NN      lemma=example
+                               .  PUNCT   lemma=∅
+                             com  NN      lemma=com
+                               (  PUNCT   lemma=∅
+                         Parfois  RB      lemma=Parfois
+                          valide  NN      lemma=valide
+                            mais  CC      lemma=mais
+                         souvent  RB      lemma=souvent
+                       considéré  NN      lemma=considérer
+                           comme  NN      lemma=comme
+                              un  DT      lemma=un
+                           piège  NN      lemma=piège
+                              en  IN      lemma=en
+                           Regex  NNP     lemma=Regex
+                          simple  NN      lemma=simple
+                               )  PUNCT   lemma=∅
+
+NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
+[('1', 'O'), ('.', 'O'), ('Adresses', 'O'), ('E-mail', 'O'), ("L'", 'O'), ('objectif', 'O'), ('est', 'O'), ("d'", 'O'), ('éliminer', 'O'), ('les', 'O'), ('formats', 'O'), ('qui', 'O'), ("n'", 'O'), ('ont', 'O'), ('pas', 'O'), ('de', 'O'), ('domaine', 'O'), ('valide', 'O'), ('ou', 'O'), ('qui', 'O'), ('contiennent', 'O'), ('des', 'O'), ('caractères', 'O'), ('interdits', 'O'), ('.', 'O'), ('Valides', 'O'), (':', 'O'), ('test.user@gmail.com', 'O'), ('support123@entreprise.dz', 'O'), ('jean-pierre.durand@service-public.fr', 'O'), ('Pièges', 'O'), ('(', 'O'), ('À', 'O'), ('NE', 'B-LOC'), ('PAS', 'I-LOC'), ('EXTRAIRE', 'I-LOC'), (')', 'O'), (':', 'O'), ('@', 'O'), ('gmail', 'O'), ('.', 'O'), ('com', 'O'), ('(', 'O'), ('Pas', 'O'), ("d'", 'O'), ('utilisateur', 'O'), (')', 'O'), ('user', 'O'), ('@', 'O'), ('nomdedomaine', 'O'), ('(', 'O'), ('Pas', 'O'), ("d'", 'O'), ('extension', 'O'), ('.', 'O'), ('com', 'O'), ('/', 'O'), ('.', 'O'), ('fr', 'O'), ('.', 'O'), ('.', 'O'), ('.', 'O'), (')', 'O'), ('mon..email@test.com', 'O'), ('(', 'O'), ('Deux', 'O'), ('points', 'O'), ('consécutifs', 'O'), ('sont', 'O'), ('interdits', 'O'), (')', 'O'), ('email', 'O'), ('@', 'O'), ('test@test.com', 'O'), ('(', 'O'), ('Deux', 'O'), ('symboles', 'O'), ('@', 'O'), (')', 'O'), ('"', 'O'), ('email', 'O'), ('"', 'O'), ('@', 'O'), ('example', 'O'), ('.', 'O'), ('com', 'O'), ('(', 'O'), ('Parfois', 'O'), ('valide', 'O'), ('mais', 'O'), ('souvent', 'O'), ('considéré', 'O'), ('comme', 'O'), ('un', 'O'), ('piège', 'O'), ('en', 'O'), ('Regex', 'B-LOC'), ('simple', 'O'), (')', 'O')]
+Entities:
+  LOC: NE PAS EXTRAIRE
+  LOC: Regex
+
+##########################################################################################
+DOC=test-regex3langue.docx | page=1 | sent=1 | lang=fr
+##########################################################################################
+==========================================================================================
+INPUT: 2. Numéros de téléphone (Format Algérie)
+L'objectif est de vérifier la longueur et l'indicatif.
+Valides :
+0550123456 (Mobile Ooredoo)
++213 661 00 11 22 (International)
+00213 770 99 88 77 (Format long)
+Pièges (À NE PAS EXTRAIRE) :
+055012345 (Trop court, 9 chiffres)
+05501234567 (Trop long, 11 chiffres)
+1234567890 (Ne commence ni par 0 ni par +213)
+05-50-AZ-34-56 (Contient des lettres)
+            2  CD      lemma=2
+            .  PUNCT   lemma=∅
+      Numéros  NNP     lemma=numéro
+           de  IN      lemma=de
+    téléphone  NN      lemma=téléphoner
+            (  PUNCT   lemma=∅
+       Format  NNP     lemma=format
+      Algérie  NNP     lemma=Algérie
+            )  PUNCT   lemma=∅
+           L'  DT      lemma=le
+     objectif  JJ      lemma=objectif
+          est  VB      lemma=être
+           de  IN      lemma=de
+     vérifier  VB      lemma=vérifier
+           la  DT      lemma=le
+     longueur  NN      lemma=longueur
+           et  CC      lemma=et
+           l'  DT      lemma=le
+    indicatif  JJ      lemma=indicatif
+            .  PUNCT   lemma=∅
+      Valides  NNP     lemma=valider
+            :  PUNCT   lemma=∅
+   0550123456  CD      lemma=0550123456
+            (  PUNCT   lemma=∅
+       Mobile  NNP     lemma=mobile
+      Ooredoo  NNP     lemma=Ooredoo
+            )  PUNCT   lemma=∅
+            +  PUNCT   lemma=∅
+          213  CD      lemma=213
+          661  CD      lemma=661
+           00  CD      lemma=00
+           11  CD      lemma=11
+           22  CD      lemma=22
+            (  PUNCT   lemma=∅
+International  NNP     lemma=international
+            )  PUNCT   lemma=∅
+        00213  CD      lemma=00213
+          770  CD      lemma=770
+           99  CD      lemma=99
+           88  CD      lemma=88
+           77  CD      lemma=77
+            (  PUNCT   lemma=∅
+       Format  NNP     lemma=format
+         long  NN      lemma=long
+            )  PUNCT   lemma=∅
+       Pièges  NNP     lemma=piège
+            (  PUNCT   lemma=∅
+            À  IN      lemma=à
+           NE  RP      lemma=ne
+          PAS  RP      lemma=PAS
+     EXTRAIRE  NNP     lemma=extraire
+            )  PUNCT   lemma=∅
+            :  PUNCT   lemma=∅
+    055012345  CD      lemma=055012345
+            (  PUNCT   lemma=∅
+         Trop  RB      lemma=Trop
+        court  NN      lemma=court
+            ,  PUNCT   lemma=∅
+            9  CD      lemma=9
+     chiffres  NN      lemma=chiffre
+            )  PUNCT   lemma=∅
+  05501234567  CD      lemma=05501234567
+            (  PUNCT   lemma=∅
+         Trop  RB      lemma=Trop
+         long  NN      lemma=long
+            ,  PUNCT   lemma=∅
+           11  CD      lemma=11
+     chiffres  NN      lemma=chiffre
+            )  PUNCT   lemma=∅
+   1234567890  CD      lemma=1234567890
+            (  PUNCT   lemma=∅
+           Ne  RP      lemma=ne
+     commence  VB      lemma=commencer
+           ni  CC      lemma=ni
+          par  IN      lemma=par
+            0  CD      lemma=0
+           ni  CC      lemma=ni
+          par  IN      lemma=par
+            +  PUNCT   lemma=∅
+          213  CD      lemma=213
+            )  PUNCT   lemma=∅
+           05  CD      lemma=05
+            -  PUNCT   lemma=∅
+           50  CD      lemma=50
+            -  PUNCT   lemma=∅
+     AZ-34-56  NNP     lemma=AZ-34-56
+            (  PUNCT   lemma=∅
+     Contient  NNP     lemma=contenir
+          des  DT      lemma=un
+      lettres  NN      lemma=lettre
+            )  PUNCT   lemma=∅
+
+NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
+[('2', 'O'), ('.', 'O'), ('Numéros', 'O'), ('de', 'O'), ('téléphone', 'O'), ('(', 'O'), ('Format', 'O'), ('Algérie', 'B-LOC'), (')', 'O'), ("L'", 'O'), ('objectif', 'O'), ('est', 'O'), ('de', 'O'), ('vérifier', 'O'), ('la', 'O'), ('longueur', 'O'), ('et', 'O'), ("l'", 'O'), ('indicatif', 'O'), ('.', 'O'), ('Valides', 'O'), (':', 'O'), ('0550123456', 'O'), ('(', 'O'), ('Mobile', 'O'), ('Ooredoo', 'O'), (')', 'O'), ('+', 'O'), ('213', 'O'), ('661', 'O'), ('00', 'O'), ('11', 'O'), ('22', 'O'), ('(', 'O'), ('International', 'O'), (')', 'O'), ('00213', 'O'), ('770', 'O'), ('99', 'O'), ('88', 'O'), ('77', 'O'), ('(', 'O'), ('Format', 'O'), ('long', 'O'), (')', 'O'), ('Pièges', 'O'), ('(', 'O'), ('À', 'O'), ('NE', 'O'), ('PAS', 'O'), ('EXTRAIRE', 'O'), (')', 'O'), (':', 'O'), ('055012345', 'O'), ('(', 'O'), ('Trop', 'O'), ('court', 'O'), (',', 'O'), ('9', 'O'), ('chiffres', 'O'), (')', 'O'), ('05501234567', 'O'), ('(', 'O'), ('Trop', 'O'), ('long', 'O'), (',', 'O'), ('11', 'O'), ('chiffres', 'O'), (')', 'O'), ('1234567890', 'O'), ('(', 'O'), ('Ne', 'O'), ('commence', 'O'), ('ni', 'O'), ('par', 'O'), ('0', 'O'), ('ni', 'O'), ('par', 'O'), ('+', 'O'), ('213', 'O'), (')', 'O'), ('05', 'O'), ('-', 'O'), ('50', 'O'), ('-', 'O'), ('AZ-34-56', 'O'), ('(', 'O'), ('Contient', 'O'), ('des', 'O'), ('lettres', 'O'), (')', 'O')]
+Entities:
+  LOC: Algérie
+
+##########################################################################################
+DOC=test-regex3langue.docx | page=1 | sent=2 | lang=fr
+##########################################################################################
+==========================================================================================
+INPUT: 3. URLs (Liens Web)
+L'objectif est de distinguer un lien d'un simple nom de fichier ou d'un texte.
+Valides :
+https://www.google.com
+http://dz-express.com
+www.monsite.dz
+Pièges (À NE PAS EXTRAIRE) :
+http:// (Vide)
+ww.monsite.com (Seulement deux 'w')
+image.png (C'est un fichier, pas une URL complète)
+https://espace..vide.com (Double point dans l'URL)
+                       3  CD      lemma=3
+                       .  PUNCT   lemma=∅
+                    URLs  NNP     lemma=URLs
+                       (  PUNCT   lemma=∅
+                   Liens  NNP     lemma=lien
+                     Web  NNP     lemma=Web
+                       )  PUNCT   lemma=∅
+                      L'  DT      lemma=le
+                objectif  JJ      lemma=objectif
+                     est  VB      lemma=être
+                      de  IN      lemma=de
+              distinguer  VB      lemma=distinguer
+                      un  DT      lemma=un
+                    lien  JJ      lemma=lien
+                      d'  IN      lemma=de
+                      un  DT      lemma=un
+                  simple  NN      lemma=simple
+                     nom  NN      lemma=nom
+                      de  IN      lemma=de
+                 fichier  VB      lemma=fichier
+                      ou  CC      lemma=ou
+                      d'  IN      lemma=de
+                      un  DT      lemma=un
+                   texte  NN      lemma=texte
+                       .  PUNCT   lemma=∅
+                 Valides  NNP     lemma=valider
+                       :  PUNCT   lemma=∅
+  https://www.google.com  NNP     lemma=https://www.google.com
+   http://dz-express.com  NNP     lemma=http://dz-express.com
+          www.monsite.dz  NNP     lemma=www.monsite.dz
+                  Pièges  NNP     lemma=piège
+                       (  PUNCT   lemma=∅
+                       À  IN      lemma=à
+                      NE  RP      lemma=ne
+                     PAS  RP      lemma=PAS
+                EXTRAIRE  NNP     lemma=extraire
+                       )  PUNCT   lemma=∅
+                       :  PUNCT   lemma=∅
+                    http  NN      lemma=http
+                       :  PUNCT   lemma=∅
+                       /  PUNCT   lemma=∅
+                       /  PUNCT   lemma=∅
+                       (  PUNCT   lemma=∅
+                    Vide  NNP     lemma=vide
+                       )  PUNCT   lemma=∅
+                      ww  NN      lemma=ww
+                       .  PUNCT   lemma=∅
+                 monsite  NN      lemma=monsite
+                       .  PUNCT   lemma=∅
+                     com  NN      lemma=com
+                       (  PUNCT   lemma=∅
+               Seulement  RB      lemma=Seulement
+                    deux  JJ      lemma=deux
+                       '  NN      lemma='
+                       w  NN      lemma=w
+                       '  NN      lemma='
+                       )  PUNCT   lemma=∅
+                   image  NN      lemma=image
+                       .  PUNCT   lemma=∅
+                     png  NN      lemma=png
+                       (  PUNCT   lemma=∅
+                      C'  PRP     lemma=ce
+                     est  VB      lemma=être
+                      un  DT      lemma=un
+                 fichier  VB      lemma=fichier
+                       ,  PUNCT   lemma=∅
+                     pas  RP      lemma=pas
+                     une  DT      lemma=un
+                     URL  NNP     lemma=URL
+                complète  NN      lemma=complet
+                       )  PUNCT   lemma=∅
+https://espace..vide.com  NNP     lemma=https://espace..vide.com
+                       (  PUNCT   lemma=∅
+                  Double  NNP     lemma=double
+                   point  NN      lemma=point
+                    dans  IN      lemma=dans
+                      l'  DT      lemma=le
+                     URL  NNP     lemma=URL
+                       )  PUNCT   lemma=∅
+
+NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
+[('3', 'O'), ('.', 'O'), ('URLs', 'O'), ('(', 'O'), ('Liens', 'O'), ('Web', 'O'), (')', 'O'), ("L'", 'O'), ('objectif', 'O'), ('est', 'O'), ('de', 'O'), ('distinguer', 'O'), ('un', 'O'), ('lien', 'O'), ("d'", 'O'), ('un', 'O'), ('simple', 'O'), ('nom', 'O'), ('de', 'O'), ('fichier', 'O'), ('ou', 'O'), ("d'", 'O'), ('un', 'O'), ('texte', 'O'), ('.', 'O'), ('Valides', 'O'), (':', 'O'), ('https://www.google.com', 'O'), ('http://dz-express.com', 'O'), ('www.monsite.dz', 'O'), ('Pièges', 'O'), ('(', 'O'), ('À', 'O'), ('NE', 'B-LOC'), ('PAS', 'I-LOC'), ('EXTRAIRE', 'I-LOC'), (')', 'O'), (':', 'O'), ('http', 'O'), (':', 'O'), ('/', 'O'), ('/', 'O'), ('(', 'O'), ('Vide', 'O'), (')', 'O'), ('ww', 'O'), ('.', 'O'), ('monsite', 'O'), ('.', 'O'), ('com', 'O'), ('(', 'O'), ('Seulement', 'O'), ('deux', 'O'), ("'", 'O'), ('w', 'O'), ("'", 'O'), (')', 'O'), ('image', 'O'), ('.', 'O'), ('png', 'O'), ('(', 'O'), ("C'", 'O'), ('est', 'O'), ('un', 'O'), ('fichier', 'O'), (',', 'O'), ('pas', 'O'), ('une', 'O'), ('URL', 'O'), ('complète', 'O'), (')', 'O'), ('https://espace..vide.com', 'O'), ('(', 'O'), ('Double', 'O'), ('point', 'O'), ('dans', 'O'), ("l'", 'O'), ('URL', 'O'), (')', 'O')]
+Entities:
+  LOC: NE PAS EXTRAIRE
+
+##########################################################################################
+DOC=test-regex3langue.docx | page=1 | sent=3 | lang=fr
+##########################################################################################
+==========================================================================================
+INPUT: 4. Dates
+L'objectif est de gérer les séparateurs et les limites (ex: pas de mois 13).
+Valides :
+12/05/2023
+01-01-2024
+31/12/1999
+Pièges (À NE PAS EXTRAIRE) :
+32/01/2023 (Le jour 32 n'existe pas)
+15/13/2022 (Le mois 13 n'existe pas)
+1/1/24 (Souvent rejeté si on cherche le format DD/MM/YYYY)
+2023/12/12 (Format inversé, si ta Regex cherche le format FR)
+          4  CD      lemma=4
+          .  PUNCT   lemma=∅
+      Dates  NNP     lemma=date
+         L'  DT      lemma=le
+   objectif  JJ      lemma=objectif
+        est  VB      lemma=être
+         de  IN      lemma=de
+      gérer  VB      lemma=gérer
+        les  DT      lemma=le
+séparateurs  NN      lemma=séparateurs
+         et  CC      lemma=et
+        les  DT      lemma=le
+    limites  NN      lemma=limite
+          (  PUNCT   lemma=∅
+         ex  NN      lemma=ex
+          :  PUNCT   lemma=∅
+        pas  RP      lemma=pas
+         de  IN      lemma=de
+       mois  NN      lemma=mois
+         13  CD      lemma=13
+          )  PUNCT   lemma=∅
+          .  PUNCT   lemma=∅
+    Valides  NNP     lemma=valider
+          :  PUNCT   lemma=∅
+ 12/05/2023  CD      lemma=12/05/2023
+ 01-01-2024  CD      lemma=01-01-2024
+ 31/12/1999  CD      lemma=31/12/1999
+     Pièges  NNP     lemma=piège
+          (  PUNCT   lemma=∅
+          À  IN      lemma=à
+         NE  RP      lemma=ne
+        PAS  RP      lemma=PAS
+   EXTRAIRE  NNP     lemma=extraire
+          )  PUNCT   lemma=∅
+          :  PUNCT   lemma=∅
+ 32/01/2023  CD      lemma=32/01/2023
+          (  PUNCT   lemma=∅
+         Le  DT      lemma=le
+       jour  NN      lemma=jour
+         32  CD      lemma=32
+         n'  RP      lemma=ne
+     existe  VB      lemma=exister
+        pas  RP      lemma=pas
+          )  PUNCT   lemma=∅
+ 15/13/2022  CD      lemma=15/13/2022
+          (  PUNCT   lemma=∅
+         Le  DT      lemma=le
+       mois  NN      lemma=mois
+         13  CD      lemma=13
+         n'  RP      lemma=ne
+     existe  VB      lemma=exister
+        pas  RP      lemma=pas
+          )  PUNCT   lemma=∅
+     1/1/24  CD      lemma=1/1/24
+          (  PUNCT   lemma=∅
+    Souvent  RB      lemma=Souvent
+     rejeté  NN      lemma=rejeté
+         si  NN      lemma=si
+         on  PRP     lemma=on
+    cherche  VB      lemma=cherche
+         le  DT      lemma=le
+     format  NN      lemma=format
+ DD/MM/YYYY  NNP     lemma=DD/MM/YYYY
+          )  PUNCT   lemma=∅
+       2023  CD      lemma=2023
+          /  PUNCT   lemma=∅
+         12  CD      lemma=12
+          /  PUNCT   lemma=∅
+         12  CD      lemma=12
+          (  PUNCT   lemma=∅
+     Format  NNP     lemma=format
+    inversé  NN      lemma=inverser
+          ,  PUNCT   lemma=∅
+         si  NN      lemma=si
+         ta  DT      lemma=ton
+      Regex  NNP     lemma=Regex
+    cherche  NN      lemma=cherche
+         le  DT      lemma=le
+     format  NN      lemma=format
+         FR  NNP     lemma=FR
+          )  PUNCT   lemma=∅
+
+NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
+[('4', 'O'), ('.', 'O'), ('Dates', 'O'), ("L'", 'O'), ('objectif', 'O'), ('est', 'O'), ('de', 'O'), ('gérer', 'O'), ('les', 'O'), ('séparateurs', 'O'), ('et', 'O'), ('les', 'O'), ('limites', 'O'), ('(', 'O'), ('ex', 'O'), (':', 'O'), ('pas', 'O'), ('de', 'O'), ('mois', 'O'), ('13', 'O'), (')', 'O'), ('.', 'O'), ('Valides', 'O'), (':', 'O'), ('12/05/2023', 'B-DATE'), ('01-01-2024', 'B-DATE'), ('31/12/1999', 'B-DATE'), ('Pièges', 'O'), ('(', 'O'), ('À', 'O'), ('NE', 'B-LOC'), ('PAS', 'I-LOC'), ('EXTRAIRE', 'I-LOC'), (')', 'O'), (':', 'O'), ('32/01/2023', 'B-DATE'), ('(', 'O'), ('Le', 'O'), ('jour', 'O'), ('32', 'O'), ("n'", 'O'), ('existe', 'O'), ('pas', 'O'), (')', 'O'), ('15/13/2022', 'B-DATE'), ('(', 'O'), ('Le', 'O'), ('mois', 'O'), ('13', 'O'), ("n'", 'O'), ('existe', 'O'), ('pas', 'O'), (')', 'O'), ('1/1/24', 'B-DATE'), ('(', 'O'), ('Souvent', 'O'), ('rejeté', 'O'), ('si', 'O'), ('on', 'O'), ('cherche', 'O'), ('le', 'O'), ('format', 'O'), ('DD/MM/YYYY', 'O'), (')', 'O'), ('2023', 'B-DATE'), ('/', 'O'), ('12', 'O'), ('/', 'O'), ('12', 'O'), ('(', 'O'), ('Format', 'O'), ('inversé', 'O'), (',', 'O'), ('si', 'O'), ('ta', 'O'), ('Regex', 'O'), ('cherche', 'O'), ('le', 'O'), ('format', 'O'), ('FR', 'O'), (')', 'O')]
+Entities:
+  DATE: 12/05/2023
+  DATE: 01-01-2024
+  DATE: 31/12/1999
+  DATE: 32/01/2023
+  DATE: 15/13/2022
+  DATE: 1/1/24
+  DATE: 2023
+  LOC: NE PAS EXTRAIRE
+
+##########################################################################################
+DOC=test-regex3langue.docx | page=1 | sent=4 | lang=fr
+##########################################################################################
+==========================================================================================
+INPUT: 5. Devises (DZD, EUR, USD)
+         5  CD      lemma=5
+         .  PUNCT   lemma=∅
+   Devises  NNP     lemma=devise
+         (  PUNCT   lemma=∅
+       DZD  NNP     lemma=DZD
+         ,  PUNCT   lemma=∅
+       EUR  NNP     lemma=EUR
+         ,  PUNCT   lemma=∅
+       USD  NNP     lemma=USD
+         )  PUNCT   lemma=∅
+
+NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
+[('5', 'O'), ('.', 'O'), ('Devises', 'O'), ('(', 'O'), ('DZD', 'O'), (',', 'O'), ('EUR', 'O'), (',', 'O'), ('USD', 'O'), (')', 'O')]
+Entities:
+
+##########################################################################################
+DOC=test-regex3langue.docx | page=1 | sent=5 | lang=fr
+##########################################################################################
+==========================================================================================
+INPUT: L'objectif est d'extraire le montant ET le code monétaire.
+        L'  DT      lemma=le
+  objectif  JJ      lemma=objectif
+       est  VB      lemma=être
+        d'  IN      lemma=de
+  extraire  VB      lemma=extraire
+        le  DT      lemma=le
+   montant  JJ      lemma=montant
+        ET  CC      lemma=et
+        le  DT      lemma=le
+      code  NN      lemma=code
+ monétaire  VB      lemma=monétaire
+         .  PUNCT   lemma=∅
+
+NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
+[("L'", 'O'), ('objectif', 'O'), ('est', 'O'), ("d'", 'O'), ('extraire', 'O'), ('le', 'O'), ('montant', 'O'), ('ET', 'O'), ('le', 'O'), ('code', 'O'), ('monétaire', 'O'), ('.', 'O')]
+Entities:
+
+##########################################################################################
+DOC=test-regex3langue.docx | page=1 | sent=6 | lang=fr
+##########################################################################################
+==========================================================================================
+INPUT: Valides :
+1500.50 DZD
+250 EUR
+10$ USD
+Pièges (À NE PAS EXTRAIRE) :
+1500 DZD4 (Chiffre collé au code)
+   Valides  NNP     lemma=valider
+         :  PUNCT   lemma=∅
+   1500.50  CD      lemma=1500.50
+       DZD  NNP     lemma=DZD
+       250  CD      lemma=250
+       EUR  NNP     lemma=EUR
+        10  CD      lemma=10
+         $  NN      lemma=$
+       USD  NNP     lemma=USD
+    Pièges  NNP     lemma=piège
+         (  PUNCT   lemma=∅
+         À  IN      lemma=à
+        NE  RP      lemma=ne
+       PAS  RP      lemma=PAS
+  EXTRAIRE  NNP     lemma=extraire
+         )  PUNCT   lemma=∅
+         :  PUNCT   lemma=∅
+      1500  CD      lemma=1500
+       DZD  NNP     lemma=DZD
+         4  CD      lemma=4
+         (  PUNCT   lemma=∅
+   Chiffre  NNP     lemma=chiffre
+     collé  NN      lemma=collé
+        au  DT      lemma=au
+      code  NN      lemma=code
+         )  PUNCT   lemma=∅
+
+NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
+[('Valides', 'O'), (':', 'O'), ('1500.50', 'O'), ('DZD', 'O'), ('250', 'O'), ('EUR', 'O'), ('10', 'O'), ('$', 'O'), ('USD', 'O'), ('Pièges', 'O'), ('(', 'O'), ('À', 'O'), ('NE', 'B-LOC'), ('PAS', 'I-LOC'), ('EXTRAIRE', 'I-LOC'), (')', 'O'), (':', 'O'), ('1500', 'O'), ('DZD', 'O'), ('4', 'O'), ('(', 'O'), ('Chiffre', 'O'), ('collé', 'O'), ('au', 'O'), ('code', 'O'), (')', 'O')]
+Entities:
+  LOC: NE PAS EXTRAIRE
+
+##########################################################################################
+DOC=test-regex3langue.docx | page=1 | sent=7 | lang=fr
+##########################################################################################
+==========================================================================================
+INPUT: EUR (Code seul sans montant)
+       EUR  NNP     lemma=EUR
+         (  PUNCT   lemma=∅
+      Code  NNP     lemma=code
+      seul  NN      lemma=seul
+      sans  IN      lemma=sans
+   montant  JJ      lemma=montant
+         )  PUNCT   lemma=∅
+
+NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
+[('EUR', 'O'), ('(', 'O'), ('Code', 'O'), ('seul', 'O'), ('sans', 'O'), ('montant', 'O'), (')', 'O')]
+Entities:
+
+##########################################################################################
+DOC=test-regex3langue.docx | page=1 | sent=8 | lang=fr
+##########################################################################################
+==========================================================================================
+INPUT: 1.2.3 USD (Format de nombre invalide)
+       1.2  CD      lemma=1.2
+         .  PUNCT   lemma=∅
+         3  CD      lemma=3
+       USD  NNP     lemma=USD
+         (  PUNCT   lemma=∅
+    Format  NNP     lemma=format
+        de  IN      lemma=de
+    nombre  VB      lemma=nombre
+  invalide  NN      lemma=invalide
+         )  PUNCT   lemma=∅
+
+NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
+[('1.2', 'O'), ('.', 'O'), ('3', 'O'), ('USD', 'O'), ('(', 'O'), ('Format', 'O'), ('de', 'O'), ('nombre', 'O'), ('invalide', 'O'), (')', 'O')]
+Entities:
+
+========================================================================================================================
+RUN AR (arabcode.py)
+========================================================================================================================
+[Component: atripusion-gramatical-en-utilisant-les3ficherla]
+Type: list
+Summary: Langues executees: en, fr, ar | docs=2
+Output: [{'chars_total': 0,
+  'content': 'image_only',
+  'doc_id': None,
+  'extraction': 'ocr:tesseract',
+  'filename': 'test-regex3langue.docx',
+  'page_count_total': 0,
+  'pages': [],
+  'paths': [],
+  'recompose_ok': True},
+ {'chars_total': 1872,
+  'content': 'text',
+  'doc_id': '32ac25cb-c410-459e-a882-57ac65c0c8e9',
+  'extraction': 'native:docx:xml',
+  'filename': 'test-regex3langue.docx',
+  'page_count_total': 1,
+  'pages': [{'chars': 1872,
+             'lang': 'fr',
+             'page_index': 1,
+             'page_text': '1. Adresses E-mail\n'
+                          "L'objectif est d'éliminer les formats qui n'ont pas de domaine valide "
+                          'ou qui contiennent des caractères interdits.\n'
+                          'Valides :\n'
+                          'test.user@gmail.com\n'
+                          'support123@entreprise.dz\n'
+                          'jean-pierre.durand@service-public.fr\n'
+                          'Pièges (À NE PAS EXTRAIRE) :\n'
+                          "@gmail.com\xa0(Pas d'utilisateur)\n"
+                          "user@nomdedomaine\xa0(Pas d'extension .com/.fr...)\n"
+                          'mon..email@test.com\xa0(Deux points consécutifs sont interdits)\n'
+                          'email@test@test.com\xa0(Deux symboles @)\n'
+                          '"email"@example.com\xa0(Parfois valide mais souvent considéré comme un '
+                          'piège en Regex simple)\n'
+                          '\n'
+                          '2. Numéros de téléphone (Format Algérie)\n'
+                          "L'objectif est de vérifier la longueur et l'indicatif.\n"
+                          'Valides :\n'
+                          '0550123456\xa0(Mobile Ooredoo)\n'
+                          '+213 661 00 11 22\xa0(International)\n'
+                          '00213 770 99 88 77\xa0(Format long)\n'
+                          'Pièges (À NE PAS EXTRAIRE) :\n'
+                          '055012345\xa0(Trop court, 9 chiffres)\n'
+                          '05501234567\xa0(Trop long, 11 chiffres)\n'
+                          '1234567890\xa0(Ne commence ni par 0 ni par +213)\n'
+                          '05-50-AZ-34-56\xa0(Contient des lettres)\n'
+                          '\n'
+                          '3. URLs (Liens Web)\n'
+                          "L'objectif est de distinguer un lien d'un simple nom de fichier ou d'un "
+                          'texte.\n'
+                          'Valides :\n'
+                          'https://www.google.com\n'
+                          'http://dz-express.com\n'
+                          'www.monsite.dz\n'
+                          'Pièges (À NE PAS EXTRAIRE) :\n'
+                          'http://\xa0(Vide)\n'
+                          "ww.monsite.com\xa0(Seulement deux 'w')\n"
+                          "image.png\xa0(C'est un fichier, pas une URL complète)\n"
+                          "https://espace..vide.com\xa0(Double point dans l'URL)\n"
+                          '\n'
+                          '4. Dates\n'
+                          "L'objectif est de gérer les séparateurs et les limites (ex: pas de mois "
+                          '13).\n'
+                          'Valides :\n'
+                          '12/05/2023\n'
+                          '01-01-2024\n'
+                          '31/12/1999\n'
+                          'Pièges (À NE PAS EXTRAIRE) :\n'
+                          "32/01/2023\xa0(Le jour 32 n'existe pas)\n"
+                          "15/13/2022\xa0(Le mois 13 n'existe pas)\n"
+                          '1/1/24\xa0(Souvent rejeté si on cherche le format\xa0DD/MM/YYYY)\n'
+                          '2023/12/12\xa0(Format inversé, si ta Regex cherche le format FR)\n'
+                          '\n'
+                          '5. Devises (DZD, EUR, USD)\n'
+                          "L'objectif est d'extraire le montant ET le code monétaire.\n"
+                          'Valides :\n'
+                          '1500.50 DZD\n'
+                          '250 EUR\n'
+                          '10$ USD\n'
+                          'Pièges (À NE PAS EXTRAIRE) :\n'
+                          '1500 DZD4\xa0(Chiffre collé au code)\n'
+                          'EUR\xa0(Code seul sans montant)\n'
+                          '1.2.3 USD\xa0(Format de nombre invalide)\n',
+             'recompose_ok': False,
+             'sentences_layout': [{'chars': 525,
+                                   'col': 0,
+                                   'col_index': None,
+                                   'end': 525,
+                                   'header_cells': None,
+                                   'header_rows': None,
+                                   'header_source': None,
+                                   'is_noise': False,
+                                   'is_sentence': True,
+                                   'layout_kind': 'plain',
+                                   'line': 1,
+                                   'nonspace': 464,
+                                   'spans': [(0, 525)],
+                                   'start': 0,
+                                   'table_rows': None,
+                                   'text': '1. Adresses E-mail\n'
+                                           "L'objectif est d'éliminer les formats qui n'ont pas de "
+                                           'domaine valide ou qui contiennent des caractères '
+                                           'interdits.\n'
+                                           'Valides :\n'
+                                           'test.user@gmail.com\n'
+                                           'support123@entreprise.dz\n'
+                                           'jean-pierre.durand@service-public.fr\n'
+                                           'Pièges (À NE PAS EXTRAIRE) :\n'
+                                           "@gmail.com\xa0(Pas d'utilisateur)\n"
+                                           "user@nomdedomaine\xa0(Pas d'extension .com/.fr...)\n"
+                                           'mon..email@test.com\xa0(Deux points consécutifs sont '
+                                           'interdits)\n'
+                                           'email@test@test.com\xa0(Deux symboles @)\n'
+                                           '"email"@example.com\xa0(Parfois valide mais souvent '
+                                           'considéré comme un piège en Regex simple)\n'
+                                           '\n'},
+                                  {'chars': 387,
+                                   'col': 0,
+                                   'col_index': None,
+                                   'end': 912,
+                                   'header_cells': None,
+                                   'header_rows': None,
+                                   'header_source': None,
+                                   'is_noise': False,
+                                   'is_sentence': True,
+                                   'layout_kind': 'plain',
+                                   'line': 14,
+                                   'nonspace': 325,
+                                   'spans': [(525, 912)],
+                                   'start': 525,
+                                   'table_rows': None,
+                                   'text': '2. Numéros de téléphone (Format Algérie)\n'
+                                           "L'objectif est de vérifier la longueur et "
+                                           "l'indicatif.\n"
+                                           'Valides :\n'
+                                           '0550123456\xa0(Mobile Ooredoo)\n'
+                                           '+213 661 00 11 22\xa0(International)\n'
+                                           '00213 770 99 88 77\xa0(Format long)\n'
+                                           'Pièges (À NE PAS EXTRAIRE) :\n'
+                                           '055012345\xa0(Trop court, 9 chiffres)\n'
+                                           '05501234567\xa0(Trop long, 11 chiffres)\n'
+                                           '1234567890\xa0(Ne commence ni par 0 ni par +213)\n'
+                                           '05-50-AZ-34-56\xa0(Contient des lettres)\n'
+                                           '\n'},
+                                  {'chars': 352,
+                                   'col': 0,
+                                   'col_index': None,
+                                   'end': 1264,
+                                   'header_cells': None,
+                                   'header_rows': None,
+                                   'header_source': None,
+                                   'is_noise': False,
+                                   'is_sentence': True,
+                                   'layout_kind': 'plain',
+                                   'line': 26,
+                                   'nonspace': 303,
+                                   'spans': [(912, 1264)],
+                                   'start': 912,
+                                   'table_rows': None,
+                                   'text': '3. URLs (Liens Web)\n'
+                                           "L'objectif est de distinguer un lien d'un simple nom "
+                                           "de fichier ou d'un texte.\n"
+                                           'Valides :\n'
+                                           'https://www.google.com\n'
+                                           'http://dz-express.com\n'
+                                           'www.monsite.dz\n'
+                                           'Pièges (À NE PAS EXTRAIRE) :\n'
+                                           'http://\xa0(Vide)\n'
+                                           "ww.monsite.com\xa0(Seulement deux 'w')\n"
+                                           "image.png\xa0(C'est un fichier, pas une URL complète)\n"
+                                           "https://espace..vide.com\xa0(Double point dans l'URL)\n"
+                                           '\n'},
+                                  {'chars': 354,
+                                   'col': 0,
+                                   'col_index': None,
+                                   'end': 1618,
+                                   'header_cells': None,
+                                   'header_rows': None,
+                                   'header_source': None,
+                                   'is_noise': False,
+                                   'is_sentence': True,
+                                   'layout_kind': 'plain',
+                                   'line': 38,
+                                   'nonspace': 295,
+                                   'spans': [(1264, 1618)],
+                                   'start': 1264,
+                                   'table_rows': None,
+                                   'text': '4. Dates\n'
+                                           "L'objectif est de gérer les séparateurs et les limites "
+                                           '(ex: pas de mois 13).\n'
+                                           'Valides :\n'
+                                           '12/05/2023\n'
+                                           '01-01-2024\n'
+                                           '31/12/1999\n'
+                                           'Pièges (À NE PAS EXTRAIRE) :\n'
+                                           "32/01/2023\xa0(Le jour 32 n'existe pas)\n"
+                                           "15/13/2022\xa0(Le mois 13 n'existe pas)\n"
+                                           '1/1/24\xa0(Souvent rejeté si on cherche le format\xa0'
+                                           'DD/MM/YYYY)\n'
+                                           '2023/12/12\xa0(Format inversé, si ta Regex cherche le '
+                                           'format FR)\n'
+                                           '\n'},
+                                  {'chars': 27,
+                                   'col': 0,
+                                   'col_index': None,
+                                   'end': 1645,
+                                   'header_cells': None,
+                                   'header_rows': None,
+                                   'header_source': None,
+                                   'is_noise': False,
+                                   'is_sentence': True,
+                                   'layout_kind': 'plain',
+                                   'line': 50,
+                                   'nonspace': 22,
+                                   'spans': [(1618, 1645)],
+                                   'start': 1618,
+                                   'table_rows': None,
+                                   'text': '5. Devises (DZD, EUR, USD)\n'},
+                                  {'chars': 59,
+                                   'col': 0,
+                                   'col_index': None,
+                                   'end': 1704,
+                                   'header_cells': None,
+                                   'header_rows': [{'spans': [(1645, 1704)],
+                                                    'text': "L'objectif est d'extraire le montant "
+                                                            'ET le code monétaire.\n'}],
+                                   'header_source': None,
+                                   'is_noise': False,
+                                   'is_sentence': True,
+                                   'layout_kind': 'table',
+                                   'line': 51,
+                                   'nonspace': 50,
+                                   'spans': [(1645, 1704)],
+                                   'start': 1645,
+                                   'table_rows': [{'spans': [(1645, 1704)],
+                                                   'text': "L'objectif est d'extraire le montant "
+                                                           'ET le code monétaire.\n'}],
+                                   'text': "L'objectif est d'extraire le montant ET le code "
+                                           'monétaire.\n'},
+                                  {'chars': 101,
+                                   'col': 0,
+                                   'col_index': None,
+                                   'end': 1805,
+                                   'header_cells': None,
+                                   'header_rows': None,
+                                   'header_source': None,
+                                   'is_noise': False,
+                                   'is_sentence': True,
+                                   'layout_kind': 'plain',
+                                   'line': 52,
+                                   'nonspace': 81,
+                                   'spans': [(1704, 1805)],
+                                   'start': 1704,
+                                   'table_rows': None,
+                                   'text': 'Valides :\n'
+                                           '1500.50 DZD\n'
+                                           '250 EUR\n'
+                                           '10$ USD\n'
+                                           'Pièges (À NE PAS EXTRAIRE) :\n'
+                                           '1500 DZD4\xa0(Chiffre collé au code)\n'},
+                                  {'chars': 29,
+                                   'col': 0,
+                                   'col_index': None,
+                                   'end': 1834,
+                                   'header_cells': None,
+                                   'header_rows': [{'spans': [(1805, 1834)],
+                                                    'text': 'EUR\xa0(Code seul sans montant)\n'}],
+                                   'header_source': None,
+                                   'is_noise': False,
+                                   'is_sentence': True,
+                                   'layout_kind': 'table',
+                                   'line': 58,
+                                   'nonspace': 24,
+                                   'spans': [(1805, 1834)],
+                                   'start': 1805,
+                                   'table_rows': [{'spans': [(1805, 1834)],
+                                                   'text': 'EUR\xa0(Code seul sans montant)\n'}],
+                                   'text': 'EUR\xa0(Code seul sans montant)\n'},
+                                  {'chars': 38,
+                                   'col': 0,
+                                   'col_index': None,
+                                   'end': 1872,
+                                   'header_cells': None,
+                                   'header_rows': None,
+                                   'header_source': None,
+                                   'is_noise': False,
+                                   'is_sentence': True,
+                                   'layout_kind': 'plain',
+                                   'line': 59,
+                                   'nonspace': 32,
+                                   'spans': [(1834, 1872)],
+                                   'start': 1834,
+                                   'table_rows': None,
+                                   'text': '1.2.3 USD\xa0(Format de nombre invalide)\n'}],
+             'source_path': 'C:\\Users\\moura\\OneDrive\\Bureau\\produit-cor\\documents\\test-regex3langue.docx'}],
+  'paths': ['C:\\Users\\moura\\OneDrive\\Bureau\\produit-cor\\documents\\test-regex3langue.docx'],
+  'recompose_ok': False}]
+
+[classification] test-regex3langue.docx -> best=UNCLASSIFIED | status=REVIEW | scores: {'ARTICLE': 0, 'BON_DE_COMMANDE': 0, 'CONTRAT': 0, 'FACTURE': 0, 'FORMULAIRE': 0}
+[classification] test-regex3langue.docx -> best=FORMULAIRE | status=OK | scores: {'ARTICLE': 0, 'BON_DE_COMMANDE': 0, 'CONTRAT': 0, 'FACTURE': 0, 'FORMULAIRE': 8}
+[Component: clasification]
+Type: list
+Summary: 2 docs classes | test-regex3langue.docx->UNCLASSIFIED, test-regex3langue.docx->FORMULAIRE
+Output: [{'decision_debug': {'diff': 0, 'second_score': 0, 'top_score': 0},
+  'doc_id': 'ea4e0a6d-04a7-4d6e-99dc-516ee388b999',
+  'doc_type': 'UNCLASSIFIED',
+  'filename': 'test-regex3langue.docx',
+  'margin': 3,
+  'scores': {'ARTICLE': 0, 'BON_DE_COMMANDE': 0, 'CONTRAT': 0, 'FACTURE': 0, 'FORMULAIRE': 0},
+  'status': 'REVIEW',
+  'threshold': 6},
+ {'decision_debug': {'diff': 8, 'second_score': 0, 'top_score': 8},
+  'doc_id': 'a9ad8cff-6379-40e0-90d7-a4d7a8fa2015',
+  'doc_type': 'FORMULAIRE',
+  'filename': 'test-regex3langue.docx',
+  'margin': 3,
+  'scores': {'ARTICLE': 0, 'BON_DE_COMMANDE': 0, 'CONTRAT': 0, 'FACTURE': 0, 'FORMULAIRE': 8},
+  'status': 'OK',
+  'threshold': 6}]
+
+
+[extraction]
+  doc: test-regex3langue.docx | type=FORMULAIRE | status=OK
+  rulesets: common.json
+    - doc_date (rule_id=CMN_DATE_01)  x0
+    - email (rule_id=CMN_EMAIL_01)  x0
+    - telephone (rule_id=CMN_PHONE_01)  x0
+    - site (rule_id=CMN_URL_01)  x0
+
+[extraction]
+  doc: test-regex3langue.docx | type=FORMULAIRE | status=OK
+  rulesets: common.json
+    - doc_date (rule_id=CMN_DATE_01)  x3
+        p1: 12/05/2023  [rule_id=CMN_DATE_01]
+        p1: 01-01-2024  [rule_id=CMN_DATE_01]
+        p1: 31/12/1999  [rule_id=CMN_DATE_01]
+    - email (rule_id=CMN_EMAIL_01)  x3
+        p1: test.user@gmail.com  [rule_id=CMN_EMAIL_01]
+        p1: support123@entreprise.dz  [rule_id=CMN_EMAIL_01]
+        p1: jean-pierre.durand@service-public.fr  [rule_id=CMN_EMAIL_01]
+    - site (rule_id=CMN_URL_01)  x3
+        p1: https://www.google.com  [rule_id=CMN_URL_01]
+        p1: http://dz-express.com  [rule_id=CMN_URL_01]
+        p1: www.monsite.dz  [rule_id=CMN_URL_01]
+    - telephone (rule_id=CMN_PHONE_01)  x0
+[Component: extraction-regles]
+Type: list
+Summary: 2 docs | fields=8 | test-regex3langue.docx->FORMULAIRE, test-regex3langue.docx->FORMULAIRE
+Output: [{'classification_status': 'OK',
+  'doc_id': None,
+  'doc_type': 'FORMULAIRE',
+  'fields': {'doc_date': {'many': True, 'matches': [], 'rule_id': 'CMN_DATE_01', 'type': 'date'},
+             'email': {'many': True, 'matches': [], 'rule_id': 'CMN_EMAIL_01', 'type': 'email'},
+             'site': {'many': True, 'matches': [], 'rule_id': 'CMN_URL_01', 'type': 'url'},
+             'telephone': {'many': True,
+                           'matches': [],
+                           'rule_id': 'CMN_PHONE_01',
+                           'type': 'phone'}},
+  'filename': 'test-regex3langue.docx',
+  'ruleset': {'applied_rulesets': ['common.json'],
+              'routes_config': {'default_rulesets': ['{doc_type}.json'],
+                                'include_common': True,
+                                'ruleset_mapping': {'BON_DE_COMMANDE': ['BON_DE_COMMANDE.json'],
+                                                    'CONTRAT': ['CONTRAT.json'],
+                                                    'FACTURE': ['FACTURE.json']}}}},
+ {'classification_status': 'OK',
+  'doc_id': '32ac25cb-c410-459e-a882-57ac65c0c8e9',
+  'doc_type': 'FORMULAIRE',
+  'fields': {'doc_date': {'many': True,
+                          'matches': [{'end': 1370,
+                                       'page_index': 1,
+                                       'snippet': 'limites (ex: pas de mois 13).\n'
+                                                  'Valides :\n'
+                                                  '12/05/2023\n'
+                                                  '01-01-2024\n'
+                                                  '31/12/1999\n'
+                                                  'Pièges (À NE PAS ',
+                                       'start': 1360,
+                                       'value': '12/05/2023'},
+                                      {'end': 1381,
+                                       'page_index': 1,
+                                       'snippet': ': pas de mois 13).\n'
+                                                  'Valides :\n'
+                                                  '12/05/2023\n'
+                                                  '01-01-2024\n'
+                                                  '31/12/1999\n'
+                                                  'Pièges (À NE PAS EXTRAIRE) :',
+                                       'start': 1371,
+                                       'value': '01-01-2024'},
+                                      {'end': 1392,
+                                       'page_index': 1,
+                                       'snippet': 'is 13).\n'
+                                                  'Valides :\n'
+                                                  '12/05/2023\n'
+                                                  '01-01-2024\n'
+                                                  '31/12/1999\n'
+                                                  'Pièges (À NE PAS EXTRAIRE) :\n'
+                                                  '32/01/2023',
+                                       'start': 1382,
+                                       'value': '31/12/1999'}],
+                          'rule_id': 'CMN_DATE_01',
+                          'type': 'date'},
+             'email': {'many': True,
+                       'matches': [{'end': 163,
+                                    'page_index': 1,
+                                    'snippet': 'ent des caractères interdits.\n'
+                                               'Valides :\n'
+                                               'test.user@gmail.com\n'
+                                               'support123@entreprise.dz\n'
+                                               'jean-pierre.du',
+                                    'start': 144,
+                                    'value': 'test.user@gmail.com'},
+                                   {'end': 188,
+                                    'page_index': 1,
+                                    'snippet': 'nterdits.\n'
+                                               'Valides :\n'
+                                               'test.user@gmail.com\n'
+                                               'support123@entreprise.dz\n'
+                                               'jean-pierre.durand@service-public.fr\n'
+                                               'Pi',
+                                    'start': 164,
+                                    'value': 'support123@entreprise.dz'},
+                                   {'end': 225,
+                                    'page_index': 1,
+                                    'snippet': 'user@gmail.com\n'
+                                               'support123@entreprise.dz\n'
+                                               'jean-pierre.durand@service-public.fr\n'
+                                               'Pièges (À NE PAS EXTRAIRE) :\n'
+                                               '@gmail.com',
+                                    'start': 189,
+                                    'value': 'jean-pierre.durand@service-public.fr'}],
+                       'rule_id': 'CMN_EMAIL_01',
+                       'type': 'email'},
+             'site': {'many': True,
+                      'matches': [{'end': 1043,
+                                   'page_index': 1,
+                                   'snippet': "nom de fichier ou d'un texte.\n"
+                                              'Valides :\n'
+                                              'https://www.google.com\n'
+                                              'http://dz-express.com\n'
+                                              'www.monsite.dz\n'
+                                              'Pi',
+                                   'start': 1021,
+                                   'value': 'https://www.google.com'},
+                                  {'end': 1065,
+                                   'page_index': 1,
+                                   'snippet': 'texte.\n'
+                                              'Valides :\n'
+                                              'https://www.google.com\n'
+                                              'http://dz-express.com\n'
+                                              'www.monsite.dz\n'
+                                              'Pièges (À NE PAS EXTRAIR',
+                                   'start': 1044,
+                                   'value': 'http://dz-express.com'},
+                                  {'end': 1080,
+                                   'page_index': 1,
+                                   'snippet': '://www.google.com\n'
+                                              'http://dz-express.com\n'
+                                              'www.monsite.dz\n'
+                                              'Pièges (À NE PAS EXTRAIRE) :\n'
+                                              'http://\xa0(V',
+                                   'start': 1066,
+                                   'value': 'www.monsite.dz'}],
+                      'rule_id': 'CMN_URL_01',
+                      'type': 'url'},
+             'telephone': {'many': True,
+                           'matches': [],
+                           'rule_id': 'CMN_PHONE_01',
+                           'type': 'phone'}},
+  'filename': 'test-regex3langue.docx',
+  'ruleset': {'applied_rulesets': ['common.json'],
+              'routes_config': {'default_rulesets': ['{doc_type}.json'],
+                                'include_common': True,
+                                'ruleset_mapping': {'BON_DE_COMMANDE': ['BON_DE_COMMANDE.json'],
+                                                    'CONTRAT': ['CONTRAT.json'],
+                                                    'FACTURE': ['FACTURE.json']}}}}]
+

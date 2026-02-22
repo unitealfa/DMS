@@ -57,16 +57,27 @@ _EN_HINT = {"the","and","to","of","in","is","for","with","invoice","date","total
 
 def detect_lang(text: str) -> str:
     t = text or ""
-    if _AR_RE.search(t):
+    if not t.strip():
+        return "en"
+
+    ar_chars = len(_AR_RE.findall(t))
+    total_chars = max(1, len(t))
+
+    # Heuristic: require a minimal density/volume of Arabic chars
+    if ar_chars >= 6 and ar_chars / total_chars >= 0.02:
         return "ar"
+    if ar_chars > 0 and not _WORD_RE.search(t):
+        return "ar"
+
     words = [w.lower() for w in _WORD_RE.findall(t[:8000])]
     if not words:
         return "en"
+
     fr_score = sum(1 for w in words if w in _FR_HINT)
     en_score = sum(1 for w in words if w in _EN_HINT)
-    # Accent hint for French
     if re.search(r"[\u00E8\u00E9\u00EA\u00EB\u00E0\u00F9\u00E7\u00F4\u00EE\u00EF]", t.lower()):
         fr_score += 1
+
     return "fr" if fr_score >= en_score else "en"
 
 # ==================== Sentence split "layout" (fallback) ====================
@@ -101,15 +112,71 @@ def split_punkt_layout(text: str, lang_pickle_name: str):
     ends = [spans[i+1][0] for i in range(len(spans)-1)] + [len(text)]
     return [text[starts[i]:ends[i]] for i in range(len(ends))]
 
+def _split_on_newline_gap(text: str, min_newlines: int = 3):
+    """
+    Coupure forte quand on a >= min_newlines sauts de ligne consécutifs sans texte entre.
+    """
+    if not text:
+        return []
+    pattern = re.compile(r"\n{%d,}" % min_newlines)
+    parts = []
+    last = 0
+    for m in pattern.finditer(text):
+        start, end = m.span()
+        if start > last:
+            parts.append(text[last:start])
+        last = end
+    if last < len(text):
+        parts.append(text[last:])
+    # Si le pattern matche des blocs de \n seuls, on les jette ; le split suffit
+    return [p for p in parts if p.strip() != ""]
+
+def _split_on_lang_switch(text: str):
+    """
+    Coupe un bloc sur les changements de langue d'une ligne Ã  l'autre.
+    Evite de laisser un bloc AR traiter du FR/EN mÃªlÃ© et inversement.
+    """
+    if not text:
+        return []
+    lines = text.splitlines(True)  # garder les \n pour recompose
+    out = []
+    buf = ""
+    cur_lang = None
+    for ln in lines:
+        ln_lang = detect_lang(ln)
+        # on ignore les lignes vides pour la dÃ©tection
+        if not ln.strip():
+            buf += ln
+            continue
+        if cur_lang is None:
+            cur_lang = ln_lang
+        elif ln_lang != cur_lang and buf.strip():
+            out.append(buf)
+            buf = ""
+            cur_lang = ln_lang
+        buf += ln
+    if buf:
+        out.append(buf)
+    return out
+
 def sentence_chunks_layout(text: str, lang: str):
     lang = (lang or "").lower()
-    if lang.startswith("ar"):
-        return split_ar_layout(text)
-    if lang.startswith("fr"):
-        return split_punkt_layout(text, "french")
-    if lang.startswith("en"):
-        return split_punkt_layout(text, "english")
-    return split_punkt_layout(text, "english")
+    primary_chunks = _split_on_newline_gap(text, min_newlines=3) or [text]
+    out = []
+    for chunk in primary_chunks:
+        # Split on language switches line-by-line to avoid mixing blocs multilingues
+        lang_slices = _split_on_lang_switch(chunk)
+        for ls in lang_slices:
+            l = detect_lang(ls)
+            if l.startswith("ar"):
+                out.extend(split_ar_layout(ls))
+            elif l.startswith("fr"):
+                out.extend(split_punkt_layout(ls, "french"))
+            elif l.startswith("en"):
+                out.extend(split_punkt_layout(ls, "english"))
+            else:
+                out.extend(split_punkt_layout(ls, "english"))
+    return out
 
 # ==================== Split sections/alinas (layout-preserving) ====================
 def _iter_line_spans(text: str):

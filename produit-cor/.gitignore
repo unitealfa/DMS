@@ -36,7 +36,6 @@ desktop.ini
 
 # Logs and outputs
 *.log
-outputgeneralterminal.txt
 
 # Documents / temporary files
 ~$*

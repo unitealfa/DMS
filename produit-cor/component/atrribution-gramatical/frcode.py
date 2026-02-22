@@ -418,6 +418,26 @@ MOIS = {
 }
 JOURS = {"lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"}
 
+# Principaux codes monÃ©taires ISO 4217 (top 15 demandÃ©s, incl. DZD)
+CURRENCY_CODES = {
+    "USD","EUR","GBP","JPY","CNY","CHF","CAD","AUD","NZD","SEK",
+    "NOK","DKK","SAR","AED","DZD"
+}
+# Symboles usuels mappÃ©s sur ces codes pour l'affichage
+CURRENCY_SYMBOLS = {"€":"EUR", "$":"USD", "£":"GBP", "¥":"JPY"}
+# Noms usuels (minuscule) pour repÃ©rage en lettres
+CURRENCY_WORDS = {
+    "euro","euros",
+    "dollar","dollars",
+    "livre","livres","livre sterling","livres sterling",
+    "yen","yens",
+    "yuan","yuans",
+    "dinar","dinars",
+    "dirham","dirhams",
+    "riyal","riyals","rial","rials",
+    "franc","francs","franc suisse","francs suisses"
+}
+
 ORG_FORMS = {"sarl","sas","sa","spa","eurl","inc","ltd","gmbh","llc"}
 ORG_HINT  = {"université","ministère","groupe","société","compagnie","banque","association"}
 TITLE_HINT = {"m.","mme","mlle","monsieur","madame","dr","docteur","prof","pr"}
@@ -469,6 +489,24 @@ def date_spans(text: str, toks: List[Tok]) -> List[Tuple[int,int,str]]:
             out.append((a,b,lab))
             last_end = b
     return out
+
+def currency_spans(toks: List[Tok]) -> List[Tuple[int,int,str]]:
+    spans: List[Tuple[int,int,str]] = []
+    for tk in toks:
+        raw = (tk.text or "").strip()
+        if not raw:
+            continue
+        up = _norm_apo(raw).upper()
+        if up in CURRENCY_CODES:
+            spans.append((tk.start, tk.end, "CUR"))
+            continue
+        if raw in CURRENCY_SYMBOLS:
+            spans.append((tk.start, tk.end, "CUR"))
+            continue
+        low = _norm_apo(raw).lower()
+        if low in CURRENCY_WORDS:
+            spans.append((tk.start, tk.end, "CUR"))
+    return spans
 
 def _norm_ner_label(raw: str) -> str:
     r = (raw or "").upper().strip()
@@ -677,6 +715,8 @@ def improve_pos_with_ner(toks: List[Tok], pos: List[str], labels: List[str]) -> 
                 out[i] = "CD"
             else:
                 out[i] = "NNP"
+        elif typ == "CUR":
+            out[i] = "NNP"
 
     return out
 
@@ -776,6 +816,8 @@ def run_one(text: str, ner_pipe=None):
     # DATE rules (n’écrase pas une entité existante)
     d_sp = date_spans(text, toks)
     apply_spans_to_tokens(toks, d_sp, labels)
+    c_sp = currency_spans(toks)
+    apply_spans_to_tokens(toks, c_sp, labels)
 
     labels = enforce_bio(labels)
 

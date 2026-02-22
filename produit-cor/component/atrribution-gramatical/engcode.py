@@ -111,6 +111,25 @@ def _is_number(t: str) -> bool:
 
 MONTHS = r"(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)"
 
+# Principaux codes monÃ©taires ISO 4217 (top 15 demandÃ©s, incl. DZD)
+CURRENCY_CODES = {
+    "USD","EUR","GBP","JPY","CNY","CHF","CAD","AUD","NZD","SEK",
+    "NOK","DKK","SAR","AED","DZD"
+}
+# Symboles usuels mappÃ©s sur ces codes
+CURRENCY_SYMBOLS = {"€":"EUR", "$":"USD", "£":"GBP", "¥":"JPY"}
+# Common currency names (lower-case) to tag spelled-out mentions
+CURRENCY_WORDS = {
+    "dollar","dollars",
+    "euro","euros",
+    "pound","pounds","pound sterling","pounds sterling",
+    "yen","yuan","yuans",
+    "dinar","dinars",
+    "dirham","dirhams",
+    "riyal","riyals","rial","rials",
+    "franc","francs","swiss franc","swiss francs"
+}
+
 # NOTE: inclut aussi les composés digit-hyphen: 20-year-old
 TOKEN_RE = re.compile(
     rf"""
@@ -510,6 +529,24 @@ def date_spans(text: str) -> List[Tuple[int,int,str]]:
             last_end = b
     return out
 
+def currency_spans(toks: List[Tok]) -> List[Tuple[int,int,str]]:
+    spans: List[Tuple[int,int,str]] = []
+    for tk in toks:
+        raw = (tk.text or "").strip()
+        if not raw:
+            continue
+        up = _norm_apos(raw).upper()
+        if up in CURRENCY_CODES:
+            spans.append((tk.start, tk.end, "CUR"))
+            continue
+        if raw in CURRENCY_SYMBOLS:
+            spans.append((tk.start, tk.end, "CUR"))
+            continue
+        low = _lower(_norm_apos(raw))
+        if low in CURRENCY_WORDS:
+            spans.append((tk.start, tk.end, "CUR"))
+    return spans
+
 def load_hf_ner(model_name: str):
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     torch.set_num_threads(1)
@@ -716,6 +753,8 @@ def run_one(text: str, ner_pipe=None):
     # DATE rules (n’écrase pas une entité existante)
     d_sp = date_spans(text)
     apply_spans_to_tokens(toks, d_sp, labels)
+    c_sp = currency_spans(toks)
+    apply_spans_to_tokens(toks, c_sp, labels)
     labels = enforce_bio(labels)
 
     # Fix bruit Buffalo

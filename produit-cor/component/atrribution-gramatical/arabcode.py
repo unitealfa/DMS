@@ -1,4 +1,4 @@
-import os
+﻿import os
 import re
 import sys
 from typing import List, Tuple, Dict, Optional
@@ -17,7 +17,7 @@ def _install_help():
     print(f'  "{py}" -m pip install --upgrade --no-user-cfg --target "{LOCAL_DEPS_DIR}" camel-tools transformers tokenizers')
     print(f'  "{py}" -m camel_tools.cli.camel_data -i morphology-db-msa-r13')
     print(f'  "{py}" -m camel_tools.cli.camel_data -i ner-arabert')
-    print("\nSi tu as l’erreur: Can not combine '--user' and '--target'")
+    print("\nSi tu as lâ€™erreur: Can not combine '--user' and '--target'")
     print("  PowerShell:")
     print('    $env:PIP_CONFIG_FILE="NUL"')
     print("    Remove-Item Env:PIP_USER -ErrorAction SilentlyContinue")
@@ -60,14 +60,32 @@ AR_BASE = r"\u0621-\u063A\u0641-\u064A\u066E-\u066F\u0671-\u06D3\u06FA-\u06FC"
 AR_DIAC = r"\u064B-\u065F\u0670\u0640"  # harakat + shadda + superscript alef + tatweel
 AR_WORD = rf"(?:[{AR_BASE}][{AR_DIAC}]*)+"
 
-# === PONCTUATION ET SYMBOLES: TOUJOURS tag PUNCT + lemma ∅ ===
+# === PONCTUATION ET SYMBOLES: TOUJOURS tag PUNCT + lemma âˆ… ===
 # Standard: . , ; : ! ? ( ) [ ] { } < > " '
-# Guillemets: " ' " ' « »
-# Tirets: — – -
-# Arabe: ، ؛ ؟ ٪
-# Symboles: @ / \ | … ـ % & = + * ^ ~ `
-PUNCT_SET = set(list(".,;:!?()[]{}<>\"'""''«»…—–-")) | {"،", "؛", "؟", "٪", "%", "ـ", "/", "\\", "|", "@", "…", "&", "=", "+", "*", "^", "~", "`"}
-TOKEN_RE = re.compile(rf"({AR_WORD}|[0-9]+|[A-Za-z]+(?:['’\-][A-Za-z]+)*|[^\s])", re.UNICODE)
+# Guillemets: " ' " ' Â« Â»
+# Tirets: â€” â€“ -
+# Arabe: ØŒ Ø› ØŸ Ùª
+# Symboles: @ / \ | â€¦ Ù€ % & = + * ^ ~ `
+PUNCT_SET = set(list(".,;:!?()[]{}<>\"'""''Â«Â»â€¦â€”â€“-")) | {"ØŒ", "Ø›", "ØŸ", "Ùª", "%", "Ù€", "/", "\\", "|", "@", "â€¦", "&", "=", "+", "*", "^", "~", "`"}
+TOKEN_RE = re.compile(rf"({AR_WORD}|[0-9]+|[A-Za-z]+(?:['â€™\-][A-Za-z]+)*|[^\s])", re.UNICODE)
+
+# Principaux codes monétaires ISO 4217 (top 15 demandés, incl. DZD)
+CURRENCY_CODES = {
+    "USD","EUR","GBP","JPY","CNY","CHF","CAD","AUD","NZD","SEK",
+    "NOK","DKK","SAR","AED","DZD"
+}
+# Symboles usuels mappés sur ces codes
+CURRENCY_SYMBOLS = {"\u20ac":"EUR", "$":"USD", "\u00a3":"GBP", "\u00a5":"JPY", "دج":"DZD", "د.ج":"DZD"}
+# Noms usuels (normalisés sans diacritiques) pour repérage en lettres
+AR_CURRENCY_WORDS = {
+    "دينار","دينار جزائري","دنانير",
+    "دولار","دولارات",
+    "يورو","ين","يوان",
+    "درهم","دراهم",
+    "ريال","ريالات",
+    "فرنك","فرنكات",
+    "جنيه","جنيه استرليني","جنيهات"
+}
 
 def simple_tokenize(text: str) -> List[str]:
     return TOKEN_RE.findall(text or "")
@@ -79,13 +97,13 @@ def is_punct(tok: str) -> bool:
 # 4) Normalization helpers (0-ML)
 # ----------------------------
 _DIACRITICS_RE = re.compile(rf"[{AR_DIAC}]")
-HAMZA_CHARS = set("ءأإؤئٱ")
+HAMZA_CHARS = set("Ø¡Ø£Ø¥Ø¤Ø¦Ù±")
 
 def strip_diacritics(s: str) -> str:
     return _DIACRITICS_RE.sub("", s or "")
 
 def norm_alef(s: str) -> str:
-    return (s or "").replace("أ", "ا").replace("إ", "ا").replace("آ", "ا").replace("ٱ", "ا")
+    return (s or "").replace("Ø£", "Ø§").replace("Ø¥", "Ø§").replace("Ø¢", "Ø§").replace("Ù±", "Ø§")
 
 def has_hamza(s: str) -> bool:
     return any(ch in HAMZA_CHARS for ch in (s or ""))
@@ -120,19 +138,19 @@ def lemma_from_analysis(a: Dict, fallback_word: str) -> str:
 # ----------------------------
 # 6) Strong closed-class overrides (0-ML)
 # ----------------------------
-FUT_PARTS = {"سوف"}
-NEG_PARTS = {"لم", "لن", "لا", "ما"}
-ASPECT_PARTS = {"قد"}
-Q_PARTS = {"هل"}
-REL_PRON = {"الذي", "التي", "الذين", "اللذين", "اللذان", "اللتان", "اللاتي", "اللواتي"}
-DEM_WORDS = {"هذا", "هذه", "هؤلاء", "ذلك", "تلك", "هٰذا", "هٰذه"}
-PREP_WORDS_EXT = {"إلى", "في", "على", "من", "عن", "مع", "حتى", "عبر", "بين", "قبل", "بعد", "دون", "حول", "عند", "لدى", "مثل", "خلال"}
-CONJ_WORDS = {"و", "ف", "ثم", "أو", "لكن", "بل", "أم"}
-NEG_ADJ = {"غير"}
-FIX_NOUNS = {"بعض"}
+FUT_PARTS = {"Ø³ÙˆÙ"}
+NEG_PARTS = {"Ù„Ù…", "Ù„Ù†", "Ù„Ø§", "Ù…Ø§"}
+ASPECT_PARTS = {"Ù‚Ø¯"}
+Q_PARTS = {"Ù‡Ù„"}
+REL_PRON = {"Ø§Ù„Ø°ÙŠ", "Ø§Ù„ØªÙŠ", "Ø§Ù„Ø°ÙŠÙ†", "Ø§Ù„Ù„Ø°ÙŠÙ†", "Ø§Ù„Ù„Ø°Ø§Ù†", "Ø§Ù„Ù„ØªØ§Ù†", "Ø§Ù„Ù„Ø§ØªÙŠ", "Ø§Ù„Ù„ÙˆØ§ØªÙŠ"}
+DEM_WORDS = {"Ù‡Ø°Ø§", "Ù‡Ø°Ù‡", "Ù‡Ø¤Ù„Ø§Ø¡", "Ø°Ù„Ùƒ", "ØªÙ„Ùƒ", "Ù‡Ù°Ø°Ø§", "Ù‡Ù°Ø°Ù‡"}
+PREP_WORDS_EXT = {"Ø¥Ù„Ù‰", "ÙÙŠ", "Ø¹Ù„Ù‰", "Ù…Ù†", "Ø¹Ù†", "Ù…Ø¹", "Ø­ØªÙ‰", "Ø¹Ø¨Ø±", "Ø¨ÙŠÙ†", "Ù‚Ø¨Ù„", "Ø¨Ø¹Ø¯", "Ø¯ÙˆÙ†", "Ø­ÙˆÙ„", "Ø¹Ù†Ø¯", "Ù„Ø¯Ù‰", "Ù…Ø«Ù„", "Ø®Ù„Ø§Ù„"}
+CONJ_WORDS = {"Ùˆ", "Ù", "Ø«Ù…", "Ø£Ùˆ", "Ù„ÙƒÙ†", "Ø¨Ù„", "Ø£Ù…"}
+NEG_ADJ = {"ØºÙŠØ±"}
+FIX_NOUNS = {"Ø¨Ø¹Ø¶"}
 
-RX_INNA_CLITIC = re.compile(r"^(إن|أن|لأن)(ه|ها|هم|هن|كما|كم|كن|نا)?$", re.UNICODE)
-RX_LAKIN_CLITIC = re.compile(r"^لكن(ه|ها|هم|هن|كما|كم|كن|نا)?$", re.UNICODE)
+RX_INNA_CLITIC = re.compile(r"^(Ø¥Ù†|Ø£Ù†|Ù„Ø£Ù†)(Ù‡|Ù‡Ø§|Ù‡Ù…|Ù‡Ù†|ÙƒÙ…Ø§|ÙƒÙ…|ÙƒÙ†|Ù†Ø§)?$", re.UNICODE)
+RX_LAKIN_CLITIC = re.compile(r"^Ù„ÙƒÙ†(Ù‡|Ù‡Ø§|Ù‡Ù…|Ù‡Ù†|ÙƒÙ…Ø§|ÙƒÙ…|ÙƒÙ†|Ù†Ø§)?$", re.UNICODE)
 
 def override_tag(tok: str) -> Optional[Tuple[str, str]]:
     if not tok or is_punct(tok):
@@ -167,43 +185,43 @@ def override_tag(tok: str) -> Optional[Tuple[str, str]]:
 
     m2 = RX_LAKIN_CLITIC.match(t0)
     if m2:
-        return ("CC", "لكن")
+        return ("CC", "Ù„ÙƒÙ†")
 
     return None
 
 # ----------------------------
 # 7) Segmentation clitiques (fix global)
 # ----------------------------
-PROCLITIC_CONJ = {"و", "ف"}
-PROCLITIC_PREP = {"ب", "ك", "ل"}
-FUT_CLITIC = {"س"}  # سـ (future)
+PROCLITIC_CONJ = {"Ùˆ", "Ù"}
+PROCLITIC_PREP = {"Ø¨", "Ùƒ", "Ù„"}
+FUT_CLITIC = {"Ø³"}  # Ø³Ù€ (future)
 
-# suffix pronouns (triés par longueur)
+# suffix pronouns (triÃ©s par longueur)
 PRON_SUFFIXES = [
-    "كما", "كم", "كن",
-    "هما", "هم", "هن",
-    "ها", "ه",
-    "نا", "ني",
-    "ي", "ك"
+    "ÙƒÙ…Ø§", "ÙƒÙ…", "ÙƒÙ†",
+    "Ù‡Ù…Ø§", "Ù‡Ù…", "Ù‡Ù†",
+    "Ù‡Ø§", "Ù‡",
+    "Ù†Ø§", "Ù†ÙŠ",
+    "ÙŠ", "Ùƒ"
 ]
 
 def _looks_like_verb_imperfect(core: str) -> bool:
-    # ي/ت/أ/ن + au moins 3 lettres ensuite
-    return bool(core) and core[0] in {"ي", "ت", "أ", "ن"} and len(core) >= 4
+    # ÙŠ/Øª/Ø£/Ù† + au moins 3 lettres ensuite
+    return bool(core) and core[0] in {"ÙŠ", "Øª", "Ø£", "Ù†"} and len(core) >= 4
 
 def _safe_split_conj(tok0: str) -> bool:
-    # split و/ف seulement si reste commence par:
-    # - préposition fermée (من/في/على/عن/إلى/...)
-    # - ال...
-    # - verbe imperfect (ي/ت/أ/ن...)
+    # split Ùˆ/Ù seulement si reste commence par:
+    # - prÃ©position fermÃ©e (Ù…Ù†/ÙÙŠ/Ø¹Ù„Ù‰/Ø¹Ù†/Ø¥Ù„Ù‰/...)
+    # - Ø§Ù„...
+    # - verbe imperfect (ÙŠ/Øª/Ø£/Ù†...)
     if len(tok0) < 3:
         return False
     rem = tok0[1:]
-    if rem.startswith("ال"):
+    if rem.startswith("Ø§Ù„"):
         return True
     if rem in PREP_WORDS_EXT:
         return True
-    if any(rem.startswith(x) for x in ("من", "في", "على", "عن", "إلى")):
+    if any(rem.startswith(x) for x in ("Ù…Ù†", "ÙÙŠ", "Ø¹Ù„Ù‰", "Ø¹Ù†", "Ø¥Ù„Ù‰")):
         return True
     if _looks_like_verb_imperfect(rem):
         return True
@@ -216,8 +234,8 @@ def _best_analysis_for(form_undiac: str) -> List[Dict]:
         return []
 
 def _char_overlap_ratio(a: str, b: str) -> float:
-    sa = set(a) - set("ـ")
-    sb = set(b) - set("ـ")
+    sa = set(a) - set("Ù€")
+    sb = set(b) - set("Ù€")
     if not sa:
         return 0.0
     return len(sa & sb) / max(1, len(sa))
@@ -241,12 +259,12 @@ def pick_analysis(
     pw = strip_diacritics(prev_word or "")
 
     w_len = len(w)
-    definite_article = w.startswith("ال")
+    definite_article = w.startswith("Ø§Ù„")
     imperfect_prefix = _looks_like_verb_imperfect(w)
     looks_like_perfect = (w_len in {3, 4}) and (not imperfect_prefix) and (not definite_article)
 
-    # patterns helpful for verbs like يَروا / يرون
-    ends_verb_plural = w.endswith("وا") or w.endswith("ون") or w.endswith("ين")
+    # patterns helpful for verbs like ÙŠÙŽØ±ÙˆØ§ / ÙŠØ±ÙˆÙ†
+    ends_verb_plural = w.endswith("ÙˆØ§") or w.endswith("ÙˆÙ†") or w.endswith("ÙŠÙ†")
 
     has_simple_verb = any(((a.get("pos") or "").lower() == "verb") for a in analyses)
 
@@ -302,14 +320,14 @@ def pick_analysis(
                 score -= 1
 
         # if next word has definite article, current verb less likely (weak)
-        if nw.startswith("ال") and pos == "verb":
+        if nw.startswith("Ø§Ù„") and pos == "verb":
             score += 1
 
         # prefer lemma similar to surface
         score += int(10 * _char_overlap_ratio(lem_norm, w_norm))
 
-        # penalty: شدة في lemma بدون شدة في surface (fix مصر vs مُصِرّ et hallucinations)
-        if "ّ" in (lem or "") and "ّ" not in (w_raw or ""):
+        # penalty: Ø´Ø¯Ø© ÙÙŠ lemma Ø¨Ø¯ÙˆÙ† Ø´Ø¯Ø© ÙÙŠ surface (fix Ù…ØµØ± vs Ù…ÙØµÙØ±Ù‘ et hallucinations)
+        if "Ù‘" in (lem or "") and "Ù‘" not in (w_raw or ""):
             score -= 6
 
         # verbs: sanity
@@ -342,7 +360,7 @@ def pick_analysis(
                 lem = lemma_from_analysis(a, w_raw)
                 lem_norm = norm_alef(strip_diacritics(lem))
                 sc = int(10 * _char_overlap_ratio(lem_norm, w_norm))
-                if "ّ" in (lem or "") and "ّ" not in (w_raw or ""):
+                if "Ù‘" in (lem or "") and "Ù‘" not in (w_raw or ""):
                     sc -= 6
                 if sc > vb_sc:
                     vb_sc = sc
@@ -360,27 +378,27 @@ def split_proclitics(tok: str) -> Tuple[List[Tuple[str,str,str]], str]:
     t0 = strip_diacritics(tok)
     prefixes: List[Tuple[str,str,str]] = []
 
-    # 1) و/ف (conj) only if safe
+    # 1) Ùˆ/Ù (conj) only if safe
     if t0 and t0[0] in PROCLITIC_CONJ and _safe_split_conj(t0):
         prefixes.append((t0[0], "CC", t0[0]))
         t0 = t0[1:]
 
-    # 2) س (future) if followed by imperfect verb
+    # 2) Ø³ (future) if followed by imperfect verb
     if t0 and t0[0] in FUT_CLITIC and len(t0) >= 3 and _looks_like_verb_imperfect(t0[1:]):
         prefixes.append((t0[0], "RP", t0[0]))
         t0 = t0[1:]
 
-    # 3) ب/ك/ل (prep) : split if remainder has analyses as noun/prop/adj OR starts with ال OR is known prep base
+    # 3) Ø¨/Ùƒ/Ù„ (prep) : split if remainder has analyses as noun/prop/adj OR starts with Ø§Ù„ OR is known prep base
     if t0 and t0[0] in PROCLITIC_PREP and len(t0) >= 3:
         rem = t0[1:]
         do_split = False
-        if rem.startswith("ال") or rem in PREP_WORDS_EXT:
+        if rem.startswith("Ø§Ù„") or rem in PREP_WORDS_EXT:
             do_split = True
         else:
             # try analyze remainder; if it yields noun/noun_prop/adj => split
             ans = _best_analysis_for(rem)
             if any((a.get("pos") or "").lower() in {"noun", "noun_prop", "adj"} for a in ans):
-                # BUT avoid splitting if whole word is a strong noun_prop match (e.g., بشار)
+                # BUT avoid splitting if whole word is a strong noun_prop match (e.g., Ø¨Ø´Ø§Ø±)
                 whole = _best_analysis_for(t0)
                 best_whole = pick_analysis(tok, whole)
                 if not (best_whole and (best_whole.get("pos","").lower()=="noun_prop") and
@@ -407,23 +425,23 @@ def split_enclitics(core_undiac: str) -> Tuple[str, List[Tuple[str,str,str]]]:
     while changed and stem:
         changed = False
 
-        # special connector "و" before a pronoun like ...وها / ...وهم / ...وكم
-        if stem.endswith("وها"):
+        # special connector "Ùˆ" before a pronoun like ...ÙˆÙ‡Ø§ / ...ÙˆÙ‡Ù… / ...ÙˆÙƒÙ…
+        if stem.endswith("ÙˆÙ‡Ø§"):
             stem = stem[:-3]
-            suffixes.insert(0, ("و", "PRP", "و"))
-            suffixes.insert(1, ("ها", "PRP", "ها"))
+            suffixes.insert(0, ("Ùˆ", "PRP", "Ùˆ"))
+            suffixes.insert(1, ("Ù‡Ø§", "PRP", "Ù‡Ø§"))
             changed = True
             continue
-        if stem.endswith("وهم"):
+        if stem.endswith("ÙˆÙ‡Ù…"):
             stem = stem[:-3]
-            suffixes.insert(0, ("و", "PRP", "و"))
-            suffixes.insert(1, ("هم", "PRP", "هم"))
+            suffixes.insert(0, ("Ùˆ", "PRP", "Ùˆ"))
+            suffixes.insert(1, ("Ù‡Ù…", "PRP", "Ù‡Ù…"))
             changed = True
             continue
-        if stem.endswith("وكم"):
+        if stem.endswith("ÙˆÙƒÙ…"):
             stem = stem[:-3]
-            suffixes.insert(0, ("و", "PRP", "و"))
-            suffixes.insert(1, ("كم", "PRP", "كم"))
+            suffixes.insert(0, ("Ùˆ", "PRP", "Ùˆ"))
+            suffixes.insert(1, ("ÙƒÙ…", "PRP", "ÙƒÙ…"))
             changed = True
             continue
 
@@ -462,17 +480,17 @@ def ner_predict_tokens(tokens: List[str]) -> List[str]:
     raise AttributeError("NERecognizer has no predict_sentence/predict method in this version.")
 
 TITLE_NORMS = {
-    "سيد", "السيد",
-    "سيدة", "السيدة",
-    "دكتور", "الدكتور",
-    "دكتورة", "الدكتورة",
-    "استاذ", "الأستاذ", "الاستاذ", "استاذة", "الأستاذة", "الاستاذة",
-    "مهندس", "المهندس",
-    "شيخ", "الشيخ",
-    "رئيس", "الرئيس",
-    "وزير", "الوزير",
-    "امير", "الأمير", "الامير",
-    "ملك", "الملك",
+    "Ø³ÙŠØ¯", "Ø§Ù„Ø³ÙŠØ¯",
+    "Ø³ÙŠØ¯Ø©", "Ø§Ù„Ø³ÙŠØ¯Ø©",
+    "Ø¯ÙƒØªÙˆØ±", "Ø§Ù„Ø¯ÙƒØªÙˆØ±",
+    "Ø¯ÙƒØªÙˆØ±Ø©", "Ø§Ù„Ø¯ÙƒØªÙˆØ±Ø©",
+    "Ø§Ø³ØªØ§Ø°", "Ø§Ù„Ø£Ø³ØªØ§Ø°", "Ø§Ù„Ø§Ø³ØªØ§Ø°", "Ø§Ø³ØªØ§Ø°Ø©", "Ø§Ù„Ø£Ø³ØªØ§Ø°Ø©", "Ø§Ù„Ø§Ø³ØªØ§Ø°Ø©",
+    "Ù…Ù‡Ù†Ø¯Ø³", "Ø§Ù„Ù…Ù‡Ù†Ø¯Ø³",
+    "Ø´ÙŠØ®", "Ø§Ù„Ø´ÙŠØ®",
+    "Ø±Ø¦ÙŠØ³", "Ø§Ù„Ø±Ø¦ÙŠØ³",
+    "ÙˆØ²ÙŠØ±", "Ø§Ù„ÙˆØ²ÙŠØ±",
+    "Ø§Ù…ÙŠØ±", "Ø§Ù„Ø£Ù…ÙŠØ±", "Ø§Ù„Ø§Ù…ÙŠØ±",
+    "Ù…Ù„Ùƒ", "Ø§Ù„Ù…Ù„Ùƒ",
 }
 
 def norm_for_match(tok: str) -> str:
@@ -483,7 +501,7 @@ def fix_titles(tokens: List[str], labels: List[str]) -> List[str]:
     for i in range(1, len(tokens)):
         if labels[i].startswith("B-PERS") and labels[i - 1] == "O":
             prev_norm = norm_for_match(tokens[i - 1])
-            prev_norm2 = prev_norm[2:] if prev_norm.startswith("ال") and len(prev_norm) > 2 else prev_norm
+            prev_norm2 = prev_norm[2:] if prev_norm.startswith("Ø§Ù„") and len(prev_norm) > 2 else prev_norm
             if prev_norm in TITLE_NORMS or prev_norm2 in TITLE_NORMS:
                 labels[i - 1] = "B-PERS"
                 labels[i] = "I-PERS"
@@ -496,6 +514,24 @@ def add_year_dates(tokens: List[str], labels: List[str]) -> List[str]:
             y = int(tok)
             if 1500 <= y <= 2100 and labels[i] == "O":
                 labels[i] = "B-DATE"
+    return labels
+
+def add_currency_codes(tokens: List[str], labels: List[str]) -> List[str]:
+    labels = labels[:]
+    for i, tok in enumerate(tokens):
+        raw = (tok or "").strip()
+        if not raw:
+            continue
+        up = raw.upper()
+        if up in CURRENCY_CODES and labels[i] == "O":
+            labels[i] = "B-CUR"
+            continue
+        if raw in CURRENCY_SYMBOLS and labels[i] == "O":
+            labels[i] = "B-CUR"
+            continue
+        norm = norm_alef(strip_diacritics(raw)).lower()
+        if norm in AR_CURRENCY_WORDS and labels[i] == "O":
+            labels[i] = "B-CUR"
     return labels
 
 def enforce_bio(labels: List[str]) -> List[str]:
@@ -512,13 +548,13 @@ def strip_entity_clitics_for_display(tok: str, lemma: str) -> str:
     t = strip_diacritics(tok)
     l = strip_diacritics(lemma or "")
 
-    if len(t) > 2 and (t.startswith("وال") or t.startswith("فال")):
+    if len(t) > 2 and (t.startswith("ÙˆØ§Ù„") or t.startswith("ÙØ§Ù„")):
         return tok[1:]
 
-    if len(t) > 1 and t.startswith("ب"):
+    if len(t) > 1 and t.startswith("Ø¨"):
         rem = t[1:]
-        rem2 = rem[2:] if rem.startswith("ال") and len(rem) > 2 else rem
-        l2 = l[2:] if l.startswith("ال") and len(l) > 2 else l
+        rem2 = rem[2:] if rem.startswith("Ø§Ù„") and len(rem) > 2 else rem
+        l2 = l[2:] if l.startswith("Ø§Ù„") and len(l) > 2 else l
         if l2 == rem2 and rem:
             return tok[1:]
 
@@ -574,10 +610,10 @@ def _estimate_clitic_count(undiac: str) -> int:
     if not undiac:
         return 0
     c = 0
-    if undiac.startswith(("و", "ف")) and len(undiac) > 2 and _safe_split_conj(undiac):
+    if undiac.startswith(("Ùˆ", "Ù")) and len(undiac) > 2 and _safe_split_conj(undiac):
         c += 1
         undiac = undiac[1:]
-    if undiac.startswith(("ب", "ك", "ل")) and len(undiac) > 2:
+    if undiac.startswith(("Ø¨", "Ùƒ", "Ù„")) and len(undiac) > 2:
         c += 1
         undiac = undiac[1:]
     # suffix pronouns
@@ -585,7 +621,7 @@ def _estimate_clitic_count(undiac: str) -> int:
         if undiac.endswith(suf):
             c += 1
             break
-    if undiac.endswith(("وها", "وهم", "وكم")):
+    if undiac.endswith(("ÙˆÙ‡Ø§", "ÙˆÙ‡Ù…", "ÙˆÙƒÙ…")):
         c += 2
     return c
 
@@ -595,7 +631,7 @@ def _lemma_suspicious(word_raw: str, lemma: str) -> bool:
     if not w or not l:
         return False
     # suspicious if lemma contains shadda but word doesn't
-    if "ّ" in (lemma or "") and "ّ" not in (word_raw or ""):
+    if "Ù‘" in (lemma or "") and "Ù‘" not in (word_raw or ""):
         return True
     # suspicious if overlap too low
     if _char_overlap_ratio(l, w) < 0.34 and len(l) >= 4:
@@ -626,7 +662,7 @@ def analyze_sentence(text: str):
 
     for i, tok in enumerate(toks):
         if is_punct(tok):
-            display_rows.append((tok, "PUNCT", "∅"))
+            display_rows.append((tok, "PUNCT", "âˆ…"))
             morph_rows_for_ner.append({"tok": tok, "tag": "PUNCT", "lemma": ""})
             prev_tag = None
             prev_word = ""
@@ -673,7 +709,7 @@ def analyze_sentence(text: str):
         for (p_surf, p_tag, p_lem) in prefixes:
             display_rows.append((p_surf, p_tag, p_lem))
 
-        # Analyze STEM only (important fix for بمصر, ومنهم, ... pronoun verbs)
+        # Analyze STEM only (important fix for Ø¨Ù…ØµØ±, ÙˆÙ…Ù†Ù‡Ù…, ... pronoun verbs)
         analyze_form = stem0 if stem0 else core0
         analyses = _best_analysis_for(analyze_form)
 
@@ -723,6 +759,7 @@ def analyze_sentence(text: str):
         ner_labels = ner_predict_tokens(toks)
         ner_labels = fix_titles(toks, ner_labels)
         ner_labels = add_year_dates(toks, ner_labels)
+        ner_labels = add_currency_codes(toks, ner_labels)
         ner_labels = enforce_bio(ner_labels)
 
         print("\nNER (pretrained + deterministic fixes) (token, label):")
@@ -750,7 +787,7 @@ def split_input_into_sentences(s: str) -> List[str]:
     if not s:
         return []
     # Split sur les points, points d'exclamation, points d'interrogation uniquement
-    parts = re.split(r"[\.\!\؟\?]+", s)
+    parts = re.split(r"[\.\!\ØŸ\?]+", s)
     return [p.strip() for p in parts if p.strip()]
 
 print("Type an Arabic sentence (empty line to stop). You can paste ONE sentence or MANY quoted sentences.")
@@ -838,3 +875,4 @@ def main(argv=None) -> None:
 
 if __name__ == "__main__":
     main()
+

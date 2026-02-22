@@ -24,6 +24,7 @@ def parse_cli() -> argparse.Namespace:
         "tokenisation-layout",
         "atripusion-gramatical-en-utilisant-les3ficherla",
         "clasification",
+        "extraction-regles",
     ], help="N'executer qu'une seule etape (par nom).")
     parser.add_argument("--upto", choices=[
         "pretraitement-de-docs",
@@ -32,6 +33,7 @@ def parse_cli() -> argparse.Namespace:
         "tokenisation-layout",
         "atripusion-gramatical-en-utilisant-les3ficherla",
         "clasification",
+        "extraction-regles",
     ], help="Executer jusqu'a et incluant cette etape.")
     parser.add_argument("--start", choices=[
         "pretraitement-de-docs",
@@ -40,6 +42,7 @@ def parse_cli() -> argparse.Namespace:
         "tokenisation-layout",
         "atripusion-gramatical-en-utilisant-les3ficherla",
         "clasification",
+        "extraction-regles",
     ], help="Commencer a partir de cette etape.")
     parser.add_argument("--list-steps", action="store_true", help="Lister les etapes sans executer.")
     return parser.parse_args()

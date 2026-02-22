@@ -219,3 +219,26 @@ class ClassificationComponent(Component):
         return results
 
 
+class RuleExtractionComponent(Component):
+    def run(self, context: Context) -> Any:
+        ctx = self._execute_script(context)
+        extractions = ctx.get("EXTRACTIONS")
+        if extractions is None:
+            raise ValueError("extraction-regles n'a retourne aucun resultat.")
+
+        total_fields = 0
+        labels = []
+        if isinstance(extractions, list):
+            total_fields = sum(len(d.get("fields") or {}) for d in extractions)
+            labels = [f"{d.get('filename')}->{d.get('doc_type')}" for d in extractions]
+
+        summary = f"{len(extractions) if isinstance(extractions, list) else 0} docs | fields={total_fields}"
+        if labels:
+            summary += f" | {', '.join(labels[:4])}"
+            if len(labels) > 4:
+                summary += " ..."
+
+        self._report(extractions, summary)
+        return extractions
+
+

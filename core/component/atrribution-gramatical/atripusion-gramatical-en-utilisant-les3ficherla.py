@@ -2,10 +2,12 @@
 # 1) Chemin vers tes .py
 # =========================
 import sys, types, re, importlib
+from pathlib import Path
 
-BASE_DIR = r"C:\Users\moura\OneDrive\Bureau\DMS\test"  # dossier qui contient engcode.py / frcode.py / arabcode.py
-if BASE_DIR not in sys.path:
-    sys.path.insert(0, BASE_DIR)
+# Utilise le dossier du composant pour rester portable
+BASE_DIR = Path(__file__).resolve().parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
 # =========================
 # 2) Petit "nb_utils" en mémoire (pas besoin de créer nb_utils.py)

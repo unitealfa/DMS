@@ -35,7 +35,7 @@ py -3.11 -m pip install --upgrade --target .\.pylibs torch transformers tokenize
 
 simplemma
 
-cd C:\Users\moura\OneDrive\Bureau\DMS
+cd DMS
 
 # 1) Crée le dossier local
 New-Item -ItemType Directory -Force .\.pylibs | Out-Null

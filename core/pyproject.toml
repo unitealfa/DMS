@@ -1,0 +1,21 @@
+[project]
+name = "produit-cor-pipeline"
+version = "0.1.0"
+description = "Orchestrateur portable pour le pipeline documentaire."
+authors = [{ name = "DMS Contributors" }]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["pipeline"]
+
+[project.scripts]
+# Commande principale (ex: `orchestre ...`)
+orchestre = "pipeline.cli:main"
+# Alias optionnel si tu préfères `main` (évite l'erreur "no matching result")
+main = "pipeline.cli:main"

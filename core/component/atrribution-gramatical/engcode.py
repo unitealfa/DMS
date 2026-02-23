@@ -9,9 +9,6 @@ LOCAL_DEPS_DIR = os.path.join(os.getcwd(), ".pylibs")
 if os.path.isdir(LOCAL_DEPS_DIR) and LOCAL_DEPS_DIR not in sys.path:
     sys.path.insert(0, LOCAL_DEPS_DIR)
 
-print("Python kernel:", sys.executable)
-print("Local deps dir:", LOCAL_DEPS_DIR if os.path.isdir(LOCAL_DEPS_DIR) else "(absent)")
-
 def print_install_help():
     py = sys.executable
     print("\n[install] Sans venv, en local dans .pylibs (utilise CE python):")

@@ -8,9 +8,6 @@ LOCAL_DEPS_DIR = os.path.join(os.getcwd(), ".pylibs")
 if os.path.isdir(LOCAL_DEPS_DIR) and LOCAL_DEPS_DIR not in sys.path:
     sys.path.insert(0, LOCAL_DEPS_DIR)
 
-print("Python:", sys.executable)
-print("Local deps:", LOCAL_DEPS_DIR if os.path.isdir(LOCAL_DEPS_DIR) else "(absent)")
-
 def _install_help():
     py = sys.executable
     print("\n[install help] Sans venv, local dans .pylibs (utilise CE python):")
@@ -790,7 +787,7 @@ def split_input_into_sentences(s: str) -> List[str]:
     parts = re.split(r"[\.\!\ØŸ\?]+", s)
     return [p.strip() for p in parts if p.strip()]
 
-print("Type an Arabic sentence (empty line to stop). You can paste ONE sentence or MANY quoted sentences.")
+# (ancienne invite supprimÃ©e pour Ã©viter le bruit au chargement)
 
 def run_one_auto(sentence: str):
     """Run AR pipeline on one sentence."""

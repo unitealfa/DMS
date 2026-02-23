@@ -7,7 +7,7 @@ Output: [{'content': 'text',
   'mime': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'path': 'documents/test-regex3langue.docx'}]
 
-[skip] content='text' -> C:\Users\moura\OneDrive\Bureau\produit-cor\documents\test-regex3langue.docx
+[skip] content='text' -> C:\Users\moura\OneDrive\Bureau\DMS\core\documents\test-regex3langue.docx
 [info] Aucun fichier à OCR (image_only). Tout ce que tu as donné est détecté comme 'text'.
 [Component: si-image-pretraiter-sinonpass-le-doc]
 Type: dict
@@ -15,9 +15,9 @@ Summary: text=1, image=0, docs_prepped=1
 Output: {'DOCS': [{'filename': 'test-regex3langue.docx',
            'page_count_total': 0,
            'pages': [],
-           'source_files': ['C:\\Users\\moura\\OneDrive\\Bureau\\produit-cor\\documents\\test-regex3langue.docx']}],
+           'source_files': ['C:\\Users\\moura\\OneDrive\\Bureau\\DMS\\core\\documents\\test-regex3langue.docx']}],
  'IMAGE_ONLY_FILES': [],
- 'TEXT_FILES': ['C:\\Users\\moura\\OneDrive\\Bureau\\produit-cor\\documents\\test-regex3langue.docx']}
+ 'TEXT_FILES': ['C:\\Users\\moura\\OneDrive\\Bureau\\DMS\\core\\documents\\test-regex3langue.docx']}
 
 [doc] test-regex3langue.docx | content=image_only | extraction=ocr:tesseract | pages=1
 
@@ -97,7 +97,7 @@ Output: [{'content': 'image_only',
   'pages_text': [],
   'text': ''},
  {'content': 'text',
-  'doc_id': '32ac25cb-c410-459e-a882-57ac65c0c8e9',
+  'doc_id': '9a3930a2-1c0d-4fee-8497-50c319c68463',
   'extraction': 'native:docx:xml',
   'filename': 'test-regex3langue.docx',
   'page_count_total': 1,
@@ -237,16 +237,16 @@ Output: [{'content': 'image_only',
 ------------------------------------------------------------------------------------------------------------------------
 ========================================================================================================================
 [doc] test-regex3langue.docx
-  doc_id       : 32ac25cb-c410-459e-a882-57ac65c0c8e9
+  doc_id       : 9a3930a2-1c0d-4fee-8497-50c319c68463
   content      : text
   extraction   : native:docx:xml
   pages_total  : 1
   chars_total  : 1872
   recompose_ok : False
   paths:
-    - C:\Users\moura\OneDrive\Bureau\produit-cor\documents\test-regex3langue.docx
+    - C:\Users\moura\OneDrive\Bureau\DMS\core\documents\test-regex3langue.docx
 ------------------------------------------------------------------------------------------------------------------------
-[page 1/1] source_path=C:\Users\moura\OneDrive\Bureau\produit-cor\documents\test-regex3langue.docx
+[page 1/1] source_path=C:\Users\moura\OneDrive\Bureau\DMS\core\documents\test-regex3langue.docx
   lang         : fr
   chars        : 1872
 ------------------------------------------------------------------------------------------------------------------------
@@ -344,7 +344,7 @@ Output: [{'chars_total': 0,
   'recompose_ok': True},
  {'chars_total': 1872,
   'content': 'text',
-  'doc_id': '32ac25cb-c410-459e-a882-57ac65c0c8e9',
+  'doc_id': '9a3930a2-1c0d-4fee-8497-50c319c68463',
   'extraction': 'native:docx:xml',
   'filename': 'test-regex3langue.docx',
   'page_count_total': 1,
@@ -625,24 +625,10 @@ Output: [{'chars_total': 0,
                                    'start': 1834,
                                    'table_rows': None,
                                    'text': '1.2.3 USD\xa0(Format de nombre invalide)\n'}],
-             'source_path': 'C:\\Users\\moura\\OneDrive\\Bureau\\produit-cor\\documents\\test-regex3langue.docx'}],
-  'paths': ['C:\\Users\\moura\\OneDrive\\Bureau\\produit-cor\\documents\\test-regex3langue.docx'],
+             'source_path': 'C:\\Users\\moura\\OneDrive\\Bureau\\DMS\\core\\documents\\test-regex3langue.docx'}],
+  'paths': ['C:\\Users\\moura\\OneDrive\\Bureau\\DMS\\core\\documents\\test-regex3langue.docx'],
   'recompose_ok': False}]
 
-Python kernel: C:\Users\moura\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe
-Local deps dir: (absent)
-Python kernel: C:\Users\moura\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe
-Local deps dir: (absent)
-Python: C:\Users\moura\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe
-Local deps: (absent)
-Type an Arabic sentence (empty line to stop). You can paste ONE sentence or MANY quoted sentences.
-Python kernel: C:\Users\moura\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe
-Local deps dir: (absent)
-Python kernel: C:\Users\moura\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe
-Local deps dir: (absent)
-Python: C:\Users\moura\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe
-Local deps: (absent)
-Type an Arabic sentence (empty line to stop). You can paste ONE sentence or MANY quoted sentences.
 
 ========================================================================================================================
 RUN EN (engcode.py)
@@ -1112,8 +1098,11 @@ INPUT: 5. Devises (DZD, EUR, USD)
          )  PUNCT   lemma=∅
 
 NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
-[('5', 'O'), ('.', 'O'), ('Devises', 'O'), ('(', 'O'), ('DZD', 'O'), (',', 'O'), ('EUR', 'O'), (',', 'O'), ('USD', 'O'), (')', 'O')]
+[('5', 'O'), ('.', 'O'), ('Devises', 'O'), ('(', 'O'), ('DZD', 'B-CUR'), (',', 'O'), ('EUR', 'B-CUR'), (',', 'O'), ('USD', 'B-CUR'), (')', 'O')]
 Entities:
+  CUR: DZD
+  CUR: EUR
+  CUR: USD
 
 ##########################################################################################
 DOC=test-regex3langue.docx | page=1 | sent=5 | lang=fr
@@ -1154,7 +1143,7 @@ Pièges (À NE PAS EXTRAIRE) :
        250  CD      lemma=250
        EUR  NNP     lemma=EUR
         10  CD      lemma=10
-         $  NN      lemma=$
+         $  NNP     lemma=$
        USD  NNP     lemma=USD
     Pièges  NNP     lemma=piège
          (  PUNCT   lemma=∅
@@ -1175,8 +1164,13 @@ Pièges (À NE PAS EXTRAIRE) :
          )  PUNCT   lemma=∅
 
 NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
-[('Valides', 'O'), (':', 'O'), ('1500.50', 'O'), ('DZD', 'O'), ('250', 'O'), ('EUR', 'O'), ('10', 'O'), ('$', 'O'), ('USD', 'O'), ('Pièges', 'O'), ('(', 'O'), ('À', 'O'), ('NE', 'B-LOC'), ('PAS', 'I-LOC'), ('EXTRAIRE', 'I-LOC'), (')', 'O'), (':', 'O'), ('1500', 'O'), ('DZD', 'O'), ('4', 'O'), ('(', 'O'), ('Chiffre', 'O'), ('collé', 'O'), ('au', 'O'), ('code', 'O'), (')', 'O')]
+[('Valides', 'O'), (':', 'O'), ('1500.50', 'O'), ('DZD', 'B-CUR'), ('250', 'O'), ('EUR', 'B-CUR'), ('10', 'O'), ('$', 'B-CUR'), ('USD', 'B-CUR'), ('Pièges', 'O'), ('(', 'O'), ('À', 'O'), ('NE', 'B-LOC'), ('PAS', 'I-LOC'), ('EXTRAIRE', 'I-LOC'), (')', 'O'), (':', 'O'), ('1500', 'O'), ('DZD', 'B-CUR'), ('4', 'O'), ('(', 'O'), ('Chiffre', 'O'), ('collé', 'O'), ('au', 'O'), ('code', 'O'), (')', 'O')]
 Entities:
+  CUR: DZD
+  CUR: EUR
+  CUR: $
+  CUR: USD
+  CUR: DZD
   LOC: NE PAS EXTRAIRE
 
 ##########################################################################################
@@ -1193,8 +1187,9 @@ INPUT: EUR (Code seul sans montant)
          )  PUNCT   lemma=∅
 
 NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
-[('EUR', 'O'), ('(', 'O'), ('Code', 'O'), ('seul', 'O'), ('sans', 'O'), ('montant', 'O'), (')', 'O')]
+[('EUR', 'B-CUR'), ('(', 'O'), ('Code', 'O'), ('seul', 'O'), ('sans', 'O'), ('montant', 'O'), (')', 'O')]
 Entities:
+  CUR: EUR
 
 ##########################################################################################
 DOC=test-regex3langue.docx | page=1 | sent=8 | lang=fr
@@ -1213,8 +1208,9 @@ INPUT: 1.2.3 USD (Format de nombre invalide)
          )  PUNCT   lemma=∅
 
 NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
-[('1.2', 'O'), ('.', 'O'), ('3', 'O'), ('USD', 'O'), ('(', 'O'), ('Format', 'O'), ('de', 'O'), ('nombre', 'O'), ('invalide', 'O'), (')', 'O')]
+[('1.2', 'O'), ('.', 'O'), ('3', 'O'), ('USD', 'B-CUR'), ('(', 'O'), ('Format', 'O'), ('de', 'O'), ('nombre', 'O'), ('invalide', 'O'), (')', 'O')]
 Entities:
+  CUR: USD
 
 ========================================================================================================================
 RUN AR (arabcode.py)
@@ -1233,7 +1229,7 @@ Output: [{'chars_total': 0,
   'recompose_ok': True},
  {'chars_total': 1872,
   'content': 'text',
-  'doc_id': '32ac25cb-c410-459e-a882-57ac65c0c8e9',
+  'doc_id': '9a3930a2-1c0d-4fee-8497-50c319c68463',
   'extraction': 'native:docx:xml',
   'filename': 'test-regex3langue.docx',
   'page_count_total': 1,
@@ -1514,8 +1510,8 @@ Output: [{'chars_total': 0,
                                    'start': 1834,
                                    'table_rows': None,
                                    'text': '1.2.3 USD\xa0(Format de nombre invalide)\n'}],
-             'source_path': 'C:\\Users\\moura\\OneDrive\\Bureau\\produit-cor\\documents\\test-regex3langue.docx'}],
-  'paths': ['C:\\Users\\moura\\OneDrive\\Bureau\\produit-cor\\documents\\test-regex3langue.docx'],
+             'source_path': 'C:\\Users\\moura\\OneDrive\\Bureau\\DMS\\core\\documents\\test-regex3langue.docx'}],
+  'paths': ['C:\\Users\\moura\\OneDrive\\Bureau\\DMS\\core\\documents\\test-regex3langue.docx'],
   'recompose_ok': False}]
 
 [classification] test-regex3langue.docx -> best=UNCLASSIFIED | status=REVIEW | scores: {'ARTICLE': 0, 'BON_DE_COMMANDE': 0, 'CONTRAT': 0, 'FACTURE': 0, 'FORMULAIRE': 0}
@@ -1524,7 +1520,7 @@ Output: [{'chars_total': 0,
 Type: list
 Summary: 2 docs classes | test-regex3langue.docx->UNCLASSIFIED, test-regex3langue.docx->FORMULAIRE
 Output: [{'decision_debug': {'diff': 0, 'second_score': 0, 'top_score': 0},
-  'doc_id': 'ea4e0a6d-04a7-4d6e-99dc-516ee388b999',
+  'doc_id': 'cdc6df89-44fd-414c-8889-0fde19008f1d',
   'doc_type': 'UNCLASSIFIED',
   'filename': 'test-regex3langue.docx',
   'margin': 3,
@@ -1532,7 +1528,7 @@ Output: [{'decision_debug': {'diff': 0, 'second_score': 0, 'top_score': 0},
   'status': 'REVIEW',
   'threshold': 6},
  {'decision_debug': {'diff': 8, 'second_score': 0, 'top_score': 8},
-  'doc_id': 'a9ad8cff-6379-40e0-90d7-a4d7a8fa2015',
+  'doc_id': '3591b9bc-edf2-48c7-b32a-f585ee34abb7',
   'doc_type': 'FORMULAIRE',
   'filename': 'test-regex3langue.docx',
   'margin': 3,
@@ -1586,7 +1582,7 @@ Output: [{'classification_status': 'OK',
                                                     'CONTRAT': ['CONTRAT.json'],
                                                     'FACTURE': ['FACTURE.json']}}}},
  {'classification_status': 'OK',
-  'doc_id': '32ac25cb-c410-459e-a882-57ac65c0c8e9',
+  'doc_id': '9a3930a2-1c0d-4fee-8497-50c319c68463',
   'doc_type': 'FORMULAIRE',
   'fields': {'doc_date': {'many': True,
                           'matches': [{'end': 1370,

@@ -6,12 +6,14 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 
 # ========= CONFIG =========
-BASE_DIR = r"C:\Users\moura\OneDrive\Bureau\DMS\test"  # où sont tes fichiers + dossier "classification"
-CLASSIFICATION_DIR = (Path(BASE_DIR) / "classification") if (Path(BASE_DIR) / "classification").exists() else Path("classification")
+# Tout est résolu depuis la racine du dépôt pour rester portable
+REPO_ROOT = Path(__file__).resolve().parent.parent
+CLASSIFICATION_DIR = REPO_ROOT / "classification"
 COMMON_PATH = CLASSIFICATION_DIR / "common.json"
 
-if BASE_DIR not in sys.path:
-    sys.path.insert(0, BASE_DIR)
+# Garder le repo root dans sys.path pour des imports éventuels
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 # ========= HELPERS =========
 def _load_json(path: Path):

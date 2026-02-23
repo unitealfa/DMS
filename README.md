@@ -52,3 +52,12 @@ C:\Users\moura\Downloads\elasticsearch-7.10.2-windows-x86_64\elasticsearch-7.10.
 - Vérifier que Python est ajouté au PATH.
 - Vérifier que Tesseract est accessible depuis la ligne de commande.
 - Installer uniquement les langues nécessaires pour éviter d’alourdir l’environnement.
+
+
+Tableau comparatif offline vs online (scores estimés)
+Langue  	POS offline 	POS online  	Δ POS   	Lemma offline   	Lemma online	Δ Lemma 	NER offline     	NER online	    Δ NER
+EN      	76%     	    76%         	0	        79%             	79%         	0          	38%	                71%         	+33
+FR      	66%     	    67%         	+1      	72%                	73%         	+1      	52%             	93%         	+41
+AR      	53%     	    54%         	+1	        44%             	45%         	+1      	74%             	70%         	-4
+
+

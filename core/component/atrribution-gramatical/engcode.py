@@ -499,7 +499,7 @@ def fix_buffalo_pos(tokens: List[str], pos: List[str], lem: List[str]) -> None:
             lem[i] = "buffalo"
 
 # ----------------------------
-# 8) DATE spans (règles) + NER IA + fixes bruit Buffalo
+# 8) DATE spans (règles) + NER 30 ml + fixes bruit Buffalo
 # ----------------------------
 def date_spans(text: str) -> List[Tuple[int,int,str]]:
     spans = []
@@ -742,7 +742,7 @@ def run_one(text: str, ner_pipe=None):
             apply_spans_to_tokens(toks, spans, labels)
             ner_mode = f"IA (transformers): {HF_MODEL_NAME}"
         except Exception as e:
-            ner_mode = f"fallback (rules) - NER IA indisponible: {e}"
+            ner_mode = f"fallback (rules) - NER 30 ml indisponible: {e}"
             labels = fallback_ner_labels(tokens, pos)
     else:
         labels = fallback_ner_labels(tokens, pos)
@@ -807,7 +807,7 @@ def get_ner_pipe():
         _EN_NER_PIPE = load_hf_ner(HF_MODEL_NAME)
     except Exception as e:
         _EN_NER_PIPE = None
-        print("[warn] (EN) NER IA not loaded, fallback rules. Cause:", e)
+        print("[warn] (EN) NER 30 ml not loaded, fallback rules. Cause:", e)
 
     return _EN_NER_PIPE
 

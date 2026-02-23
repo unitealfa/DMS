@@ -1,13 +1,19 @@
 # =========================
 # 1) Chemin vers tes .py
 # =========================
-import sys, types, re, importlib
+import sys, types, re, importlib, os
 from pathlib import Path
 
 # Utilise le dossier du composant pour rester portable
 BASE_DIR = Path(__file__).resolve().parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
+
+# Mode offline : forcer ici (MANUAL_OFFLINE=True) ou via l'env LANG_PIPE_OFFLINE=1
+MANUAL_OFFLINE = False
+OFFLINE = MANUAL_OFFLINE or (os.environ.get("LANG_PIPE_OFFLINE", "0").lower() in {"1", "true", "yes", "on"})
+if OFFLINE:
+    print("[info] Mode offline: NER désactivé (eng/fr).")
 
 # =========================
 # 2) Petit "nb_utils" en mémoire (pas besoin de créer nb_utils.py)
@@ -109,6 +115,17 @@ importlib.reload(engcode)
 importlib.reload(frcode)
 if HAVE_AR:
     importlib.reload(arabcode)
+
+# Si offline, désactiver explicitement les pipelines 30% IA ENG/FR (fallback règles uniquement)
+if OFFLINE:
+    if hasattr(engcode, "HF_OK"):
+        engcode.HF_OK = False
+    if hasattr(engcode, "_EN_NER_PIPE"):
+        engcode._EN_NER_PIPE = None
+    if hasattr(frcode, "HF_OK"):
+        frcode.HF_OK = False
+    if hasattr(frcode, "_FR_NER_PIPE"):
+        frcode._FR_NER_PIPE = None
 
 # =========================
 # 4) Exécution: chaque script filtre sa langue et print son output

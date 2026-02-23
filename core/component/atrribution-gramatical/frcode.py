@@ -802,7 +802,7 @@ def run_one(text: str, ner_pipe=None):
             apply_spans_to_tokens(toks, spans, labels)
             ner_mode = f"IA (transformers): {HF_MODEL_NAME}"
         except Exception as e:
-            ner_mode = f"fallback (règles) - NER IA indisponible: {e}"
+            ner_mode = f"fallback (règles) - NER 30% IA indisponible: {e}"
             labels = ["O"] * len(toks)
 
     # fallback règles si toujours vide
@@ -874,7 +874,7 @@ def get_ner_pipe():
         _FR_NER_PIPE = load_hf_ner(HF_MODEL_NAME)
     except Exception as e:
         _FR_NER_PIPE = None
-        print("[warn] (FR) NER IA not loaded, fallback rules. Cause:", e)
+        print("[warn] (FR) NER 30% IA not loaded, fallback rules. Cause:", e)
 
     return _FR_NER_PIPE
 

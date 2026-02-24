@@ -29,8 +29,13 @@ def _strip_accents(s: str) -> str:
     )
 
 def _norm_text(s: str) -> str:
-    s = _strip_accents(s)
-    return " ".join((s or "").upper().split())
+    s = _strip_accents(s or "")
+    s = re.sub(r"[^A-Za-z0-9]+", " ", s)  # remplace ponctuation par espaces
+    return " ".join(s.upper().split())
+
+def _norm_keyword(k: str) -> str:
+    """Applique la même normalisation qu'au texte pour garantir le match."""
+    return _norm_text(k or "")
 
 def _ensure_kw_dict(d: Dict[str, Any]) -> Dict[str, List[str]]:
     kw = d.get("keywords")
@@ -142,32 +147,55 @@ def classify_scores(DOCS: List[Dict[str, Any]], common: Dict[str, Any], configs:
     for doc in DOCS:
         scores_doc = {dt: 0 for dt in configs.keys()}
         matches_doc = {
-            dt: {"strong": [], "medium": [], "weak": [], "negative": [], "strong_negative": []}
+            dt: {"strong": {}, "medium": {}, "weak": {}, "negative": {}, "strong_negative": {}, "anti_confusion": {}}
             for dt in configs.keys()
         }
 
-        def add_score(text: str, keywords: List[str], delta: int, bucket: str, dt: str) -> int:
+        def add_score(text: str, keywords: List[str], delta: int, bucket: str, dt: str, weight_factor: float) -> int:
             if not keywords:
                 return 0
             s = 0
             for k in keywords:
-                k_norm = str(k).upper()
-                if k_norm and k_norm in text:
-                    s += delta
-                    if k_norm not in matches_doc[dt][bucket]:
-                        matches_doc[dt][bucket].append(k_norm)
+                k_norm = _norm_keyword(k)
+                if not k_norm:
+                    continue
+                # mot/phrase entier(e) avec espaces tolérant la ponctuation (déjà normalisée en spaces)
+                pattern = r"\b" + re.escape(k_norm).replace(r"\ ", r"\s+") + r"\b"
+                occ = len(re.findall(pattern, text))
+                if occ:
+                    gain = int(delta * occ * weight_factor)
+                    s += gain
+                    matches_doc[dt][bucket][k_norm] = matches_doc[dt][bucket].get(k_norm, 0) + occ
             return s
 
         for page in doc.get("pages", []):
+            page_idx = page.get("page_index", page.get("page", 1)) or 1
+            weight_factor = 1.2 if page_idx == 1 else 1.0  # la page 1 pèse un peu plus
             text = _norm_text(page.get("ocr_text", ""))
             for dt, cfg in configs.items():
                 kw = cfg["keywords"]
                 score = 0
-                score += add_score(text, kw.get("strong", []), int(weights.get("strong", 5)), "strong", dt)
-                score += add_score(text, kw.get("medium", []), int(weights.get("medium", 2)), "medium", dt)
-                score += add_score(text, kw.get("weak", []), int(weights.get("weak", 1)), "weak", dt)
-                score += add_score(text, kw.get("negative", []), int(penalties.get("negative", -2)), "negative", dt)
-                score += add_score(text, kw.get("strong_negative", []), int(penalties.get("strong_negative", -5)), "strong_negative", dt)
+                score += add_score(text, kw.get("strong", []), int(weights.get("strong", 5)), "strong", dt, weight_factor)
+                score += add_score(text, kw.get("medium", []), int(weights.get("medium", 2)), "medium", dt, weight_factor)
+                score += add_score(text, kw.get("weak", []), int(weights.get("weak", 1)), "weak", dt, weight_factor)
+                score += add_score(text, kw.get("negative", []), int(penalties.get("negative", -2)), "negative", dt, weight_factor)
+                score += add_score(text, kw.get("strong_negative", []), int(penalties.get("strong_negative", -5)), "strong_negative", dt, weight_factor)
+
+                # Anti-confusion : appliquer un malus si des termes concurrents sont présents
+                for tgt in cfg.get("anti_confusion_targets", []):
+                    tgt_norm = _norm_keyword(tgt)
+                    if not tgt_norm:
+                        continue
+                    # si c'est un doc_type style BON_DE_COMMANDE (pas dans le texte), on ignore
+                    if "_" in tgt_norm:
+                        continue
+                    pattern_c = r"\b" + re.escape(tgt_norm).replace(r"\ ", r"\s+") + r"\b"
+                    occ_c = len(re.findall(pattern_c, text))
+                    if occ_c:
+                        malus = int(weights.get("strong", 5)) * occ_c * weight_factor
+                        score -= malus
+                        matches_doc[dt]["anti_confusion"][tgt_norm] = matches_doc[dt]["anti_confusion"].get(tgt_norm, 0) + occ_c
+
                 scores_doc[dt] += score
         doc["scores"] = scores_doc
         doc["score_matches"] = matches_doc
@@ -233,11 +261,16 @@ for doc in DOCS:
         matches = (doc.get("score_matches") or {}).get(best, {})
         ac_targets = configs[best].get("anti_confusion_targets", [])
         def _fmt(bucket: str) -> str:
-            vals = matches.get(bucket) or []
-            return f"{bucket}=[" + ", ".join(vals) + "]" if vals else f"{bucket}=[]"
+            vals = matches.get(bucket) or {}
+            if not vals:
+                return f"{bucket}=[]"
+            items = [f"{k}(x{v})" for k, v in vals.items()]
+            return f"{bucket}=[" + ", ".join(items) + "]"
         print("  keywords:", _fmt("strong"), _fmt("medium"), _fmt("weak"), _fmt("negative"))
         if matches.get("strong_negative"):
-            print("  keywords strong_negative:", ", ".join(matches["strong_negative"]))
+            print("  keywords strong_negative:", ", ".join(f"{k}(x{v})" for k,v in matches["strong_negative"].items()))
+        if matches.get("anti_confusion"):
+            print("  anti_confusion hits:", ", ".join(f"{k}(x{v})" for k,v in matches["anti_confusion"].items()))
         if ac_targets:
             print("  anti_confusion_targets:", ", ".join(ac_targets))
 

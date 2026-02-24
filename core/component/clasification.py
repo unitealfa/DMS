@@ -73,10 +73,14 @@ def load_classification_configs():
             doc_type = str(d.get("doc_type") or p.stem).upper()
             if doc_type == "COMMON":
                 continue
+            # Skip configs explicitly disabled
+            if d.get("enabled") is False:
+                continue
             configs[doc_type] = {
                 "doc_type": doc_type,
                 "keywords": _ensure_kw_dict(d),
                 "priority": int(d.get("priority", 0) or 0),
+                "anti_confusion_targets": [str(x).upper() for x in d.get("anti_confusion_targets", []) if x],
             }
     return common, configs
 
@@ -135,30 +139,38 @@ def classify_scores(DOCS: List[Dict[str, Any]], common: Dict[str, Any], configs:
     weights = common.get("weights", {"strong": 5, "medium": 2, "weak": 1})
     penalties = common.get("global_penalties", {"negative": -2, "strong_negative": -5})
 
-    def add_score(text: str, keywords: List[str], delta: int) -> int:
-        if not keywords:
-            return 0
-        s = 0
-        for k in keywords:
-            k = str(k).upper()
-            if k and k in text:
-                s += delta
-        return s
-
     for doc in DOCS:
         scores_doc = {dt: 0 for dt in configs.keys()}
+        matches_doc = {
+            dt: {"strong": [], "medium": [], "weak": [], "negative": [], "strong_negative": []}
+            for dt in configs.keys()
+        }
+
+        def add_score(text: str, keywords: List[str], delta: int, bucket: str, dt: str) -> int:
+            if not keywords:
+                return 0
+            s = 0
+            for k in keywords:
+                k_norm = str(k).upper()
+                if k_norm and k_norm in text:
+                    s += delta
+                    if k_norm not in matches_doc[dt][bucket]:
+                        matches_doc[dt][bucket].append(k_norm)
+            return s
+
         for page in doc.get("pages", []):
             text = _norm_text(page.get("ocr_text", ""))
             for dt, cfg in configs.items():
                 kw = cfg["keywords"]
                 score = 0
-                score += add_score(text, kw.get("strong", []), int(weights.get("strong", 5)))
-                score += add_score(text, kw.get("medium", []), int(weights.get("medium", 2)))
-                score += add_score(text, kw.get("weak", []), int(weights.get("weak", 1)))
-                score += add_score(text, kw.get("negative", []), int(penalties.get("negative", -2)))
-                score += add_score(text, kw.get("strong_negative", []), int(penalties.get("strong_negative", -5)))
+                score += add_score(text, kw.get("strong", []), int(weights.get("strong", 5)), "strong", dt)
+                score += add_score(text, kw.get("medium", []), int(weights.get("medium", 2)), "medium", dt)
+                score += add_score(text, kw.get("weak", []), int(weights.get("weak", 1)), "weak", dt)
+                score += add_score(text, kw.get("negative", []), int(penalties.get("negative", -2)), "negative", dt)
+                score += add_score(text, kw.get("strong_negative", []), int(penalties.get("strong_negative", -5)), "strong_negative", dt)
                 scores_doc[dt] += score
         doc["scores"] = scores_doc
+        doc["score_matches"] = matches_doc
 
 # ========= DECISION =========
 def decide(scores: Dict[str, int], configs: Dict[str, Any], common: Dict[str, Any]) -> Dict[str, Any]:
@@ -215,6 +227,19 @@ for doc in DOCS:
 
     # ---- sortie lisible + compacte (tu vois enfin la classe)
     print(f"[classification] {doc.get('filename')} -> best={best} | status={status} | scores: {ordered_scores}")
+
+    # Détails: mots-clés matchés et cibles d'anti-confusion pour la classe retenue
+    if best in configs:
+        matches = (doc.get("score_matches") or {}).get(best, {})
+        ac_targets = configs[best].get("anti_confusion_targets", [])
+        def _fmt(bucket: str) -> str:
+            vals = matches.get(bucket) or []
+            return f"{bucket}=[" + ", ".join(vals) + "]" if vals else f"{bucket}=[]"
+        print("  keywords:", _fmt("strong"), _fmt("medium"), _fmt("weak"), _fmt("negative"))
+        if matches.get("strong_negative"):
+            print("  keywords strong_negative:", ", ".join(matches["strong_negative"]))
+        if ac_targets:
+            print("  anti_confusion_targets:", ", ".join(ac_targets))
 
     # (optionnel) stocker le json détaillé sans l'imprimer
     doc["result"] = {

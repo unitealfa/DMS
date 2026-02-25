@@ -1,38 +1,190 @@
 {
-  "ruleset_id": "BON_DE_COMMANDE_V1",
+  "ruleset_id": "BON_COMMANDE_EXTRACT_V1_FR_EN_AR",
   "extractors": {
-
-
-    "po_number": {
-      "rule_id": "PO_NUM_01",
-      "pattern": "(?i)(purchase\\s*order|bon\\s*de\\s*commande)\\s*(no\\.|#|n\\u00b0)?\\s*[:\\-]?\\s*([A-Z0-9\\-]+)",
-      "group": 3,
-      "type": "text",
-      "flags": ["IGNORECASE"]
-    },
-    "order_date": {
-      "rule_id": "PO_DATE_01",
-      "pattern": "(?i)(order\\s*date|date\\s*de\\s*commande)\\s*[:\\-]?\\s*(\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})",
-      "group": 2,
-      "type": "date",
-      "flags": ["IGNORECASE"]
-    },
-    "supplier": {
-      "rule_id": "PO_SUP_01",
-      "pattern": "(?i)(supplier|fournisseur)\\s*[:\\-]?\\s*(.+)",
-      "group": 2,
-      "type": "text",
+    "numero_bc": {
+      "rule_id": "BC_NUM_01",
+      "pattern": "(?xim)\\b(?:bon\\s*de\\s*commande|commande\\s*d['’]?achat|purchase\\s*order|p\\.?\\s*o\\.?|po|order\\s*(?:number|no\\.?|#)|num(?:e|é)?ro\\s*de\\s*commande|n(?:o|°|º)?\\s*commande|رقم\\s*(?:الطلب|طلب\\s*الشراء|أمر\\s*الشراء|امر\\s*الشراء)|(?:طلب|أمر|امر)\\s*شراء\\s*(?:رقم|#)?)\\b[\\s\\t:;=\\-–—#]*([A-Za-z0-9٠-٩\\u0621-\\u064A][A-Za-z0-9٠-٩\\u0621-\\u064A._\\/-]{0,32}(?:[ \\t][A-Za-z0-9٠-٩\\u0621-\\u064A._\\/-]{1,24}){0,2})",
+      "group": 1,
+      "type": "string",
       "flags": ["IGNORECASE", "MULTILINE"],
-      "surface": "lines"
+      "many": true,
+      "nlp": {
+        "use_pos": false,
+        "pos_patterns": [],
+        "use_ner": false,
+        "ner_labels": [],
+        "confidence_threshold": 0.0
+      },
+      "min_confidence": 0.0,
+      "apply_post_filters": true,
+      "post_filters": [
+        "trim_spaces",
+        "strip_trailing_punct",
+        "normalize_arabic_indic_digits",
+        "reject_pure_date_like",
+        "reject_common_labels_as_value",
+        "normalize_reference_number"
+      ]
     },
-    "total_amount": {
-      "rule_id": "PO_TOTAL_01",
-      "pattern": "(?i)(total|montant\\s+total|total\\s+ttc)\\s*[:\\-]?\\s*([0-9][0-9\\s.,]+)",
-      "group": 2,
-      "type": "number",
-      "flags": ["IGNORECASE"]
-    }
 
-    
+    "date_commande": {
+      "rule_id": "BC_ORDER_DATE_01",
+      "pattern": "(?xim)\\b(?:date\\s*de\\s*commande|date\\s*commande|order\\s*date|purchase\\s*order\\s*date|date\\s*d['’]?achat|تاريخ\\s*(?:الطلب|طلب\\s*الشراء|أمر\\s*الشراء|امر\\s*الشراء))\\b[\\s\\t:;=\\-–—]*((?:(?:[0-3]?[0-9٠-٩])[\\/\\-.](?:[0-1]?[0-9٠-٩])[\\/\\-.](?:[12١٢][0-9٠-٩]{3}))|(?:(?:[12١٢][0-9٠-٩]{3})[\\/\\-.](?:[0-1]?[0-9٠-٩])[\\/\\-.](?:[0-3]?[0-9٠-٩])))",
+      "group": 1,
+      "type": "date",
+      "flags": ["IGNORECASE", "MULTILINE"],
+      "many": true,
+      "nlp": {
+        "use_pos": false,
+        "pos_patterns": [],
+        "use_ner": true,
+        "ner_labels": ["DATE"],
+        "confidence_threshold": 0.0
+      },
+      "min_confidence": 0.0,
+      "apply_post_filters": true,
+      "post_filters": [
+        "strip_trailing_punct",
+        "normalize_arabic_indic_digits",
+        "normalize_date_separators",
+        "normalize_date_iso",
+        "validate_calendar_date"
+      ]
+    },
+
+    "date_livraison": {
+      "rule_id": "BC_DELIVERY_DATE_01",
+      "pattern": "(?xim)\\b(?:date\\s*de\\s*livraison|livraison\\s*prevue|livraison\\s*prévue|delivery\\s*date|expected\\s*delivery\\s*date|requested\\s*delivery\\s*date|ship(?:ping)?\\s*date|تاريخ\\s*التسليم|تاريخ\\s*الاستلام|موعد\\s*التسليم|تاريخ\\s*التوريد)\\b[\\s\\t:;=\\-–—]*((?:(?:[0-3]?[0-9٠-٩])[\\/\\-.](?:[0-1]?[0-9٠-٩])[\\/\\-.](?:[12١٢][0-9٠-٩]{3}))|(?:(?:[12١٢][0-9٠-٩]{3})[\\/\\-.](?:[0-1]?[0-9٠-٩])[\\/\\-.](?:[0-3]?[0-9٠-٩])))",
+      "group": 1,
+      "type": "date",
+      "flags": ["IGNORECASE", "MULTILINE"],
+      "many": true,
+      "nlp": {
+        "use_pos": false,
+        "pos_patterns": [],
+        "use_ner": true,
+        "ner_labels": ["DATE"],
+        "confidence_threshold": 0.0
+      },
+      "min_confidence": 0.0,
+      "apply_post_filters": true,
+      "post_filters": [
+        "strip_trailing_punct",
+        "normalize_arabic_indic_digits",
+        "normalize_date_separators",
+        "normalize_date_iso",
+        "validate_calendar_date"
+      ]
+    },
+
+    "fournisseur_nom": {
+      "rule_id": "BC_SUPPLIER_NAME_01",
+      "pattern": "(?xim)^\\s*(?:nom\\s*du\\s*fournisseur|fournisseur|supplier\\s*name|supplier|vendor\\s*name|vendor|seller|from|اسم\\s*المورد|المورد|اسم\\s*البائع|البائع)\\b(?:\\s*(?:[:=]|[\\-–—]))?\\s*([^\\r\\n]{2,140})$",
+      "group": 1,
+      "type": "organization_name",
+      "flags": ["IGNORECASE", "MULTILINE"],
+      "many": true,
+      "nlp": {
+        "use_pos": false,
+        "pos_patterns": [],
+        "use_ner": true,
+        "ner_labels": ["ORG"],
+        "confidence_threshold": 0.0
+      },
+      "min_confidence": 0.0,
+      "apply_post_filters": true,
+      "post_filters": [
+        "trim_spaces",
+        "strip_trailing_punct",
+        "reject_if_looks_like_address_only",
+        "reject_if_phone_only",
+        "reject_if_email_only",
+        "reject_if_date_like",
+        "reject_if_amount_like",
+        "truncate_at_double_space_if_label_chain"
+      ]
+    },
+
+    "fournisseur_label": {
+      "rule_id": "BC_SUPPLIER_LABEL_01",
+      "pattern": "(?xim)^\\s*(nom\\s*du\\s*fournisseur|fournisseur|supplier\\s*name|supplier|vendor\\s*name|vendor|seller|from|اسم\\s*المورد|المورد|اسم\\s*البائع|البائع)\\b",
+      "group": 1,
+      "type": "label",
+      "flags": ["IGNORECASE", "MULTILINE"],
+      "many": true,
+      "nlp": {
+        "use_pos": false,
+        "pos_patterns": [],
+        "use_ner": false,
+        "ner_labels": [],
+        "confidence_threshold": 0.0
+      },
+      "min_confidence": 0.0,
+      "apply_post_filters": true,
+      "post_filters": [
+        "trim_spaces",
+        "strip_trailing_punct"
+      ]
+    },
+
+    "total_ht": {
+      "rule_id": "BC_TOTAL_HT_01",
+      "pattern": "(?xim)^\\s*(?:total\\s*ht|montant\\s*ht|total\\s*hors\\s*taxe|montant\\s*hors\\s*taxe|sous[- ]?total|subtotal|sub-total|order\\s*subtotal|total\\s*excl(?:\\.?|uding)?\\s*tax|amount\\s*before\\s*tax|المجموع\\s*(?:دون|قبل)\\s*الضريبة|ال(?:إ|ا)جمالي\\s*(?:دون|قبل)\\s*الضريبة|المبلغ\\s*(?:دون|قبل)\\s*الضريبة|المبلغ\\s*خارج\\s*الرسم)\\b[^\\r\\n]{0,100}?(?:[:=]|\\.{2,}|\\s)\\s*(?:[A-Z]{3}|[€$£¥]|د\\.ج\\.?|دج|DA)?\\s*([+-]?(?:[0-9٠-٩]{1,3}(?:[ \\u00A0\\u202F.,'٬][0-9٠-٩]{3})+|[0-9٠-٩]+)(?:[.,٫][0-9٠-٩]{2,4})?)(?!\\s*%)\\s*(?:[A-Z]{3}|[€$£¥]|د\\.ج\\.?|دج|DA)?",
+      "group": 1,
+      "type": "amount",
+      "flags": ["IGNORECASE", "MULTILINE"],
+      "many": true,
+      "nlp": {
+        "use_pos": false,
+        "pos_patterns": [],
+        "use_ner": true,
+        "ner_labels": ["MONEY"],
+        "confidence_threshold": 0.0
+      },
+      "min_confidence": 0.0,
+      "apply_post_filters": true,
+      "post_filters": [
+        "strip_trailing_punct",
+        "reject_percent_value",
+        "normalize_arabic_indic_digits",
+        "normalize_amount_decimal",
+        "reject_zero_length"
+      ]
+    },
+
+    "total_ttc": {
+      "rule_id": "BC_TOTAL_TTC_01",
+      "pattern": "(?xim)^\\s*(?:total\\s*ttc|montant\\s*ttc|total\\s*toutes?\\s*taxes\\s*comprises|order\\s*total|grand\\s*total|total\\s*incl(?:\\.?|uding)?\\s*tax|total\\s*including\\s*tax|amount\\s*due|total\\s*due|ال(?:إ|ا)جمالي\\s*شامل\\s*الضريبة|المبلغ\\s*شامل\\s*الضريبة|المبلغ\\s*الإجمالي|المبلغ\\s*الاجمالي|إجمالي\\s*الطلب|اجمالي\\s*الطلب|إجمالي\\s*الشراء|اجمالي\\s*الشراء|المبلغ\\s*المستحق)\\b[^\\r\\n]{0,110}?(?:[:=]|\\.{2,}|\\s)\\s*(?:[A-Z]{3}|[€$£¥]|د\\.ج\\.?|دج|DA)?\\s*([+-]?(?:[0-9٠-٩]{1,3}(?:[ \\u00A0\\u202F.,'٬][0-9٠-٩]{3})+|[0-9٠-٩]+)(?:[.,٫][0-9٠-٩]{2,4})?)(?!\\s*%)\\s*(?:[A-Z]{3}|[€$£¥]|د\\.ج\\.?|دج|DA)?",
+      "group": 1,
+      "type": "amount",
+      "flags": ["IGNORECASE", "MULTILINE"],
+      "many": true,
+      "nlp": {
+        "use_pos": false,
+        "pos_patterns": [],
+        "use_ner": true,
+        "ner_labels": ["MONEY"],
+        "confidence_threshold": 0.0
+      },
+      "min_confidence": 0.0,
+      "apply_post_filters": true,
+      "post_filters": [
+        "strip_trailing_punct",
+        "reject_percent_value",
+        "normalize_arabic_indic_digits",
+        "normalize_amount_decimal",
+        "reject_zero_length"
+      ]
+    }
+  },
+
+  "implementation_notes": "Extraction BON DE COMMANDE / PURCHASE ORDER multilingue FR/EN/AR. Les regex sont ancrees sur des labels metier (numero BC, date commande, fournisseur, totaux, date livraison) pour limiter les faux positifs. Support des chiffres latins et arabes-indiens (0-9 / ٠-٩), formats de date DMY/YMD avec separateurs / - ., et montants avec separateurs de milliers (espace, NBSP, NNBSP, virgule, point, apostrophe, ٬) + decimaux virgule/point/٫. Les montants tolerent la devise avant ou apres (codes ISO, symboles, DA, دج). Le champ fournisseur_nom est volontairement label-ancre et peut necessiter ranking/selection pour choisir la meilleure ligne si plusieurs candidats (adresse, entete, bloc vendeur).",
+  "selection_hints": {
+    "numero_bc": "prefer_values_near_PO_labels; prefer_alnum_mixed; reject_if_near_invoice_labels",
+    "date_commande": "prefer_order_date_labels; prefer_first_valid_date_after_numero_bc",
+    "date_livraison": "prefer_delivery_date_labels; optional_field_if_absent",
+    "fournisseur_nom": "prefer_line_after_supplier_label; reject_lines_with_only_digits_or_contact_tokens",
+    "total_ht": "prefer_subtotal_or_excl_tax_labels; reject_percent_values",
+    "total_ttc": "prefer_order_total_or_grand_total_or_total_ttc_labels; choose_max_total_if_multiple"
   }
 }

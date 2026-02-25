@@ -1,46 +1,194 @@
 {
-  "ruleset_id": "CONTRAT_V1",
+  "ruleset_id": "CONTRAT_EXTRACT_V1_FR_EN_AR",
   "extractors": {
-
-
-    "contract_number": {
-      "rule_id": "CTR_NUM_01",
-      "pattern": "(?i)(contract\\s*(no\\.|#)|contrat\\s*(n\\u00b0|no\\.|#))\\s*[:\\-]?\\s*([A-Z0-9\\-]+)",
-      "group": 4,
-      "type": "text",
-      "flags": ["IGNORECASE"]
-    },
-    "contract_date": {
-      "rule_id": "CTR_DATE_01",
-      "pattern": "(?i)(date|dated|date\\s+du\\s+contrat)\\s*[:\\-]?\\s*(\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})",
-      "group": 2,
-      "type": "date",
-      "flags": ["IGNORECASE"]
-    },
-    "effective_date": {
-      "rule_id": "CTR_DATE_EFF_01",
-      "pattern": "(?i)(effective\\s+date|date\\s+d['\\\"]?effet|date\\s+d['\\\"]?entree\\s+en\\s+vigueur)\\s*[:\\-]?\\s*(\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})",
-      "group": 2,
-      "type": "date",
-      "flags": ["IGNORECASE"]
-    },
-    "party_supplier": {
-      "rule_id": "CTR_PARTY_01",
-      "pattern": "(?i)(supplier|fournisseur)\\s*[:\\-]?\\s*(.+)",
-      "group": 2,
-      "type": "text",
+    "titre_contrat": {
+      "rule_id": "CTR_TITLE_01",
+      "pattern": "(?xim)^(?:\\s*(?:titre\\s*du\\s*contrat|intitul(?:e|é)\\s*du\\s*contrat|contract\\s*title|agreement\\s*title|title|عنوان\\s*العقد|موضوع\\s*العقد)\\b\\s*(?:[:=\\-–—])\\s*([^\r\n]{4,220})\\s*$|\\s*((?:contrat|contract|agreement|accord|convention|عقد|اتفاقية|اتفاق)\\b[^\r\n]{3,220})\\s*$)",
+      "group": 1,
+      "type": "string",
       "flags": ["IGNORECASE", "MULTILINE"],
-      "surface": "lines"
+      "many": true,
+      "nlp": {
+        "use_pos": false,
+        "pos_patterns": [],
+        "use_ner": false,
+        "ner_labels": [],
+        "confidence_threshold": 0.0
+      },
+      "min_confidence": 0.0,
+      "apply_post_filters": true,
+      "post_filters": [
+        "trim_spaces",
+        "strip_trailing_punct",
+        "reject_if_too_short",
+        "reject_if_date_like",
+        "reject_if_amount_like",
+        "normalize_spaces"
+      ]
     },
-    "contract_object": {
-      "rule_id": "CTR_OBJ_01",
-      "pattern": "(?i)(objet\\s+du\\s+contrat|purpose\\s+of\\s+the\\s+agreement)\\s*[:\\-]?\\s*(.+)",
-      "group": 2,
-      "type": "text",
+
+    "date_signature": {
+      "rule_id": "CTR_SIGN_DATE_01",
+      "pattern": "(?xim)\\b(?:date\\s*de\\s*signature|date\\s*signature|sign(?:ature)?\\s*date|signed\\s*on|date\\s*of\\s*signature|تاريخ\\s*التوقيع|تاريخ\\s*الإمضاء|تاريخ\\s*الامضاء)\\b[\\s\\t:;=\\-–—]*((?:(?:[0-3]?[0-9٠-٩])[\\/\\-.](?:[0-1]?[0-9٠-٩])[\\/\\-.](?:[12١٢][0-9٠-٩]{3}))|(?:(?:[12١٢][0-9٠-٩]{3})[\\/\\-.](?:[0-1]?[0-9٠-٩])[\\/\\-.](?:[0-3]?[0-9٠-٩])))",
+      "group": 1,
+      "type": "date",
       "flags": ["IGNORECASE", "MULTILINE"],
-      "surface": "lines"
+      "many": true,
+      "nlp": {
+        "use_pos": false,
+        "pos_patterns": [],
+        "use_ner": true,
+        "ner_labels": ["DATE"],
+        "confidence_threshold": 0.0
+      },
+      "min_confidence": 0.0,
+      "apply_post_filters": true,
+      "post_filters": [
+        "strip_trailing_punct",
+        "normalize_arabic_indic_digits",
+        "normalize_date_separators",
+        "normalize_date_iso",
+        "validate_calendar_date"
+      ]
+    },
+
+    "date_effet": {
+      "rule_id": "CTR_EFFECTIVE_DATE_01",
+      "pattern": "(?xim)\\b(?:date\\s*d['’]?effet|prise\\s*d['’]?effet|date\\s*d['’]?entr(?:e|é)e\\s*en\\s*vigueur|effective\\s*date|commencement\\s*date|entry\\s*into\\s*force\\s*date|start\\s*date|تاريخ\\s*السريان|تاريخ\\s*النفاذ|تاريخ\\s*بدء\\s*السريان|تاريخ\\s*بداية\\s*العقد|تاريخ\\s*دخول\\s*حيز\\s*التنفيذ)\\b[\\s\\t:;=\\-–—]*((?:(?:[0-3]?[0-9٠-٩])[\\/\\-.](?:[0-1]?[0-9٠-٩])[\\/\\-.](?:[12١٢][0-9٠-٩]{3}))|(?:(?:[12١٢][0-9٠-٩]{3})[\\/\\-.](?:[0-1]?[0-9٠-٩])[\\/\\-.](?:[0-3]?[0-9٠-٩])))",
+      "group": 1,
+      "type": "date",
+      "flags": ["IGNORECASE", "MULTILINE"],
+      "many": true,
+      "nlp": {
+        "use_pos": false,
+        "pos_patterns": [],
+        "use_ner": true,
+        "ner_labels": ["DATE"],
+        "confidence_threshold": 0.0
+      },
+      "min_confidence": 0.0,
+      "apply_post_filters": true,
+      "post_filters": [
+        "strip_trailing_punct",
+        "normalize_arabic_indic_digits",
+        "normalize_date_separators",
+        "normalize_date_iso",
+        "validate_calendar_date"
+      ]
+    },
+
+    "parties": {
+      "rule_id": "CTR_PARTIES_01",
+      "pattern": "(?xim)^(?:\\s*(?:parties?|parties\\s*to\\s*the\\s*contract|contracting\\s*parties|les\\s*parties|parties\\s*contractantes|parties\\s*au\\s*contrat|الأطراف|اطراف\\s*العقد|أطراف\\s*العقد)\\b\\s*(?:[:=\\-–—])\\s*|\\s*(?:partie\\s*(?:1|2|i|ii|premi(?:e|è)re|deuxi(?:e|è)me|seconde)|party\\s*(?:1|2|first|second)|first\\s*party|second\\s*party|الطرف\\s*(?:الأول|الاول|الثاني|الثانية|1|2)|طرف\\s*(?:أول|اول|ثان(?:ي|ية)?|1|2))\\b\\s*(?:[:=\\-–—])\\s*|\\s*(?:entre\\s+les\\s+soussign(?:e|é)s|entre\\s*:|between\\s+the\\s+undersigned|between\\s*:|بين\\s+كل\\s+من|بين\\s*:?)\\s*)([^\\r\\n]{3,260})\\s*$",
+      "group": 1,
+      "type": "party_name_or_block",
+      "flags": ["IGNORECASE", "MULTILINE"],
+      "many": true,
+      "nlp": {
+        "use_pos": false,
+        "pos_patterns": [],
+        "use_ner": true,
+        "ner_labels": ["ORG", "PERSON"],
+        "confidence_threshold": 0.0
+      },
+      "min_confidence": 0.0,
+      "apply_post_filters": true,
+      "post_filters": [
+        "trim_spaces",
+        "strip_trailing_punct",
+        "reject_if_too_short",
+        "reject_if_date_like",
+        "reject_if_amount_like",
+        "reject_if_only_role_words",
+        "truncate_at_phone_email_url",
+        "normalize_spaces"
+      ]
+    },
+
+    "duree": {
+      "rule_id": "CTR_DURATION_01",
+      "pattern": "(?xim)^\\s*(?:dur(?:e|é)e(?:\\s*du\\s*contrat)?|terme|duree\\s*de\\s*validite|dur(?:e|é)e\\s*de\\s*validit(?:e|é)|contract\\s*term|term\\s*of\\s*the\\s*contract|duration|validity\\s*period|contract\\s*duration|مدة\\s*العقد|مدة\\s*السريان|فترة\\s*السريان|مدة\\s*النفاذ|مدة\\s*الاتفاقية|مدة\\s*الاتفاقية)\\b[^\\r\\n]{0,60}?(?:[:=\\-–—]|\\.{2,}|\\s)\\s*([^\\r\\n]{2,180})$",
+      "group": 1,
+      "type": "duration_or_term",
+      "flags": ["IGNORECASE", "MULTILINE"],
+      "many": true,
+      "nlp": {
+        "use_pos": false,
+        "pos_patterns": [],
+        "use_ner": true,
+        "ner_labels": ["DATE"],
+        "confidence_threshold": 0.0
+      },
+      "min_confidence": 0.0,
+      "apply_post_filters": true,
+      "post_filters": [
+        "trim_spaces",
+        "strip_trailing_punct",
+        "normalize_arabic_indic_digits",
+        "reject_if_amount_like",
+        "normalize_spaces"
+      ]
+    },
+
+    "date_fin": {
+      "rule_id": "CTR_END_DATE_01",
+      "pattern": "(?xim)\\b(?:date\\s*de\\s*fin|date\\s*d['’]?expiration|date\\s*d['’]?expir(?:e|é)e?ation|fin\\s*du\\s*contrat|expiration\\s*date|expiry\\s*date|end\\s*date|termination\\s*date|date\\s*of\\s*termination|تاريخ\\s*الانتهاء|تاريخ\\s*نهاية\\s*العقد|تاريخ\\s*انتهاء\\s*العقد|تاريخ\\s*انتهاء\\s*السريان|تاريخ\\s*انقضاء\\s*العقد)\\b[\\s\\t:;=\\-–—]*((?:(?:[0-3]?[0-9٠-٩])[\\/\\-.](?:[0-1]?[0-9٠-٩])[\\/\\-.](?:[12١٢][0-9٠-٩]{3}))|(?:(?:[12١٢][0-9٠-٩]{3})[\\/\\-.](?:[0-1]?[0-9٠-٩])[\\/\\-.](?:[0-3]?[0-9٠-٩])))",
+      "group": 1,
+      "type": "date",
+      "flags": ["IGNORECASE", "MULTILINE"],
+      "many": true,
+      "nlp": {
+        "use_pos": false,
+        "pos_patterns": [],
+        "use_ner": true,
+        "ner_labels": ["DATE"],
+        "confidence_threshold": 0.0
+      },
+      "min_confidence": 0.0,
+      "apply_post_filters": true,
+      "post_filters": [
+        "strip_trailing_punct",
+        "normalize_arabic_indic_digits",
+        "normalize_date_separators",
+        "normalize_date_iso",
+        "validate_calendar_date"
+      ]
+    },
+
+    "objet_contrat": {
+      "rule_id": "CTR_OBJECT_01",
+      "pattern": "(?xim)^\\s*(?:objet\\s*du\\s*contrat|objet|purpose\\s*of\\s*the\\s*agreement|purpose\\s*of\\s*the\\s*contract|contract\\s*purpose|subject\\s*matter|scope\\s*of\\s*(?:work|services|agreement|contract)|موضوع\\s*العقد|غرض\\s*العقد|محل\\s*العقد|موضوع\\s*الاتفاقية)\\b\\s*(?:[:=\\-–—])\\s*([^\\r\\n]{3,500})$",
+      "group": 1,
+      "type": "contract_object",
+      "flags": ["IGNORECASE", "MULTILINE"],
+      "many": true,
+      "nlp": {
+        "use_pos": false,
+        "pos_patterns": [],
+        "use_ner": false,
+        "ner_labels": [],
+        "confidence_threshold": 0.0
+      },
+      "min_confidence": 0.0,
+      "apply_post_filters": true,
+      "post_filters": [
+        "trim_spaces",
+        "strip_trailing_punct",
+        "reject_if_too_short",
+        "reject_if_date_like",
+        "normalize_spaces"
+      ]
     }
+  },
 
-    
+  "implementation_notes": "Extraction CONTRAT / CONTRACT / AGREEMENT multilingue FR/EN/AR. Les regex sont ancrees sur des libelles metier pour limiter les faux positifs. Support des chiffres latins et arabes-indiens (0-9 / ٠-٩) et des formats de date DMY/YMD avec separateurs / - . ; la validation calendrier est confiee aux post-filters apres normalisation des chiffres. Le champ parties retourne des lignes candidates de parties (Partie 1/2, Party 1/2, الطرف الاول/الثاني, etc.) ou bloc 'Entre / Between / بين كل من'. Le champ duree capture la valeur textuelle (ex: 12 mois, 2 years, until..., لمدة سنة واحدة) ; il peut ensuite etre normalise en duree structuree ou derive vers date_fin si besoin.",
+  "selection_hints": {
+    "titre_contrat": "prefer_labeled_title; fallback_to_heading_line_starting_with_CONTRAT_or_CONTRACT_or_عقد",
+    "date_signature": "prefer_signature_labels; if multiple choose date nearest signature section",
+    "date_effet": "prefer_effective_date_labels; if absent fallback to commencement/start date",
+    "parties": "prefer_party_labeled_lines; split on et/and/و only after extracting candidates; dedupe normalized names",
+    "duree": "prefer_duration_labels; keep textual value before normalization",
+    "date_fin": "prefer_end_or_expiration_labels; if absent may be derived from date_effet + duree",
+    "objet_contrat": "prefer_labeled_object_lines; if multiple choose longest non-heading candidate"
   }
 }

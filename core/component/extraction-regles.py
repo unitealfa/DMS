@@ -134,7 +134,11 @@ def apply_extractors_to_page(text: str, extractors: Dict[str, Any]) -> Dict[str,
     out: Dict[str, List[Dict[str, Any]]] = {}
 
     for name, cfg in extractors.items():
-        regex = _compile_regex(cfg.get("pattern", ""), cfg.get("flags"))
+        try:
+            regex = _compile_regex(cfg.get("pattern", ""), cfg.get("flags"))
+        except re.error as e:
+            print(f"[extraction-regles] regex invalide pour '{name}': {e} | pattern={cfg.get('pattern')}")
+            continue
         group_idx = int(cfg.get("group", 0) or 0)
         many = bool(cfg.get("many", False))
         surface = (cfg.get("surface") or "text").lower()

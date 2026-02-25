@@ -1,61 +1,51 @@
-##########################################################################################
-DOC=test-regex3langue.docx | page=1 | sent=4 | lang=ar
-##########################################################################################
-
-==========================================================================================
-INPUT: A.C.M.E. S.A.R.L.
-“ACME” SARL
-Cie. des Chemins-de-fer
-Entreprise « Les Fils d’Émile »
-O’Reilly Média
-ООО “Пример”
-شركة المثال (Exemple)
-Lignes “piège” (souvent à exclure si regex strictes) :
-Email: jean.pierre@exemple..fr
-Email: jean.pierre@.exemple.fr
-Email: jean.pierre@exemple-.fr
-URL: https:///exemple.fr
-URL: http://
-URL: https://exemple.fr:99999
-Nom: J3an-Pierr€ O’Neil
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Englais
-Subject: Account verification needed — Case #A-2026-0219
-Hello,
-Below are test strings to validate your patterns. Some are intentionally tricky or invalid.
-Emails (mixed validity) :
-mary.jane@acme.com
-mary-jane+billing@acme.com
-mary_jane@sub.acme.co.uk
-mj@acme.museum
-mary.jane@xn--acm-9la.com
-mary.jane@[10.0.0.5]
-"mary.jane"@acme.com
-mary..jane@acme.com
-mary.jane@acme..com
-mary.jane@-acme.com
-mary.jane@acme
-mary.jane@acme.c
-mary.jane@acme.com.
-mary.jane@acme,com
-mary.jane@@acme.com
-mary.jane@ac_me.com
-first.last@company.рф
-support@例子.公司
-user@domain-with–en-dash.com
-Phone numbers (formats + traps) :
-+1 202-555-0173
-+1 (202) 555-0173
+Traceback (most recent call last):
+  File "C:\Users\moura\OneDrive\Bureau\DMS\core\pipeline\cli.py", line 81, in main
+    orchestrator.run(inputs, only=args.only, upto=args.upto, start=args.start)
+  File "C:\Users\moura\OneDrive\Bureau\DMS\core\pipeline\orchestrator.py", line 56, in run
+    output: Any = comp.run(context)
+                  ^^^^^^^^^^^^^^^^^
+  File "C:\Users\moura\OneDrive\Bureau\DMS\core\pipeline\components.py", line 224, in run
+    ctx = self._execute_script(context)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\moura\OneDrive\Bureau\DMS\core\pipeline\components.py", line 38, in _execute_script
+    result = runpy.run_path(
+             ^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 291, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\moura\OneDrive\Bureau\DMS\core\component\extraction-regles.py", line 283, in <module>
+    EXTRACTIONS = run()
+                  ^^^^^
+  File "C:\Users\moura\OneDrive\Bureau\DMS\core\component\extraction-regles.py", line 230, in run
+    page_res = apply_extractors_to_page(page_text, extractors)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\moura\OneDrive\Bureau\DMS\core\component\extraction-regles.py", line 137, in apply_extractors_to_page
+    regex = _compile_regex(cfg.get("pattern", ""), cfg.get("flags"))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\moura\OneDrive\Bureau\DMS\core\component\extraction-regles.py", line 44, in _compile_regex
+    return re.compile(pattern, flags)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\re\__init__.py", line 227, in compile
+    return _compile(pattern, flags)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\re\__init__.py", line 294, in _compile
+    p = _compiler.compile(pattern, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\re\_compiler.py", line 745, in compile
+    p = _parser.parse(p, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\re\_parser.py", line 989, in parse
+    p = _parse_sub(source, state, flags & SRE_FLAG_VERBOSE, 0)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\re\_parser.py", line 464, in _parse_sub
+    itemsappend(_parse(source, state, verbose, nested + 1,
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\re\_parser.py", line 872, in _parse
+    p = _parse_sub(source, state, sub_verbose, nested + 1)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\re\_parser.py", line 464, in _parse_sub
+    itemsappend(_parse(source, state, verbose, nested + 1,
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\re\_parser.py", line 874, in _parse
+    raise source.error("missing ), unterminated subpattern",
+re.error: missing ), unterminated subpattern at position 21

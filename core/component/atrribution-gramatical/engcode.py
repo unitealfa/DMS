@@ -631,6 +631,61 @@ def fix_buffalo_ner(tokens: List[str], labels: List[str]) -> List[str]:
     return enforce_bio(out)
 
 # ----------------------------
+# 11bis) Filtre anti-faux PERS (initiales enchaînées, titres seuls)
+# ----------------------------
+HONORIFICS_EN = {
+    "agent","al hadj","ambassador","amir","archbishop","architect","attorney","b.a.","b.s.","b.sc.","ba","bailiff",
+    "baron","baroness","bishop","bp","bp.","br","br.","brother","bs","bsc","c.e.o.","c.eng.","c.f.o.","c.o.o.","c.t.o.",
+    "cadi","capt","capt.","captain","cardinal","ceng","ceo","cfo","chair","chairman","chairwoman","chancellor",
+    "chief executive officer","chief financial officer","chief operating officer","chief technology officer","cmdr",
+    "cmdr.","col","col.","commander","commissioner","commr","commr.","consul general","consul-general","coo","counsel",
+    "count","countess","cto","d.d.s.","d.m.d.","d.o.","d.phil.","dame","dds","dean","dentist","director","dmd","do",
+    "docr","doctor","doctr","dphil","duchess","duke","el hadj","emir","eng","eng.","engineer","esq","esq.","esquire",
+    "excellency","father","field marshal","fr","fr.","gen","gen.","general","gov","gov.","governor","h.e.","h.h.","h.m.",
+    "hadj","hadja","haj","hajj","hajja","hajjah","he","head of","her excellency","her highness","her majesty","hh",
+    "highness","his excellency","his highness","his majesty","hm","hon","hon.","hon. judge","honorable","honourable",
+    "i","ii","iii","imam","imam.","inspector","iv","ix","j.d.","jd","jr","jr.","judge","junior","justice","king",
+    "l'hon.","lady","lawyer","lieut.","ll.m.","llm","lord","lt","lt.","m.a.","m.b.a.","m.d.","m.p.","m.s.","m.sc.","ma",
+    "madam","maj","maj.","majesty","major","manager","marshal","master","mayor","mba","md","minister","miss","mister",
+    "mother","mp","mr","mr.","mrs","mrs.","ms","ms.","msc","mufti","mulay","mx","mx.","notary","officer","p.e.","p.eng.",
+    "p.m.","pastor","pe","peng","ph.d","ph.d.","pharm.d.","pharmacist","pharmd","phd","pm","pope","president",
+    "president of the board","president of university","prime minister","prince","princeps","princess","qadi","queen",
+    "r.n.","rabbi","rector","rep","rep.","representative","rev","rev.","reverend","reverend father","rn","rt hon",
+    "rt. hon.","s.e.","sec-gen","secretary general","secretary of state","sen","sen.","senator","senior","sergeant","sg",
+    "sgt","sgt.","shaikh","shaykh","sheikh","si","sidi","sir","sister","sr","sr.","the hon.","university president","v",
+    "v.p.","veterinarian","vi","vice president","vii","viii","vp","x"
+}
+
+def _is_initial_chain(tokens: List[str]) -> bool:
+    letters = [t for t in tokens if re.fullmatch(r"[A-Za-z]", t)]
+    dots = [t for t in tokens if t == "."]
+    long = any(len(t) > 2 and t.isalpha() for t in tokens)
+    return (len(letters) >= 2) and (len(dots) >= len(letters) - 1) and not long
+
+def drop_false_pers(tokens: List[str], labels: List[str]) -> List[str]:
+    out = labels[:]
+    i = 0
+    while i < len(out):
+        lab = out[i]
+        if not lab.startswith("B-"):
+            i += 1
+            continue
+        typ = lab[2:]
+        j = i + 1
+        while j < len(out) and out[j] == f"I-{typ}":
+            j += 1
+        span_tokens = tokens[i:j]
+        if typ == "PERS":
+            if _is_initial_chain(span_tokens):
+                for k in range(i, j):
+                    out[k] = "O"
+            elif all(_norm_apos(t).lower() in HONORIFICS_EN for t in span_tokens):
+                for k in range(i, j):
+                    out[k] = "O"
+        i = j
+    return enforce_bio(out)
+
+# ----------------------------
 # 9) Entities depuis BIO
 # ----------------------------
 def _join_entity_tokens(parts: List[str]) -> str:
@@ -756,6 +811,7 @@ def run_one(text: str, ner_pipe=None):
 
     # Fix bruit Buffalo
     labels = fix_buffalo_ner(tokens, labels)
+    labels = drop_false_pers(tokens, labels)
 
     # Print NER output
     print()

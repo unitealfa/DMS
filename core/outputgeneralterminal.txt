@@ -29,24 +29,24 @@ Output: [{'content': 'image_only',
 [info] Using INPUT_FILE=C:\Users\moura\OneDrive\Bureau\DMS\core\documents\bon-de-commade.png
 [info] Using INPUT_FILE=C:\Users\moura\OneDrive\Bureau\DMS\core\documents\image2tab.webp
 [info] Using INPUT_FILE=C:\Users\moura\OneDrive\Bureau\DMS\core\documents\signettab.png
-<PIL.Image.Image image mode=RGB size=707x1000 at 0x2353BA50450>
-<PIL.Image.Image image mode=L size=1060x1500 at 0x2353B790990>
-<PIL.WebPImagePlugin.WebPImageFile image mode=RGB size=768x1024 at 0x2353B911F10>
-<PIL.Image.Image image mode=L size=1152x1536 at 0x2353BA41C50>
-<PIL.Image.Image image mode=RGB size=750x1061 at 0x2353BA50450>
-<PIL.Image.Image image mode=L size=1125x1591 at 0x2353BA442D0>
+<PIL.Image.Image image mode=RGB size=707x1000 at 0x273F3902610>
+<PIL.Image.Image image mode=L size=1060x1500 at 0x273F23C2B10>
+<PIL.WebPImagePlugin.WebPImageFile image mode=RGB size=768x1024 at 0x273F3800D50>
+<PIL.Image.Image image mode=L size=1152x1536 at 0x273F3902B90>
+<PIL.Image.Image image mode=RGB size=750x1061 at 0x273F3902610>
+<PIL.Image.Image image mode=L size=1125x1591 at 0x273F3908050>
 [Component: si-image-pretraiter-sinonpass-le-doc]
 Type: dict
 Summary: text=1, image=3, docs_prepped=3
-Output: {'DOCS': [{'original': <PIL.PngImagePlugin.PngImageFile image mode=P size=707x1000 at 0x2353AC05390>,
+Output: {'DOCS': [{'original': <PIL.PngImagePlugin.PngImageFile image mode=P size=707x1000 at 0x273F37A2550>,
            'path': WindowsPath('C:/Users/moura/OneDrive/Bureau/DMS/core/documents/bon-de-commade.png'),
-           'prepped': <PIL.Image.Image image mode=L size=1060x1500 at 0x2353B790990>},
-          {'original': <PIL.WebPImagePlugin.WebPImageFile image mode=RGB size=768x1024 at 0x2353B911F10>,
+           'prepped': <PIL.Image.Image image mode=L size=1060x1500 at 0x273F23C2B10>},
+          {'original': <PIL.WebPImagePlugin.WebPImageFile image mode=RGB size=768x1024 at 0x273F3800D50>,
            'path': WindowsPath('C:/Users/moura/OneDrive/Bureau/DMS/core/documents/image2tab.webp'),
-           'prepped': <PIL.Image.Image image mode=L size=1152x1536 at 0x2353BA41C50>},
-          {'original': <PIL.PngImagePlugin.PngImageFile image mode=P size=750x1061 at 0x2353BA44710>,
+           'prepped': <PIL.Image.Image image mode=L size=1152x1536 at 0x273F3902B90>},
+          {'original': <PIL.PngImagePlugin.PngImageFile image mode=P size=750x1061 at 0x273F3908210>,
            'path': WindowsPath('C:/Users/moura/OneDrive/Bureau/DMS/core/documents/signettab.png'),
-           'prepped': <PIL.Image.Image image mode=L size=1125x1591 at 0x2353BA442D0>}],
+           'prepped': <PIL.Image.Image image mode=L size=1125x1591 at 0x273F3908050>}],
  'IMAGE_ONLY_FILES': ['C:\\Users\\moura\\OneDrive\\Bureau\\DMS\\core\\documents\\bon-de-commade.png',
                       'C:\\Users\\moura\\OneDrive\\Bureau\\DMS\\core\\documents\\image2tab.webp',
                       'C:\\Users\\moura\\OneDrive\\Bureau\\DMS\\core\\documents\\signettab.png'],
@@ -1143,7 +1143,7 @@ Purchase Contract No: SAMPLE                                                    
 Type: list
 Summary: 4 docs | pages=17
 Output: [{'content': 'image_only',
-  'doc_id': '840ca6f2-f7e1-4eb5-b240-54321d0e1add',
+  'doc_id': 'b5299dd9-f800-4d75-bbbd-6a4066609739',
   'extraction': 'ocr:tesseract',
   'filename': 'bon-de-commade.png',
   'page_count_total': 1,
@@ -1408,7 +1408,7 @@ Output: [{'content': 'image_only',
           '        N° TVA intra. FRXX '
           '999999899                                                      SWIFT/@IC   FRHHCXX1001'},
  {'content': 'image_only',
-  'doc_id': '77074768-5f85-4cc5-9e55-699bf9283108',
+  'doc_id': 'a1ee9be5-a245-4e82-b6ee-8ad056c6c882',
   'extraction': 'ocr:tesseract',
   'filename': 'image2tab.webp',
   'page_count_total': 1,
@@ -1586,7 +1586,7 @@ Output: [{'content': 'image_only',
           '\n'
           '                                                                   Cachet & Signature'},
  {'content': 'image_only',
-  'doc_id': '1f8e9109-424f-4aaf-9c5d-b873401db7fb',
+  'doc_id': 'a5f1a3ea-40c3-42c4-8c1d-a8cfefe79954',
   'extraction': 'ocr:tesseract',
   'filename': 'signettab.png',
   'page_count_total': 1,
@@ -1790,7 +1790,7 @@ Output: [{'content': 'image_only',
           '\n'
           '        SWIFT/BIC: ABCDFRP1XXX'},
  {'content': 'text',
-  'doc_id': 'b8538eb6-b21a-4232-8e88-01e72f2d1c94',
+  'doc_id': '426e47c3-d1cd-4734-98d7-460b510d8575',
   'extraction': 'native:pdf:pypdf',
   'filename': 'contras-14page.pdf',
   'page_count_total': 14,
@@ -4069,7 +4069,7 @@ Output: [{'content': 'image_only',
 
 ========================================================================================================================
 [doc] bon-de-commade.png
-  doc_id       : 840ca6f2-f7e1-4eb5-b240-54321d0e1add
+  doc_id       : b5299dd9-f800-4d75-bbbd-6a4066609739
   content      : image_only
   extraction   : ocr:tesseract
   pages_total  : 1
@@ -4206,7 +4206,7 @@ Frais de livraison   39,99 €
 
 ========================================================================================================================
 [doc] contras-14page.pdf
-  doc_id       : b8538eb6-b21a-4232-8e88-01e72f2d1c94
+  doc_id       : 426e47c3-d1cd-4734-98d7-460b510d8575
   content      : text
   extraction   : native:pdf:pypdf
   pages_total  : 14
@@ -5264,7 +5264,7 @@ In addition to any other existing examination-of-r  ecords authority, Mercy Corp
 
 ========================================================================================================================
 [doc] image2tab.webp
-  doc_id       : 77074768-5f85-4cc5-9e55-699bf9283108
+  doc_id       : a1ee9be5-a245-4e82-b6ee-8ad056c6c882
   content      : image_only
   extraction   : ocr:tesseract
   pages_total  : 1
@@ -5352,7 +5352,7 @@ In addition to any other existing examination-of-r  ecords authority, Mercy Corp
 
 ========================================================================================================================
 [doc] signettab.png
-  doc_id       : 1f8e9109-424f-4aaf-9c5d-b873401db7fb
+  doc_id       : a5f1a3ea-40c3-42c4-8c1d-a8cfefe79954
   content      : image_only
   extraction   : ocr:tesseract
   pages_total  : 1
@@ -5432,7 +5432,7 @@ Type: list
 Summary: 4 docs | sentences=191
 Output: [{'chars_total': 3651,
   'content': 'image_only',
-  'doc_id': '840ca6f2-f7e1-4eb5-b240-54321d0e1add',
+  'doc_id': 'b5299dd9-f800-4d75-bbbd-6a4066609739',
   'extraction': 'ocr:tesseract',
   'filename': 'bon-de-commade.png',
   'page_count_total': 1,
@@ -6432,7 +6432,7 @@ Output: [{'chars_total': 3651,
   'recompose_ok': False},
  {'chars_total': 54928,
   'content': 'text',
-  'doc_id': 'b8538eb6-b21a-4232-8e88-01e72f2d1c94',
+  'doc_id': '426e47c3-d1cd-4734-98d7-460b510d8575',
   'extraction': 'native:pdf:pypdf',
   'filename': 'contras-14page.pdf',
   'page_count_total': 14,
@@ -11631,7 +11631,7 @@ Output: [{'chars_total': 3651,
   'recompose_ok': False},
  {'chars_total': 2200,
   'content': 'image_only',
-  'doc_id': '77074768-5f85-4cc5-9e55-699bf9283108',
+  'doc_id': 'a1ee9be5-a245-4e82-b6ee-8ad056c6c882',
   'extraction': 'ocr:tesseract',
   'filename': 'image2tab.webp',
   'page_count_total': 1,
@@ -12304,7 +12304,7 @@ Output: [{'chars_total': 3651,
   'recompose_ok': False},
  {'chars_total': 1656,
   'content': 'image_only',
-  'doc_id': '1f8e9109-424f-4aaf-9c5d-b873401db7fb',
+  'doc_id': 'a5f1a3ea-40c3-42c4-8c1d-a8cfefe79954',
   'extraction': 'ocr:tesseract',
   'filename': 'signettab.png',
   'page_count_total': 1,
@@ -21622,9 +21622,8 @@ a.
          .  PUNCT   lemma=∅
 
 NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
-[('c', 'B-PERS'), ('.', 'I-PERS'), ('d', 'I-PERS'), ('.', 'I-PERS'), ('a', 'I-PERS'), ('.', 'O')]
+[('c', 'O'), ('.', 'O'), ('d', 'O'), ('.', 'O'), ('a', 'O'), ('.', 'O')]
 Entities:
-  PERS: c. d. a
 
 ##########################################################################################
 DOC=contras-14page.pdf | page=3 | sent=2 | lang=fr
@@ -21766,9 +21765,8 @@ e.
          .  PUNCT   lemma=∅
 
 NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
-[('a', 'B-PERS'), ('.', 'I-PERS'), ('b', 'I-PERS'), ('.', 'I-PERS'), ('c', 'I-PERS'), ('.', 'I-PERS'), ('d', 'I-PERS'), ('.', 'O'), ('e', 'O'), ('.', 'O')]
+[('a', 'O'), ('.', 'O'), ('b', 'O'), ('.', 'O'), ('c', 'O'), ('.', 'O'), ('d', 'O'), ('.', 'O'), ('e', 'O'), ('.', 'O')]
 Entities:
-  PERS: a. b. c. d
 
 ##########################################################################################
 DOC=contras-14page.pdf | page=5 | sent=7 | lang=fr
@@ -21872,10 +21870,9 @@ f.
          .  PUNCT   lemma=∅
 
 NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
-[('a', 'B-PERS'), ('.', 'O'), ('b', 'B-PERS'), ('.', 'I-PERS'), ('c', 'I-PERS'), ('.', 'O'), ('d', 'O'), ('.', 'O'), ('e', 'O'), ('.', 'O'), ('f', 'O'), ('.', 'O')]
+[('a', 'B-PERS'), ('.', 'O'), ('b', 'O'), ('.', 'O'), ('c', 'O'), ('.', 'O'), ('d', 'O'), ('.', 'O'), ('e', 'O'), ('.', 'O'), ('f', 'O'), ('.', 'O')]
 Entities:
   PERS: a
-  PERS: b. c
 
 ##########################################################################################
 DOC=contras-14page.pdf | page=7 | sent=3 | lang=fr
@@ -22921,7 +22918,7 @@ Type: list
 Summary: Langues executees: en, fr, ar | docs=4
 Output: [{'chars_total': 3651,
   'content': 'image_only',
-  'doc_id': '840ca6f2-f7e1-4eb5-b240-54321d0e1add',
+  'doc_id': 'b5299dd9-f800-4d75-bbbd-6a4066609739',
   'extraction': 'ocr:tesseract',
   'filename': 'bon-de-commade.png',
   'page_count_total': 1,
@@ -23921,7 +23918,7 @@ Output: [{'chars_total': 3651,
   'recompose_ok': False},
  {'chars_total': 54928,
   'content': 'text',
-  'doc_id': 'b8538eb6-b21a-4232-8e88-01e72f2d1c94',
+  'doc_id': '426e47c3-d1cd-4734-98d7-460b510d8575',
   'extraction': 'native:pdf:pypdf',
   'filename': 'contras-14page.pdf',
   'page_count_total': 14,
@@ -29120,7 +29117,7 @@ Output: [{'chars_total': 3651,
   'recompose_ok': False},
  {'chars_total': 2200,
   'content': 'image_only',
-  'doc_id': '77074768-5f85-4cc5-9e55-699bf9283108',
+  'doc_id': 'a1ee9be5-a245-4e82-b6ee-8ad056c6c882',
   'extraction': 'ocr:tesseract',
   'filename': 'image2tab.webp',
   'page_count_total': 1,
@@ -29793,7 +29790,7 @@ Output: [{'chars_total': 3651,
   'recompose_ok': False},
  {'chars_total': 1656,
   'content': 'image_only',
-  'doc_id': '1f8e9109-424f-4aaf-9c5d-b873401db7fb',
+  'doc_id': 'a5f1a3ea-40c3-42c4-8c1d-a8cfefe79954',
   'extraction': 'ocr:tesseract',
   'filename': 'signettab.png',
   'page_count_total': 1,
@@ -30313,51 +30310,52 @@ Output: [{'chars_total': 3651,
   'paths': ['C:\\Users\\moura\\OneDrive\\Bureau\\DMS\\core\\documents\\signettab.png'],
   'recompose_ok': False}]
 
-[classification] bon-de-commade.png -> best=BON_DE_COMMANDE | status=OK | scores: {'ARTICLE': 3, 'BON_DE_COMMANDE': 11, 'CONTRAT': -8, 'FACTURE': 7, 'FORMULAIRE': 7}
-  keywords: strong=[BON DE COMMANDE, BON DE COMMANDE N, BON DE COMMANDE N°, ACHETEUR] medium=[FOURNISSEUR] weak=[QUANTITE, UNITE, UNIT, LIVRAISON, COMMANDE] negative=[TOTAL TTC, TOTAL HT, TVA, MODE DE PAIEMENT, IBAN, SWIFT, DEVIS, AVOIR]
+[classification] bon-de-commade.png -> best=BON_DE_COMMANDE | status=OK | scores: {'ARTICLE': 4, 'BON_DE_COMMANDE': 31, 'CONTRAT': -26, 'FACTURE': -8, 'FORMULAIRE': 2}
+  keywords: strong=[BON DE COMMANDE(x2), BON DE COMMANDE N(x2), ACHETEUR(x3)] medium=[FOURNISSEUR(x2)] weak=[QUANTITE(x1), UNITE(x1), LIVRAISON(x1), COMMANDE(x2)] negative=[TOTAL TTC(x1), TOTAL HT(x1), TVA(x1), MODE DE PAIEMENT(x1), IBAN(x1), SWIFT(x1), AVOIR(x1)]
+  anti_confusion hits: AVOIR(x1)
   anti_confusion_targets: FACTURE, DEVIS, BON_DE_LIVRAISON, CONTRAT, AVOIR
-[classification] contras-14page.pdf -> best=CONTRAT | status=OK | scores: {'ARTICLE': 22, 'BON_DE_COMMANDE': 6, 'CONTRAT': 138, 'FACTURE': 1, 'FORMULAIRE': 56}
-  keywords: strong=[THIS CONTRACT, PARTIES, PARTY A, CONTRACT NUMBER, AGREEMENT] medium=[AMENDMENT, SIGNED BY, LIABILITY, APPLICABLE LAW, OBLIGATIONS, TERMINATION, TERMS AND CONDITIONS, CONFIDENTIALITY, FORCE MAJEURE, INDEMNIFICATION, PAYMENT TERMS, CLAUSE] weak=[SCHEDULE, AMENDMENT, ADDRESS] negative=[PURCHASE ORDER, FACTURE, BL, INVOICE]
+[classification] contras-14page.pdf -> best=CONTRAT | status=OK | scores: {'ARTICLE': 13, 'BON_DE_COMMANDE': 69, 'CONTRAT': 488, 'FACTURE': 48, 'FORMULAIRE': 12}
+  keywords: strong=[THIS CONTRACT(x67), PARTIES(x7), CONTRACT NUMBER(x4), AGREEMENT(x4)] medium=[AMENDMENT(x5), SIGNED BY(x3), LIABILITY(x1), APPLICABLE LAW(x3), OBLIGATIONS(x5), TERMINATION(x6), TERMS AND CONDITIONS(x3), CONFIDENTIALITY(x8), FORCE MAJEURE(x2), INDEMNIFICATION(x1), PAYMENT TERMS(x1), CLAUSE(x3)] weak=[SCHEDULE(x9), AMENDMENT(x5), ADDRESS(x3)] negative=[PURCHASE ORDER(x6), INVOICE(x6), PO(x1)]
   anti_confusion_targets: BON_DE_COMMANDE, FACTURE, DEVIS, BON_DE_LIVRAISON, AVOIR
-[classification] image2tab.webp -> best=FACTURE | status=OK | scores: {'ARTICLE': 4, 'BON_DE_COMMANDE': -5, 'CONTRAT': -4, 'FACTURE': 15, 'FORMULAIRE': 4}
-  keywords: strong=[FACTURE] medium=[TVA, ECHEANCE, MODE DE PAIEMENT, CLIENT] weak=[TTC, MONTANT] negative=[]
+[classification] image2tab.webp -> best=FACTURE | status=OK | scores: {'ARTICLE': 4, 'BON_DE_COMMANDE': -10, 'CONTRAT': -8, 'FACTURE': 15, 'FORMULAIRE': 4}
+  keywords: strong=[FACTURE(x1)] medium=[ECHEANCE(x1), MODE DE PAIEMENT(x1), CLIENT(x1)] weak=[TTC(x1), MONTANT(x2)] negative=[]
   anti_confusion_targets: BON_DE_COMMANDE, CONTRAT, DEVIS, BON_DE_LIVRAISON, AVOIR
-[classification] signettab.png -> best=FACTURE | status=OK | scores: {'ARTICLE': 1, 'BON_DE_COMMANDE': -17, 'CONTRAT': -6, 'FACTURE': 30, 'FORMULAIRE': 7}
-  keywords: strong=[FACTURE, FACTURE N, FACTURE N°] medium=[TOTAL HT, MONTANT HT, TVA, ECHEANCE, IBAN, BIC, SWIFT] weak=[TOTAL, HT, MONTANT] negative=[BL]
+[classification] signettab.png -> best=FACTURE | status=OK | scores: {'ARTICLE': 2, 'BON_DE_COMMANDE': -38, 'CONTRAT': -27, 'FACTURE': 50, 'FORMULAIRE': 2}
+  keywords: strong=[FACTURE(x3), FACTURE N(x2)] medium=[TOTAL HT(x1), MONTANT HT(x1), TVA(x1), ECHEANCE(x1), IBAN(x1), BIC(x1), SWIFT(x1)] weak=[TOTAL(x2), HT(x3), MONTANT(x1)] negative=[]
   anti_confusion_targets: BON_DE_COMMANDE, CONTRAT, DEVIS, BON_DE_LIVRAISON, AVOIR
 [Component: clasification]
 Type: list
 Summary: 4 docs classes | bon-de-commade.png->BON_DE_COMMANDE, contras-14page.pdf->CONTRAT, image2tab.webp->FACTURE, signettab.png->FACTURE
-Output: [{'decision_debug': {'diff': 4, 'second_score': 7, 'top_score': 11},
-  'doc_id': 'fb60a24a-d5b4-425f-934e-478a41265df3',
+Output: [{'decision_debug': {'diff': 27, 'second_score': 4, 'top_score': 31},
+  'doc_id': '456d1632-2b29-46c4-8765-ce8d9bed0d33',
   'doc_type': 'BON_DE_COMMANDE',
   'filename': 'bon-de-commade.png',
   'margin': 3,
-  'scores': {'ARTICLE': 3, 'BON_DE_COMMANDE': 11, 'CONTRAT': -8, 'FACTURE': 7, 'FORMULAIRE': 7},
+  'scores': {'ARTICLE': 4, 'BON_DE_COMMANDE': 31, 'CONTRAT': -26, 'FACTURE': -8, 'FORMULAIRE': 2},
   'status': 'OK',
   'threshold': 6},
- {'decision_debug': {'diff': 82, 'second_score': 56, 'top_score': 138},
-  'doc_id': '46559d81-df64-4c4e-a18e-d818a9778d74',
+ {'decision_debug': {'diff': 419, 'second_score': 69, 'top_score': 488},
+  'doc_id': '41091a32-12d9-4f0c-9252-c92cc1ccb842',
   'doc_type': 'CONTRAT',
   'filename': 'contras-14page.pdf',
   'margin': 3,
-  'scores': {'ARTICLE': 22, 'BON_DE_COMMANDE': 6, 'CONTRAT': 138, 'FACTURE': 1, 'FORMULAIRE': 56},
+  'scores': {'ARTICLE': 13, 'BON_DE_COMMANDE': 69, 'CONTRAT': 488, 'FACTURE': 48, 'FORMULAIRE': 12},
   'status': 'OK',
   'threshold': 6},
  {'decision_debug': {'diff': 11, 'second_score': 4, 'top_score': 15},
-  'doc_id': '047ee695-486a-4772-9c5f-d04e531b8af5',
+  'doc_id': '9e9003ce-7a32-4e1c-b3f6-9aaf57a966ea',
   'doc_type': 'FACTURE',
   'filename': 'image2tab.webp',
   'margin': 3,
-  'scores': {'ARTICLE': 4, 'BON_DE_COMMANDE': -5, 'CONTRAT': -4, 'FACTURE': 15, 'FORMULAIRE': 4},
+  'scores': {'ARTICLE': 4, 'BON_DE_COMMANDE': -10, 'CONTRAT': -8, 'FACTURE': 15, 'FORMULAIRE': 4},
   'status': 'OK',
   'threshold': 6},
- {'decision_debug': {'diff': 23, 'second_score': 7, 'top_score': 30},
-  'doc_id': '9ea5e018-2be5-440d-bc05-65ccf79bd251',
+ {'decision_debug': {'diff': 48, 'second_score': 2, 'top_score': 50},
+  'doc_id': '402d291c-37ad-42c6-a99a-507b3354917b',
   'doc_type': 'FACTURE',
   'filename': 'signettab.png',
   'margin': 3,
-  'scores': {'ARTICLE': 1, 'BON_DE_COMMANDE': -17, 'CONTRAT': -6, 'FACTURE': 30, 'FORMULAIRE': 7},
+  'scores': {'ARTICLE': 2, 'BON_DE_COMMANDE': -38, 'CONTRAT': -27, 'FACTURE': 50, 'FORMULAIRE': 2},
   'status': 'OK',
   'threshold': 6}]
 

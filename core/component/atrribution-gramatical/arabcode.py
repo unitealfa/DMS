@@ -495,14 +495,30 @@ def norm_for_match(tok: str) -> str:
 
 def fix_titles(tokens: List[str], labels: List[str]) -> List[str]:
     labels = labels[:]
-    for i in range(1, len(tokens)):
-        if labels[i].startswith("B-PERS") and labels[i - 1] == "O":
-            prev_norm = norm_for_match(tokens[i - 1])
+    title_set = set(TITLE_NORMS) | set(HONORIFICS_AR)
+
+    for i in range(len(tokens)):
+        cur_norm = norm_for_match(tokens[i]).lower()
+        cur_norm2 = cur_norm[2:] if cur_norm.startswith("Ø§Ù„") and len(cur_norm) > 2 else cur_norm
+
+        # Cas 1: titre juste avant un B-PERS => fusionner
+        if labels[i].startswith("B-PERS") and i > 0:
+            prev_norm = norm_for_match(tokens[i - 1]).lower()
             prev_norm2 = prev_norm[2:] if prev_norm.startswith("Ø§Ù„") and len(prev_norm) > 2 else prev_norm
-            if prev_norm in TITLE_NORMS or prev_norm2 in TITLE_NORMS:
+            if prev_norm in title_set or prev_norm2 in title_set:
                 labels[i - 1] = "B-PERS"
                 labels[i] = "I-PERS"
-    return labels
+
+        # Cas 2: token est un titre, on l'étend avec le nom qui suit (même si non taggué)
+        if cur_norm in title_set or cur_norm2 in title_set:
+            labels[i] = "B-PERS"
+            if i + 1 < len(tokens) and not is_punct(tokens[i + 1]):
+                if labels[i + 1].startswith("B-PERS") or labels[i + 1].startswith("I-PERS"):
+                    labels[i + 1] = "I-PERS"
+                else:
+                    labels[i + 1] = "I-PERS"
+
+    return enforce_bio(labels)
 
 def add_year_dates(tokens: List[str], labels: List[str]) -> List[str]:
     labels = labels[:]
@@ -540,6 +556,58 @@ def enforce_bio(labels: List[str]) -> List[str]:
             if i == 0 or out[i - 1] == "O" or out[i - 1][2:] != typ:
                 out[i] = "B-" + typ
     return out
+
+# Anti-faux PERS : titres/abréviations courants (liste locale)
+HONORIFICS_AR = {
+    "آنسـة","آنسة","أ","أ.","أ/","أستاذ","أستاذة","أساتذة","أسقف","أطبـاء","أطباء","أمير","أميرة","إمام","ابونا",
+    "اساتذة","اطباء","الآنسة","الأب","الأخ","الأخت","الأستاذ","الأستاذة","الأسقف","الأم","الأم الرئيسة","الأمير",
+    "الأميرة","الأمين العام","الإمام","الاستاذ","الاستاذة","الامير","البابا","الجنرال","الحاج","الحاجة","الحاخام",
+    "الدكتور","الدكتورة","الرئيس","الرئيس التنفيذي","الرئيس التنفيذي للعمليات","الرئيسة","الرائد","الراعي","الرقيب",
+    "السفير","السفيرة","السيد","السيدة","الشيخ","الشيخة","الصيدلانية","الصيدلي","الضابط","العقيد","العميد","القائد",
+    "القاضي","القاضية","القس","القسيس","القنصل","الكابتن","المحافظ","المحامي","المحامية","المحترم","المحترمة",
+    "المدير","المدير التقني","المدير التنفيذي","المدير المالي","المديرة","المستشار","المفتش","المفتي","الملازم",
+    "الملك","الملكة","المهندس","المهندسة","الوالي","الوزير","الوزير الأول","الوزيرة","امام","انسة","بروف","بروف.",
+    "بروفيسور","بيطري","جلالة","جنرال","حاج","حاجة","حاخام","حضرة","د","د.","د/","دكاترة","دكاتره","دكتور",
+    "دكتور أسنان","دكتور بيطري","دكتورة","دكتورة أسنان","رئيس","رئيس الأساقفة","رئيس البلدية","رئيس الجامعة",
+    "رئيس الحكومة","رئيس الوزراء","رئيس قسم","رئيس مجلس الإدارة","رئيس مصلحة","رائد","راعي","راهبة","رقيب","سعادة",
+    "سمو","سمو الأمير","سمو الأميرة","سيد","سيدة","سيدي","سير","سيناتور","سيّد","سيّدة","شيخ","صاحب الجلالة",
+    "صاحب السمو","صاحب الفخامة","صاحبة الجلالة","صاحبة السمو","صيدلانية","صيدلي","ضابط","طبيب أسنان","طبيب بيطري",
+    "طبيبة أسنان","عضو البرلمان","عضو مجلس الشيوخ","عضو مجلس النواب","عقيد","عمدة","عميد","عون","فخامة",
+    "فخامة الرئيس","قائد","قاض","قاضي","قنصل","كابتن","كاتب الدولة","كاردينال","لالة","لواء","م","م.","م/","محافظ",
+    "محام","محامية","مدير","مدير التكنولوجيا","مدير العمليات","مديرة","مسؤول","مستشار","مشرف","مشير","معالي",
+    "معماري","مفتش","مفتي","مفوض","مفوّض","ملازم","ملك","ملكة","مهندس","مهندس معماري","مهندسة","موثق","موثقة",
+    "مولاي","نائب","نائب الرئيس","نائبة","نائبة الرئيس","نقيب","والي","وزير دولة","وكيل",
+    "امير","اميرة","الامير","الاميرة","ام","الأم","الأخت","الأمير","الأميرة","السادة","السيدات","ام","الأم","الأخت"
+}
+
+def _is_initial_chain(tokens: List[str]) -> bool:
+    letters = [t for t in tokens if re.fullmatch(r"[A-Za-z]", t)]
+    dots = [t for t in tokens if t == "."]
+    long = any(len(t) > 2 and t.isalpha() for t in tokens)
+    return (len(letters) >= 2) and (len(dots) >= len(letters) - 1) and not long
+
+def drop_false_pers(tokens: List[str], labels: List[str]) -> List[str]:
+    out = labels[:]
+    i = 0
+    while i < len(out):
+        lab = out[i]
+        if not lab.startswith("B-"):
+            i += 1
+            continue
+        typ = lab[2:]
+        j = i + 1
+        while j < len(out) and out[j] == f"I-{typ}":
+            j += 1
+        span_tokens = tokens[i:j]
+        if typ == "PERS":
+            if _is_initial_chain(span_tokens):
+                for k in range(i, j):
+                    out[k] = "O"
+            elif all(strip_diacritics(t).lower() in HONORIFICS_AR for t in span_tokens):
+                for k in range(i, j):
+                    out[k] = "O"
+        i = j
+    return enforce_bio(out)
 
 def strip_entity_clitics_for_display(tok: str, lemma: str) -> str:
     t = strip_diacritics(tok)
@@ -758,6 +826,7 @@ def analyze_sentence(text: str):
         ner_labels = add_year_dates(toks, ner_labels)
         ner_labels = add_currency_codes(toks, ner_labels)
         ner_labels = enforce_bio(ner_labels)
+        ner_labels = drop_false_pers(toks, ner_labels)
 
         print("\nNER (pretrained + deterministic fixes) (token, label):")
         print(list(zip(toks, ner_labels)))

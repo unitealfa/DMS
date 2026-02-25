@@ -577,6 +577,56 @@ def enforce_bio(labels: List[str]) -> List[str]:
                 out[i] = "B-" + typ
     return out
 
+# ----------------------------
+# 8bis) Filtre anti-faux PERS (initiales enchaînées, titres seuls)
+# ----------------------------
+HONORIFICS_FR = {
+    "abbe","abbé","amb","amb.","ambassadeur","ambassadrice","arch.","archeveque","archevêque","architecte","av","av.",
+    "avocat","avocate","baronne","capitaine","chancelier","chancelière","chef","chef de","cheikh","cmdt","cmdt.",
+    "colonel","commandant","commissaire","comte","comtesse","consul","consule","dentiste","dir","dir.","directeur",
+    "directrice","docteur","docteure","doyen","doyenne","dr","dr.","duc","duchesse","député","députée","eveque","frere",
+    "frère","generale","gestionnaire","gouv.","gouverneur","général","huissier","huissière","ing","ing.","ingenieur",
+    "ingenieure","ingénieur","ingénieure","insp","insp.","inspecteur","inspectrice","juge","lalla","lieutenant","m",
+    "m.","madame","mademoiselle","maire","mairesse","maitre","marechal","maréchal","maître","me","me.","mere","mes",
+    "mes.","mesdames","mesdemoiselles","messieurs","min","min.","ministre","mlle","mlle.","mlles","mm","mm.","mme","mme.",
+    "mmes","monsieur","moulay","mère","notaire","officier","p.d.g.","pape","parlementaire","pasteur","pdg","pere",
+    "pharm","pharm.","pharmacien","pharmacienne","pr","pr.","premier ministre","première ministre","pres.",
+    "president-directeur general","prof","prof.","professeur","professeure","professor","prés.","président",
+    "président d'université","président du conseil","président-directeur général","présidente","père","rabbin","recteur",
+    "rectrice","reine","responsable","roi","rév.","révérend","sa excellence","secretaire d'etat","secrétaire d'état",
+    "secrétaire général","secrétaire générale","sergent","soeur","son excellence","sénateur","sénatrice","sœur","vet",
+    "vet.","veterinaire","vice-président","vice-présidente","vét.","vétérinaire","évêque"
+}
+
+def _is_initial_chain(tokens: List[str]) -> bool:
+    letters = [t for t in tokens if re.fullmatch(r"[A-Za-zÀ-ÖØ-öø-ÿ]", t)]
+    dots = [t for t in tokens if t == "."]
+    long = any(len(t) > 2 and re.fullmatch(r"[A-Za-zÀ-ÖØ-öø-ÿ]+", t) for t in tokens)
+    return (len(letters) >= 2) and (len(dots) >= len(letters) - 1) and not long
+
+def drop_false_pers(tokens: List[str], labels: List[str]) -> List[str]:
+    out = labels[:]
+    i = 0
+    while i < len(out):
+        lab = out[i]
+        if not lab.startswith("B-"):
+            i += 1
+            continue
+        typ = lab[2:]
+        j = i + 1
+        while j < len(out) and out[j] == f"I-{typ}":
+            j += 1
+        span_tokens = tokens[i:j]
+        if typ == "PERS":
+            if _is_initial_chain(span_tokens):
+                for k in range(i, j):
+                    out[k] = "O"
+            elif all(_norm_apo(t).lower() in HONORIFICS_FR for t in span_tokens):
+                for k in range(i, j):
+                    out[k] = "O"
+        i = j
+    return enforce_bio(out)
+
 def ner_rules_spans(text: str, toks: List[Tok]) -> List[Tuple[int,int,str]]:
     spans: List[Tuple[int,int,str]] = []
     i = 0
@@ -819,6 +869,7 @@ def run_one(text: str, ner_pipe=None):
     labels = enforce_bio(labels)
 
     # POS boost via NER (ce que tu veux)
+    labels = drop_false_pers([t.text for t in toks], labels)
     pos2 = improve_pos_with_ner(toks, pos, labels)
 
     # Recompute lemma pour tokens impactés (simple et sûr)

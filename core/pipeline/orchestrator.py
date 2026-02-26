@@ -11,6 +11,7 @@ from .components import (
     OutputTxtComponent,
     PretraitementComponent,
     TokenisationLayoutComponent,
+    FusionResultComponent,
 )
 from .settings import COMPONENT_DIR, Context, InputLike, normalize_input
 
@@ -26,6 +27,7 @@ class PipelineOrchestrator:
             GrammarComponent("atripusion-gramatical-en-utilisant-les3ficherla", COMPONENT_DIR / "atrribution-gramatical" / "atripusion-gramatical-en-utilisant-les3ficherla.py"),
             ClassificationComponent("clasification", COMPONENT_DIR / "clasification.py"),
             RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction-regles.py"),
+            FusionResultComponent("fusion-resultats", COMPONENT_DIR / "fusion_resultats.py"),
         ]
 
     def list_steps(self) -> List[str]:

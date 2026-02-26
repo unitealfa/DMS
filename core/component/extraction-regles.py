@@ -271,12 +271,10 @@ def run() -> List[Dict[str, Any]]:
             matches = fcfg.get("matches") or []
             rule_id = fcfg.get("rule_id") or "?"
             print(f"    - {fname} (rule_id={rule_id})  x{len(matches)}")
-            for m in matches[:5]:
+            for m in matches:
                 val = m.get("value")
                 page = m.get("page_index", "?")
                 print(f"        p{page}: {val}  [rule_id={rule_id}]")
-            if len(matches) > 5:
-                print("        ...")
 
         extracted_docs.append(extracted_doc)
 

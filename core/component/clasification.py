@@ -253,8 +253,9 @@ for doc in DOCS:
     d = decide(scores, configs, common)
     best, status = d["best"], d["status"]
 
-    # ---- sortie lisible + compacte (tu vois enfin la classe)
-    print(f"[classification] {doc.get('filename')} -> best={best} | status={status} | scores: {ordered_scores}")
+    # ---- sortie lisible (suppress si tout est nul et UNCLASSIFIED)
+    if not (best == "UNCLASSIFIED" and all(v == 0 for v in ordered_scores.values())):
+        print(f"[classification] {doc.get('filename')} -> best={best} | status={status} | scores: {ordered_scores}")
 
     # Détails: mots-clés matchés et cibles d'anti-confusion pour la classe retenue
     if best in configs:

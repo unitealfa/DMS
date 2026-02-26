@@ -3,7 +3,7 @@
   "extractors": {
     "numero_facture": {
       "rule_id": "INV_NUM_02",
-      "pattern": "(?xim)\\b(?:facture\\s*(?:n(?:o|°|º)?|num(?:e|é)?ro|number|no\\.?|#)|(?:n(?:o|°|º)?|num(?:e|é)?ro)\\s*de\\s*facture|invoice\\s*(?:number|no\\.?|#)|رقم\\s*الفاتورة|فاتورة\\s*(?:رقم|#)?|الفاتورة\\s*(?:رقم|#)?)\\b[\\s\\t:;=\\-–—#]*([A-Za-z0-9٠-٩\\u0621-\\u064A][A-Za-z0-9٠-٩\\u0621-\\u064A._\\/-]{0,30}(?:[ \\t][A-Za-z0-9٠-٩\\u0621-\\u064A._\\/-]{1,30}){0,2})",
+      "pattern": "(?xim)\\b(?:facture\\s*(?:n(?:o|°|º)?|num(?:e|é)?ro|number|no\\.?|#)|(?:n(?:o|°|º)?|num(?:e|é)?ro)\\s*de\\s*facture|invoice\\s*(?:number|no\\.?|#)|رقم\\s*الفاتورة|فاتورة\\s*(?:رقم|#)?|الفاتورة\\s*(?:رقم|#)?)\\b[\\s\\t:;=\\-–—#]*([A-Za-z0-9٠-٩ء-ي][A-Za-z0-9٠-٩ء-ي._\\/-]{0,30}(?:[ \\t][A-Za-z0-9٠-٩ء-ي._\\/-]{1,30}){0,2})",
       "group": 1,
       "type": "string",
       "flags": ["IGNORECASE", "MULTILINE"],

@@ -242,3 +242,16 @@ class RuleExtractionComponent(Component):
         return extractions
 
 
+class FusionResultComponent(Component):
+    """Fusionne les sorties en un JSON final (voir component/fusion_resultats.py)."""
+
+    def run(self, context: Context) -> Any:
+        ctx = self._execute_script(context)
+        fusion = ctx.get("FUSION_RESULT")
+        if fusion is None:
+            fusion = "fusion_output.json"
+        summary = f"fusion -> {fusion}"
+        self._report(fusion, summary)
+        return fusion
+
+

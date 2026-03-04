@@ -9,45 +9,11 @@ sentence-transformers
 elasticsearch==7.10.1
 pypdf
 requests
-openpyxl 
-
-
-
-import sys
-
-print("PYTHON:", sys.executable)
-
-# Installer dans EXACTEMENT ce Python
-!"{sys.executable}" -m pip install --upgrade pip
-!"{sys.executable}" -m pip install --upgrade camel-tools
-
-# Vérif
-!"{sys.executable}" -m pip show camel-tools
-
-
-
-
-
-py -3.11 -m pip install --upgrade --target .\.pylibs simplemma
-py -3.11 -m pip install --upgrade --target .\.pylibs torch transformers tokenizers
-
-
-
+openpyxl
+camel-tools
 simplemma
-
-cd DMS
-
-# 1) Crée le dossier local
-New-Item -ItemType Directory -Force .\.pylibs | Out-Null
-
-# 2) Désactive la config pip (sinon --user revient)
-$env:PIP_CONFIG_FILE="NUL"
-Remove-Item Env:PIP_USER -ErrorAction SilentlyContinue
-
-# 3) Installe dans .pylibs
-py -3.11 -m pip install --upgrade --target .\.pylibs simplemma
-py -3.11 -m pip install --upgrade --target .\.pylibs torch transformers tokenizers
-
-# 4) Test rapide (sans Jupyter)
-py -3.11 -c "import sys; sys.path.insert(0, r'.\.pylibs'); import simplemma; import transformers; import tokenizers; print('OK', simplemma.__version__, transformers.__version__, tokenizers.__version__)"
-
+torch
+transformers
+tokenizers
+ipython
+nltk

@@ -38,3 +38,5 @@ structurer tout les info des document dasn une sortie json
   python orchestre.py --upto clasification "documents/testword.docx, documents/
   testexcel.xlsx, documents/signettab.png, documents/image2tab.webp, documents/francais.docx, documents/arab.docx, test/
   documents/englais.docx, documents/testexcel.xlsx"
+
+python orchestre.py "documents/contrat_regex_test_corpus_fr_en_ar.pdf"

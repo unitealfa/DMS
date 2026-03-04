@@ -151,6 +151,31 @@ def _build_DOCS_from_input(data) -> List[Dict[str, Any]]:
 
     raise TypeError(f"Format d'entrée non supporté: {type(data)}")
 
+
+def _doc_text_len(doc: Dict[str, Any]) -> int:
+    total = 0
+    for pg in doc.get("pages") or []:
+        txt = str(pg.get("ocr_text") or "")
+        total += len(txt.strip())
+    return total
+
+
+def _drop_empty_duplicates(docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Si un même filename existe en version vide et non-vide, garder la version non-vide.
+    Evite les faux UNCLASSIFIED issus de docs placeholders sans texte.
+    """
+    grouped: Dict[str, List[Dict[str, Any]]] = {}
+    for doc in docs:
+        key = str(doc.get("filename") or doc.get("doc_id") or "")
+        grouped.setdefault(key, []).append(doc)
+
+    out: List[Dict[str, Any]] = []
+    for _, group in grouped.items():
+        non_empty = [d for d in group if _doc_text_len(d) > 0]
+        out.extend(non_empty if non_empty else group)
+    return out
+
 def classify_scores(DOCS: List[Dict[str, Any]], common: Dict[str, Any], configs: Dict[str, Any]) -> None:
     weights = common.get("weights", {"strong": 5, "medium": 2, "weak": 1})
     penalties = common.get("global_penalties", {"negative": -2, "strong_negative": -5})
@@ -250,7 +275,7 @@ common, configs = load_classification_configs()
 if not configs:
     raise RuntimeError(f"Aucune classe trouvée dans: {CLASSIFICATION_DIR}")
 
-DOCS = _build_DOCS_from_input(data)
+DOCS = _drop_empty_duplicates(_build_DOCS_from_input(data))
 classify_scores(DOCS, common, configs)
 
 preferred = ["ARTICLE", "BON_DE_COMMANDE", "CONTRAT", "FACTURE", "FORMULAIRE"]

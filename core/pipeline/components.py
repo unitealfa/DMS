@@ -29,6 +29,57 @@ from .settings import (
 )
 
 
+def _doc_has_meaningful_text(doc: Dict[str, Any]) -> bool:
+    if not isinstance(doc, dict):
+        return False
+
+    for key in ("text", "full_text"):
+        value = doc.get(key)
+        if isinstance(value, str) and value.strip():
+            return True
+
+    for pg in doc.get("pages") or []:
+        if not isinstance(pg, dict):
+            continue
+        for key in ("page_text", "ocr_text", "text"):
+            value = pg.get(key)
+            if isinstance(value, str) and value.strip():
+                return True
+        sent_items = pg.get("sentences_layout") or pg.get("sentences") or pg.get("chunks") or []
+        for sent in sent_items:
+            if isinstance(sent, dict):
+                value = str(sent.get("text") or "")
+            else:
+                value = str(sent)
+            if value.strip():
+                return True
+    return False
+
+
+def _drop_empty_duplicate_docs(docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    grouped: Dict[str, List[Dict[str, Any]]] = {}
+    order: List[str] = []
+    for i, doc in enumerate(docs):
+        if not isinstance(doc, dict):
+            continue
+        paths = doc.get("paths")
+        first_path = ""
+        if isinstance(paths, list) and paths:
+            first_path = str(paths[0])
+        key = str(doc.get("filename") or first_path or doc.get("doc_id") or f"doc#{i}")
+        if key not in grouped:
+            grouped[key] = []
+            order.append(key)
+        grouped[key].append(doc)
+
+    out: List[Dict[str, Any]] = []
+    for key in order:
+        group = grouped[key]
+        non_empty = [d for d in group if _doc_has_meaningful_text(d)]
+        out.extend(non_empty if non_empty else group)
+    return out
+
+
 @dataclass
 class Component:
     name: str
@@ -187,7 +238,18 @@ class TokenisationLayoutComponent(Component):
         if not output:
             raise ValueError("tokenisation-layout n'a produit aucun document tokenise.")
 
-        total_sent = count_sentences(tok_docs or [])
+        if isinstance(output, list):
+            filtered = _drop_empty_duplicate_docs(output)
+            removed = len(output) - len(filtered)
+            if removed > 0:
+                logging.info("Tokenisation: %d document(s) vide(s) en doublon ignores.", removed)
+            if tok_docs is not None:
+                ctx["TOK_DOCS"] = filtered
+            if selected is not None:
+                ctx["selected"] = filtered
+            output = filtered
+
+        total_sent = count_sentences(output or [])
         summary = f"{len(output)} docs | sentences={total_sent}"
         self._report(output, summary)
         return output

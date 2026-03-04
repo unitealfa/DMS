@@ -44,12 +44,51 @@ python -m pip install -r requirements.txt
 5) Installer les modèles SpaCy
 python -m spacy download en_core_web_sm
 python -m spacy download fr_core_news_sm
+
+
+pour Ubuntu 22.04 LTS pour installer Elasticsearch 7.x.:
+2. Installer Java
+
+Elasticsearch 7 fonctionne bien avec OpenJDK 11.
+
+sudo apt install openjdk-11-jdk -y
+
+Vérifier :
+
+java -version
+3. Ajouter la clé Elasticsearch
+wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg
+4. Ajouter le dépôt
+echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-7.x.list
+5. Installer Elasticsearch
+sudo apt update
+sudo apt install elasticsearch -y
+6. Activer le service
+sudo systemctl daemon-reexec
+sudo systemctl enable elasticsearch
+7. Démarrer Elasticsearch
+sudo systemctl start elasticsearch
+8. Vérifier que ça fonctionne
+curl http://localhost:9200
+
+Tu dois obtenir une réponse JSON avec la version.
+
+
+
 6) Vérification
 python -c "import sys; print('Python utilisé :', sys.executable)"
 python -m pip list
 7) Lancer le projet
 source .venv/bin/activate
+
+
+
 python orchestre.py "documents/mon_fichier.pdf"
+
+
+
+
+
 🔹 Installation sous Windows
 1. Installer Python
 

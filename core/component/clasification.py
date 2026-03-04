@@ -91,7 +91,7 @@ def load_classification_configs():
 
 def _get_previous_cell_input():
     g = globals()
-    for k in ("selected", "TOK_DOCS", "FINAL_DOCS", "DOCS", "TEXT_DOCS", "_"):
+    for k in ("ES_CLASSIFICATION_DOCS", "selected", "TOK_DOCS", "FINAL_DOCS", "DOCS", "TEXT_DOCS", "_"):
         if k in g and g[k] is not None:
             return g[k]
     return None
@@ -101,6 +101,7 @@ def _build_DOCS_from_input(data) -> List[Dict[str, Any]]:
     if isinstance(data, list) and data and isinstance(data[0], dict) and "pages" in data[0]:
         out = []
         for i, doc in enumerate(data):
+            doc_id = doc.get("doc_id")
             name = doc.get("filename") or doc.get("doc_id") or f"doc#{i}"
             pages_out = []
             for p_i, pg in enumerate(doc.get("pages") or []):
@@ -118,21 +119,31 @@ def _build_DOCS_from_input(data) -> List[Dict[str, Any]]:
                             parts.append(str(s))
                     txt = "\n".join([x for x in parts if x])
                 pages_out.append({"page_index": page_index, "ocr_text": txt or ""})
-            out.append({"filename": name, "pages": pages_out})
+            out.append({"doc_id": doc_id, "filename": name, "pages": pages_out})
         return out
 
     # Cas: FINAL_DOCS list[{text,...}]
     if isinstance(data, list) and data and isinstance(data[0], dict) and "text" in data[0]:
         out = []
         for i, d in enumerate(data):
+            doc_id = d.get("doc_id")
             name = d.get("filename") or d.get("doc_id") or f"doc#{i}"
-            out.append({"filename": name, "pages": [{"page_index": 1, "ocr_text": d.get("text") or ""}]})
+            out.append({
+                "doc_id": doc_id,
+                "filename": name,
+                "pages": [{"page_index": 1, "ocr_text": d.get("text") or ""}],
+            })
         return out
 
     # Cas: dict {text:...}
     if isinstance(data, dict) and "text" in data:
+        doc_id = data.get("doc_id")
         name = data.get("filename") or data.get("doc_id") or "doc"
-        return [{"filename": name, "pages": [{"page_index": 1, "ocr_text": data.get("text") or ""}]}]
+        return [{
+            "doc_id": doc_id,
+            "filename": name,
+            "pages": [{"page_index": 1, "ocr_text": data.get("text") or ""}],
+        }]
 
     # Cas: string
     if isinstance(data, str):

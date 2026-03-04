@@ -5,6 +5,7 @@ from typing import Any, List, Optional
 
 from .components import (
     ClassificationComponent,
+    ElasticsearchComponent,
     RuleExtractionComponent,
     GrammarComponent,
     OCRPreprocessComponent,
@@ -25,6 +26,7 @@ class PipelineOrchestrator:
             OutputTxtComponent("output-txt", COMPONENT_DIR / "output-txt.py"),
             TokenisationLayoutComponent("tokenisation-layout", COMPONENT_DIR / "tokenisation-layout.py"),
             GrammarComponent("atripusion-gramatical-en-utilisant-les3ficherla", COMPONENT_DIR / "atrribution-gramatical" / "atripusion-gramatical-en-utilisant-les3ficherla.py"),
+            ElasticsearchComponent("elasticsearch", COMPONENT_DIR / "elasticsearch.py"),
             ClassificationComponent("clasification", COMPONENT_DIR / "clasification.py"),
             RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction-regles.py"),
             FusionResultComponent("fusion-resultats", COMPONENT_DIR / "fusion_resultats.py"),
@@ -51,8 +53,17 @@ class PipelineOrchestrator:
             comps = [c for c in self.components if c.name == only]
         return comps
 
-    def run(self, input_files: InputLike, only: Optional[str] = None, upto: Optional[str] = None, start: Optional[str] = None) -> Context:
+    def run(
+        self,
+        input_files: InputLike,
+        only: Optional[str] = None,
+        upto: Optional[str] = None,
+        start: Optional[str] = None,
+        context_overrides: Optional[Context] = None,
+    ) -> Context:
         context: Context = {"INPUT_FILE": normalize_input(input_files)}
+        if context_overrides:
+            context.update(context_overrides)
         selected = self._select_components(only, upto, start)
         for comp in selected:
             output: Any = comp.run(context)

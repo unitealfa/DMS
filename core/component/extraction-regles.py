@@ -104,9 +104,9 @@ def load_extractors_for(doc_type: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
 # ----------------- Documents -----------------
 def _get_input_docs(globals_dict: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
-    Priorité: selected > TOK_DOCS > FINAL_DOCS > DOCS > TEXT_DOCS
+    Priorité: ES_EXTRACTION_DOCS > selected > TOK_DOCS > FINAL_DOCS > DOCS > TEXT_DOCS
     """
-    for key in ("selected", "TOK_DOCS", "FINAL_DOCS", "DOCS", "TEXT_DOCS"):
+    for key in ("ES_EXTRACTION_DOCS", "selected", "TOK_DOCS", "FINAL_DOCS", "DOCS", "TEXT_DOCS"):
         val = globals_dict.get(key)
         if isinstance(val, list):
             return val

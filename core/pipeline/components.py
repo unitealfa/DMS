@@ -8,6 +8,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Union
 
+from .elasticsearch import (
+    fetch_sources_for_ids,
+    maybe_build_store,
+    to_classification_docs,
+    to_extraction_docs,
+    update_classification_results,
+    update_extraction_results,
+)
 from .settings import (
     COMPONENT_DIR,
     REPO_ROOT,
@@ -206,12 +214,65 @@ class GrammarComponent(Component):
         return data
 
 
+class ElasticsearchComponent(Component):
+    def run(self, context: Context) -> Any:
+        ctx = self._execute_script(context)
+        enabled = bool(ctx.get("USE_ELASTICSEARCH"))
+        available = bool(ctx.get("ES_AVAILABLE"))
+        doc_ids = ctx.get("ES_DOC_IDS") or []
+        cls_docs = ctx.get("ES_CLASSIFICATION_DOCS") or []
+        ext_docs = ctx.get("ES_EXTRACTION_DOCS") or []
+
+        output = {
+            "enabled": enabled,
+            "available": available,
+            "es_url": ctx.get("ES_URL"),
+            "es_index": ctx.get("ES_INDEX"),
+            "doc_ids": len(doc_ids),
+            "classification_docs": len(cls_docs),
+            "extraction_docs": len(ext_docs),
+        }
+        summary = (
+            f"enabled={enabled} | available={available} | indexed={len(doc_ids)} | "
+            f"cls_docs={len(cls_docs)} | ext_docs={len(ext_docs)}"
+        )
+        self._report(output, summary)
+        return output
+
+
 class ClassificationComponent(Component):
     def run(self, context: Context) -> Any:
+        store = None
+        try:
+            store = maybe_build_store(context)
+            if store is not None:
+                if not context.get("ES_CLASSIFICATION_DOCS"):
+                    es_ids = [str(x) for x in (context.get("ES_DOC_IDS") or []) if x]
+                    if es_ids:
+                        es_sources = fetch_sources_for_ids(store, es_ids)
+                        es_docs = to_classification_docs(es_sources)
+                        if es_docs:
+                            context["ES_CLASSIFICATION_DOCS"] = es_docs
+                            logging.info(
+                                "Classification: fallback Elasticsearch active (%d docs).",
+                                len(es_docs),
+                            )
+        except Exception as exc:
+            logging.warning("Elasticsearch pre-classification desactive: %s", exc)
+            store = None
+
         ctx = self._execute_script(context)
         results = ctx.get("RESULTS")
         if not results:
             raise ValueError("clasification n'a retourne aucun resultat.")
+
+        if store is not None:
+            try:
+                synced = update_classification_results(store, results)
+                ctx["ES_CLASSIFICATION_SYNCED"] = synced
+                logging.info("Classification synchronisee vers Elasticsearch: %d document(s).", synced)
+            except Exception as exc:
+                logging.warning("Sync classification vers Elasticsearch echouee: %s", exc)
 
         labels = ", ".join(f"{r.get('filename')}->{r.get('doc_type')}" for r in results)
         summary = f"{len(results)} docs classes | {labels}"
@@ -221,10 +282,37 @@ class ClassificationComponent(Component):
 
 class RuleExtractionComponent(Component):
     def run(self, context: Context) -> Any:
+        store = None
+        try:
+            store = maybe_build_store(context)
+            if store is not None:
+                if not context.get("ES_EXTRACTION_DOCS"):
+                    es_ids: List[str] = [str(x) for x in (context.get("ES_DOC_IDS") or []) if x]
+                    if es_ids:
+                        es_sources = fetch_sources_for_ids(store, es_ids)
+                        es_docs = to_extraction_docs(es_sources)
+                        if es_docs:
+                            context["ES_EXTRACTION_DOCS"] = es_docs
+                            logging.info(
+                                "Extraction-regles: fallback Elasticsearch active (%d docs).",
+                                len(es_docs),
+                            )
+        except Exception as exc:
+            logging.warning("Elasticsearch pre-extraction desactive: %s", exc)
+            store = None
+
         ctx = self._execute_script(context)
         extractions = ctx.get("EXTRACTIONS")
         if extractions is None:
             raise ValueError("extraction-regles n'a retourne aucun resultat.")
+
+        if store is not None:
+            try:
+                synced = update_extraction_results(store, extractions)
+                ctx["ES_EXTRACTION_SYNCED"] = synced
+                logging.info("Extraction synchronisee vers Elasticsearch: %d document(s).", synced)
+            except Exception as exc:
+                logging.warning("Sync extraction vers Elasticsearch echouee: %s", exc)
 
         total_fields = 0
         labels = []
@@ -246,12 +334,43 @@ class FusionResultComponent(Component):
     """Fusionne les sorties en un JSON final (voir component/fusion_resultats.py)."""
 
     def run(self, context: Context) -> Any:
-        ctx = self._execute_script(context)
-        fusion = ctx.get("FUSION_RESULT")
-        if fusion is None:
-            fusion = "fusion_output.json"
-        summary = f"fusion -> {fusion}"
-        self._report(fusion, summary)
-        return fusion
+        if not self.script.exists():
+            output = {
+                "path": None,
+                "source": "disabled",
+                "docs": 0,
+                "es_synced": 0,
+                "skipped": True,
+            }
+            self._report(output, "fusion debug absent -> ignore")
+            return output
 
+        try:
+            ctx = self._execute_script(context)
+        except Exception as exc:
+            logging.warning("fusion-resultats (debug) ignore apres erreur: %s", exc)
+            output = {
+                "path": None,
+                "source": "disabled",
+                "docs": 0,
+                "es_synced": 0,
+                "skipped": True,
+                "error": str(exc),
+            }
+            self._report(output, "fusion debug en erreur -> ignore")
+            return output
 
+        fusion = ctx.get("FUSION_RESULT") or "fusion_output.json"
+        source = ctx.get("FUSION_SOURCE") or "local-context"
+        doc_count = len(ctx.get("FUSION_PAYLOADS") or [])
+        es_synced = int(ctx.get("ES_FUSION_SYNCED") or 0)
+        output = {
+            "path": fusion,
+            "source": source,
+            "docs": doc_count,
+            "es_synced": es_synced,
+            "skipped": False,
+        }
+        summary = f"fusion -> {fusion} | source={source} | docs={doc_count} | es_synced={es_synced}"
+        self._report(output, summary)
+        return output

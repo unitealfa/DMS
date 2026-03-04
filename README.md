@@ -139,7 +139,7 @@ Exemple de chemin Windows :
 
 C:\Users\moura\Downloads\elasticsearch-7.10.2-windows-x86_64\elasticsearch-7.10.2
 Notes importantes
-
+ 
 Vérifier que Python est bien ajouté au PATH.
 
 Vérifier que Tesseract est accessible en ligne de commande.

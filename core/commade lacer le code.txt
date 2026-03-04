@@ -40,3 +40,10 @@ structurer tout les info des document dasn une sortie json
   documents/englais.docx, documents/testexcel.xlsx"
 
 python orchestre.py "documents/contrat_regex_test_corpus_fr_en_ar.pdf"
+
+
+
+python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf \\
+    --use-elasticsearch \\
+    --es-url http://localhost:9200 \\
+    --es-index dms_documents

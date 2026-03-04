@@ -23,6 +23,7 @@ def parse_cli() -> argparse.Namespace:
         "output-txt",
         "tokenisation-layout",
         "atripusion-gramatical-en-utilisant-les3ficherla",
+        "elasticsearch",
         "clasification",
         "extraction-regles",
         "fusion-resultats",
@@ -33,6 +34,7 @@ def parse_cli() -> argparse.Namespace:
         "output-txt",
         "tokenisation-layout",
         "atripusion-gramatical-en-utilisant-les3ficherla",
+        "elasticsearch",
         "clasification",
         "extraction-regles",
         "fusion-resultats",
@@ -43,11 +45,27 @@ def parse_cli() -> argparse.Namespace:
         "output-txt",
         "tokenisation-layout",
         "atripusion-gramatical-en-utilisant-les3ficherla",
+        "elasticsearch",
         "clasification",
         "extraction-regles",
         "fusion-resultats",
     ], help="Commencer a partir de cette etape.")
     parser.add_argument("--list-steps", action="store_true", help="Lister les etapes sans executer.")
+    parser.add_argument(
+        "--use-elasticsearch",
+        action="store_true",
+        help="Active Elasticsearch comme source texte pour classification/extraction et sync des resultats.",
+    )
+    parser.add_argument(
+        "--es-url",
+        default="http://localhost:9200",
+        help="URL Elasticsearch (ex: http://localhost:9200).",
+    )
+    parser.add_argument(
+        "--es-index",
+        default="dms_documents",
+        help="Nom d'index Elasticsearch utilise par le pipeline.",
+    )
     return parser.parse_args()
 
 
@@ -81,7 +99,17 @@ def main() -> None:
         return
 
     try:
-        orchestrator.run(inputs, only=args.only, upto=args.upto, start=args.start)
+        orchestrator.run(
+            inputs,
+            only=args.only,
+            upto=args.upto,
+            start=args.start,
+            context_overrides={
+                "USE_ELASTICSEARCH": bool(args.use_elasticsearch),
+                "ES_URL": args.es_url,
+                "ES_INDEX": args.es_index,
+            },
+        )
     except Exception as exc:
         logging.exception("Echec du pipeline: %s", exc)
         raise

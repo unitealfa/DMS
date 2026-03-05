@@ -1,0 +1,1509 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DMS Core - Graphe d'Execution Pipeline</title>
+  <style>
+    :root {
+      --bg0: #08111f;
+      --bg1: #111f36;
+      --panel: #0d1a2fd9;
+      --line: #2a3c5f;
+      --text: #e7eefc;
+      --muted: #a4b6dc;
+      --entry: #22d3ee;
+      --engine: #60a5fa;
+      --component: #34d399;
+      --script: #f59e0b;
+      --condition: #fb7185;
+      --data: #a78bfa;
+      --storage: #f97316;
+      --output: #10b981;
+      --flow: #8ea0cb;
+      --read: #22d3ee;
+      --write: #22c55e;
+      --branch: #f59e0b;
+      --persist: #f97316;
+      --alert: #ef4444;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: "IBM Plex Sans", "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 460px at 5% -10%, #1b2f5a 0%, transparent 70%),
+        radial-gradient(1000px 500px at 95% 0%, #233556 0%, transparent 65%),
+        linear-gradient(150deg, var(--bg0), var(--bg1));
+      overflow: hidden;
+    }
+
+    .app {
+      height: 100%;
+      padding: 10px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 10px;
+    }
+
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: linear-gradient(135deg, #0f1b34dd, #142545dd);
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: start;
+    }
+    .hero h1 {
+      margin: 0 0 6px;
+      font-size: 18px;
+      letter-spacing: .35px;
+    }
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .cmd {
+      margin-top: 8px;
+      border: 1px solid #365183;
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: #091429;
+      font-family: "IBM Plex Mono", "Consolas", monospace;
+      font-size: 12px;
+      color: #d5e3ff;
+      overflow-wrap: anywhere;
+    }
+    .hero-right {
+      min-width: 320px;
+      display: grid;
+      gap: 8px;
+    }
+    .hero-right .row {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+    .hero-right label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .hero-right select,
+    .hero-right input {
+      width: 100%;
+      border: 1px solid #355180;
+      border-radius: 8px;
+      background: #09152c;
+      color: var(--text);
+      font-size: 12px;
+      padding: 6px 8px;
+    }
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+    button {
+      border: 1px solid #3b598f;
+      background: #19325f;
+      color: #f1f6ff;
+      border-radius: 8px;
+      font-size: 12px;
+      padding: 7px 10px;
+      cursor: pointer;
+    }
+    button:hover { filter: brightness(1.1); }
+    button.ghost {
+      background: #101f3f;
+      color: var(--muted);
+    }
+
+    .workspace {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 320px 1fr 360px;
+      gap: 10px;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+      overflow: hidden;
+      min-height: 0;
+    }
+    .panel h2 {
+      margin: 0;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+      letter-spacing: .25px;
+      background: #0a152f;
+    }
+    .panel-body {
+      height: calc(100% - 40px);
+      padding: 10px 12px;
+      overflow: auto;
+    }
+
+    .controls .group-title {
+      margin: 12px 0 6px;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .3px;
+    }
+    .pill-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .pill {
+      border: 1px solid #334c7a;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #0a1733;
+    }
+    .pill input { margin: 0; }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50px;
+      display: inline-block;
+    }
+    .stats {
+      margin-top: 12px;
+      border: 1px solid #33496f;
+      border-radius: 8px;
+      background: #081328;
+      padding: 8px;
+      font-family: "IBM Plex Mono", "Consolas", monospace;
+      font-size: 11px;
+      white-space: pre-wrap;
+      color: #d3e1ff;
+    }
+
+    .graph-stage {
+      position: relative;
+      height: calc(100% - 40px);
+      background:
+        radial-gradient(circle at 0 0, #15295222 2px, transparent 2px) 0 0 / 26px 26px,
+        #081125;
+    }
+    .graph-stage svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+    .graph-stage svg.dragging { cursor: grabbing; }
+    .legend {
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-width: calc(100% - 20px);
+      pointer-events: none;
+    }
+    .legend .item {
+      border: 1px solid #2f4571;
+      background: #08142ad8;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .details .kv {
+      display: grid;
+      grid-template-columns: 98px 1fr;
+      gap: 6px;
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+    .details .k { color: var(--muted); }
+    .details pre {
+      margin: 8px 0 0;
+      border: 1px solid #334d79;
+      border-radius: 8px;
+      padding: 8px;
+      background: #081327;
+      color: #dce8ff;
+      font-size: 11px;
+      font-family: "IBM Plex Mono", "Consolas", monospace;
+      max-height: 140px;
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+    .list {
+      margin: 6px 0 0;
+      padding-left: 18px;
+      color: #cfddff;
+      font-size: 12px;
+    }
+    .list li { margin: 4px 0; }
+    .hint { color: var(--muted); font-size: 11px; }
+    .warn { color: var(--alert); }
+
+    .bottom {
+      min-height: 220px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      background: #0d1932e6;
+    }
+    .tabs {
+      display: flex;
+      gap: 6px;
+      padding: 8px;
+      border-bottom: 1px solid var(--line);
+      background: #09142d;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      border: 1px solid #365183;
+      border-radius: 8px;
+      padding: 6px 10px;
+      background: #101f3d;
+      color: var(--muted);
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      background: #183466;
+      color: #fff;
+      border-color: #4f7fce;
+    }
+    .tab {
+      display: none;
+      overflow: auto;
+      padding: 10px;
+    }
+    .tab.active { display: block; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    th, td {
+      border-bottom: 1px solid #2a3d61;
+      padding: 6px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      background: #0d1a32;
+      z-index: 1;
+    }
+    code {
+      font-family: "IBM Plex Mono", "Consolas", monospace;
+      font-size: 11px;
+      color: #d9e7ff;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="hero">
+      <div>
+        <h1>Graphe d'Execution Complet - DMS Core Pipeline</h1>
+        <p>
+          Vue runtime explicative du flux complet de <code>core</code>:
+          orchestration, composants, clés du contexte, branches conditionnelles Elasticsearch,
+          persistance des résultats et sortie finale.
+        </p>
+        <div class="cmd">
+          python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="row">
+          <label for="scenarioSelect">Scenario</label>
+          <select id="scenarioSelect">
+            <option value="es_off" selected>Run reel (ES indisponible - fallback local)</option>
+            <option value="es_on">Run cible (ES disponible + NLP full)</option>
+          </select>
+        </div>
+        <div class="row">
+          <label for="searchInput">Recherche</label>
+          <input id="searchInput" type="text" placeholder="fonction, composant, clé context..." />
+        </div>
+        <div class="btn-row">
+          <button id="highlightPathBtn">Highlight Path</button>
+          <button id="fitBtn" class="ghost">Fit View</button>
+          <button id="clearBtn" class="ghost">Clear</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <aside class="panel controls">
+        <h2>Filtres</h2>
+        <div class="panel-body">
+          <div class="group-title">Types de noeuds</div>
+          <div class="pill-grid" id="nodeTypeFilters"></div>
+          <div class="group-title">Types de liens</div>
+          <div class="pill-grid" id="edgeTypeFilters"></div>
+          <div class="stats" id="stats"></div>
+          <div class="hint" style="margin-top:10px">
+            Clique un noeud pour voir: fichier, fonction, lecture/ecriture de contexte, dependances.
+          </div>
+        </div>
+      </aside>
+
+      <section class="panel">
+        <h2>Graphe Visuel</h2>
+        <div class="graph-stage">
+          <svg id="graphSvg">
+            <defs>
+              <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                <polygon points="0 0, 9 4.5, 0 9" fill="#95a8d5"></polygon>
+              </marker>
+            </defs>
+            <g id="viewport">
+              <g id="edgeLayer"></g>
+              <g id="edgeLabelLayer"></g>
+              <g id="nodeLayer"></g>
+              <g id="labelLayer"></g>
+            </g>
+          </svg>
+          <div class="legend">
+            <span class="item"><span class="dot" style="background:var(--entry)"></span> Entry</span>
+            <span class="item"><span class="dot" style="background:var(--component)"></span> Component</span>
+            <span class="item"><span class="dot" style="background:var(--script)"></span> Script</span>
+            <span class="item"><span class="dot" style="background:var(--data)"></span> Context Data</span>
+            <span class="item"><span class="dot" style="background:var(--storage)"></span> Elasticsearch/Storage</span>
+            <span class="item"><span class="dot" style="background:var(--output)"></span> Output</span>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel details">
+        <h2>Details</h2>
+        <div class="panel-body">
+          <div id="detailsBox" class="hint">Selectionne un noeud pour afficher son role exact.</div>
+          <div style="height:14px"></div>
+          <div class="hint">
+            Interprétation:
+            <ul class="list">
+              <li><code>flow</code>: ordre d'execution</li>
+              <li><code>read/write</code>: echanges via contexte partage</li>
+              <li><code>branch</code>: decision conditionnelle</li>
+              <li><code>persist</code>: ecriture disque / Elasticsearch</li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="bottom">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="tab-sequence">Sequence Pipeline</button>
+        <button class="tab-btn" data-tab="tab-context">Context Keys Map</button>
+        <button class="tab-btn" data-tab="tab-trace">Run Trace (2026-03-05)</button>
+        <button class="tab-btn" data-tab="tab-notes">Notes Execution</button>
+      </div>
+
+      <div id="tab-sequence" class="tab active">
+        <table id="sequenceTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Step</th>
+              <th>Wrapper / Script</th>
+              <th>Lit</th>
+              <th>Ecrit</th>
+              <th>Resume run reel</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div id="tab-context" class="tab">
+        <table id="contextTable">
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th>Produit par</th>
+              <th>Consomme par</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div id="tab-trace" class="tab">
+        <table id="traceTable">
+          <thead>
+            <tr>
+              <th>Horodatage</th>
+              <th>Composant</th>
+              <th>Etat</th>
+              <th>Duree approx.</th>
+              <th>Detail</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div id="tab-notes" class="tab">
+        <p>
+          Ce graphe représente exactement le pipeline <code>core</code> pour la commande cible.
+          Le scénario <b>run reel</b> suit le log capturé le <b>5 mars 2026</b> :
+          Elasticsearch indisponible, puis fallback local.
+        </p>
+        <p>
+          Le scénario <b>ES disponible + NLP full</b> affiche la branche attendue:
+          indexation <code>dms_documents</code> + sync tokens NLP dans <code>dms_nlp_tokens</code>,
+          ensuite classification/extraction/fusion alimentées depuis Elasticsearch.
+        </p>
+        <p>
+          Fichiers de sortie visibles dans ce flux:
+          <code>outputgeneralterminal.txt</code>, <code>fusion_output.json</code>,
+          et index Elasticsearch selon disponibilité.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const NODE_COLORS = {
+        entry: css("--entry"),
+        engine: css("--engine"),
+        component: css("--component"),
+        script: css("--script"),
+        condition: css("--condition"),
+        data: css("--data"),
+        storage: css("--storage"),
+        output: css("--output")
+      };
+
+      const EDGE_COLORS = {
+        flow: css("--flow"),
+        read: css("--read"),
+        write: css("--write"),
+        branch: css("--branch"),
+        persist: css("--persist")
+      };
+
+      const graph = {
+        nodes: [
+          { id: "cmd", label: "Commande CLI", type: "entry", level: 0, lane: 1, scenario: ["both"], file: "main.py", fn: "__main__", detail: "Point d'entree du run.", runtime: "Commande cible lancee." },
+          { id: "cli.parse", label: "parse_cli()", type: "engine", level: 1, lane: 0, scenario: ["both"], file: "pipeline/cli.py", fn: "parse_cli", detail: "Parse les arguments (--use-elasticsearch, --es-nlp-level full, --es-nlp-index)." },
+          { id: "cli.main", label: "pipeline.cli.main()", type: "engine", level: 1, lane: 2, scenario: ["both"], file: "pipeline/cli.py", fn: "main", detail: "Configure logs, tee print -> outputgeneralterminal.txt, construit context_overrides." },
+          { id: "orch", label: "PipelineOrchestrator.run()", type: "engine", level: 2, lane: 1, scenario: ["both"], file: "pipeline/orchestrator.py", fn: "PipelineOrchestrator.run", detail: "Execute les composants dans l'ordre fixe." },
+
+          { id: "comp.pretrait", label: "pretraitement-de-docs", type: "component", level: 3, lane: 1, scenario: ["both"], file: "pipeline/components.py", fn: "PretraitementComponent.run", reads: ["INPUT_FILE"], writes: ["PRETRAITEMENT_RESULT", "INPUT_FILE"], runtime: "Summary: 1 fichiers | text=1 | image=0" },
+          { id: "script.pretrait", label: "analyze_many_two_states()", type: "script", level: 3, lane: 2, scenario: ["both"], file: "component/pretraitement-de-docs.py", fn: "analyze_many_two_states", detail: "Detecte format, content=text/image_only, size en octets." },
+
+          { id: "comp.ocr", label: "si-image-pretraiter-sinonpass-le-doc", type: "component", level: 4, lane: 1, scenario: ["both"], file: "pipeline/components.py", fn: "OCRPreprocessComponent.run", reads: ["INPUT_FILE", "PRETRAITEMENT_RESULT"], writes: ["TEXT_FILES", "IMAGE_ONLY_FILES", "DOCS", "PREPROCESS_RESULT"], runtime: "Summary: text=1, image=0, docs_prepped=0" },
+          { id: "script.ocr", label: "OCR routing + preprocess", type: "script", level: 4, lane: 2, scenario: ["both"], file: "component/si-image-pretraiter-sinonpass-le-doc.py", fn: "content_kind_two_states + preprocess_image", detail: "Route texte/image et lance OCR seulement pour image_only." },
+          { id: "cond.image", label: "content == image_only ?", type: "condition", level: 4, lane: 3, scenario: ["both"], detail: "Noeud de branche OCR/native." },
+
+          { id: "comp.output", label: "output-txt", type: "component", level: 5, lane: 1, scenario: ["both"], file: "pipeline/components.py", fn: "OutputTxtComponent.run", reads: ["TEXT_FILES", "DOCS"], writes: ["FINAL_DOCS"], runtime: "Summary: 1 docs | pages=12" },
+          { id: "script.output", label: "extract_text_native()", type: "script", level: 5, lane: 2, scenario: ["both"], file: "component/output-txt.py", fn: "extract_text_native", detail: "Extrait texte natif (PDF/DOCX/XLSX/...) et consolide OCR + natif." },
+
+          { id: "comp.token", label: "tokenisation-layout", type: "component", level: 6, lane: 1, scenario: ["both"], file: "pipeline/components.py", fn: "TokenisationLayoutComponent.run", reads: ["FINAL_DOCS"], writes: ["TOK_DOCS", "selected"], runtime: "Summary: 1 docs | sentences=72" },
+          { id: "script.token", label: "layout_items() + TOK_DOCS", type: "script", level: 6, lane: 2, scenario: ["both"], file: "component/tokenisation-layout.py", fn: "layout_items", detail: "Segmentation phrase/layout, filtrage bruit, structure pages/sentences." },
+
+          { id: "comp.grammar", label: "attribution-grammatical", type: "component", level: 7, lane: 1, scenario: ["both"], file: "pipeline/components.py", fn: "GrammarComponent.run", reads: ["TOK_DOCS / selected"], writes: ["NLP_ANALYSES", "NLP_SENTENCES", "NLP_POS", "NLP_LEMMA", "NLP_ENTITIES"], runtime: "Summary: Langues executees: en, fr | docs=1" },
+          { id: "script.grammar", label: "eng/fr/arab runners", type: "script", level: 7, lane: 2, scenario: ["both"], file: "component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py", fn: "run_from_previous_cell orchestration", detail: "Produit analyses linguistiques unifiees." },
+
+          { id: "comp.es", label: "elasticsearch", type: "component", level: 8, lane: 1, scenario: ["both"], file: "pipeline/components.py", fn: "ElasticsearchComponent.run", reads: ["TOK_DOCS", "NLP_ANALYSES", "ES_* settings"], writes: ["ES_AVAILABLE", "ES_DOC_IDS", "ES_CLASSIFICATION_DOCS", "ES_EXTRACTION_DOCS", "ES_NLP_SYNC"], runtime: "Run reel: available=False -> fallback local" },
+          { id: "script.es", label: "component/elasticsearch.run()", type: "script", level: 8, lane: 2, scenario: ["both"], file: "component/elasticsearch.py", fn: "run", detail: "Ping ES, index docs, sync NLP summary/full selon niveau." },
+          { id: "cond.es", label: "ES ping OK ?", type: "condition", level: 8, lane: 3, scenario: ["both"], detail: "Si KO: fallback local. Si OK: indexation/sync ES." },
+          { id: "cond.full", label: "es-nlp-level == full ?", type: "condition", level: 8, lane: 4, scenario: ["both"], detail: "Active index tokens dms_nlp_tokens quand ES disponible." },
+
+          { id: "comp.class", label: "clasification", type: "component", level: 9, lane: 1, scenario: ["both"], file: "pipeline/components.py", fn: "ClassificationComponent.run", reads: ["ES_CLASSIFICATION_DOCS or TOK_DOCS", "classification/*.json"], writes: ["RESULTS"], runtime: "Summary: contrat_regex... -> CONTRAT" },
+          { id: "script.class", label: "classify_scores() / decide()", type: "script", level: 9, lane: 2, scenario: ["both"], file: "component/clasification.py", fn: "classify_scores + decide", detail: "Scores keywords + anti-confusion + status OK/REVIEW." },
+
+          { id: "comp.extract", label: "extraction-regles", type: "component", level: 10, lane: 1, scenario: ["both"], file: "pipeline/components.py", fn: "RuleExtractionComponent.run", reads: ["RESULTS", "ES_EXTRACTION_DOCS or TOK_DOCS", "rules/*.json"], writes: ["EXTRACTIONS"], runtime: "Summary: 1 docs | fields=11" },
+          { id: "script.extract", label: "apply_extractors_to_page()", type: "script", level: 10, lane: 2, scenario: ["both"], file: "component/extraction-regles.py", fn: "run + apply_extractors_to_page", detail: "Applique les regex par doc_type et assemble fields/matches." },
+
+          { id: "comp.fusion", label: "fusion-resultats", type: "component", level: 11, lane: 1, scenario: ["both"], file: "pipeline/components.py", fn: "FusionResultComponent.run", reads: ["RESULTS", "EXTRACTIONS", "TOK_DOCS", "PRETRAITEMENT_RESULT", "PREPROCESS_RESULT", "ES_*"], writes: ["FUSION_PAYLOAD", "FUSION_RESULT", "fusion_output.json"], runtime: "Summary: source=local-context | docs=1 | es_synced=0" },
+          { id: "script.fusion", label: "build_payload_from_*()", type: "script", level: 11, lane: 2, scenario: ["both"], file: "component/fusion_resultats.py", fn: "main + build_payloads_from_es", detail: "Structure finale document-centric, dedup et lisible humain/machine." },
+
+          { id: "data.input", label: "INPUT_FILE", type: "data", level: 2, lane: 5, scenario: ["both"], detail: "Liste des fichiers entree normalises." },
+          { id: "data.es.settings", label: "ES settings", type: "data", level: 2, lane: 6, scenario: ["both"], detail: "USE_ELASTICSEARCH, ES_URL, ES_INDEX, ES_NLP_LEVEL=full, ES_NLP_INDEX." },
+          { id: "data.pretrait", label: "PRETRAITEMENT_RESULT", type: "data", level: 3, lane: 5, scenario: ["both"], detail: "Type contenu + size + mime/ext par fichier." },
+          { id: "data.preprocess", label: "PREPROCESS_RESULT", type: "data", level: 4, lane: 5, scenario: ["both"], detail: "Resume routage OCR/native." },
+          { id: "data.textfiles", label: "TEXT_FILES", type: "data", level: 4, lane: 6, scenario: ["both"], detail: "Fichiers detectes texte (no OCR)." },
+          { id: "data.imagefiles", label: "IMAGE_ONLY_FILES", type: "data", level: 4, lane: 7, scenario: ["both"], detail: "Fichiers image_only (OCR requis)." },
+          { id: "data.docs", label: "DOCS (OCR)", type: "data", level: 4, lane: 8, scenario: ["both"], detail: "Pages OCR preprocessed." },
+          { id: "data.finaldocs", label: "FINAL_DOCS", type: "data", level: 5, lane: 6, scenario: ["both"], detail: "Documents unifies text/image avec pages_text." },
+          { id: "data.tokdocs", label: "TOK_DOCS / selected", type: "data", level: 6, lane: 6, scenario: ["both"], detail: "Structure pages + sentences_layout + metadata." },
+          { id: "data.nlp", label: "NLP_ANALYSES + NLP_*", type: "data", level: 7, lane: 6, scenario: ["both"], detail: "Phrases, tokens, POS, lemmas, entities, langues." },
+          { id: "data.es.available", label: "ES_AVAILABLE", type: "data", level: 8, lane: 5, scenario: ["both"], detail: "Indique si Elasticsearch est joignable." },
+          { id: "data.es.docids", label: "ES_DOC_IDS", type: "data", level: 8, lane: 6, scenario: ["both"], detail: "IDs des docs indexes dans dms_documents." },
+          { id: "data.es.clsdocs", label: "ES_CLASSIFICATION_DOCS", type: "data", level: 8, lane: 7, scenario: ["both"], detail: "Docs prets pour classification depuis ES." },
+          { id: "data.es.extdocs", label: "ES_EXTRACTION_DOCS", type: "data", level: 8, lane: 8, scenario: ["both"], detail: "Docs prets pour extraction regex depuis ES." },
+          { id: "data.es.nlpsync", label: "ES_NLP_SYNC", type: "data", level: 8, lane: 9, scenario: ["both"], detail: "Compteurs sync NLP summary/full." },
+          { id: "data.results", label: "RESULTS", type: "data", level: 9, lane: 6, scenario: ["both"], detail: "Classification doc_type/status/scores/matches." },
+          { id: "data.extractions", label: "EXTRACTIONS", type: "data", level: 10, lane: 6, scenario: ["both"], detail: "Champs metier extraits par regex." },
+          { id: "data.fusion", label: "FUSION_PAYLOAD", type: "data", level: 11, lane: 6, scenario: ["both"], detail: "Payload final structure, documents[] et pipeline meta." },
+
+          { id: "store.docs", label: "ES index dms_documents", type: "storage", level: 9, lane: 10, scenario: ["es_on"], detail: "Index principal documents/classification/extraction/nlp summary." },
+          { id: "store.tokens", label: "ES index dms_nlp_tokens", type: "storage", level: 9, lane: 11, scenario: ["es_on"], detail: "Index detaille token-level (mode NLP full)." },
+
+          { id: "out.log", label: "outputgeneralterminal.txt", type: "output", level: 1, lane: 10, scenario: ["both"], detail: "Tee de tous les print() pipeline." },
+          { id: "out.warn", label: "Warning fallback ES", type: "output", level: 9, lane: 9, scenario: ["es_off"], detail: "Elasticsearch indisponible -> fallback flux local.", runtime: "WARNING a 2026-03-05 13:11:35.687" },
+          { id: "out.fusion", label: "fusion_output.json", type: "output", level: 12, lane: 10, scenario: ["both"], detail: "Sortie finale fusionnee." }
+        ],
+        edges: [
+          { source: "cmd", target: "cli.parse", type: "flow", label: "entry", scenario: ["both"] },
+          { source: "cli.parse", target: "cli.main", type: "flow", label: "args", scenario: ["both"] },
+          { source: "cli.main", target: "orch", type: "flow", label: "run()", scenario: ["both"] },
+          { source: "orch", target: "comp.pretrait", type: "flow", label: "step1", scenario: ["both"] },
+          { source: "comp.pretrait", target: "comp.ocr", type: "flow", label: "step2", scenario: ["both"] },
+          { source: "comp.ocr", target: "comp.output", type: "flow", label: "step3", scenario: ["both"] },
+          { source: "comp.output", target: "comp.token", type: "flow", label: "step4", scenario: ["both"] },
+          { source: "comp.token", target: "comp.grammar", type: "flow", label: "step5", scenario: ["both"] },
+          { source: "comp.grammar", target: "comp.es", type: "flow", label: "step6", scenario: ["both"] },
+          { source: "comp.es", target: "comp.class", type: "flow", label: "step7", scenario: ["both"] },
+          { source: "comp.class", target: "comp.extract", type: "flow", label: "step8", scenario: ["both"] },
+          { source: "comp.extract", target: "comp.fusion", type: "flow", label: "step9", scenario: ["both"] },
+
+          { source: "comp.pretrait", target: "script.pretrait", type: "flow", label: "runpy", scenario: ["both"] },
+          { source: "comp.ocr", target: "script.ocr", type: "flow", label: "runpy", scenario: ["both"] },
+          { source: "comp.output", target: "script.output", type: "flow", label: "runpy", scenario: ["both"] },
+          { source: "comp.token", target: "script.token", type: "flow", label: "runpy", scenario: ["both"] },
+          { source: "comp.grammar", target: "script.grammar", type: "flow", label: "runpy", scenario: ["both"] },
+          { source: "comp.es", target: "script.es", type: "flow", label: "runpy", scenario: ["both"] },
+          { source: "comp.class", target: "script.class", type: "flow", label: "runpy", scenario: ["both"] },
+          { source: "comp.extract", target: "script.extract", type: "flow", label: "runpy", scenario: ["both"] },
+          { source: "comp.fusion", target: "script.fusion", type: "flow", label: "runpy", scenario: ["both"] },
+
+          { source: "cli.main", target: "data.input", type: "write", label: "set INPUT_FILE", scenario: ["both"] },
+          { source: "cli.main", target: "data.es.settings", type: "write", label: "context_overrides", scenario: ["both"] },
+          { source: "cli.main", target: "out.log", type: "persist", label: "tee print", scenario: ["both"] },
+
+          { source: "data.input", target: "comp.pretrait", type: "read", label: "read", scenario: ["both"] },
+          { source: "comp.pretrait", target: "data.pretrait", type: "write", label: "write", scenario: ["both"] },
+          { source: "comp.pretrait", target: "data.input", type: "write", label: "normalize", scenario: ["both"] },
+
+          { source: "data.input", target: "comp.ocr", type: "read", label: "paths", scenario: ["both"] },
+          { source: "data.pretrait", target: "comp.ocr", type: "read", label: "content kind", scenario: ["both"] },
+          { source: "comp.ocr", target: "cond.image", type: "branch", label: "text/image", scenario: ["both"] },
+          { source: "cond.image", target: "data.textfiles", type: "branch", label: "text", scenario: ["both"] },
+          { source: "cond.image", target: "data.imagefiles", type: "branch", label: "image_only", scenario: ["both"] },
+          { source: "cond.image", target: "data.docs", type: "branch", label: "OCR docs", scenario: ["both"] },
+          { source: "comp.ocr", target: "data.preprocess", type: "write", label: "summary", scenario: ["both"] },
+
+          { source: "data.textfiles", target: "comp.output", type: "read", label: "native", scenario: ["both"] },
+          { source: "data.docs", target: "comp.output", type: "read", label: "ocr", scenario: ["both"] },
+          { source: "comp.output", target: "data.finaldocs", type: "write", label: "FINAL_DOCS", scenario: ["both"] },
+
+          { source: "data.finaldocs", target: "comp.token", type: "read", label: "pages_text", scenario: ["both"] },
+          { source: "comp.token", target: "data.tokdocs", type: "write", label: "TOK_DOCS", scenario: ["both"] },
+
+          { source: "data.tokdocs", target: "comp.grammar", type: "read", label: "selected/TOK_DOCS", scenario: ["both"] },
+          { source: "comp.grammar", target: "data.nlp", type: "write", label: "NLP_*", scenario: ["both"] },
+
+          { source: "data.es.settings", target: "comp.es", type: "read", label: "ES config", scenario: ["both"] },
+          { source: "data.tokdocs", target: "comp.es", type: "read", label: "base docs", scenario: ["both"] },
+          { source: "data.nlp", target: "comp.es", type: "read", label: "NLP input", scenario: ["both"] },
+          { source: "comp.es", target: "cond.es", type: "branch", label: "ping()", scenario: ["both"] },
+          { source: "cond.es", target: "data.es.available", type: "write", label: "True/False", scenario: ["both"] },
+          { source: "cond.es", target: "data.es.docids", type: "write", label: "ids", scenario: ["both"] },
+          { source: "cond.es", target: "data.es.clsdocs", type: "write", label: "docs cls", scenario: ["both"] },
+          { source: "cond.es", target: "data.es.extdocs", type: "write", label: "docs ext", scenario: ["both"] },
+          { source: "cond.es", target: "data.es.nlpsync", type: "write", label: "sync stats", scenario: ["both"] },
+          { source: "cond.es", target: "out.warn", type: "branch", label: "if unavailable", scenario: ["es_off"] },
+          { source: "cond.es", target: "store.docs", type: "persist", label: "upsert docs", scenario: ["es_on"] },
+          { source: "comp.es", target: "cond.full", type: "branch", label: "nlp level", scenario: ["both"] },
+          { source: "cond.full", target: "store.tokens", type: "persist", label: "index tokens", scenario: ["es_on"] },
+
+          { source: "data.es.clsdocs", target: "comp.class", type: "read", label: "priority", scenario: ["both"] },
+          { source: "data.tokdocs", target: "comp.class", type: "read", label: "fallback", scenario: ["both"] },
+          { source: "comp.class", target: "data.results", type: "write", label: "RESULTS", scenario: ["both"] },
+          { source: "comp.class", target: "store.docs", type: "persist", label: "update classification", scenario: ["es_on"] },
+
+          { source: "data.results", target: "comp.extract", type: "read", label: "doc_type", scenario: ["both"] },
+          { source: "data.es.extdocs", target: "comp.extract", type: "read", label: "priority", scenario: ["both"] },
+          { source: "data.tokdocs", target: "comp.extract", type: "read", label: "fallback", scenario: ["both"] },
+          { source: "comp.extract", target: "data.extractions", type: "write", label: "EXTRACTIONS", scenario: ["both"] },
+          { source: "comp.extract", target: "store.docs", type: "persist", label: "update extraction", scenario: ["es_on"] },
+
+          { source: "data.pretrait", target: "comp.fusion", type: "read", label: "sizes/meta", scenario: ["both"] },
+          { source: "data.preprocess", target: "comp.fusion", type: "read", label: "routing", scenario: ["both"] },
+          { source: "data.finaldocs", target: "comp.fusion", type: "read", label: "text fallback", scenario: ["both"] },
+          { source: "data.tokdocs", target: "comp.fusion", type: "read", label: "structure", scenario: ["both"] },
+          { source: "data.nlp", target: "comp.fusion", type: "read", label: "nlp ctx", scenario: ["both"] },
+          { source: "data.results", target: "comp.fusion", type: "read", label: "classification", scenario: ["both"] },
+          { source: "data.extractions", target: "comp.fusion", type: "read", label: "regex", scenario: ["both"] },
+          { source: "store.docs", target: "comp.fusion", type: "read", label: "source=elasticsearch", scenario: ["es_on"] },
+          { source: "store.tokens", target: "comp.fusion", type: "read", label: "nlp full tokens", scenario: ["es_on"] },
+          { source: "comp.fusion", target: "data.fusion", type: "write", label: "FUSION_PAYLOAD", scenario: ["both"] },
+          { source: "comp.fusion", target: "out.fusion", type: "persist", label: "write file", scenario: ["both"] }
+        ]
+      };
+
+      const sequenceRows = [
+        ["1", "pretraitement-de-docs", "PretraitementComponent.run / analyze_many_two_states", "INPUT_FILE", "PRETRAITEMENT_RESULT, INPUT_FILE", "1 fichiers | text=1 | image=0"],
+        ["2", "si-image-pretraiter-sinonpass-le-doc", "OCRPreprocessComponent.run / content_kind_two_states", "INPUT_FILE, PRETRAITEMENT_RESULT", "TEXT_FILES, IMAGE_ONLY_FILES, DOCS, PREPROCESS_RESULT", "text=1, image=0, docs_prepped=0"],
+        ["3", "output-txt", "OutputTxtComponent.run / extract_text_native", "TEXT_FILES, DOCS", "FINAL_DOCS", "1 docs | pages=12"],
+        ["4", "tokenisation-layout", "TokenisationLayoutComponent.run / layout_items", "FINAL_DOCS", "TOK_DOCS, selected", "1 docs | sentences=72"],
+        ["5", "attribution-grammatical", "GrammarComponent.run / eng+fr runners", "TOK_DOCS/selected", "NLP_ANALYSES + NLP_*", "Langues executees: en, fr"],
+        ["6", "elasticsearch", "ElasticsearchComponent.run / component.elasticsearch.run", "TOK_DOCS, NLP_ANALYSES, ES settings", "ES_AVAILABLE, ES_DOC_IDS, ES_*_DOCS, ES_NLP_SYNC", "Run reel: indisponible -> fallback local"],
+        ["7", "clasification", "ClassificationComponent.run / classify_scores, decide", "ES_CLASSIFICATION_DOCS or TOK_DOCS", "RESULTS", "CONTRAT | status=OK"],
+        ["8", "extraction-regles", "RuleExtractionComponent.run / apply_extractors_to_page", "RESULTS + ES_EXTRACTION_DOCS or TOK_DOCS", "EXTRACTIONS", "1 docs | fields=11"],
+        ["9", "fusion-resultats", "FusionResultComponent.run / build_payload_from_context|es", "RESULTS, EXTRACTIONS, TOK_DOCS, PRETRAITEMENT_RESULT, PREPROCESS_RESULT, ES_*", "FUSION_PAYLOAD, fusion_output.json", "source=local-context | docs=1"]
+      ];
+
+      const contextRows = [
+        ["INPUT_FILE", "cli.main + pretraitement", "pretraitement, OCR routing, fusion", "Chemins d'entree normalises."],
+        ["PRETRAITEMENT_RESULT", "pretraitement-de-docs", "OCR routing, fusion", "content=text/image_only, size, mime/ext."],
+        ["TEXT_FILES", "si-image-pretraiter-sinonpass-le-doc", "output-txt", "Fichiers traites en natif sans OCR."],
+        ["IMAGE_ONLY_FILES", "si-image-pretraiter-sinonpass-le-doc", "OCR script", "Fichiers orientes OCR."],
+        ["DOCS", "OCR script", "output-txt", "Resultats OCR preprocessed."],
+        ["PREPROCESS_RESULT", "OCRPreprocessComponent", "fusion", "Resume routage OCR/native."],
+        ["FINAL_DOCS", "output-txt", "tokenisation-layout, fusion", "Documents consolides par pages."],
+        ["TOK_DOCS / selected", "tokenisation-layout", "attribution grammaticale, elasticsearch, classification/extraction fallback, fusion", "Pages + sentences_layout + metadata."],
+        ["NLP_ANALYSES + NLP_*", "attribution grammaticale", "elasticsearch sync NLP, fusion", "POS/lemma/NER par phrase/token."],
+        ["ES_AVAILABLE", "elasticsearch component", "classification/extraction/fusion", "Disponibilite Elasticsearch sur ce run."],
+        ["ES_DOC_IDS", "elasticsearch component", "classification/extraction/fusion", "IDs docs indexes."],
+        ["ES_CLASSIFICATION_DOCS", "elasticsearch component", "classification", "Docs convertis pour classif depuis ES."],
+        ["ES_EXTRACTION_DOCS", "elasticsearch component", "extraction-regles", "Docs convertis pour extraction depuis ES."],
+        ["ES_NLP_SYNC", "elasticsearch component", "fusion", "Compteurs sync NLP summary/full."],
+        ["RESULTS", "clasification", "extraction-regles, fusion", "doc_type/status/scores + logs keywords."],
+        ["EXTRACTIONS", "extraction-regles", "fusion", "Champs regex extraits."],
+        ["FUSION_PAYLOAD/FUSION_RESULT", "fusion-resultats", "sortie finale", "Payload structure + chemin sortie JSON."]
+      ];
+
+      const runTrace = [
+        ["2026-03-05 13:09:48.398", "pretraitement-de-docs", "OK", "0.113 s", "Summary: 1 fichiers | text=1 | image=0"],
+        ["2026-03-05 13:09:48.511", "si-image-pretraiter-sinonpass-le-doc", "OK", "0.712 s", "Summary: text=1, image=0, docs_prepped=0"],
+        ["2026-03-05 13:09:49.223", "output-txt", "OK", "0.059 s", "Summary: 1 docs | pages=12"],
+        ["2026-03-05 13:09:49.282", "tokenisation-layout", "OK", "0.761 s", "Summary: 1 docs | sentences=72"],
+        ["2026-03-05 13:09:50.043", "atripusion-gramatical-en-utilisant-les3ficherla", "OK", "105.641 s", "Summary: Langues executees: en, fr | docs=1"],
+        ["2026-03-05 13:11:35.684", "elasticsearch", "WARN", "0.004 s", "Elasticsearch indisponible (http://localhost:9200). Fallback sur flux local."],
+        ["2026-03-05 13:11:35.688", "clasification", "OK", "0.140 s", "Summary: 1 docs classes | ... -> CONTRAT"],
+        ["2026-03-05 13:11:35.828", "extraction-regles", "OK", "0.069 s", "Summary: 1 docs | fields=11"],
+        ["2026-03-05 13:11:35.897", "fusion-resultats", "OK", "~0.06 s", "source=local-context | docs=1 | es_synced=0"]
+      ];
+
+      const componentDocs = {
+        "comp.pretrait": {
+          output: [
+            {
+              path: "documents/contrat_regex_test_corpus_fr_en_ar.pdf",
+              ext: ".pdf",
+              mime: "application/pdf",
+              label: "PDF document",
+              size: 68061,
+              content: "text"
+            }
+          ],
+          fields: [
+            { name: "path", desc: "Chemin du fichier detecte." },
+            { name: "ext", desc: "Extension detectee (.pdf, .docx, ...)." },
+            { name: "mime", desc: "Type MIME detecte." },
+            { name: "label", desc: "Libelle lisible du type de fichier." },
+            { name: "size", desc: "Taille du fichier en octets." },
+            { name: "content", desc: "Classification binaire: text ou image_only." }
+          ]
+        },
+        "comp.ocr": {
+          output: {
+            TEXT_FILES: ["/home/mourad/Bureau/DMS/core/documents/contrat_regex_test_corpus_fr_en_ar.pdf"],
+            IMAGE_ONLY_FILES: [],
+            DOCS: []
+          },
+          fields: [
+            { name: "TEXT_FILES", desc: "Fichiers qui passent en extraction native (pas OCR)." },
+            { name: "IMAGE_ONLY_FILES", desc: "Fichiers a envoyer vers OCR Tesseract." },
+            { name: "DOCS", desc: "Documents OCR prepares (vide si tout est texte)." }
+          ]
+        },
+        "comp.output": {
+          output: [
+            {
+              doc_id: "7f3925cb-e33f-404d-b1bd-e14451d6b1bd",
+              filename: "contrat_regex_test_corpus_fr_en_ar.pdf",
+              size: 68061,
+              content: "text",
+              extraction: "native:pdf:pypdf",
+              text: "...texte complet du document...",
+              pages_text: ["...page 1...", "...page 2...", "..."],
+              page_count_total: 12
+            }
+          ],
+          fields: [
+            { name: "doc_id", desc: "Identifiant du document dans le pipeline." },
+            { name: "filename", desc: "Nom du fichier source." },
+            { name: "size", desc: "Taille en octets." },
+            { name: "content", desc: "text ou image_only." },
+            { name: "extraction", desc: "Methode d'extraction utilisee." },
+            { name: "text", desc: "Texte global consolide." },
+            { name: "pages_text", desc: "Texte separe par page." },
+            { name: "page_count_total", desc: "Nombre total de pages." }
+          ]
+        },
+        "comp.token": {
+          output: [
+            {
+              doc_id: "7f3925cb-e33f-404d-b1bd-e14451d6b1bd",
+              filename: "contrat_regex_test_corpus_fr_en_ar.pdf",
+              size: 68061,
+              page_count_total: 12,
+              chars_total: 20147,
+              recompose_ok: true,
+              pages: [
+                {
+                  page_index: 1,
+                  lang: "fr",
+                  chars: 1720,
+                  sentences_layout: [
+                    {
+                      text: "Titre du contrat : Contrat de prestation...",
+                      start: 132,
+                      end: 188,
+                      line: 8,
+                      col: 1,
+                      is_noise: false,
+                      is_sentence: true,
+                      layout_kind: "plain"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          fields: [
+            { name: "pages", desc: "Pages tokenisees et segmentees." },
+            { name: "pages[].sentences_layout", desc: "Chunks de phrases/layout utilises ensuite par NLP." },
+            { name: "chars_total", desc: "Volume texte total detecte." },
+            { name: "recompose_ok", desc: "Indique si la reconstruction est jugée stable." }
+          ]
+        },
+        "comp.grammar": {
+          output: {
+            NLP_ANALYSES: [
+              {
+                filename: "contrat_regex_test_corpus_fr_en_ar.pdf",
+                page_index: 2,
+                sent_index: 0,
+                lang: "fr",
+                text: "Titre du contrat : Contrat de prestation de services...",
+                tokens: ["Titre", "du", "contrat"],
+                pos: ["NOUN", "ADP", "NOUN"],
+                lemmas: ["titre", "de", "contrat"],
+                ner_labels: ["O", "O", "O"],
+                entities: { flat: [{ type: "DOC_TITLE", text: "Contrat de prestation de services..." }] }
+              }
+            ],
+            NLP_SENTENCES: [{ filename: "contrat_regex_test_corpus_fr_en_ar.pdf", page_index: 2, sent_index: 0, lang: "fr", text: "..." }],
+            NLP_POS: [{ token: "Contrat", pos: "NOUN", lang: "fr" }],
+            NLP_LEMMA: [{ token: "Contrat", lemma: "contrat", lang: "fr" }],
+            NLP_ENTITIES: [{ type: "DOC_TITLE", text: "Contrat de prestation de services..." }]
+          },
+          fields: [
+            { name: "NLP_ANALYSES", desc: "Sortie phrase par phrase avec tokens/POS/lemmas/NER." },
+            { name: "NLP_SENTENCES", desc: "Liste normalisee des phrases." },
+            { name: "NLP_POS", desc: "Etiquettes grammaticales token par token." },
+            { name: "NLP_LEMMA", desc: "Lemmes token par token." },
+            { name: "NLP_ENTITIES", desc: "Entites nommees detectees." }
+          ]
+        },
+        "comp.es": {
+          outputByScenario: {
+            es_off: {
+              enabled: true,
+              available: false,
+              es_url: "http://localhost:9200",
+              es_index: "dms_documents",
+              doc_ids: 0,
+              classification_docs: 0,
+              extraction_docs: 0,
+              nlp_level: null,
+              nlp_docs_synced: 0,
+              nlp_tokens_indexed: 0,
+              nlp_token_errors: 0,
+              nlp_unresolved_rows: 0,
+              nlp_tokens_index: null
+            },
+            es_on: {
+              enabled: true,
+              available: true,
+              es_url: "http://localhost:9200",
+              es_index: "dms_documents",
+              doc_ids: 1,
+              classification_docs: 1,
+              extraction_docs: 1,
+              nlp_level: "full",
+              nlp_docs_synced: 1,
+              nlp_tokens_indexed: 3245,
+              nlp_token_errors: 0,
+              nlp_unresolved_rows: 0,
+              nlp_tokens_index: "dms_nlp_tokens"
+            }
+          },
+          fields: [
+            { name: "enabled", desc: "Option --use-elasticsearch active ou non." },
+            { name: "available", desc: "Ping Elasticsearch OK ou KO." },
+            { name: "doc_ids", desc: "Nombre de documents indexes." },
+            { name: "classification_docs", desc: "Nombre de docs prepares pour classification depuis ES." },
+            { name: "extraction_docs", desc: "Nombre de docs prepares pour extraction depuis ES." },
+            { name: "nlp_level", desc: "Niveau de sync NLP effectif (off/summary/full)." },
+            { name: "nlp_docs_synced", desc: "Nombre de docs avec resume NLP sync." },
+            { name: "nlp_tokens_indexed", desc: "Nombre total de tokens indexes (mode full)." },
+            { name: "nlp_tokens_index", desc: "Index ES des tokens NLP en mode full." }
+          ]
+        },
+        "comp.class": {
+          output: [
+            {
+              doc_id: "7f3925cb-e33f-404d-b1bd-e14451d6b1bd",
+              filename: "contrat_regex_test_corpus_fr_en_ar.pdf",
+              doc_type: "CONTRAT",
+              status: "OK",
+              scores: {
+                ARTICLE: -43,
+                BON_DE_COMMANDE: -202,
+                CONTRAT: 202,
+                FACTURE: -179,
+                FORMULAIRE: 21
+              },
+              winning_score: 202,
+              classification_log: "[classification] ... -> best=CONTRAT | status=OK | scores: {...}",
+              keyword_matches: {
+                strong: [{ keyword: "CONTRAT", count: 21 }],
+                medium: [{ keyword: "EFFECTIVE DATE", count: 4 }],
+                weak: [{ keyword: "OBJET", count: 8 }],
+                negative: [{ keyword: "FACTURE", count: 6 }],
+                anti_confusion_hits: [{ keyword: "BON DE COMMANDE", count: 4 }]
+              },
+              anti_confusion_targets: ["BON_DE_COMMANDE", "FACTURE", "DEVIS", "BON_DE_LIVRAISON", "AVOIR"]
+            }
+          ],
+          fields: [
+            { name: "doc_type", desc: "Classe documentaire predite." },
+            { name: "status", desc: "OK si decision confiante, sinon REVIEW." },
+            { name: "scores", desc: "Scores par classe candidate." },
+            { name: "winning_score", desc: "Score final retenu pour la classe gagnante." },
+            { name: "classification_log", desc: "Message log lisible en terminal." },
+            { name: "keyword_matches", desc: "Occurrences des mots-cles par bucket." },
+            { name: "anti_confusion_targets", desc: "Cibles de malus anti-confusion utilisees." }
+          ]
+        },
+        "comp.extract": {
+          output: [
+            {
+              doc_id: "7f3925cb-e33f-404d-b1bd-e14451d6b1bd",
+              filename: "contrat_regex_test_corpus_fr_en_ar.pdf",
+              doc_type: "CONTRAT",
+              classification_status: "OK",
+              ruleset: {
+                applied_rulesets: ["common.json", "CONTRAT.json"]
+              },
+              fields: {
+                titre_contrat: {
+                  rule_id: "CTR_TITLE_01",
+                  type: "string",
+                  many: true,
+                  matches: [{ value: "Contrat de prestation de services informatiques...", page_index: 2 }]
+                },
+                date_signature: {
+                  rule_id: "DATE_SIGNATURE_01",
+                  type: "date",
+                  many: true,
+                  matches: [{ value: "25/02/2026", page_index: 2 }]
+                }
+              }
+            }
+          ],
+          fields: [
+            { name: "doc_type", desc: "Type documentaire utilise pour choisir les rulesets." },
+            { name: "ruleset.applied_rulesets", desc: "Fichiers de regles charges." },
+            { name: "fields", desc: "Resultats d'extraction par champ metier." },
+            { name: "fields.<champ>.rule_id", desc: "Identifiant de la regle appliquee." },
+            { name: "fields.<champ>.matches", desc: "Valeurs trouvees avec page/snippet." }
+          ]
+        },
+        "comp.fusion": {
+          outputByScenario: {
+            es_off: {
+              path: "/home/mourad/Bureau/DMS/core/fusion_output.json",
+              source: "local-context",
+              docs: 1,
+              es_synced: 0,
+              skipped: false
+            },
+            es_on: {
+              path: "/home/mourad/Bureau/DMS/core/fusion_output.json",
+              source: "elasticsearch",
+              docs: 1,
+              es_synced: 1,
+              skipped: false
+            }
+          },
+          fields: [
+            { name: "path", desc: "Chemin du JSON final fusionne." },
+            { name: "source", desc: "Origine principale de la fusion (local-context ou elasticsearch)." },
+            { name: "docs", desc: "Nombre de documents dans la sortie." },
+            { name: "es_synced", desc: "Nombre de docs resynchronises vers ES par la fusion." },
+            { name: "skipped", desc: "Indique si la fusion a ete ignoree." }
+          ]
+        }
+      };
+
+      const criticalPath = {
+        es_off: ["cmd", "cli.parse", "cli.main", "orch", "comp.pretrait", "comp.ocr", "comp.output", "comp.token", "comp.grammar", "comp.es", "out.warn", "comp.class", "comp.extract", "comp.fusion", "out.fusion"],
+        es_on: ["cmd", "cli.parse", "cli.main", "orch", "comp.pretrait", "comp.ocr", "comp.output", "comp.token", "comp.grammar", "comp.es", "store.docs", "cond.full", "store.tokens", "comp.class", "comp.extract", "comp.fusion", "out.fusion"]
+      };
+
+      const state = {
+        scenario: "es_off",
+        search: "",
+        selectedNodeId: null,
+        visibleNodeTypes: new Set(Object.keys(NODE_COLORS)),
+        visibleEdgeTypes: new Set(Object.keys(EDGE_COLORS)),
+        panX: 50,
+        panY: 60,
+        scale: 0.58,
+        dragging: false,
+        dragX: 0,
+        dragY: 0,
+        highlightNodes: new Set(),
+        highlightEdges: new Set()
+      };
+
+      const svg = id("graphSvg");
+      const viewport = id("viewport");
+      const edgeLayer = id("edgeLayer");
+      const edgeLabelLayer = id("edgeLabelLayer");
+      const nodeLayer = id("nodeLayer");
+      const labelLayer = id("labelLayer");
+      const detailsBox = id("detailsBox");
+
+      let nodeMap = new Map();
+      let edgeList = [];
+      let incomingMap = new Map();
+      let outgoingMap = new Map();
+      let positions = new Map();
+
+      init();
+
+      function init() {
+        buildFilters();
+        buildTabs();
+        buildTables();
+        bindEvents();
+        rebuildIndexes();
+        layoutNodes();
+        fitView();
+        render();
+      }
+
+      function buildFilters() {
+        const nodeWrap = id("nodeTypeFilters");
+        const edgeWrap = id("edgeTypeFilters");
+        nodeWrap.innerHTML = "";
+        edgeWrap.innerHTML = "";
+
+        for (const [type, color] of Object.entries(NODE_COLORS)) {
+          nodeWrap.appendChild(makeTogglePill(type, color, true, checked => {
+            if (checked) state.visibleNodeTypes.add(type);
+            else state.visibleNodeTypes.delete(type);
+            render();
+          }));
+        }
+        for (const [type, color] of Object.entries(EDGE_COLORS)) {
+          edgeWrap.appendChild(makeTogglePill(type, color, true, checked => {
+            if (checked) state.visibleEdgeTypes.add(type);
+            else state.visibleEdgeTypes.delete(type);
+            render();
+          }));
+        }
+      }
+
+      function makeTogglePill(name, color, checked, onChange) {
+        const label = document.createElement("label");
+        label.className = "pill";
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = checked;
+        cb.addEventListener("change", () => onChange(cb.checked));
+        const dot = document.createElement("span");
+        dot.className = "dot";
+        dot.style.background = color;
+        const txt = document.createElement("span");
+        txt.textContent = name;
+        label.appendChild(cb);
+        label.appendChild(dot);
+        label.appendChild(txt);
+        return label;
+      }
+
+      function buildTabs() {
+        const btns = [...document.querySelectorAll(".tab-btn")];
+        const tabs = [...document.querySelectorAll(".tab")];
+        btns.forEach(btn => {
+          btn.addEventListener("click", () => {
+            btns.forEach(b => b.classList.remove("active"));
+            tabs.forEach(t => t.classList.remove("active"));
+            btn.classList.add("active");
+            id(btn.dataset.tab).classList.add("active");
+          });
+        });
+      }
+
+      function buildTables() {
+        const seqBody = id("sequenceTable").querySelector("tbody");
+        sequenceRows.forEach(row => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${esc(row[0])}</td>
+            <td><b>${esc(row[1])}</b></td>
+            <td><code>${esc(row[2])}</code></td>
+            <td><code>${esc(row[3])}</code></td>
+            <td><code>${esc(row[4])}</code></td>
+            <td>${esc(row[5])}</td>
+          `;
+          seqBody.appendChild(tr);
+        });
+
+        const ctxBody = id("contextTable").querySelector("tbody");
+        contextRows.forEach(row => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td><code>${esc(row[0])}</code></td>
+            <td>${esc(row[1])}</td>
+            <td>${esc(row[2])}</td>
+            <td>${esc(row[3])}</td>
+          `;
+          ctxBody.appendChild(tr);
+        });
+
+        const traceBody = id("traceTable").querySelector("tbody");
+        runTrace.forEach(row => {
+          const tr = document.createElement("tr");
+          const cls = row[2] === "WARN" ? "warn" : "";
+          tr.innerHTML = `
+            <td><code>${esc(row[0])}</code></td>
+            <td>${esc(row[1])}</td>
+            <td class="${cls}"><b>${esc(row[2])}</b></td>
+            <td>${esc(row[3])}</td>
+            <td>${esc(row[4])}</td>
+          `;
+          traceBody.appendChild(tr);
+        });
+      }
+
+      function bindEvents() {
+        id("scenarioSelect").addEventListener("change", e => {
+          state.scenario = String(e.target.value || "es_off");
+          state.highlightNodes.clear();
+          state.highlightEdges.clear();
+          rebuildIndexes();
+          layoutNodes();
+          fitView();
+          render();
+        });
+
+        id("searchInput").addEventListener("input", e => {
+          state.search = String(e.target.value || "").trim().toLowerCase();
+          render();
+        });
+
+        id("fitBtn").addEventListener("click", () => {
+          fitView();
+          render();
+        });
+
+        id("clearBtn").addEventListener("click", () => {
+          state.selectedNodeId = null;
+          state.highlightNodes.clear();
+          state.highlightEdges.clear();
+          detailsBox.innerHTML = "<span class='hint'>Selectionne un noeud pour afficher son role exact.</span>";
+          render();
+        });
+
+        id("highlightPathBtn").addEventListener("click", () => {
+          applyCriticalPathHighlight();
+          render();
+        });
+
+        svg.addEventListener("wheel", ev => {
+          ev.preventDefault();
+          const rect = svg.getBoundingClientRect();
+          const cx = ev.clientX - rect.left;
+          const cy = ev.clientY - rect.top;
+          const prev = state.scale;
+          const next = clamp(prev * (ev.deltaY < 0 ? 1.12 : 0.88), 0.2, 2.4);
+          const wx = (cx - state.panX) / prev;
+          const wy = (cy - state.panY) / prev;
+          state.scale = next;
+          state.panX = cx - wx * next;
+          state.panY = cy - wy * next;
+          render();
+        }, { passive: false });
+
+        svg.addEventListener("mousedown", ev => {
+          if (ev.button !== 0) return;
+          state.dragging = true;
+          state.dragX = ev.clientX;
+          state.dragY = ev.clientY;
+          svg.classList.add("dragging");
+        });
+        window.addEventListener("mousemove", ev => {
+          if (!state.dragging) return;
+          const dx = ev.clientX - state.dragX;
+          const dy = ev.clientY - state.dragY;
+          state.dragX = ev.clientX;
+          state.dragY = ev.clientY;
+          state.panX += dx;
+          state.panY += dy;
+          render();
+        });
+        window.addEventListener("mouseup", () => {
+          state.dragging = false;
+          svg.classList.remove("dragging");
+        });
+
+        svg.addEventListener("click", ev => {
+          if (ev.target === svg) {
+            state.selectedNodeId = null;
+            state.highlightNodes.clear();
+            state.highlightEdges.clear();
+            detailsBox.innerHTML = "<span class='hint'>Selectionne un noeud pour afficher son role exact.</span>";
+            render();
+          }
+        });
+      }
+
+      function rebuildIndexes() {
+        const scenario = state.scenario;
+        const nodes = graph.nodes.filter(n => hasScenario(n.scenario, scenario));
+        const edges = graph.edges.filter(e => hasScenario(e.scenario, scenario));
+        nodeMap = new Map(nodes.map(n => [n.id, n]));
+        edgeList = edges.filter(e => nodeMap.has(e.source) && nodeMap.has(e.target));
+        incomingMap = new Map();
+        outgoingMap = new Map();
+        nodes.forEach(n => {
+          incomingMap.set(n.id, []);
+          outgoingMap.set(n.id, []);
+        });
+        edgeList.forEach(e => {
+          outgoingMap.get(e.source).push(e);
+          incomingMap.get(e.target).push(e);
+        });
+      }
+
+      function hasScenario(flags, active) {
+        return Array.isArray(flags) && (flags.includes("both") || flags.includes(active));
+      }
+
+      function layoutNodes() {
+        positions.clear();
+        for (const node of nodeMap.values()) {
+          const x = 110 + node.level * 220;
+          const y = 80 + node.lane * 72;
+          positions.set(node.id, { x, y });
+        }
+      }
+
+      function render() {
+        const visibleNodes = [...nodeMap.values()].filter(n => state.visibleNodeTypes.has(n.type));
+        const visibleIds = new Set(visibleNodes.map(n => n.id));
+        const searchHits = new Set();
+        if (state.search) {
+          visibleNodes.forEach(n => {
+            const text = `${n.label || ""} ${n.file || ""} ${n.fn || ""} ${n.detail || ""}`.toLowerCase();
+            if (text.includes(state.search)) searchHits.add(n.id);
+          });
+        }
+        const visibleEdges = edgeList.filter(e => state.visibleEdgeTypes.has(e.type) && visibleIds.has(e.source) && visibleIds.has(e.target));
+
+        edgeLayer.innerHTML = "";
+        edgeLabelLayer.innerHTML = "";
+        nodeLayer.innerHTML = "";
+        labelLayer.innerHTML = "";
+
+        visibleEdges.forEach((e, i) => {
+          const a = positions.get(e.source);
+          const b = positions.get(e.target);
+          if (!a || !b) return;
+          const isHL = state.highlightEdges.has(edgeId(e));
+          const dimBySelection = state.selectedNodeId && state.selectedNodeId !== e.source && state.selectedNodeId !== e.target;
+          const opacity = isHL ? 0.98 : (dimBySelection ? 0.14 : 0.52);
+
+          const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          path.setAttribute("d", curvedPath(a.x, a.y, b.x, b.y));
+          path.setAttribute("fill", "none");
+          path.setAttribute("stroke", EDGE_COLORS[e.type] || "#93a4c7");
+          path.setAttribute("stroke-width", e.type === "flow" ? "1.8" : "1.4");
+          path.setAttribute("stroke-opacity", String(opacity));
+          path.setAttribute("marker-end", "url(#arrow)");
+          edgeLayer.appendChild(path);
+
+          if (state.scale > 0.55 && visibleEdges.length < 180) {
+            const lx = (a.x + b.x) / 2 + ((i % 3) - 1) * 8;
+            const ly = (a.y + b.y) / 2 - 5;
+            const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            txt.setAttribute("x", String(lx));
+            txt.setAttribute("y", String(ly));
+            txt.setAttribute("font-size", "10");
+            txt.setAttribute("fill", "#cfe0ff");
+            txt.setAttribute("fill-opacity", String(opacity));
+            txt.setAttribute("font-family", "IBM Plex Mono, Consolas, monospace");
+            txt.textContent = e.label || e.type;
+            edgeLabelLayer.appendChild(txt);
+          }
+        });
+
+        visibleNodes.forEach(n => {
+          const p = positions.get(n.id);
+          if (!p) return;
+          const w = 146;
+          const h = 36;
+          const x = p.x - w / 2;
+          const y = p.y - h / 2;
+          const selected = state.selectedNodeId === n.id;
+          const hit = searchHits.has(n.id);
+          const hl = state.highlightNodes.has(n.id);
+
+          const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+          g.style.cursor = "pointer";
+
+          if (hit || hl) {
+            const ring = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            ring.setAttribute("x", String(x - 4));
+            ring.setAttribute("y", String(y - 4));
+            ring.setAttribute("rx", "10");
+            ring.setAttribute("ry", "10");
+            ring.setAttribute("width", String(w + 8));
+            ring.setAttribute("height", String(h + 8));
+            ring.setAttribute("fill", "none");
+            ring.setAttribute("stroke", hit ? "#22d3ee" : "#93c5fd");
+            ring.setAttribute("stroke-width", "1.6");
+            ring.setAttribute("stroke-opacity", hit ? "0.85" : "0.65");
+            g.appendChild(ring);
+          }
+
+          const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+          rect.setAttribute("x", String(x));
+          rect.setAttribute("y", String(y));
+          rect.setAttribute("rx", "8");
+          rect.setAttribute("ry", "8");
+          rect.setAttribute("width", String(w));
+          rect.setAttribute("height", String(h));
+          rect.setAttribute("fill", NODE_COLORS[n.type] || "#94a3b8");
+          rect.setAttribute("fill-opacity", selected ? "0.95" : "0.86");
+          rect.setAttribute("stroke", selected ? "#ffffff" : "#0c1530");
+          rect.setAttribute("stroke-width", selected ? "2.1" : "1.2");
+          g.appendChild(rect);
+
+          const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          t.setAttribute("x", String(p.x));
+          t.setAttribute("y", String(p.y + 4));
+          t.setAttribute("text-anchor", "middle");
+          t.setAttribute("font-size", "11");
+          t.setAttribute("font-family", "IBM Plex Sans, Trebuchet MS, sans-serif");
+          t.setAttribute("fill", "#f4f8ff");
+          t.textContent = trimLabel(n.label, 24);
+          g.appendChild(t);
+
+          g.addEventListener("click", ev => {
+            ev.stopPropagation();
+            selectNode(n.id);
+          });
+          nodeLayer.appendChild(g);
+
+          if (state.scale > 0.68) {
+            const sub = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            sub.setAttribute("x", String(p.x));
+            sub.setAttribute("y", String(p.y + 22));
+            sub.setAttribute("text-anchor", "middle");
+            sub.setAttribute("font-size", "9");
+            sub.setAttribute("font-family", "IBM Plex Mono, Consolas, monospace");
+            sub.setAttribute("fill", "#d8e5ff");
+            sub.setAttribute("fill-opacity", "0.72");
+            sub.textContent = n.type;
+            labelLayer.appendChild(sub);
+          }
+        });
+
+        viewport.setAttribute("transform", `translate(${state.panX} ${state.panY}) scale(${state.scale})`);
+        id("stats").textContent =
+          `scenario=${state.scenario}\n` +
+          `nodes visible=${visibleNodes.length}/${nodeMap.size}\n` +
+          `edges visible=${visibleEdges.length}/${edgeList.length}\n` +
+          `search_hits=${searchHits.size}\n` +
+          `highlight_nodes=${state.highlightNodes.size}\n` +
+          `highlight_edges=${state.highlightEdges.size}`;
+      }
+
+      function selectNode(nodeId) {
+        state.selectedNodeId = nodeId;
+        state.highlightNodes.clear();
+        state.highlightEdges.clear();
+        state.highlightNodes.add(nodeId);
+
+        const out = outgoingMap.get(nodeId) || [];
+        const inc = incomingMap.get(nodeId) || [];
+        out.forEach(e => {
+          state.highlightEdges.add(edgeId(e));
+          state.highlightNodes.add(e.target);
+        });
+        inc.forEach(e => {
+          state.highlightEdges.add(edgeId(e));
+          state.highlightNodes.add(e.source);
+        });
+
+        const n = nodeMap.get(nodeId);
+        if (!n) return;
+        const inList = inc.map(e => `${nodeLabel(e.source)} (${e.type})`).slice(0, 20);
+        const outList = out.map(e => `${nodeLabel(e.target)} (${e.type})`).slice(0, 20);
+        const componentDocHtml = n.type === "component" ? renderComponentDoc(n.id) : "";
+
+        detailsBox.innerHTML = `
+          <div class="kv"><div class="k">Label</div><div><b>${esc(n.label)}</b></div></div>
+          <div class="kv"><div class="k">Type</div><div>${esc(n.type)}</div></div>
+          <div class="kv"><div class="k">File</div><div><code>${esc(n.file || "n/a")}</code></div></div>
+          <div class="kv"><div class="k">Function</div><div><code>${esc(n.fn || "n/a")}</code></div></div>
+          <div class="kv"><div class="k">Scenario</div><div>${esc((n.scenario || []).join(", "))}</div></div>
+          <div class="kv"><div class="k">Incoming</div><div>${inc.length}</div></div>
+          <div class="kv"><div class="k">Outgoing</div><div>${out.length}</div></div>
+          <div class="kv"><div class="k">Detail</div><div>${esc(n.detail || n.runtime || "n/a")}</div></div>
+          ${n.runtime ? `<div class="kv"><div class="k">Run</div><div>${esc(n.runtime)}</div></div>` : ""}
+          ${n.reads ? `<div class="kv"><div class="k">Reads</div><div><code>${esc(n.reads.join(", "))}</code></div></div>` : ""}
+          ${n.writes ? `<div class="kv"><div class="k">Writes</div><div><code>${esc(n.writes.join(", "))}</code></div></div>` : ""}
+          ${componentDocHtml}
+          <div class="hint" style="margin-top:8px">Dependances entrantes</div>
+          <ul class="list">${inList.length ? inList.map(x => `<li>${esc(x)}</li>`).join("") : "<li>aucune</li>"}</ul>
+          <div class="hint">Dependances sortantes</div>
+          <ul class="list">${outList.length ? outList.map(x => `<li>${esc(x)}</li>`).join("") : "<li>aucune</li>"}</ul>
+        `;
+        render();
+      }
+
+      function renderComponentDoc(nodeId) {
+        const doc = componentDocs[nodeId];
+        if (!doc) {
+          return "<div class='hint' style='margin-top:8px'>Pas d'exemple defini pour ce composant.</div>";
+        }
+        const sample = getComponentSample(doc);
+        const fieldItems = (doc.fields || []).map(row => {
+          return `<li><code>${esc(row.name)}</code>: ${esc(row.desc)}</li>`;
+        }).join("");
+        return `
+          <div class="hint" style="margin-top:10px">Output exemple</div>
+          <pre>${esc(JSON.stringify(sample, null, 2))}</pre>
+          <div class="hint" style="margin-top:8px">Explication des champs</div>
+          <ul class="list">${fieldItems || "<li>Aucune explication.</li>"}</ul>
+        `;
+      }
+
+      function getComponentSample(doc) {
+        if (doc.outputByScenario && typeof doc.outputByScenario === "object") {
+          if (doc.outputByScenario[state.scenario]) return doc.outputByScenario[state.scenario];
+          if (doc.outputByScenario.es_off) return doc.outputByScenario.es_off;
+          if (doc.outputByScenario.es_on) return doc.outputByScenario.es_on;
+        }
+        return doc.output;
+      }
+
+      function applyCriticalPathHighlight() {
+        state.selectedNodeId = null;
+        state.highlightNodes.clear();
+        state.highlightEdges.clear();
+        const path = criticalPath[state.scenario] || [];
+        for (const nid of path) {
+          if (nodeMap.has(nid)) state.highlightNodes.add(nid);
+        }
+        for (let i = 0; i < path.length - 1; i++) {
+          const s = path[i];
+          const t = path[i + 1];
+          const edge = edgeList.find(e => e.source === s && e.target === t);
+          if (edge) state.highlightEdges.add(edgeId(edge));
+        }
+      }
+
+      function fitView() {
+        const pts = [...positions.values()];
+        if (!pts.length) return;
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        pts.forEach(p => {
+          minX = Math.min(minX, p.x);
+          maxX = Math.max(maxX, p.x);
+          minY = Math.min(minY, p.y);
+          maxY = Math.max(maxY, p.y);
+        });
+        const pad = 120;
+        const w = Math.max(200, maxX - minX + pad);
+        const h = Math.max(200, maxY - minY + pad);
+        const rect = svg.getBoundingClientRect();
+        const k = clamp(Math.min(rect.width / w, rect.height / h), 0.2, 1.5);
+        state.scale = k;
+        state.panX = rect.width / 2 - (minX + maxX) * 0.5 * k;
+        state.panY = rect.height / 2 - (minY + maxY) * 0.5 * k;
+      }
+
+      function curvedPath(x1, y1, x2, y2) {
+        const dx = x2 - x1;
+        const cx1 = x1 + dx * 0.35;
+        const cx2 = x2 - dx * 0.35;
+        return `M ${x1} ${y1} C ${cx1} ${y1}, ${cx2} ${y2}, ${x2} ${y2}`;
+      }
+
+      function trimLabel(text, maxLen) {
+        const t = String(text || "");
+        return t.length <= maxLen ? t : `${t.slice(0, maxLen - 1)}…`;
+      }
+
+      function nodeLabel(idValue) {
+        const n = nodeMap.get(idValue);
+        return n ? n.label : idValue;
+      }
+
+      function edgeId(e) {
+        return `${e.type}|${e.source}|${e.target}|${e.label || ""}`;
+      }
+
+      function id(v) {
+        return document.getElementById(v);
+      }
+
+      function esc(v) {
+        return String(v == null ? "" : v).replace(/[&<>"]/g, s => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[s]));
+      }
+
+      function css(name) {
+        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      }
+
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+    })();
+  </script>
+</body>
+</html>

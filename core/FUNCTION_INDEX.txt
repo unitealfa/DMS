@@ -279,6 +279,29 @@ component/tokenisation-layout.py:1205:def _doc_size_from_paths(paths):
 component/tokenisation-layout.py:1433:def _sort_key(x):
 component/tokenisation-layout.py:1444:def _select_doc(target):
 component/tokenisation-layout.py:1471:def print_one_doc(doc):
+graphecode.html:1014:function init()
+graphecode.html:1025:function buildFilters()
+graphecode.html:1047:function makeTogglePill(name, color, checked, onChange)
+graphecode.html:1065:function buildTabs()
+graphecode.html:1078:function buildTables()
+graphecode.html:1120:function bindEvents()
+graphecode.html:1202:function rebuildIndexes()
+graphecode.html:1220:function hasScenario(flags, active)
+graphecode.html:1224:function layoutNodes()
+graphecode.html:1233:function render()
+graphecode.html:1364:function selectNode(nodeId)
+graphecode.html:1408:function renderComponentDoc(nodeId)
+graphecode.html:1425:function getComponentSample(doc)
+graphecode.html:1434:function applyCriticalPathHighlight()
+graphecode.html:1450:function fitView()
+graphecode.html:1470:function curvedPath(x1, y1, x2, y2)
+graphecode.html:1477:function trimLabel(text, maxLen)
+graphecode.html:1482:function nodeLabel(idValue)
+graphecode.html:1487:function edgeId(e)
+graphecode.html:1491:function id(v)
+graphecode.html:1495:function esc(v)
+graphecode.html:1499:function css(name)
+graphecode.html:1503:function clamp(v, min, max)
 pipeline/cli.py:13:def _env_bool(name: str, default: bool = False) -> bool:
 pipeline/cli.py:20:def _env_int(name: str, default: int) -> int:
 pipeline/cli.py:30:def _env_optional(name: str) -> str | None:

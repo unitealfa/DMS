@@ -273,8 +273,41 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
   - `component/fusion_resultats.py`:
     - optimisation anti-redondance supplementaire: retrait des champs lourds dupliques dans `components` (`scores`, `keyword_matches`, `classification_log`, `anti_confusion_targets`, tailles dupliquees),
     - conservation des details complets uniquement dans les blocs principaux du document.
+  - `graphecode.html`:
+    - refonte complete en graphe runtime pipeline (commande cible `main.py ... --use-elasticsearch --es-nlp-level full`),
+    - ajout de 2 scenarios visuels (`es_off` reel fallback local / `es_on` cible ES disponible),
+    - ajout des vues explicatives `Sequence`, `Context Keys`, `Run Trace`,
+    - clic sur un composant: affichage d'un output exemple + explication de chaque champ.
 
 ## 12) Regle de maintenance
 - A chaque modification de code Python dans `pipeline/` ou `component/`:
   - mettre a jour `FUNCTION_INDEX.txt`
   - ajouter/mettre a jour l'entree correspondante dans `PROJECT_CODE_MAP.md` (sections impactees + changelog)
+
+## 13) Visualisation HTML du pipeline
+- Fichier: `graphecode.html`
+- Role: graphe runtime interactif du pipeline `core` pour la commande:
+  - `python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens`
+- Contenu de la vue:
+  - noeuds execution (CLI -> orchestrateur -> 9 composants)
+  - noeuds scripts (`component/*.py` et wrappers `pipeline/components.py`)
+  - noeuds de contexte (`INPUT_FILE`, `FINAL_DOCS`, `TOK_DOCS`, `NLP_*`, `RESULTS`, `EXTRACTIONS`, `FUSION_*`, `ES_*`)
+  - branches conditionnelles:
+    - `content == image_only ?`
+    - `ES ping OK ?`
+    - `es-nlp-level == full ?`
+  - sorties/stockage:
+    - `outputgeneralterminal.txt`
+    - `fusion_output.json`
+    - index ES `dms_documents`
+    - index ES `dms_nlp_tokens`
+- Scenarios integres dans la meme page:
+  - `es_off`: run reel capture (fallback local)
+  - `es_on`: run cible ES disponible + NLP full
+- Tables explicatives integrees:
+  - sequence pipeline
+  - map des context keys
+  - trace run horodatee (2026-03-05)
+- Interaction detaillee au clic composant:
+  - affiche un `output` exemple realiste du composant
+  - affiche une explication courte champ-par-champ

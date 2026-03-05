@@ -1030,7 +1030,7 @@ Regex Test Corpus - Contracts (FR/EN/AR)                                        
 Type: list
 Summary: 1 docs | pages=12
 Output: [{'content': 'text',
-  'doc_id': 'd27459c0-720b-4f00-b3af-314b77b0a78f',
+  'doc_id': 'b36aeb0e-ebb3-4b8c-adb5-fc53507b3914',
   'extraction': 'native:pdf:pypdf',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'page_count_total': 12,
@@ -3120,7 +3120,7 @@ Output: [{'content': 'text',
 
 ========================================================================================================================
 [doc] contrat_regex_test_corpus_fr_en_ar.pdf
-  doc_id       : d27459c0-720b-4f00-b3af-314b77b0a78f
+  doc_id       : b36aeb0e-ebb3-4b8c-adb5-fc53507b3914
   content      : text
   extraction   : native:pdf:pypdf
   pages_total  : 12
@@ -3908,7 +3908,7 @@ Type: list
 Summary: 1 docs | sentences=72
 Output: [{'chars_total': 11256,
   'content': 'text',
-  'doc_id': 'd27459c0-720b-4f00-b3af-314b77b0a78f',
+  'doc_id': 'b36aeb0e-ebb3-4b8c-adb5-fc53507b3914',
   'extraction': 'native:pdf:pypdf',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'page_count_total': 12,
@@ -7188,9 +7188,17 @@ Output: [{'chars_total': 11256,
   'recompose_ok': False,
   'size': 68061}]
 
+[nltk_data] Error loading wordnet: <urlopen error [Errno -3] Temporary
+[nltk_data]     failure in name resolution>
+[nltk_data] Error loading omw-1.4: <urlopen error [Errno -3] Temporary
+[nltk_data]     failure in name resolution>
 [warn] arabcode.py non chargé (dépendances manquantes ?). Détail: CAMeL morphology DB not found. Run:
   "/home/mourad/Bureau/DMS/.venv/bin/python" -m camel_tools.cli.camel_data -i morphology-db-msa-r13
 
+[nltk_data] Error loading wordnet: <urlopen error [Errno -3] Temporary
+[nltk_data]     failure in name resolution>
+[nltk_data] Error loading omw-1.4: <urlopen error [Errno -3] Temporary
+[nltk_data]     failure in name resolution>
 
 ========================================================================================================================
 RUN EN (engcode.py)
@@ -8736,7 +8744,7 @@ Type: list
 Summary: Langues executees: en, fr | docs=1
 Output: [{'chars_total': 11256,
   'content': 'text',
-  'doc_id': 'd27459c0-720b-4f00-b3af-314b77b0a78f',
+  'doc_id': 'b36aeb0e-ebb3-4b8c-adb5-fc53507b3914',
   'extraction': 'native:pdf:pypdf',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'page_count_total': 12,
@@ -12019,11 +12027,11 @@ Output: [{'chars_total': 11256,
 [elasticsearch] desactive ou indisponible -> fallback flux local.
 [Component: elasticsearch]
 Type: dict
-Summary: enabled=False | available=False | indexed=0 | cls_docs=0 | ext_docs=0 | nlp=None docs=0 tokens=0 errors=0
+Summary: enabled=True | available=False | indexed=0 | cls_docs=0 | ext_docs=0 | nlp=None docs=0 tokens=0 errors=0
 Output: {'available': False,
  'classification_docs': 0,
  'doc_ids': 0,
- 'enabled': False,
+ 'enabled': True,
  'es_index': 'dms_documents',
  'es_url': 'http://localhost:9200',
  'extraction_docs': 0,
@@ -12046,7 +12054,7 @@ Output: [{'anti_confusion_targets': ['BON_DE_COMMANDE', 'FACTURE', 'DEVIS', 'BON
                         "status=OK | scores: {'ARTICLE': -43, 'BON_DE_COMMANDE': -202, 'CONTRAT': "
                         "202, 'FACTURE': -179, 'FORMULAIRE': 21}",
   'decision_debug': {'diff': 181, 'second_score': 21, 'top_score': 202},
-  'doc_id': 'd27459c0-720b-4f00-b3af-314b77b0a78f',
+  'doc_id': 'b36aeb0e-ebb3-4b8c-adb5-fc53507b3914',
   'doc_type': 'CONTRAT',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'keyword_matches': {'anti_confusion_hits': [{'count': 6, 'keyword': 'FACTURE'},
@@ -12202,7 +12210,7 @@ Output: [{'anti_confusion_targets': ['BON_DE_COMMANDE', 'FACTURE', 'DEVIS', 'BON
 Type: list
 Summary: 1 docs | fields=11 | contrat_regex_test_corpus_fr_en_ar.pdf->CONTRAT
 Output: [{'classification_status': 'OK',
-  'doc_id': 'd27459c0-720b-4f00-b3af-314b77b0a78f',
+  'doc_id': 'b36aeb0e-ebb3-4b8c-adb5-fc53507b3914',
   'doc_type': 'CONTRAT',
   'fields': {'date_effet': {'many': True,
                             'matches': [{'end': 337,

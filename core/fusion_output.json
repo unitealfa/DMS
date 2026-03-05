@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-03-05T11:03:38.054565+00:00",
+  "generated_at": "2026-03-05T12:11:35.910301+00:00",
   "source": "local-context",
   "documents_count": 1,
   "documents": [
@@ -15,7 +15,7 @@
         "page_count": 1
       },
       "classification": {
-        "doc_id": "d27459c0-720b-4f00-b3af-314b77b0a78f",
+        "doc_id": "b36aeb0e-ebb3-4b8c-adb5-fc53507b3914",
         "filename": "contrat_regex_test_corpus_fr_en_ar.pdf",
         "doc_type": "CONTRAT",
         "status": "OK",
@@ -234,7 +234,7 @@
           "entities_count": 86
         },
         "elasticsearch": {
-          "enabled": false,
+          "enabled": true,
           "available": false,
           "es_url": "http://localhost:9200",
           "es_index": "dms_documents",
@@ -274,7 +274,7 @@
         "pages_meta": [],
         "pages": [
           {
-            "doc_id": "d27459c0-720b-4f00-b3af-314b77b0a78f",
+            "doc_id": "b36aeb0e-ebb3-4b8c-adb5-fc53507b3914",
             "filename": "contrat_regex_test_corpus_fr_en_ar.pdf",
             "paths": [
               "/home/mourad/Bureau/DMS/core/documents/contrat_regex_test_corpus_fr_en_ar.pdf"
@@ -2679,7 +2679,7 @@
         "tesseract": [],
         "regex_extractions": [
           {
-            "doc_id": "d27459c0-720b-4f00-b3af-314b77b0a78f",
+            "doc_id": "b36aeb0e-ebb3-4b8c-adb5-fc53507b3914",
             "filename": "contrat_regex_test_corpus_fr_en_ar.pdf",
             "doc_type": "CONTRAT",
             "classification_status": "OK",
@@ -22110,14 +22110,14 @@
         "timestamp": null
       },
       "meta": {
-        "generated_at": "2026-03-05T11:03:38.054548+00:00",
+        "generated_at": "2026-03-05T12:11:35.910271+00:00",
         "schema_version": "2.0",
         "source": "local-context"
       }
     }
   ],
   "pipeline": {
-    "es_enabled": false,
+    "es_enabled": true,
     "es_available": false,
     "es_url": "http://localhost:9200",
     "es_index": "dms_documents",

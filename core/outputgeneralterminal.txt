@@ -5,23 +5,17 @@ Output: [{'content': 'text',
   'ext': '.pdf',
   'label': 'PDF document',
   'mime': 'application/pdf',
-  'path': 'documents/contrat_regex_test_corpus_fr_en_ar.pdf'}]
+  'path': 'documents/contrat_regex_test_corpus_fr_en_ar.pdf',
+  'size': 68061}]
 
 [skip] content='text' -> /home/mourad/Bureau/DMS/core/documents/contrat_regex_test_corpus_fr_en_ar.pdf
 [info] Aucun fichier à OCR (image_only). Tout ce que tu as donné est détecté comme 'text'.
 [Component: si-image-pretraiter-sinonpass-le-doc]
 Type: dict
-Summary: text=1, image=0, docs_prepped=1
-Output: {'DOCS': [{'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
-           'page_count_total': 0,
-           'pages': [],
-           'source_files': ['/home/mourad/Bureau/DMS/core/documents/contrat_regex_test_corpus_fr_en_ar.pdf']}],
+Summary: text=1, image=0, docs_prepped=0
+Output: {'DOCS': [],
  'IMAGE_ONLY_FILES': [],
  'TEXT_FILES': ['/home/mourad/Bureau/DMS/core/documents/contrat_regex_test_corpus_fr_en_ar.pdf']}
-
-[doc] contrat_regex_test_corpus_fr_en_ar.pdf | content=image_only | extraction=ocr:tesseract | pages=1
-
-------------------------------------------------------------------------------------------------------------------------
 
 [doc] contrat_regex_test_corpus_fr_en_ar.pdf | content=text | extraction=native:pdf:pypdf | pages=12
 [page 1/12]
@@ -1034,16 +1028,9 @@ Regex Test Corpus - Contracts (FR/EN/AR)                                        
 
 [Component: output-txt]
 Type: list
-Summary: 2 docs | pages=13
-Output: [{'content': 'image_only',
-  'doc_id': None,
-  'extraction': 'ocr:tesseract',
-  'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
-  'page_count_total': 1,
-  'pages_text': [],
-  'text': ''},
- {'content': 'text',
-  'doc_id': '8adb9263-a9ef-47f4-98ad-550a359a3133',
+Summary: 1 docs | pages=12
+Output: [{'content': 'text',
+  'doc_id': 'd27459c0-720b-4f00-b3af-314b77b0a78f',
   'extraction': 'native:pdf:pypdf',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'page_count_total': 12,
@@ -2092,6 +2079,7 @@ Output: [{'content': 'image_only',
                  'Regex Test Corpus - Contracts '
                  '(FR/EN/AR)                                                                    '
                  'Page 12'],
+  'size': 68061,
   'text': 'Corpus de test - Contrats / Contracts / '
           'عقود                                                            INFO\n'
           "Jeu de test pour regex d'extraction: titre_contrat, dates, parties, duree, date_fin,\n"
@@ -3132,18 +3120,7 @@ Output: [{'content': 'image_only',
 
 ========================================================================================================================
 [doc] contrat_regex_test_corpus_fr_en_ar.pdf
-  doc_id       : None
-  content      : image_only
-  extraction   : ocr:tesseract
-  pages_total  : 0
-  chars_total  : 0
-  recompose_ok : True
-  paths:
-    - (unknown)
-------------------------------------------------------------------------------------------------------------------------
-========================================================================================================================
-[doc] contrat_regex_test_corpus_fr_en_ar.pdf
-  doc_id       : 8adb9263-a9ef-47f4-98ad-550a359a3133
+  doc_id       : d27459c0-720b-4f00-b3af-314b77b0a78f
   content      : text
   extraction   : native:pdf:pypdf
   pages_total  : 12
@@ -3931,7 +3908,7 @@ Type: list
 Summary: 1 docs | sentences=72
 Output: [{'chars_total': 11256,
   'content': 'text',
-  'doc_id': '8adb9263-a9ef-47f4-98ad-550a359a3133',
+  'doc_id': 'd27459c0-720b-4f00-b3af-314b77b0a78f',
   'extraction': 'native:pdf:pypdf',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'page_count_total': 12,
@@ -7208,7 +7185,8 @@ Output: [{'chars_total': 11256,
                                            'Page 12'}],
              'source_path': '/home/mourad/Bureau/DMS/core/documents/contrat_regex_test_corpus_fr_en_ar.pdf'}],
   'paths': ['/home/mourad/Bureau/DMS/core/documents/contrat_regex_test_corpus_fr_en_ar.pdf'],
-  'recompose_ok': False}]
+  'recompose_ok': False,
+  'size': 68061}]
 
 [warn] arabcode.py non chargé (dépendances manquantes ?). Détail: CAMeL morphology DB not found. Run:
   "/home/mourad/Bureau/DMS/.venv/bin/python" -m camel_tools.cli.camel_data -i morphology-db-msa-r13
@@ -8758,7 +8736,7 @@ Type: list
 Summary: Langues executees: en, fr | docs=1
 Output: [{'chars_total': 11256,
   'content': 'text',
-  'doc_id': '8adb9263-a9ef-47f4-98ad-550a359a3133',
+  'doc_id': 'd27459c0-720b-4f00-b3af-314b77b0a78f',
   'extraction': 'native:pdf:pypdf',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'page_count_total': 12,
@@ -12035,19 +12013,26 @@ Output: [{'chars_total': 11256,
                                            'Page 12'}],
              'source_path': '/home/mourad/Bureau/DMS/core/documents/contrat_regex_test_corpus_fr_en_ar.pdf'}],
   'paths': ['/home/mourad/Bureau/DMS/core/documents/contrat_regex_test_corpus_fr_en_ar.pdf'],
-  'recompose_ok': False}]
+  'recompose_ok': False,
+  'size': 68061}]
 
 [elasticsearch] desactive ou indisponible -> fallback flux local.
 [Component: elasticsearch]
 Type: dict
-Summary: enabled=True | available=False | indexed=0 | cls_docs=0 | ext_docs=0
+Summary: enabled=False | available=False | indexed=0 | cls_docs=0 | ext_docs=0 | nlp=None docs=0 tokens=0 errors=0
 Output: {'available': False,
  'classification_docs': 0,
  'doc_ids': 0,
- 'enabled': True,
+ 'enabled': False,
  'es_index': 'dms_documents',
  'es_url': 'http://localhost:9200',
- 'extraction_docs': 0}
+ 'extraction_docs': 0,
+ 'nlp_docs_synced': 0,
+ 'nlp_level': None,
+ 'nlp_token_errors': 0,
+ 'nlp_tokens_index': None,
+ 'nlp_tokens_indexed': 0,
+ 'nlp_unresolved_rows': 0}
 
 [classification] contrat_regex_test_corpus_fr_en_ar.pdf -> best=CONTRAT | status=OK | scores: {'ARTICLE': -43, 'BON_DE_COMMANDE': -202, 'CONTRAT': 202, 'FACTURE': -179, 'FORMULAIRE': 21}
   keywords: strong=[CONTRAT(x21), AGREEMENT(x14), PARTIES(x15), ENTRE LES SOUSSIGNES(x1), THIS AGREEMENT(x1), BETWEEN THE UNDERSIGNED(x1), LES PARTIES(x1)] medium=[DATE D EFFET(x2), OBLIGATIONS(x1), EFFECTIVE DATE(x4), CLAUSE(x1), TERMINATION(x1), DURATION(x1)] weak=[OBJET(x8), DUREE(x4), OBJET DU CONTRAT(x1), DUREE DU CONTRAT(x1), AVENANT(x1), DATE DE SIGNATURE(x1), REPRESENTED BY(x2), ADRESSE(x2)] negative=[PO(x1), BON DE COMMANDE(x4), FACTURE(x6), BON DE LIVRAISON(x4), DELIVERY NOTE(x3), INVOICE(x1), MONTANT TTC(x1), TVA(x1), PURCHASE ORDER(x1), DATE DE COMMANDE(x1), BL(x1)]
@@ -12056,10 +12041,49 @@ Output: {'available': False,
 [Component: clasification]
 Type: list
 Summary: 1 docs classes | contrat_regex_test_corpus_fr_en_ar.pdf->CONTRAT
-Output: [{'decision_debug': {'diff': 181, 'second_score': 21, 'top_score': 202},
-  'doc_id': '8adb9263-a9ef-47f4-98ad-550a359a3133',
+Output: [{'anti_confusion_targets': ['BON_DE_COMMANDE', 'FACTURE', 'DEVIS', 'BON_DE_LIVRAISON', 'AVOIR'],
+  'classification_log': '[classification] contrat_regex_test_corpus_fr_en_ar.pdf -> best=CONTRAT | '
+                        "status=OK | scores: {'ARTICLE': -43, 'BON_DE_COMMANDE': -202, 'CONTRAT': "
+                        "202, 'FACTURE': -179, 'FORMULAIRE': 21}",
+  'decision_debug': {'diff': 181, 'second_score': 21, 'top_score': 202},
+  'doc_id': 'd27459c0-720b-4f00-b3af-314b77b0a78f',
   'doc_type': 'CONTRAT',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
+  'keyword_matches': {'anti_confusion_hits': [{'count': 6, 'keyword': 'FACTURE'},
+                                              {'count': 4, 'keyword': 'BON DE COMMANDE'},
+                                              {'count': 4, 'keyword': 'BON DE LIVRAISON'}],
+                      'medium': [{'count': 4, 'keyword': 'EFFECTIVE DATE'},
+                                 {'count': 2, 'keyword': 'DATE D EFFET'},
+                                 {'count': 1, 'keyword': 'CLAUSE'},
+                                 {'count': 1, 'keyword': 'DURATION'},
+                                 {'count': 1, 'keyword': 'OBLIGATIONS'},
+                                 {'count': 1, 'keyword': 'TERMINATION'}],
+                      'negative': [{'count': 6, 'keyword': 'FACTURE'},
+                                   {'count': 4, 'keyword': 'BON DE COMMANDE'},
+                                   {'count': 4, 'keyword': 'BON DE LIVRAISON'},
+                                   {'count': 3, 'keyword': 'DELIVERY NOTE'},
+                                   {'count': 1, 'keyword': 'BL'},
+                                   {'count': 1, 'keyword': 'DATE DE COMMANDE'},
+                                   {'count': 1, 'keyword': 'INVOICE'},
+                                   {'count': 1, 'keyword': 'MONTANT TTC'},
+                                   {'count': 1, 'keyword': 'PO'},
+                                   {'count': 1, 'keyword': 'PURCHASE ORDER'},
+                                   {'count': 1, 'keyword': 'TVA'}],
+                      'strong': [{'count': 21, 'keyword': 'CONTRAT'},
+                                 {'count': 15, 'keyword': 'PARTIES'},
+                                 {'count': 14, 'keyword': 'AGREEMENT'},
+                                 {'count': 1, 'keyword': 'BETWEEN THE UNDERSIGNED'},
+                                 {'count': 1, 'keyword': 'ENTRE LES SOUSSIGNES'},
+                                 {'count': 1, 'keyword': 'LES PARTIES'},
+                                 {'count': 1, 'keyword': 'THIS AGREEMENT'}],
+                      'strong_negative': [],
+                      'weak': [{'count': 8, 'keyword': 'OBJET'}, {'count': 4, 'keyword': 'DUREE'},
+                               {'count': 2, 'keyword': 'ADRESSE'},
+                               {'count': 2, 'keyword': 'REPRESENTED BY'},
+                               {'count': 1, 'keyword': 'AVENANT'},
+                               {'count': 1, 'keyword': 'DATE DE SIGNATURE'},
+                               {'count': 1, 'keyword': 'DUREE DU CONTRAT'},
+                               {'count': 1, 'keyword': 'OBJET DU CONTRAT'}]},
   'margin': 3,
   'scores': {'ARTICLE': -43,
              'BON_DE_COMMANDE': -202,
@@ -12067,7 +12091,8 @@ Output: [{'decision_debug': {'diff': 181, 'second_score': 21, 'top_score': 202},
              'FACTURE': -179,
              'FORMULAIRE': 21},
   'status': 'OK',
-  'threshold': 6}]
+  'threshold': 6,
+  'winning_score': 202}]
 
 
 [extraction]
@@ -12177,7 +12202,7 @@ Output: [{'decision_debug': {'diff': 181, 'second_score': 21, 'top_score': 202},
 Type: list
 Summary: 1 docs | fields=11 | contrat_regex_test_corpus_fr_en_ar.pdf->CONTRAT
 Output: [{'classification_status': 'OK',
-  'doc_id': '8adb9263-a9ef-47f4-98ad-550a359a3133',
+  'doc_id': 'd27459c0-720b-4f00-b3af-314b77b0a78f',
   'doc_type': 'CONTRAT',
   'fields': {'date_effet': {'many': True,
                             'matches': [{'end': 337,

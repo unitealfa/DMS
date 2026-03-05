@@ -1192,6 +1192,33 @@ def _pdf_page_count(path: str):
     except Exception:
         return None
 
+
+def _safe_file_size(path):
+    if not path:
+        return None
+    try:
+        return int(Path(path).stat().st_size)
+    except Exception:
+        return None
+
+
+def _doc_size_from_paths(paths):
+    uniq = []
+    seen = set()
+    for p in (paths or []):
+        sp = _safe_str(p)
+        if not sp or sp in seen:
+            continue
+        seen.add(sp)
+        uniq.append(sp)
+    if not uniq:
+        return None
+    values = [_safe_file_size(p) for p in uniq]
+    valid = [v for v in values if isinstance(v, int)]
+    if not valid:
+        return None
+    return int(sum(valid))
+
 # ==================== Vrifier FINAL_DOCS (mme logique que test) ====================
 if "FINAL_DOCS" not in globals() or not isinstance(FINAL_DOCS, list):
     raise RuntimeError("FINAL_DOCS not found. Excute d'abord la cellule prcdente (celle qui imprime FINAL PRINT).")
@@ -1229,6 +1256,7 @@ if "DOCS" in globals() and isinstance(DOCS, list):
             "content": "image_only",
             "extraction": "ocr:tesseract",
             "paths": paths,
+            "size": d.get("size") if isinstance(d.get("size"), int) else _doc_size_from_paths(paths),
             "page_count_total": page_count_total,
             "pages": pages_out,
         })
@@ -1292,6 +1320,7 @@ if "TEXT_DOCS" in globals() and isinstance(TEXT_DOCS, list):
             "content": "text",
             "extraction": extraction,
             "paths": paths,
+            "size": d.get("size") if isinstance(d.get("size"), int) else _doc_size_from_paths(paths),
             "page_count_total": page_count_total,
             "pages": pages_out,
         })
@@ -1305,6 +1334,7 @@ if not DOC_PACK:
             "content": d.get("content"),
             "extraction": d.get("extraction"),
             "paths": [],
+            "size": d.get("size") if isinstance(d.get("size"), int) else None,
             "page_count_total": 1,
             "pages": [{"page_index": 1, "text": d.get("text") or "", "source_path": ""}],
         })
@@ -1391,6 +1421,7 @@ for doc in DOC_PACK:
         "doc_id": doc_id,
         "filename": filename,
         "paths": paths,
+        "size": doc.get("size") if isinstance(doc.get("size"), int) else _doc_size_from_paths(paths),
         "page_count_total": page_count_total,
         "content": content_type,
         "extraction": extraction,
@@ -1523,7 +1554,6 @@ if not selected:
 else:
     for doc in selected:
         print_one_doc(doc)
-
 
 
 

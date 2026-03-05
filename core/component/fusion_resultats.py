@@ -13,8 +13,10 @@ from __future__ import annotations
 
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+from urllib.parse import quote
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 OUTPUT_PATH = REPO_ROOT / "fusion_output.json"
@@ -55,6 +57,406 @@ def _safe_load_json(value: Any) -> Any:
         return None
 
 
+def _safe_int(value: Any, default: int = 0) -> int:
+    try:
+        return int(value)
+    except Exception:
+        return default
+
+
+def _iso_now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _basename(value: Any) -> str:
+    if value is None:
+        return ""
+    try:
+        return Path(str(value)).name
+    except Exception:
+        return str(value)
+
+
+def _safe_non_negative_int(value: Any) -> Optional[int]:
+    try:
+        parsed = int(value)
+    except Exception:
+        return None
+    if parsed < 0:
+        return None
+    return parsed
+
+
+def _size_from_paths(paths: List[Any]) -> Optional[int]:
+    uniq: List[str] = []
+    seen = set()
+    for path in paths:
+        sp = str(path or "").strip()
+        if not sp or sp in seen:
+            continue
+        seen.add(sp)
+        uniq.append(sp)
+    if not uniq:
+        return None
+    total = 0
+    found = False
+    for sp in uniq:
+        try:
+            total += int(Path(sp).stat().st_size)
+            found = True
+        except Exception:
+            continue
+    if not found:
+        return None
+    return total
+
+
+def _size_maps_from_pretraitement(ctx: Dict[str, Any]) -> Tuple[Dict[str, int], Dict[str, int]]:
+    cached = ctx.get("_FUSION_PRETRAIT_SIZE_CACHE")
+    if isinstance(cached, dict):
+        by_path = cached.get("by_path")
+        by_name = cached.get("by_name")
+        if isinstance(by_path, dict) and isinstance(by_name, dict):
+            return by_path, by_name
+
+    by_path: Dict[str, int] = {}
+    by_name: Dict[str, int] = {}
+    for row in _safe_list(ctx.get("PRETRAITEMENT_RESULT")):
+        if not isinstance(row, dict):
+            continue
+        size = _safe_non_negative_int(row.get("size"))
+        if size is None:
+            continue
+        path = str(row.get("path") or "").strip()
+        if path:
+            by_path[path] = size
+            name = _basename(path)
+            if name and name not in by_name:
+                by_name[name] = size
+        else:
+            name = str(row.get("filename") or "").strip()
+            if name and name not in by_name:
+                by_name[name] = size
+
+    ctx["_FUSION_PRETRAIT_SIZE_CACHE"] = {"by_path": by_path, "by_name": by_name}
+    return by_path, by_name
+
+
+def _resolve_file_size(
+    ctx: Dict[str, Any],
+    paths: List[Any],
+    filename: Optional[str],
+    preferred: Any = None,
+) -> Optional[int]:
+    preferred_size = _safe_non_negative_int(preferred)
+    if preferred_size is not None:
+        return preferred_size
+
+    by_path, by_name = _size_maps_from_pretraitement(ctx)
+    for path in paths:
+        sp = str(path or "").strip()
+        if not sp:
+            continue
+        if sp in by_path:
+            return by_path[sp]
+
+    name = str(filename or "").strip()
+    if name and name in by_name:
+        return by_name[name]
+
+    return _safe_non_negative_int(_size_from_paths(paths))
+
+
+def _row_belongs_to_doc(row: Any, doc_id: Optional[str], filename: Optional[str]) -> bool:
+    if not isinstance(row, dict):
+        return False
+    row_doc_id = str(row.get("doc_id") or row.get("document_id") or "").strip()
+    row_filename = str(row.get("filename") or row.get("doc") or "").strip()
+    if doc_id and row_doc_id and row_doc_id == doc_id:
+        return True
+    if filename and row_filename and row_filename == filename:
+        return True
+    return False
+
+
+def _filter_rows_for_doc(rows: Any, doc_id: Optional[str], filename: Optional[str]) -> List[Dict[str, Any]]:
+    if not isinstance(rows, list):
+        return []
+    out: List[Dict[str, Any]] = []
+    for row in rows:
+        if _row_belongs_to_doc(row, doc_id, filename):
+            out.append(row)
+    return out
+
+
+def _default_nlp_tokens_index(ctx: Dict[str, Any]) -> str:
+    idx = str(ctx.get("ES_NLP_INDEX_EFFECTIVE") or ctx.get("ES_NLP_INDEX") or "").strip()
+    if idx:
+        return idx
+    base = str(ctx.get("ES_INDEX") or "dms_documents").strip() or "dms_documents"
+    return f"{base}_nlp_tokens"
+
+
+def _search_index(
+    store: Any,
+    index: str,
+    query: Dict[str, Any],
+    size: int,
+    sort: Optional[List[Any]] = None,
+    source_includes: Optional[List[str]] = None,
+    search_after: Optional[List[Any]] = None,
+) -> Dict[str, Any]:
+    payload: Dict[str, Any] = {"size": size, "query": query}
+    if sort:
+        payload["sort"] = sort
+    if source_includes:
+        payload["_source"] = source_includes
+    if search_after:
+        payload["search_after"] = search_after
+    path = f"/{quote(index)}/_search"
+    return store._request("POST", path, payload=payload) or {}
+
+
+def _fetch_nlp_tokens(
+    store: Any,
+    index: str,
+    query: Dict[str, Any],
+    max_tokens: int = 50000,
+) -> Dict[str, Any]:
+    sort = [
+        {"page_index": "asc"},
+        {"sent_index": "asc"},
+        {"tok_index": "asc"},
+        {"_id": "asc"},
+    ]
+    source_includes = [
+        "doc_id",
+        "filename",
+        "lang",
+        "page_index",
+        "sent_index",
+        "tok_index",
+        "token",
+        "lemma",
+        "pos",
+        "ner",
+        "sentence_text",
+        "updated_at",
+    ]
+
+    rows: List[Dict[str, Any]] = []
+    search_after: Optional[List[Any]] = None
+    total = 0
+    batch_size = 2000
+
+    while len(rows) < max_tokens:
+        wanted = min(batch_size, max_tokens - len(rows))
+        res = _search_index(
+            store=store,
+            index=index,
+            query=query,
+            size=wanted,
+            sort=sort,
+            source_includes=source_includes,
+            search_after=search_after,
+        )
+        hits_root = (res.get("hits") or {}) if isinstance(res, dict) else {}
+        total_info = hits_root.get("total")
+        if isinstance(total_info, dict):
+            total = _safe_int(total_info.get("value"), total)
+        elif isinstance(total_info, int):
+            total = total_info
+
+        hits = hits_root.get("hits") or []
+        if not isinstance(hits, list) or not hits:
+            break
+        for hit in hits:
+            if not isinstance(hit, dict):
+                continue
+            src = hit.get("_source")
+            if isinstance(src, dict):
+                rows.append(src)
+            if len(rows) >= max_tokens:
+                break
+
+        last_sort = hits[-1].get("sort") if isinstance(hits[-1], dict) else None
+        if not isinstance(last_sort, list):
+            break
+        search_after = last_sort
+
+    if total <= 0:
+        total = len(rows)
+    return {
+        "rows": rows,
+        "total": total,
+        "truncated": total > len(rows),
+        "index": index,
+    }
+
+
+def _structure_nlp_tokens(tokens: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    pages_map: Dict[int, Dict[str, Any]] = {}
+    for row in tokens:
+        if not isinstance(row, dict):
+            continue
+        page_index = _safe_int(row.get("page_index"), 0)
+        sent_index = _safe_int(row.get("sent_index"), 0)
+        page_entry = pages_map.setdefault(
+            page_index,
+            {"page_index": page_index, "_sent_map": {}},
+        )
+        sent_map = page_entry["_sent_map"]
+        sent_entry = sent_map.setdefault(
+            sent_index,
+            {
+                "sent_index": sent_index,
+                "lang": row.get("lang"),
+                "text": row.get("sentence_text"),
+                "tokens": [],
+            },
+        )
+        sent_entry["tokens"].append(
+            {
+                "tok_index": _safe_int(row.get("tok_index"), 0),
+                "token": row.get("token"),
+                "lemma": row.get("lemma"),
+                "pos": row.get("pos"),
+                "ner": row.get("ner"),
+            }
+        )
+
+    pages_out: List[Dict[str, Any]] = []
+    for page_index in sorted(pages_map.keys()):
+        page = pages_map[page_index]
+        sent_map = page.pop("_sent_map", {})
+        sentences: List[Dict[str, Any]] = []
+        for sent_index in sorted(sent_map.keys()):
+            sent = sent_map[sent_index]
+            sent["tokens"] = sorted(
+                sent.get("tokens") or [],
+                key=lambda x: _safe_int(x.get("tok_index"), 0),
+            )
+            sentences.append(sent)
+        page["sentences"] = sentences
+        pages_out.append(page)
+    return pages_out
+
+
+def _nlp_from_es_and_ctx(
+    ctx: Dict[str, Any],
+    src: Dict[str, Any],
+    store: Any,
+    doc_id: str,
+    filename: str,
+) -> Dict[str, Any]:
+    es_nlp = src.get("nlp") if isinstance(src.get("nlp"), dict) else {}
+    level = str(es_nlp.get("level") or ctx.get("ES_NLP_LEVEL") or "").strip().lower()
+    if level not in {"off", "summary", "full"}:
+        level = "summary"
+
+    sentences = _filter_rows_for_doc(ctx.get("NLP_SENTENCES"), doc_id, filename)
+    entities = _filter_rows_for_doc(ctx.get("NLP_ENTITIES"), doc_id, filename)
+    pos_rows = _filter_rows_for_doc(ctx.get("NLP_POS"), doc_id, filename)
+    lemma_rows = _filter_rows_for_doc(ctx.get("NLP_LEMMA"), doc_id, filename)
+
+    out: Dict[str, Any] = {
+        "source": "elasticsearch",
+        "level": level,
+        "language": ctx.get("NLP_LANGUAGE"),
+        "summary": {
+            "languages": _safe_list(es_nlp.get("languages")) or _safe_list(src.get("detected_languages")),
+            "language_stats": es_nlp.get("language_stats") if isinstance(es_nlp, dict) else {},
+            "sentences_count": _safe_int(es_nlp.get("sentences_count"), len(sentences)),
+            "tokens_count": _safe_int(es_nlp.get("tokens_count"), len(pos_rows)),
+            "entities_count": _safe_int(es_nlp.get("entities_count"), len(entities)),
+            "top_pos": _safe_list(es_nlp.get("top_pos")),
+            "top_ner": _safe_list(es_nlp.get("top_ner")),
+            "entities_sample": _safe_list(es_nlp.get("entities_sample_flat")) or _safe_list(es_nlp.get("entities_sample")),
+            "sentences_sample": _safe_list(es_nlp.get("sentences_sample")),
+            "updated_at": src.get("nlp_updated_at"),
+        },
+        "sentences": sentences,
+        "entities": entities,
+        "matches": _filter_rows_for_doc(ctx.get("NLP_MATCHES"), doc_id, filename),
+        "pos": pos_rows,
+        "lemma": lemma_rows,
+    }
+
+    if level == "full":
+        tokens_index = _default_nlp_tokens_index(ctx)
+        max_tokens = _safe_int(ctx.get("FUSION_NLP_TOKENS_MAX"), 50000)
+        if max_tokens <= 0:
+            max_tokens = 50000
+        try:
+            fetched = _fetch_nlp_tokens(
+                store=store,
+                index=tokens_index,
+                query={"term": {"doc_id": doc_id}},
+                max_tokens=max_tokens,
+            )
+
+            flat_rows = fetched["rows"]
+            selected_doc_id = doc_id
+
+            if not flat_rows and filename:
+                fetched_by_name = _fetch_nlp_tokens(
+                    store=store,
+                    index=tokens_index,
+                    query={"term": {"filename": filename}},
+                    max_tokens=max_tokens,
+                )
+                rows_by_doc: Dict[str, List[Dict[str, Any]]] = {}
+                for row in fetched_by_name["rows"]:
+                    if not isinstance(row, dict):
+                        continue
+                    rid = str(row.get("doc_id") or "").strip() or "_missing_doc_id"
+                    rows_by_doc.setdefault(rid, []).append(row)
+
+                if rows_by_doc:
+                    expected = _safe_int((es_nlp.get("tokens_count") if isinstance(es_nlp, dict) else None), 0)
+                    best_id = None
+                    best_rows: List[Dict[str, Any]] = []
+                    best_score: Optional[Tuple[int, int]] = None
+                    for rid, rid_rows in rows_by_doc.items():
+                        size = len(rid_rows)
+                        if expected > 0:
+                            score = (abs(size - expected), -size)
+                        else:
+                            score = (0, -size)
+                        if best_score is None or score < best_score:
+                            best_score = score
+                            best_id = rid
+                            best_rows = rid_rows
+                    if best_id is not None:
+                        selected_doc_id = best_id
+                        flat_rows = best_rows
+                        fetched["total"] = len(best_rows)
+                        fetched["truncated"] = False
+
+            out["full"] = {
+                "index": fetched["index"],
+                "count": fetched["total"],
+                "returned": len(flat_rows),
+                "truncated": bool(fetched["truncated"]),
+                "doc_id": selected_doc_id,
+                "tokens": flat_rows,
+                "structure": _structure_nlp_tokens(flat_rows),
+            }
+        except Exception as exc:
+            out["full"] = {
+                "index": tokens_index,
+                "count": 0,
+                "returned": 0,
+                "truncated": False,
+                "doc_id": doc_id,
+                "tokens": [],
+                "structure": [],
+                "error": str(exc),
+            }
+
+    return out
+
+
 def _build_map(rows: Any) -> Dict[str, Dict[str, Dict[str, Any]]]:
     by_id: Dict[str, Dict[str, Any]] = {}
     by_fn: Dict[str, Dict[str, Any]] = {}
@@ -80,6 +482,228 @@ def _pick_from_map(
     if filename and filename in rows_map["by_fn"]:
         return rows_map["by_fn"][filename]
     return {}
+
+
+def _same_doc_hint(value: Any, filename: str, first_path: str) -> bool:
+    if value is None:
+        return False
+    txt = str(value)
+    if first_path and txt == first_path:
+        return True
+    return bool(filename and _basename(txt) == filename)
+
+
+def _extract_component_views(
+    ctx: Dict[str, Any],
+    doc_payload: Dict[str, Any],
+) -> Dict[str, Any]:
+    document_id = str(doc_payload.get("document_id") or "")
+    file_obj = doc_payload.get("file") if isinstance(doc_payload.get("file"), dict) else {}
+    filename = str(file_obj.get("name") or "")
+    first_path = ""
+    paths = _safe_list(file_obj.get("path"))
+    if paths:
+        first_path = str(paths[0])
+
+    pretrait_rows = _safe_list(ctx.get("PRETRAITEMENT_RESULT"))
+    pretrait_match = {}
+    for row in pretrait_rows:
+        if not isinstance(row, dict):
+            continue
+        if _same_doc_hint(row.get("path"), filename, first_path):
+            pretrait_match = row
+            break
+
+    preprocess = ctx.get("PREPROCESS_RESULT") if isinstance(ctx.get("PREPROCESS_RESULT"), dict) else {}
+    text_files = _safe_list(preprocess.get("TEXT_FILES"))
+    image_files = _safe_list(preprocess.get("IMAGE_ONLY_FILES"))
+    pre_docs = _safe_list(preprocess.get("DOCS"))
+    is_text_file = any(_same_doc_hint(p, filename, first_path) for p in text_files)
+    is_image_file = any(_same_doc_hint(p, filename, first_path) for p in image_files)
+
+    final_rows = _safe_list(ctx.get("FINAL_DOCS"))
+    final_doc = {}
+    for row in final_rows:
+        if not isinstance(row, dict):
+            continue
+        if _same_doc_hint(row.get("filename"), filename, first_path):
+            final_doc = row
+            break
+
+    tok_rows = _safe_list(ctx.get("TOK_DOCS") or ctx.get("selected"))
+    tok_doc = {}
+    for row in tok_rows:
+        if not isinstance(row, dict):
+            continue
+        if document_id and str(row.get("doc_id") or "") == document_id:
+            tok_doc = row
+            break
+        if _same_doc_hint(row.get("filename"), filename, first_path):
+            tok_doc = row
+            break
+
+    tok_pages = _safe_list(tok_doc.get("pages"))
+    tok_sentences = 0
+    for page in tok_pages:
+        if not isinstance(page, dict):
+            continue
+        sent_items = page.get("sentences_layout") or page.get("sentences") or page.get("chunks") or []
+        if isinstance(sent_items, list):
+            tok_sentences += len(sent_items)
+
+    nlp_obj = doc_payload.get("nlp") if isinstance(doc_payload.get("nlp"), dict) else {}
+    nlp_summary = nlp_obj.get("summary") if isinstance(nlp_obj.get("summary"), dict) else {}
+    cls_obj = doc_payload.get("content", {}).get("classification") if isinstance(doc_payload.get("content"), dict) else {}
+    ext_obj = doc_payload.get("extraction") if isinstance(doc_payload.get("extraction"), dict) else {}
+    regex_obj = ext_obj.get("regex_extractions")
+    if isinstance(regex_obj, dict):
+        regex_doc_count = 1
+        regex_fields_count = len(regex_obj.get("fields") or {}) if isinstance(regex_obj.get("fields"), dict) else 0
+    elif isinstance(regex_obj, list):
+        regex_doc_count = len(regex_obj)
+        regex_fields_count = sum(
+            len((r.get("fields") or {})) for r in regex_obj if isinstance(r, dict) and isinstance(r.get("fields"), dict)
+        )
+    else:
+        regex_doc_count = 0
+        regex_fields_count = 0
+
+    final_pages = _safe_int(final_doc.get("page_count_total"), 0)
+    if final_pages <= 0:
+        final_pages = len(_safe_list(final_doc.get("pages_text")))
+
+    return {
+        "pretraitement_de_docs": {
+            "matched_path": pretrait_match.get("path"),
+            "detected_ext": pretrait_match.get("ext"),
+            "detected_mime": pretrait_match.get("mime"),
+            "detected_label": pretrait_match.get("label"),
+            "detected_content": pretrait_match.get("content"),
+            "total_files_detected": len(pretrait_rows),
+        },
+        "si_image_pretraiter_sinonpass_le_doc": {
+            "is_text_file": is_text_file,
+            "is_image_only_file": is_image_file,
+            "text_files_count": len(text_files),
+            "image_only_files_count": len(image_files),
+            "docs_prepared_count": len(pre_docs),
+        },
+        "output_txt": {
+            "content": final_doc.get("content"),
+            "extraction": final_doc.get("extraction"),
+            "pages_count": final_pages,
+            "has_text": bool(str((doc_payload.get("text") or {}).get("text_raw") or "").strip()),
+            "text_length": len(str((doc_payload.get("text") or {}).get("text_raw") or "")),
+        },
+        "tokenisation_layout": {
+            "pages_count": len(tok_pages),
+            "sentences_count": tok_sentences,
+            "detected_languages": _safe_list(tok_doc.get("detected_languages")),
+        },
+        "attribution_grammaticale": {
+            "level": nlp_obj.get("level"),
+            "language": nlp_obj.get("language"),
+            "languages": _safe_list(nlp_summary.get("languages")),
+            "sentences_count": _safe_int(nlp_summary.get("sentences_count"), len(_safe_list(nlp_obj.get("sentences")))),
+            "tokens_count": _safe_int(nlp_summary.get("tokens_count"), len(_safe_list((nlp_obj.get("full") or {}).get("tokens")))),
+            "entities_count": _safe_int(nlp_summary.get("entities_count"), len(_safe_list(nlp_obj.get("entities")))),
+        },
+        "elasticsearch": {
+            "enabled": bool(ctx.get("USE_ELASTICSEARCH")),
+            "available": bool(ctx.get("ES_AVAILABLE")),
+            "es_url": ctx.get("ES_URL"),
+            "es_index": ctx.get("ES_INDEX"),
+            "doc_id": document_id or None,
+            "nlp_level": ctx.get("ES_NLP_LEVEL_EFFECTIVE") or ctx.get("ES_NLP_LEVEL"),
+            "nlp_tokens_index": ctx.get("ES_NLP_INDEX_EFFECTIVE") or ctx.get("ES_NLP_INDEX"),
+            "nlp_docs_synced": _safe_int(ctx.get("ES_NLP_DOCS_SYNCED"), 0),
+            "nlp_tokens_synced": _safe_int(ctx.get("ES_NLP_TOKENS_SYNCED"), 0),
+            "nlp_token_errors": _safe_int(ctx.get("ES_NLP_TOKEN_ERRORS"), 0),
+        },
+        "classification": {
+            "doc_type": cls_obj.get("doc_type") if isinstance(cls_obj, dict) else None,
+            "status": cls_obj.get("status") if isinstance(cls_obj, dict) else None,
+            "winning_score": cls_obj.get("winning_score") if isinstance(cls_obj, dict) else None,
+        },
+        "extraction_regles": {
+            "documents_count": regex_doc_count,
+            "fields_count": regex_fields_count,
+        },
+        "fusion_resultats": {
+            "source": ctx.get("FUSION_SOURCE"),
+            "output_path": str(OUTPUT_PATH),
+            "es_synced": _safe_int(ctx.get("ES_FUSION_SYNCED"), 0),
+        },
+    }
+
+
+def _to_document_output(
+    ctx: Dict[str, Any],
+    doc_payload: Dict[str, Any],
+    source: str,
+) -> Dict[str, Any]:
+    file_obj = doc_payload.get("file") if isinstance(doc_payload.get("file"), dict) else {}
+    content_obj = doc_payload.get("content") if isinstance(doc_payload.get("content"), dict) else {}
+    nlp_obj = doc_payload.get("nlp") if isinstance(doc_payload.get("nlp"), dict) else {}
+    extraction_obj = doc_payload.get("extraction") if isinstance(doc_payload.get("extraction"), dict) else {}
+    text_obj = doc_payload.get("text") if isinstance(doc_payload.get("text"), dict) else {}
+    structure_obj = doc_payload.get("document_structure") if isinstance(doc_payload.get("document_structure"), dict) else {}
+
+    components = _extract_component_views(ctx, doc_payload)
+    page_count = len(_safe_list(structure_obj.get("pages")))
+
+    return {
+        "document_id": doc_payload.get("document_id"),
+        "file": {
+            "name": file_obj.get("name"),
+            "paths": _safe_list(file_obj.get("path")),
+            "size": file_obj.get("size"),
+            "page_count": page_count,
+        },
+        "classification": content_obj.get("classification"),
+        "doc_type": content_obj.get("document_kind") or content_obj.get("content_type"),
+        "components": components,
+        "text": text_obj,
+        "document_structure": structure_obj,
+        "ocr": doc_payload.get("ocr"),
+        "extraction": extraction_obj,
+        "nlp": nlp_obj,
+        "quality_checks": doc_payload.get("quality_checks"),
+        "human_review": doc_payload.get("human_review"),
+        "processing": doc_payload.get("processing"),
+        "meta": {
+            "generated_at": _iso_now(),
+            "schema_version": "2.0",
+            "source": source,
+        },
+    }
+
+
+def _final_output(
+    ctx: Dict[str, Any],
+    payloads: List[Dict[str, Any]],
+    source: str,
+) -> Dict[str, Any]:
+    docs = [_to_document_output(ctx, p, source) for p in payloads if isinstance(p, dict)]
+    out: Dict[str, Any] = {
+        "schema_version": "2.0",
+        "generated_at": _iso_now(),
+        "source": source,
+        "documents_count": len(docs),
+        "documents": docs,
+        "pipeline": {
+            "es_enabled": bool(ctx.get("USE_ELASTICSEARCH")),
+            "es_available": bool(ctx.get("ES_AVAILABLE")),
+            "es_url": ctx.get("ES_URL"),
+            "es_index": ctx.get("ES_INDEX"),
+            "es_nlp_level": ctx.get("ES_NLP_LEVEL_EFFECTIVE") or ctx.get("ES_NLP_LEVEL"),
+            "es_nlp_index": ctx.get("ES_NLP_INDEX_EFFECTIVE") or ctx.get("ES_NLP_INDEX"),
+            "es_doc_ids": _safe_list(ctx.get("ES_DOC_IDS")),
+            "steps": _safe_list(ctx.get("PIPELINE_STEPS")),
+            "durations": ctx.get("PROCESS_DURATIONS") or {},
+        },
+    }
+    return out
 
 
 def extract_text_raw(ctx: Dict[str, Any]) -> str:
@@ -148,13 +772,28 @@ def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
     pages = extract_pages(ctx)
     extractions = extract_extractions(ctx)
     detected_langs = extract_detected_languages(ctx)
+    tok_docs = _safe_list(ctx.get("TOK_DOCS") or ctx.get("selected"))
+    first_doc = first(tok_docs) if tok_docs else {}
+    first_doc = first_doc if isinstance(first_doc, dict) else {}
+    file_paths = _safe_list(ctx.get("INPUT_FILE")) or _safe_list(first_doc.get("paths"))
+    file_name = (
+        _basename(file_paths[0])
+        if file_paths
+        else str(first_doc.get("filename") or "").strip() or None
+    )
+    file_size = _resolve_file_size(
+        ctx,
+        file_paths,
+        file_name,
+        first_doc.get("size"),
+    )
 
     payload: Dict[str, Any] = {
         "document_id": ctx.get("DOC_ID") or ns(),
         "file": {
-            "path": ctx.get("INPUT_FILE") or [],
-            "name": None,
-            "size": None,
+            "path": file_paths,
+            "name": file_name,
+            "size": file_size,
         },
         "content": {
             "content_type": doc_type,
@@ -261,6 +900,7 @@ def build_payload_from_es_source(
     src: Dict[str, Any],
     cls_map: Dict[str, Dict[str, Dict[str, Any]]],
     ext_map: Dict[str, Dict[str, Dict[str, Any]]],
+    store: Any,
 ) -> Dict[str, Any]:
     doc_id = str(src.get("doc_id") or src.get("_id") or ns())
     filename = str(src.get("filename") or doc_id)
@@ -268,10 +908,13 @@ def build_payload_from_es_source(
 
     from_ctx_cls = _pick_from_map(cls_map, doc_id, filename)
     from_ctx_ext = _pick_from_map(ext_map, doc_id, filename)
-    classification = from_ctx_cls if from_ctx_cls else (src.get("classification") or {})
-    extraction = from_ctx_ext
-    if not extraction:
-        extraction = _safe_load_json(src.get("rule_extraction_payload")) or (src.get("rule_extraction") or {})
+    classification = src.get("classification") or from_ctx_cls or {}
+    extraction = (
+        _safe_load_json(src.get("rule_extraction_payload"))
+        or src.get("rule_extraction")
+        or from_ctx_ext
+        or {}
+    )
 
     doc_type = str(
         (classification.get("doc_type") if isinstance(classification, dict) else None)
@@ -283,13 +926,14 @@ def build_payload_from_es_source(
     pages = _es_pages(src)
     words = _safe_list(src.get("words"))
     detected_langs = _safe_list(src.get("detected_languages"))
+    file_size = _resolve_file_size(ctx, paths, filename, src.get("size"))
 
     payload: Dict[str, Any] = {
         "document_id": doc_id,
         "file": {
             "path": paths,
             "name": filename,
-            "size": None,
+            "size": file_size,
         },
         "content": {
             "content_type": doc_type,
@@ -340,14 +984,7 @@ def build_payload_from_es_source(
             "relations": ctx.get("RELATIONS") or [],
             "quality_checks": ctx.get("QUALITY_CHECKS") or [],
         },
-        "nlp": {
-            "language": ctx.get("NLP_LANGUAGE"),
-            "sentences": ctx.get("NLP_SENTENCES") or [],
-            "entities": ctx.get("NLP_ENTITIES") or [],
-            "matches": ctx.get("NLP_MATCHES") or [],
-            "pos": ctx.get("NLP_POS") or [],
-            "lemma": ctx.get("NLP_LEMMA") or [],
-        },
+        "nlp": _nlp_from_es_and_ctx(ctx, src, store, doc_id, filename),
         "processing": {
             "warnings": ctx.get("PROCESS_WARNINGS") or [],
             "logs": ctx.get("PROCESS_LOGS") or [],
@@ -381,7 +1018,11 @@ def build_payloads_from_es(ctx: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], i
 
         cls_map = _build_map(ctx.get("RESULTS"))
         ext_map = _build_map(ctx.get("EXTRACTIONS"))
-        payloads = [build_payload_from_es_source(ctx, src, cls_map, ext_map) for src in es_sources if isinstance(src, dict)]
+        payloads = [
+            build_payload_from_es_source(ctx, src, cls_map, ext_map, store)
+            for src in es_sources
+            if isinstance(src, dict)
+        ]
         return payloads, 0
     except Exception:
         return [], 0
@@ -403,10 +1044,11 @@ def main() -> None:
         payload = build_payload_from_context(ctx)
         payloads = [payload]
 
-    OUTPUT_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    final_payload = _final_output(ctx, payloads, source)
+    OUTPUT_PATH.write_text(json.dumps(final_payload, ensure_ascii=False, indent=2), encoding="utf-8")
     ctx["FUSION_RESULT"] = str(OUTPUT_PATH)
-    ctx["FUSION_PAYLOAD"] = payload
-    ctx["FUSION_PAYLOADS"] = payloads
+    ctx["FUSION_PAYLOAD"] = final_payload
+    ctx["FUSION_PAYLOADS"] = final_payload.get("documents") if isinstance(final_payload, dict) else payloads
     ctx["FUSION_SOURCE"] = source
     ctx["ES_FUSION_SYNCED"] = es_synced
 

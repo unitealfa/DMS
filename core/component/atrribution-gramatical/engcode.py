@@ -1,6 +1,6 @@
 import os, re, sys
 from dataclasses import dataclass
-from typing import List, Tuple, Optional, Dict
+from typing import Any, List, Tuple, Optional, Dict
 
 # ----------------------------
 # 0) Option deps local (sans venv)
@@ -836,6 +836,26 @@ def run_one(text: str, ner_pipe=None):
     print(f"  NN/NNP ratio     : {nn_like}/{len(pos)} = {nn_like/total*100:.2f} %")
     print(f"  contraction tokens (approx): {contr} ({contr/total*100:.2f} %)")
 
+    return {
+        "lang": "en",
+        "text": text,
+        "tokens": tokens,
+        "pos": pos,
+        "lemmas": lem,
+        "ner_labels": labels,
+        "entities": ents,
+        "modes": {
+            "pos": pos_mode,
+            "lemma": lemma_mode,
+            "ner": ner_mode,
+        },
+        "audit": {
+            "tokens_total": len(tokens),
+            "nn_nnp_ratio_pct": (nn_like / total * 100.0) if total else 0.0,
+            "contraction_tokens": contr,
+        },
+    }
+
 def split_input_into_sentences(s: str) -> List[str]:
     s = (s or "").strip()
     if not s:
@@ -916,7 +936,9 @@ def run_from_previous_cell(data=None, max_sentences=None):
         if isinstance(out, dict):
             out = dict(out)
             out["doc"] = doc_name
+            out["filename"] = doc_name
             out["page"] = page_idx
+            out["page_index"] = page_idx
             out["sent_index"] = sent_idx
         results.append(out)
 

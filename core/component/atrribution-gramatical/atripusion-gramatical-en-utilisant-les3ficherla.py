@@ -2,6 +2,7 @@
 # 1) Chemin vers tes .py
 # =========================
 import sys, types, re, importlib, os
+from collections import Counter
 from pathlib import Path
 
 # Utilise le dossier du composant pour rester portable
@@ -42,8 +43,12 @@ def detect_lang(text: str) -> str:
 def get_previous_cell_input():
     g = globals()
     for k in ("selected", "TOK_DOCS", "FINAL_DOCS", "DOCS", "TEXT_DOCS", "_"):
-        if k in g and g[k] is not None:
-            return g[k]
+        if k not in g or g[k] is None:
+            continue
+        val = g[k]
+        if isinstance(val, list) and not val:
+            continue
+        return val
     return None
 
 def iter_sentences_from_input(data):
@@ -139,15 +144,114 @@ MAX_SENTENCES_PER_LANG = None  # ex: 30 pour debug, ou None pour tout
 print("\n" + "="*120)
 print("RUN EN (engcode.py)")
 print("="*120)
-engcode.run_from_previous_cell(data=data, max_sentences=MAX_SENTENCES_PER_LANG)
+EN_RESULTS = engcode.run_from_previous_cell(data=data, max_sentences=MAX_SENTENCES_PER_LANG) or []
 
 print("\n" + "="*120)
 print("RUN FR (frcode.py)")
 print("="*120)
-frcode.run_from_previous_cell(data=data, max_sentences=MAX_SENTENCES_PER_LANG)
+FR_RESULTS = frcode.run_from_previous_cell(data=data, max_sentences=MAX_SENTENCES_PER_LANG) or []
+
+AR_RESULTS = []
 
 if HAVE_AR:
     print("\n" + "="*120)
     print("RUN AR (arabcode.py)")
     print("="*120)
-    arabcode.run_from_previous_cell(data=data, max_sentences=MAX_SENTENCES_PER_LANG)
+    AR_RESULTS = arabcode.run_from_previous_cell(data=data, max_sentences=MAX_SENTENCES_PER_LANG) or []
+
+NLP_ANALYSES = [x for x in (EN_RESULTS + FR_RESULTS + AR_RESULTS) if isinstance(x, dict)]
+NLP_SENTENCES = []
+NLP_ENTITIES = []
+NLP_POS = []
+NLP_LEMMA = []
+_lang_counter = Counter()
+
+for row in NLP_ANALYSES:
+    lang = str(row.get("lang") or "unknown")
+    _lang_counter[lang] += 1
+    sent_text = str(row.get("text") or "")
+    filename = row.get("filename") or row.get("doc")
+    page_index = row.get("page_index")
+    sent_index = row.get("sent_index")
+
+    NLP_SENTENCES.append(
+        {
+            "filename": filename,
+            "page_index": page_index,
+            "sent_index": sent_index,
+            "lang": lang,
+            "text": sent_text,
+        }
+    )
+
+    entities = row.get("entities")
+    if isinstance(entities, dict):
+        if "flat" in entities and isinstance(entities.get("flat"), list):
+            for ent in entities.get("flat") or []:
+                if not isinstance(ent, dict):
+                    continue
+                NLP_ENTITIES.append(
+                    {
+                        "filename": filename,
+                        "page_index": page_index,
+                        "sent_index": sent_index,
+                        "lang": lang,
+                        "type": ent.get("type"),
+                        "text": ent.get("text"),
+                    }
+                )
+        else:
+            for etype, values in entities.items():
+                if not isinstance(values, list):
+                    continue
+                for val in values:
+                    NLP_ENTITIES.append(
+                        {
+                            "filename": filename,
+                            "page_index": page_index,
+                            "sent_index": sent_index,
+                            "lang": lang,
+                            "type": etype,
+                            "text": val,
+                        }
+                    )
+
+    tokens = row.get("tokens") or []
+    pos = row.get("pos") or []
+    lemmas = row.get("lemmas") or []
+    ner = row.get("ner_labels") or []
+    size = min(len(tokens), len(pos), len(lemmas))
+    if isinstance(ner, list) and len(ner) >= size:
+        ner_view = ner
+    else:
+        ner_view = ["O"] * size
+
+    for i in range(size):
+        tok = tokens[i]
+        NLP_POS.append(
+            {
+                "filename": filename,
+                "page_index": page_index,
+                "sent_index": sent_index,
+                "tok_index": i,
+                "token": tok,
+                "pos": pos[i],
+                "lang": lang,
+                "ner": ner_view[i],
+            }
+        )
+        NLP_LEMMA.append(
+            {
+                "filename": filename,
+                "page_index": page_index,
+                "sent_index": sent_index,
+                "tok_index": i,
+                "token": tok,
+                "lemma": lemmas[i],
+                "lang": lang,
+            }
+        )
+
+NLP_LANGUAGE = ",".join(sorted(_lang_counter.keys())) if _lang_counter else None
+NLP_LANGUAGE_STATS = dict(_lang_counter)
+DETECTED_LANGUAGES = sorted(_lang_counter.keys())

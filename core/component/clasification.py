@@ -294,26 +294,46 @@ for doc in DOCS:
 
     d = decide(scores, configs, common)
     best, status = d["best"], d["status"]
+    best_matches = {}
+    ac_targets: List[str] = []
+    if best in configs:
+        best_matches = ((doc.get("score_matches") or {}).get(best) or {})
+        ac_targets = [str(x) for x in (configs[best].get("anti_confusion_targets") or []) if x]
+
+    def _bucket_pairs(bucket: str) -> List[Dict[str, Any]]:
+        vals = best_matches.get(bucket) or {}
+        if not isinstance(vals, dict):
+            return []
+        pairs = []
+        for k, v in vals.items():
+            try:
+                pairs.append({"keyword": str(k), "count": int(v)})
+            except Exception:
+                continue
+        pairs.sort(key=lambda x: (-int(x["count"]), x["keyword"]))
+        return pairs
+
+    classification_log = (
+        f"[classification] {doc.get('filename')} -> best={best} | status={status} | scores: {ordered_scores}"
+    )
 
     # ---- sortie lisible (suppress si tout est nul et UNCLASSIFIED)
     if not (best == "UNCLASSIFIED" and all(v == 0 for v in ordered_scores.values())):
-        print(f"[classification] {doc.get('filename')} -> best={best} | status={status} | scores: {ordered_scores}")
+        print(classification_log)
 
     # Détails: mots-clés matchés et cibles d'anti-confusion pour la classe retenue
     if best in configs:
-        matches = (doc.get("score_matches") or {}).get(best, {})
-        ac_targets = configs[best].get("anti_confusion_targets", [])
         def _fmt(bucket: str) -> str:
-            vals = matches.get(bucket) or {}
+            vals = best_matches.get(bucket) or {}
             if not vals:
                 return f"{bucket}=[]"
             items = [f"{k}(x{v})" for k, v in vals.items()]
             return f"{bucket}=[" + ", ".join(items) + "]"
         print("  keywords:", _fmt("strong"), _fmt("medium"), _fmt("weak"), _fmt("negative"))
-        if matches.get("strong_negative"):
-            print("  keywords strong_negative:", ", ".join(f"{k}(x{v})" for k,v in matches["strong_negative"].items()))
-        if matches.get("anti_confusion"):
-            print("  anti_confusion hits:", ", ".join(f"{k}(x{v})" for k,v in matches["anti_confusion"].items()))
+        if best_matches.get("strong_negative"):
+            print("  keywords strong_negative:", ", ".join(f"{k}(x{v})" for k,v in best_matches["strong_negative"].items()))
+        if best_matches.get("anti_confusion"):
+            print("  anti_confusion hits:", ", ".join(f"{k}(x{v})" for k,v in best_matches["anti_confusion"].items()))
         if ac_targets:
             print("  anti_confusion_targets:", ", ".join(ac_targets))
 
@@ -324,8 +344,19 @@ for doc in DOCS:
         "doc_type": best,
         "status": status,
         "scores": d["scores_stable"],
+        "winning_score": d["top_score"],
         "threshold": int(common.get("threshold", 6)),
         "margin": int(common.get("margin", 3)),
+        "classification_log": classification_log,
+        "keyword_matches": {
+            "strong": _bucket_pairs("strong"),
+            "medium": _bucket_pairs("medium"),
+            "weak": _bucket_pairs("weak"),
+            "negative": _bucket_pairs("negative"),
+            "strong_negative": _bucket_pairs("strong_negative"),
+            "anti_confusion_hits": _bucket_pairs("anti_confusion"),
+        },
+        "anti_confusion_targets": ac_targets,
         "decision_debug": {
             "top_score": d["top_score"],
             "second_score": d["second_score"],

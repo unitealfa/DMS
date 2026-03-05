@@ -1,6 +1,9 @@
+component/atrribution-gramatical/arabcode.py:11:def _install_help():
+component/atrribution-gramatical/arabcode.py:87:def simple_tokenize(text: str) -> List[str]:
+component/atrribution-gramatical/arabcode.py:90:def is_punct(tok: str) -> bool:
+component/atrribution-gramatical/arabcode.py:99:def strip_diacritics(s: str) -> str:
 component/atrribution-gramatical/arabcode.py:102:def norm_alef(s: str) -> str:
 component/atrribution-gramatical/arabcode.py:105:def has_hamza(s: str) -> bool:
-component/atrribution-gramatical/arabcode.py:11:def _install_help():
 component/atrribution-gramatical/arabcode.py:128:def penn_from_analysis(a: Dict) -> str:
 component/atrribution-gramatical/arabcode.py:132:def lemma_from_analysis(a: Dict, fallback_word: str) -> str:
 component/atrribution-gramatical/arabcode.py:152:def override_tag(tok: str) -> Optional[Tuple[str, str]]:
@@ -25,19 +28,18 @@ component/atrribution-gramatical/arabcode.py:628:def bio_to_entities(tokens: Lis
 component/atrribution-gramatical/arabcode.py:674:def _estimate_clitic_count(undiac: str) -> int:
 component/atrribution-gramatical/arabcode.py:693:def _lemma_suspicious(word_raw: str, lemma: str) -> bool:
 component/atrribution-gramatical/arabcode.py:707:def analyze_sentence(text: str):
-component/atrribution-gramatical/arabcode.py:851:def split_input_into_sentences(s: str) -> List[str]:
-component/atrribution-gramatical/arabcode.py:861:def run_one_auto(sentence: str):
-component/atrribution-gramatical/arabcode.py:865:def run_from_previous_cell(data=None, max_sentences=None):
-component/atrribution-gramatical/arabcode.py:87:def simple_tokenize(text: str) -> List[str]:
-component/atrribution-gramatical/arabcode.py:90:def is_punct(tok: str) -> bool:
-component/atrribution-gramatical/arabcode.py:920:def main(argv=None) -> None:
-component/atrribution-gramatical/arabcode.py:99:def strip_diacritics(s: str) -> str:
-component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:29:def detect_lang(text: str) -> str:
-component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:42:def get_previous_cell_input():
-component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:49:def iter_sentences_from_input(data):
+component/atrribution-gramatical/arabcode.py:871:def split_input_into_sentences(s: str) -> List[str]:
+component/atrribution-gramatical/arabcode.py:881:def run_one_auto(sentence: str):
+component/atrribution-gramatical/arabcode.py:885:def run_from_previous_cell(data=None, max_sentences=None):
+component/atrribution-gramatical/arabcode.py:942:def main(argv=None) -> None:
+component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:30:def detect_lang(text: str) -> str:
+component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:43:def get_previous_cell_input():
+component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:54:def iter_sentences_from_input(data):
+component/atrribution-gramatical/engcode.py:12:def print_install_help():
+component/atrribution-gramatical/engcode.py:39:def _ensure_nltk():
+component/atrribution-gramatical/engcode.py:88:class Tok:
 component/atrribution-gramatical/engcode.py:103:def _is_punct(t: str) -> bool:
 component/atrribution-gramatical/engcode.py:106:def _is_number(t: str) -> bool:
-component/atrribution-gramatical/engcode.py:12:def print_install_help():
 component/atrribution-gramatical/engcode.py:149:def _lower(s: str) -> str:
 component/atrribution-gramatical/engcode.py:152:def _has_apostrophe(s: str) -> bool:
 component/atrribution-gramatical/engcode.py:155:def _norm_apos(s: str) -> str:
@@ -49,7 +51,6 @@ component/atrribution-gramatical/engcode.py:290:def guess_pos_heur(token: str, p
 component/atrribution-gramatical/engcode.py:330:def map_penn_to_simple(p: str) -> str:
 component/atrribution-gramatical/engcode.py:367:def pos_tag_simple(tokens: List[str]) -> Tuple[List[str], str]:
 component/atrribution-gramatical/engcode.py:387:def looks_like_nounish(tok: str) -> bool:
-component/atrribution-gramatical/engcode.py:39:def _ensure_nltk():
 component/atrribution-gramatical/engcode.py:400:def resolve_s_contractions(toks: List[Tok]) -> None:
 component/atrribution-gramatical/engcode.py:435:def _penn_to_wordnet_simple(pos: str) -> str:
 component/atrribution-gramatical/engcode.py:447:def lemma_en(token: str, pos: str) -> str:
@@ -69,12 +70,13 @@ component/atrribution-gramatical/engcode.py:698:def entities_from_bio(tokens: Li
 component/atrribution-gramatical/engcode.py:721:def print_table(tokens: List[str], pos: List[str], lem: List[str], max_rows: Optional[int] = None):
 component/atrribution-gramatical/engcode.py:730:def fallback_ner_labels(tokens: List[str], pos: List[str]) -> List[str]:
 component/atrribution-gramatical/engcode.py:756:def run_one(text: str, ner_pipe=None):
-component/atrribution-gramatical/engcode.py:839:def split_input_into_sentences(s: str) -> List[str]:
-component/atrribution-gramatical/engcode.py:853:def get_ner_pipe():
-component/atrribution-gramatical/engcode.py:870:def run_one_auto(sentence: str):
-component/atrribution-gramatical/engcode.py:874:def run_from_previous_cell(data=None, max_sentences=None):
-component/atrribution-gramatical/engcode.py:88:class Tok:
-component/atrribution-gramatical/engcode.py:929:def main(argv=None) -> None:
+component/atrribution-gramatical/engcode.py:859:def split_input_into_sentences(s: str) -> List[str]:
+component/atrribution-gramatical/engcode.py:873:def get_ner_pipe():
+component/atrribution-gramatical/engcode.py:890:def run_one_auto(sentence: str):
+component/atrribution-gramatical/engcode.py:894:def run_from_previous_cell(data=None, max_sentences=None):
+component/atrribution-gramatical/engcode.py:951:def main(argv=None) -> None:
+component/atrribution-gramatical/frcode.py:12:def print_install_help():
+component/atrribution-gramatical/frcode.py:99:class Tok:
 component/atrribution-gramatical/frcode.py:104:def _norm_apo(s: str) -> str:
 component/atrribution-gramatical/frcode.py:107:def _has_letters(t: str) -> bool:
 component/atrribution-gramatical/frcode.py:110:def _is_punct(t: str) -> bool:
@@ -84,7 +86,6 @@ component/atrribution-gramatical/frcode.py:119:def _is_acronym(t: str) -> bool:
 component/atrribution-gramatical/frcode.py:122:def _is_capitalized_word(t: str) -> bool:
 component/atrribution-gramatical/frcode.py:125:def _is_hyphenated_word(t: str) -> bool:
 component/atrribution-gramatical/frcode.py:128:def _is_email(t: str) -> bool:
-component/atrribution-gramatical/frcode.py:12:def print_install_help():
 component/atrribution-gramatical/frcode.py:131:def _is_url(t: str) -> bool:
 component/atrribution-gramatical/frcode.py:135:def _is_ipv4(t: str) -> bool:
 component/atrribution-gramatical/frcode.py:138:def _is_hash(t: str) -> bool:
@@ -110,82 +111,107 @@ component/atrribution-gramatical/frcode.py:777:def join_fr(tokens: List[str]) ->
 component/atrribution-gramatical/frcode.py:794:def entities_from_bio(toks: List[Tok], labels: List[str]) -> Dict[str, List[str]]:
 component/atrribution-gramatical/frcode.py:816:def print_table(toks: List[Tok], pos: List[str], lem: List[str], max_rows: Optional[int] = None):
 component/atrribution-gramatical/frcode.py:828:def run_one(text: str, ner_pipe=None):
-component/atrribution-gramatical/frcode.py:901:def split_input_into_sentences(s: str) -> List[str]:
-component/atrribution-gramatical/frcode.py:915:def get_ner_pipe():
-component/atrribution-gramatical/frcode.py:932:def run_one_auto(sentence: str):
-component/atrribution-gramatical/frcode.py:935:def run_from_previous_cell(data=None, max_sentences=None):
-component/atrribution-gramatical/frcode.py:982:def main(argv=None) -> None:
-component/atrribution-gramatical/frcode.py:99:class Tok:
-component/clasification.py:105:def _build_DOCS_from_input(data) -> List[Dict[str, Any]]:
-component/clasification.py:161:def _doc_text_len(doc: Dict[str, Any]) -> int:
-component/clasification.py:169:def _drop_empty_duplicates(docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-component/clasification.py:185:def classify_scores(DOCS: List[Dict[str, Any]], common: Dict[str, Any], configs: Dict[str, Any]) -> None:
+component/atrribution-gramatical/frcode.py:914:def split_input_into_sentences(s: str) -> List[str]:
+component/atrribution-gramatical/frcode.py:928:def get_ner_pipe():
+component/atrribution-gramatical/frcode.py:945:def run_one_auto(sentence: str):
+component/atrribution-gramatical/frcode.py:948:def run_from_previous_cell(data=None, max_sentences=None):
+component/atrribution-gramatical/frcode.py:1002:def main(argv=None) -> None:
 component/clasification.py:19:def _load_json(path: Path):
-component/clasification.py:246:def decide(scores: Dict[str, int], configs: Dict[str, Any], common: Dict[str, Any]) -> Dict[str, Any]:
 component/clasification.py:25:def _strip_accents(s: str) -> str:
 component/clasification.py:31:def _norm_text(s: str) -> str:
 component/clasification.py:36:def _norm_keyword(k: str) -> str:
 component/clasification.py:40:def _ensure_kw_dict(d: Dict[str, Any]) -> Dict[str, List[str]]:
 component/clasification.py:59:def load_classification_configs():
 component/clasification.py:92:def _get_previous_cell_input():
-component/elasticsearch.py:20:def _normalize_ids(values: Any) -> List[str]:
-component/elasticsearch.py:30:def run(ctx: Dict[str, Any]) -> Dict[str, Any]:
+component/clasification.py:105:def _build_DOCS_from_input(data) -> List[Dict[str, Any]]:
+component/clasification.py:161:def _doc_text_len(doc: Dict[str, Any]) -> int:
+component/clasification.py:169:def _drop_empty_duplicates(docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+component/clasification.py:185:def classify_scores(DOCS: List[Dict[str, Any]], common: Dict[str, Any], configs: Dict[str, Any]) -> None:
+component/clasification.py:246:def decide(scores: Dict[str, int], configs: Dict[str, Any], common: Dict[str, Any]) -> Dict[str, Any]:
+component/elasticsearch.py:21:def _normalize_ids(values: Any) -> List[str]:
+component/elasticsearch.py:31:def run(ctx: Dict[str, Any]) -> Dict[str, Any]:
+component/extraction-regles.py:25:def _load_json(path: Path) -> Dict[str, Any]:
+component/extraction-regles.py:32:def _compile_regex(pattern: str, flags_list: Optional[List[str]]) -> re.Pattern:
+component/extraction-regles.py:48:def _load_routes() -> Dict[str, Any]:
+component/extraction-regles.py:65:def _resolve_rulesets(doc_type: str, routes: Dict[str, Any]) -> List[str]:
+component/extraction-regles.py:80:def load_extractors_for(doc_type: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
 component/extraction-regles.py:105:def _get_input_docs(globals_dict: Dict[str, Any]) -> List[Dict[str, Any]]:
 component/extraction-regles.py:116:def _page_text_from_page(pg: Dict[str, Any]) -> str:
 component/extraction-regles.py:133:def apply_extractors_to_page(text: str, extractors: Dict[str, Any]) -> Dict[str, List[Dict[str, Any]]]:
 component/extraction-regles.py:182:def _build_cls_map(results: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
 component/extraction-regles.py:193:def _classification_for(doc: Dict[str, Any], cls_map: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
 component/extraction-regles.py:203:def run() -> List[Dict[str, Any]]:
-component/extraction-regles.py:25:def _load_json(path: Path) -> Dict[str, Any]:
-component/extraction-regles.py:32:def _compile_regex(pattern: str, flags_list: Optional[List[str]]) -> re.Pattern:
-component/extraction-regles.py:48:def _load_routes() -> Dict[str, Any]:
-component/extraction-regles.py:65:def _resolve_rulesets(doc_type: str, routes: Dict[str, Any]) -> List[str]:
-component/extraction-regles.py:80:def load_extractors_for(doc_type: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
-component/fusion_resultats.py:114:def extract_pages_meta(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:120:def extract_pages(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:125:def extract_classification(ctx: Dict[str, Any]) -> Dict[str, Any]:
-component/fusion_resultats.py:131:def extract_doc_type(cls: Dict[str, Any]) -> str:
-component/fusion_resultats.py:135:def extract_extractions(ctx: Dict[str, Any]) -> Any:
-component/fusion_resultats.py:139:def extract_detected_languages(ctx: Dict[str, Any]) -> List[str]:
-component/fusion_resultats.py:143:def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
-component/fusion_resultats.py:232:def _es_text_from_pages(src: Dict[str, Any]) -> str:
-component/fusion_resultats.py:243:def _es_pages(src: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:259:def build_payload_from_es_source(
-component/fusion_resultats.py:29:def ns() -> str:
-component/fusion_resultats.py:33:def first(lst: List[Any]) -> Any:
-component/fusion_resultats.py:367:def build_payloads_from_es(ctx: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], int]:
-component/fusion_resultats.py:37:def merge_list(*args: Optional[List[Any]]) -> List[Any]:
-component/fusion_resultats.py:390:def main() -> None:
-component/fusion_resultats.py:45:def _safe_list(value: Any) -> List[Any]:
-component/fusion_resultats.py:49:def _safe_load_json(value: Any) -> Any:
-component/fusion_resultats.py:58:def _build_map(rows: Any) -> Dict[str, Dict[str, Dict[str, Any]]]:
-component/fusion_resultats.py:73:def _pick_from_map(
-component/fusion_resultats.py:85:def extract_text_raw(ctx: Dict[str, Any]) -> str:
-component/output-txt.py:127:def _render_layout_from_data(data: dict, img_w: int, img_h: int) -> str:
-component/output-txt.py:238:def _basename(val) -> Optional[str]:
-component/output-txt.py:334:def _get_pdf_reader_with_name():
-component/output-txt.py:346:def _pdf_extract_text_preserve_layout(page) -> str:
-component/output-txt.py:358:def _docx_xml_to_text(xml_bytes: bytes) -> str:
-component/output-txt.py:377:def _pptx_slide_xml_to_text(xml_bytes: bytes) -> str:
-component/output-txt.py:397:def _xlsx_col_to_index(col_letters: str) -> int:
-component/output-txt.py:405:def _xlsx_shared_strings(xml_bytes: bytes) -> list:
-component/output-txt.py:417:def _xlsx_sheet_to_text(sheet_xml: bytes, shared: list) -> str:
-component/output-txt.py:467:def _odf_content_to_text(xml_bytes: bytes) -> str:
-component/output-txt.py:498:def _html_bytes_to_text_preserve(b: bytes) -> str:
-component/output-txt.py:509:def extract_text_native(path: str) -> dict:
+component/fusion_resultats.py:31:def ns() -> str:
+component/fusion_resultats.py:35:def first(lst: List[Any]) -> Any:
+component/fusion_resultats.py:39:def merge_list(*args: Optional[List[Any]]) -> List[Any]:
+component/fusion_resultats.py:47:def _safe_list(value: Any) -> List[Any]:
+component/fusion_resultats.py:51:def _safe_load_json(value: Any) -> Any:
+component/fusion_resultats.py:60:def _safe_int(value: Any, default: int = 0) -> int:
+component/fusion_resultats.py:67:def _iso_now() -> str:
+component/fusion_resultats.py:71:def _basename(value: Any) -> str:
+component/fusion_resultats.py:80:def _safe_non_negative_int(value: Any) -> Optional[int]:
+component/fusion_resultats.py:90:def _size_from_paths(paths: List[Any]) -> Optional[int]:
+component/fusion_resultats.py:114:def _size_maps_from_pretraitement(ctx: Dict[str, Any]) -> Tuple[Dict[str, int], Dict[str, int]]:
+component/fusion_resultats.py:145:def _resolve_file_size(
+component/fusion_resultats.py:170:def _row_belongs_to_doc(row: Any, doc_id: Optional[str], filename: Optional[str]) -> bool:
+component/fusion_resultats.py:182:def _filter_rows_for_doc(rows: Any, doc_id: Optional[str], filename: Optional[str]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:192:def _default_nlp_tokens_index(ctx: Dict[str, Any]) -> str:
+component/fusion_resultats.py:200:def _search_index(
+component/fusion_resultats.py:220:def _fetch_nlp_tokens(
+component/fusion_resultats.py:297:def _structure_nlp_tokens(tokens: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:345:def _nlp_from_es_and_ctx(
+component/fusion_resultats.py:460:def _build_map(rows: Any) -> Dict[str, Dict[str, Dict[str, Any]]]:
+component/fusion_resultats.py:475:def _pick_from_map(
+component/fusion_resultats.py:487:def _same_doc_hint(value: Any, filename: str, first_path: str) -> bool:
+component/fusion_resultats.py:496:def _extract_component_views(
+component/fusion_resultats.py:640:def _to_document_output(
+component/fusion_resultats.py:682:def _final_output(
+component/fusion_resultats.py:709:def extract_text_raw(ctx: Dict[str, Any]) -> str:
+component/fusion_resultats.py:738:def extract_pages_meta(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:744:def extract_pages(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:749:def extract_classification(ctx: Dict[str, Any]) -> Dict[str, Any]:
+component/fusion_resultats.py:755:def extract_doc_type(cls: Dict[str, Any]) -> str:
+component/fusion_resultats.py:759:def extract_extractions(ctx: Dict[str, Any]) -> Any:
+component/fusion_resultats.py:763:def extract_detected_languages(ctx: Dict[str, Any]) -> List[str]:
+component/fusion_resultats.py:767:def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
+component/fusion_resultats.py:871:def _es_text_from_pages(src: Dict[str, Any]) -> str:
+component/fusion_resultats.py:882:def _es_pages(src: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:898:def build_payload_from_es_source(
+component/fusion_resultats.py:1004:def build_payloads_from_es(ctx: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], int]:
+component/fusion_resultats.py:1031:def main() -> None:
 component/output-txt.py:72:def _median(values):
 component/output-txt.py:83:def _estimate_char_metrics(data: dict) -> Tuple[float, float]:
-component/pretraitement-de-docs.py:155:def _xml_text_len(xml_bytes: bytes) -> int:
-component/pretraitement-de-docs.py:169:def _zip_has_text(path: str, ext: str) -> bool:
-component/pretraitement-de-docs.py:240:def _get_pdf_reader():
-component/pretraitement-de-docs.py:253:def _pdf_has_text(path: str) -> bool:
-component/pretraitement-de-docs.py:317:def content_kind_two_states(path: str, ftype: FileType) -> str:
-component/pretraitement-de-docs.py:337:def analyze_many_two_states(input_file: Optional[Union[str, Sequence[str]]]) -> List[Dict[str, Any]]:
+component/output-txt.py:127:def _render_layout_from_data(data: dict, img_w: int, img_h: int) -> str:
+component/output-txt.py:238:def _basename(val) -> Optional[str]:
+component/output-txt.py:248:def _safe_file_size(path: Optional[str]) -> Optional[int]:
+component/output-txt.py:257:def _doc_size_from_sources(doc: dict) -> Optional[int]:
+component/output-txt.py:371:def _get_pdf_reader_with_name():
+component/output-txt.py:383:def _pdf_extract_text_preserve_layout(page) -> str:
+component/output-txt.py:395:def _docx_xml_to_text(xml_bytes: bytes) -> str:
+component/output-txt.py:414:def _pptx_slide_xml_to_text(xml_bytes: bytes) -> str:
+component/output-txt.py:434:def _xlsx_col_to_index(col_letters: str) -> int:
+component/output-txt.py:442:def _xlsx_shared_strings(xml_bytes: bytes) -> list:
+component/output-txt.py:454:def _xlsx_sheet_to_text(sheet_xml: bytes, shared: list) -> str:
+component/output-txt.py:504:def _odf_content_to_text(xml_bytes: bytes) -> str:
+component/output-txt.py:535:def _html_bytes_to_text_preserve(b: bytes) -> str:
+component/output-txt.py:546:def extract_text_native(path: str) -> dict:
 component/pretraitement-de-docs.py:34:class FileType:
 component/pretraitement-de-docs.py:42:def normalize_input_files(x: Optional[Union[str, Sequence[str]]]) -> List[str]:
 component/pretraitement-de-docs.py:57:def resolve_path(p: str) -> Optional[str]:
-component/pretraitement-de-docs.py:79:def _read_head(path: str, n: int = 16384) -> bytes:
-component/pretraitement-de-docs.py:84:def detect_path_type(path: str) -> FileType:
+component/pretraitement-de-docs.py:77:def _safe_file_size(path: str) -> Optional[int]:
+component/pretraitement-de-docs.py:86:def _read_head(path: str, n: int = 16384) -> bytes:
+component/pretraitement-de-docs.py:91:def detect_path_type(path: str) -> FileType:
+component/pretraitement-de-docs.py:162:def _xml_text_len(xml_bytes: bytes) -> int:
+component/pretraitement-de-docs.py:176:def _zip_has_text(path: str, ext: str) -> bool:
+component/pretraitement-de-docs.py:247:def _get_pdf_reader():
+component/pretraitement-de-docs.py:260:def _pdf_has_text(path: str) -> bool:
+component/pretraitement-de-docs.py:324:def content_kind_two_states(path: str, ftype: FileType) -> str:
+component/pretraitement-de-docs.py:344:def analyze_many_two_states(input_file: Optional[Union[str, Sequence[str]]]) -> List[Dict[str, Any]]:
+component/si-image-pretraiter-sinonpass-le-doc.py:46:class FileType:
+component/si-image-pretraiter-sinonpass-le-doc.py:52:def _read_head(path: str, n: int = 16384) -> bytes:
+component/si-image-pretraiter-sinonpass-le-doc.py:57:def normalize_input_files(x: Optional[Union[str, Sequence[str]]]) -> List[str]:
+component/si-image-pretraiter-sinonpass-le-doc.py:71:def resolve_path(p: str) -> Optional[str]:
+component/si-image-pretraiter-sinonpass-le-doc.py:85:def detect_path_type(path: str) -> FileType:
 component/si-image-pretraiter-sinonpass-le-doc.py:148:def _xml_text_len(xml_bytes: bytes) -> int:
 component/si-image-pretraiter-sinonpass-le-doc.py:161:def _zip_has_text(path: str, ext: str) -> bool:
 component/si-image-pretraiter-sinonpass-le-doc.py:224:def _get_pdf_reader():
@@ -196,28 +222,16 @@ component/si-image-pretraiter-sinonpass-le-doc.py:341:def build_config(
 component/si-image-pretraiter-sinonpass-le-doc.py:367:def ensure_environment(lang: str) -> None:
 component/si-image-pretraiter-sinonpass-le-doc.py:387:def auto_rotate_if_needed(img: Image.Image, enhance: EnhanceOptions) -> Image.Image:
 component/si-image-pretraiter-sinonpass-le-doc.py:407:def preprocess_image(image: Image.Image, enhance: EnhanceOptions) -> Image.Image:
-component/si-image-pretraiter-sinonpass-le-doc.py:46:class FileType:
 component/si-image-pretraiter-sinonpass-le-doc.py:488:def parse_args(argv: Optional[Iterable[str]] = None) -> argparse.Namespace:
-component/si-image-pretraiter-sinonpass-le-doc.py:52:def _read_head(path: str, n: int = 16384) -> bytes:
 component/si-image-pretraiter-sinonpass-le-doc.py:561:def _normalize_input_files(val):
-component/si-image-pretraiter-sinonpass-le-doc.py:57:def normalize_input_files(x: Optional[Union[str, Sequence[str]]]) -> List[str]:
 component/si-image-pretraiter-sinonpass-le-doc.py:593:def _load_images_from_path(path: Path, dpi: int):
-component/si-image-pretraiter-sinonpass-le-doc.py:71:def resolve_path(p: str) -> Optional[str]:
-component/si-image-pretraiter-sinonpass-le-doc.py:85:def detect_path_type(path: str) -> FileType:
+component/tokenisation-layout.py:39:def _ensure_nltk():
+component/tokenisation-layout.py:58:def detect_lang(text: str) -> str:
+component/tokenisation-layout.py:86:def split_ar_layout(text: str):
+component/tokenisation-layout.py:99:def _load_punkt_pickle(lang_pickle_name: str):
 component/tokenisation-layout.py:104:def split_punkt_layout(text: str, lang_pickle_name: str):
-component/tokenisation-layout.py:1072:def build_noise_keys_for_doc(pages_text):
-component/tokenisation-layout.py:1115:def chunk_is_noise(chunk_text: str, noise_keys: set) -> bool:
-component/tokenisation-layout.py:1144:def _nonspace_len(s: str) -> int:
-component/tokenisation-layout.py:1147:def _line_col_from_offset(text: str, off: int):
-component/tokenisation-layout.py:1158:def _safe_str(x):
 component/tokenisation-layout.py:115:def _split_on_newline_gap(text: str, min_newlines: int = 3):
-component/tokenisation-layout.py:1164:def _unique_keep_order(seq):
-component/tokenisation-layout.py:1173:def _pdf_extract_pages_text(path: str):
-component/tokenisation-layout.py:1186:def _pdf_page_count(path: str):
 component/tokenisation-layout.py:134:def _split_on_lang_switch(text: str):
-component/tokenisation-layout.py:1402:def _sort_key(x):
-component/tokenisation-layout.py:1413:def _select_doc(target):
-component/tokenisation-layout.py:1440:def print_one_doc(doc):
 component/tokenisation-layout.py:162:def sentence_chunks_layout(text: str, lang: str):
 component/tokenisation-layout.py:182:def _iter_line_spans(text: str):
 component/tokenisation-layout.py:193:def _collapse_ws(s: str) -> str:
@@ -232,7 +246,6 @@ component/tokenisation-layout.py:380:def _has_big_gap(s: str, gap_min: int, min_
 component/tokenisation-layout.py:383:def _num_tokens(s: str) -> int:
 component/tokenisation-layout.py:386:def _dec_tokens(s: str) -> int:
 component/tokenisation-layout.py:389:def _is_table_line(line: str, gap_min: int) -> bool:
-component/tokenisation-layout.py:39:def _ensure_nltk():
 component/tokenisation-layout.py:404:def _cluster_centers(values, tol=2, min_hits=1):
 component/tokenisation-layout.py:425:def _upper_ratio(s: str) -> float:
 component/tokenisation-layout.py:432:def _sep_spans(line: str, gap_min: int):
@@ -245,61 +258,89 @@ component/tokenisation-layout.py:530:def _normalize_kv_generic(text: str) -> str
 component/tokenisation-layout.py:558:def _strip_sep_lines(block_text: str) -> str:
 component/tokenisation-layout.py:569:def _assign_to_centers(x: int, centers, tol: int):
 component/tokenisation-layout.py:581:def _merge_close_columns(centers, row_cells, merge_dist: int):
-component/tokenisation-layout.py:58:def detect_lang(text: str) -> str:
 component/tokenisation-layout.py:614:def _is_grid_like(row_cells, col_count: int):
 component/tokenisation-layout.py:626:def _is_micro_table_like(row_cells, col_count: int) -> bool:
 component/tokenisation-layout.py:640:def _transpose_or_group_multicol(block_text: str, abs_start: int, gap_min: int, is_ocr: bool):
 component/tokenisation-layout.py:817:def _looks_like_paragraphish(line_full: str) -> bool:
 component/tokenisation-layout.py:827:def _is_address_continuation_line(line_full: str, gap_min: int, is_ocr: bool) -> bool:
 component/tokenisation-layout.py:852:def _collect_table_block(lines, start_i, gap_min):
-component/tokenisation-layout.py:86:def split_ar_layout(text: str):
 component/tokenisation-layout.py:920:def _make_span_item(page_text, spans, text_override, kind, meta=None):
 component/tokenisation-layout.py:933:def layout_items(page_text: str, lang: str, extraction: str = ""):
-component/tokenisation-layout.py:99:def _load_punkt_pickle(lang_pickle_name: str):
-pipeline/cli.py:12:def parse_cli() -> argparse.Namespace:
-pipeline/cli.py:72:def main() -> None:
+component/tokenisation-layout.py:1072:def build_noise_keys_for_doc(pages_text):
+component/tokenisation-layout.py:1115:def chunk_is_noise(chunk_text: str, noise_keys: set) -> bool:
+component/tokenisation-layout.py:1144:def _nonspace_len(s: str) -> int:
+component/tokenisation-layout.py:1147:def _line_col_from_offset(text: str, off: int):
+component/tokenisation-layout.py:1158:def _safe_str(x):
+component/tokenisation-layout.py:1164:def _unique_keep_order(seq):
+component/tokenisation-layout.py:1173:def _pdf_extract_pages_text(path: str):
+component/tokenisation-layout.py:1186:def _pdf_page_count(path: str):
+component/tokenisation-layout.py:1196:def _safe_file_size(path):
+component/tokenisation-layout.py:1205:def _doc_size_from_paths(paths):
+component/tokenisation-layout.py:1433:def _sort_key(x):
+component/tokenisation-layout.py:1444:def _select_doc(target):
+component/tokenisation-layout.py:1471:def print_one_doc(doc):
+pipeline/cli.py:13:def _env_bool(name: str, default: bool = False) -> bool:
+pipeline/cli.py:20:def _env_int(name: str, default: int) -> int:
+pipeline/cli.py:30:def _env_optional(name: str) -> str | None:
+pipeline/cli.py:38:def parse_cli() -> argparse.Namespace:
+pipeline/cli.py:132:def main() -> None:
+pipeline/components.py:32:def _doc_has_meaningful_text(doc: Dict[str, Any]) -> bool:
+pipeline/components.py:59:def _drop_empty_duplicate_docs(docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+pipeline/components.py:84:class Component:
 pipeline/components.py:120:class PretraitementComponent(Component):
 pipeline/components.py:165:class OCRPreprocessComponent(Component):
-pipeline/components.py:212:class OutputTxtComponent(Component):
+pipeline/components.py:209:class OutputTxtComponent(Component):
 pipeline/components.py:231:class TokenisationLayoutComponent(Component):
 pipeline/components.py:258:class GrammarComponent(Component):
 pipeline/components.py:279:class ElasticsearchComponent(Component):
-pipeline/components.py:305:class ClassificationComponent(Component):
-pipeline/components.py:32:def _doc_has_meaningful_text(doc: Dict[str, Any]) -> bool:
-pipeline/components.py:345:class RuleExtractionComponent(Component):
-pipeline/components.py:395:class FusionResultComponent(Component):
-pipeline/components.py:59:def _drop_empty_duplicate_docs(docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-pipeline/components.py:84:class Component:
-pipeline/elasticsearch.py:112:def _run_auto_start_command(cmd: List[str], timeout_seconds: int) -> tuple[bool, str]:
-pipeline/elasticsearch.py:142:def _wait_for_es_ping(store: "ElasticsearchStore", wait_seconds: int) -> bool:
-pipeline/elasticsearch.py:151:def _try_auto_start_elasticsearch(store: "ElasticsearchStore", context: Dict[str, Any]) -> bool:
-pipeline/elasticsearch.py:209:def _same_es_target(context: Dict[str, Any], base_url: str, index: str) -> bool:
-pipeline/elasticsearch.py:215:def _split_words(text: str) -> List[str]:
-pipeline/elasticsearch.py:220:def _json_serialize(value: Any) -> str:
-pipeline/elasticsearch.py:227:def build_es_doc_id(doc: Dict[str, Any], position: int) -> str:
-pipeline/elasticsearch.py:240:def _page_text_from_page(pg: Dict[str, Any]) -> str:
-pipeline/elasticsearch.py:25:def _iso_now() -> str:
-pipeline/elasticsearch.py:262:def flatten_tok_doc_for_index(doc: Dict[str, Any]) -> Dict[str, Any]:
-pipeline/elasticsearch.py:29:def _unique_keep_order(items: Iterable[str]) -> List[str]:
-pipeline/elasticsearch.py:347:class ElasticsearchStore:
-pipeline/elasticsearch.py:40:def _safe_int(value: Any, default: int = 0) -> int:
-pipeline/elasticsearch.py:47:def _safe_positive_int(value: Any, default: int) -> int:
-pipeline/elasticsearch.py:495:def index_tok_docs(store: ElasticsearchStore, tok_docs: Any) -> List[str]:
-pipeline/elasticsearch.py:512:def _group_passages_by_page(passages: List[Dict[str, Any]]) -> Dict[int, List[str]]:
-pipeline/elasticsearch.py:525:def to_classification_docs(es_docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-pipeline/elasticsearch.py:568:def to_extraction_docs(es_docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-pipeline/elasticsearch.py:57:def _is_local_es_url(base_url: str) -> bool:
-pipeline/elasticsearch.py:611:def fetch_sources_for_ids(store: ElasticsearchStore, doc_ids: List[str]) -> List[Dict[str, Any]]:
-pipeline/elasticsearch.py:618:def update_classification_results(store: ElasticsearchStore, results: Any) -> int:
-pipeline/elasticsearch.py:62:def _normalize_command(raw: Any) -> List[str]:
-pipeline/elasticsearch.py:645:def update_extraction_results(store: ElasticsearchStore, extractions: Any) -> int:
-pipeline/elasticsearch.py:691:def maybe_build_store(context: Dict[str, Any]) -> Optional[ElasticsearchStore]:
-pipeline/elasticsearch.py:74:def _format_command(cmd: List[str]) -> str:
-pipeline/elasticsearch.py:78:def _resolve_auto_start_commands(context: Dict[str, Any]) -> List[List[str]]:
+pipeline/components.py:315:class ClassificationComponent(Component):
+pipeline/components.py:355:class RuleExtractionComponent(Component):
+pipeline/components.py:405:class FusionResultComponent(Component):
+pipeline/elasticsearch.py:33:def _iso_now() -> str:
+pipeline/elasticsearch.py:37:def _unique_keep_order(items: Iterable[str]) -> List[str]:
+pipeline/elasticsearch.py:48:def _safe_int(value: Any, default: int = 0) -> int:
+pipeline/elasticsearch.py:55:def _safe_positive_int(value: Any, default: int) -> int:
+pipeline/elasticsearch.py:65:def _is_local_es_url(base_url: str) -> bool:
+pipeline/elasticsearch.py:70:def _normalize_command(raw: Any) -> List[str]:
+pipeline/elasticsearch.py:83:def _format_command(cmd: List[str]) -> str:
+pipeline/elasticsearch.py:87:def _resolve_auto_start_commands(context: Dict[str, Any]) -> List[List[str]]:
+pipeline/elasticsearch.py:160:def _run_auto_start_command(
+pipeline/elasticsearch.py:195:def _wait_for_es_ping(store: "ElasticsearchStore", wait_seconds: int) -> bool:
+pipeline/elasticsearch.py:204:def _try_auto_start_elasticsearch(store: "ElasticsearchStore", context: Dict[str, Any]) -> bool:
+pipeline/elasticsearch.py:274:def _same_es_target(context: Dict[str, Any], base_url: str, index: str) -> bool:
+pipeline/elasticsearch.py:280:def _split_words(text: str) -> List[str]:
+pipeline/elasticsearch.py:285:def _json_serialize(value: Any) -> str:
+pipeline/elasticsearch.py:292:def _normalize_nlp_level(raw: Any) -> str:
+pipeline/elasticsearch.py:303:def _normalize_nlp_index(raw: Any, base_index: str) -> str:
+pipeline/elasticsearch.py:311:def _to_clean_str(value: Any) -> str:
+pipeline/elasticsearch.py:316:def _top_counter_items(counter: Counter, limit: int = ES_NLP_SUMMARY_TOP_K) -> List[Dict[str, Any]]:
+pipeline/elasticsearch.py:320:def _extract_entities(entities: Any) -> List[Dict[str, str]]:
+pipeline/elasticsearch.py:354:def _entities_sample_flat(entities: List[Dict[str, str]], limit: int = ES_NLP_SUMMARY_MAX_ENTITY_SAMPLES) -> List[str]:
+pipeline/elasticsearch.py:366:def build_es_doc_id(doc: Dict[str, Any], position: int) -> str:
+pipeline/elasticsearch.py:379:def _file_size_from_paths(paths: Any) -> Optional[int]:
+pipeline/elasticsearch.py:405:def _extract_doc_size(doc: Dict[str, Any]) -> Optional[int]:
+pipeline/elasticsearch.py:417:def _page_text_from_page(pg: Dict[str, Any]) -> str:
+pipeline/elasticsearch.py:439:def flatten_tok_doc_for_index(doc: Dict[str, Any]) -> Dict[str, Any]:
+pipeline/elasticsearch.py:525:class ElasticsearchStore:
+pipeline/elasticsearch.py:774:def index_tok_docs(store: ElasticsearchStore, tok_docs: Any) -> List[str]:
+pipeline/elasticsearch.py:791:def _group_passages_by_page(passages: List[Dict[str, Any]]) -> Dict[int, List[str]]:
+pipeline/elasticsearch.py:804:def to_classification_docs(es_docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+pipeline/elasticsearch.py:847:def to_extraction_docs(es_docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+pipeline/elasticsearch.py:890:def fetch_sources_for_ids(store: ElasticsearchStore, doc_ids: List[str]) -> List[Dict[str, Any]]:
+pipeline/elasticsearch.py:897:def update_classification_results(store: ElasticsearchStore, results: Any) -> int:
+pipeline/elasticsearch.py:924:def update_extraction_results(store: ElasticsearchStore, extractions: Any) -> int:
+pipeline/elasticsearch.py:970:def _build_nlp_doc_lookup(tok_docs: Any) -> tuple[Dict[str, str], Dict[str, List[str]]]:
+pipeline/elasticsearch.py:990:def _resolve_nlp_doc_id(
+pipeline/elasticsearch.py:1015:def _ensure_nlp_tokens_index(store: ElasticsearchStore, index_name: str) -> None:
+pipeline/elasticsearch.py:1038:def _build_nlp_token_doc_id(row: Dict[str, Any]) -> str:
+pipeline/elasticsearch.py:1049:def _bulk_index_nlp_tokens(
+pipeline/elasticsearch.py:1079:def sync_nlp_results(store: ElasticsearchStore, context: Dict[str, Any], tok_docs: Any) -> Dict[str, Any]:
+pipeline/elasticsearch.py:1254:def maybe_build_store(context: Dict[str, Any]) -> Optional[ElasticsearchStore]:
 pipeline/orchestrator.py:20:class PipelineOrchestrator:
-pipeline/settings.py:20:def configure_logging(level: str = "INFO") -> None:
-pipeline/settings.py:31:def normalize_input(input_data: InputLike) -> List[str]:
-pipeline/settings.py:49:def safe_repr(obj: Any) -> str:
-pipeline/settings.py:54:def count_sentences(tok_docs: Any) -> int:
-pipeline/settings.py:63:def change_dir(path: Path) -> Iterator[None]:
-pipeline/settings.py:74:def isolated_argv(argv: Sequence[str]) -> Iterator[None]:
+pipeline/settings.py:20:def load_dotenv(path: Union[str, Path, None] = None, override: bool = False) -> Dict[str, str]:
+pipeline/settings.py:55:def configure_logging(level: str = "INFO") -> None:
+pipeline/settings.py:66:def normalize_input(input_data: InputLike) -> List[str]:
+pipeline/settings.py:84:def safe_repr(obj: Any) -> str:
+pipeline/settings.py:89:def count_sentences(tok_docs: Any) -> int:
+pipeline/settings.py:98:def change_dir(path: Path) -> Iterator[None]:
+pipeline/settings.py:109:def isolated_argv(argv: Sequence[str]) -> Iterator[None]:

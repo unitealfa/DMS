@@ -17,6 +17,41 @@ COMPONENT_DIR = REPO_ROOT / "component"
 LOG_PATH = REPO_ROOT / "orchestre.log"
 
 
+def load_dotenv(path: Union[str, Path, None] = None, override: bool = False) -> Dict[str, str]:
+    """
+    Lightweight .env loader (no external dependency).
+    Supports lines like:
+      KEY=value
+      export KEY="value"
+    """
+    target = Path(path) if path is not None else (REPO_ROOT / ".env")
+    if not target.exists():
+        return {}
+
+    loaded: Dict[str, str] = {}
+    for raw_line in target.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("export "):
+            line = line[len("export "):].strip()
+        if "=" not in line:
+            continue
+
+        key, value = line.split("=", 1)
+        key = key.strip()
+        if not key:
+            continue
+        value = value.strip()
+        if value and value[0] == value[-1] and value[0] in {"'", '"'}:
+            value = value[1:-1]
+
+        if override or key not in os.environ:
+            os.environ[key] = value
+        loaded[key] = value
+    return loaded
+
+
 def configure_logging(level: str = "INFO") -> None:
     logging.basicConfig(
         level=getattr(logging, level.upper(), logging.INFO),

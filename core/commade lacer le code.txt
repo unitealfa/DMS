@@ -39,7 +39,8 @@ structurer tout les info des document dasn une sortie json
   testexcel.xlsx, documents/signettab.png, documents/image2tab.webp, documents/francais.docx, documents/arab.docx, test/
   documents/englais.docx, documents/testexcel.xlsx"
 
-python orchestre.py "documents/contrat_regex_test_corpus_fr_en_ar.pdf"
+
+source .venv/bin/activate
 
 
 
@@ -49,5 +50,40 @@ python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf \
 --es-index dms_documents
 
 
-source .venv/bin/activate
 
+
+
+
+
+2. Mode complet tokens: 
+
+lancer une fois EA manuelmetn sinon sa marche pas : 
+
+  sudo systemctl start elasticsearch
+  sudo systemctl status elasticsearch --no-pager
+  curl -s http://localhost:9200
+
+  python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
+
+
+
+
+
+
+
+
+
+
+
+
+• Pour stocker la grammaire dans ES:
+
+  python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
+
+  Pour ne pas stocker la grammaire token par token (juste résumé):
+
+  python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf --use-elasticsearch --es-nlp-level summary
+
+  Pour ne rien stocker NLP:
+
+  python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf --use-elasticsearch --es-nlp-level off

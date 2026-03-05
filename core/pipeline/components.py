@@ -182,13 +182,10 @@ class OCRPreprocessComponent(Component):
         image_files = ctx.get("IMAGE_ONLY_FILES") or []
         docs = ctx.get("DOCS") or []
 
-        # Si OCR n'a pas trouv d'images parce qu'elles ont t classes "text",
-        # transformer les TEXT_FILES en DOCS vides pour que le pipeline continue.
+        # Ne jamais injecter de DOCS artificiels quand les fichiers sont detectes en texte:
+        # cela cree un faux document OCR vide dans output-txt.
         if not docs and image_files and not text_files:
             docs = []
-        if not docs and not image_files and text_files:
-            # inject minimal DOCS with source info to allow downstream extraction
-            docs = [{"pages": [], "filename": Path(p).name, "source_files": [p], "page_count_total": 0} for p in text_files]
 
         if not text_files and not image_files and not docs:
             raise ValueError("si-image-pretraiter-sinonpass-le-doc n'a rien produit.")
@@ -220,10 +217,13 @@ class OutputTxtComponent(Component):
         if "_get_pdf_reader" not in ctx and callable(reader_with_name):
             ctx["_get_pdf_reader"] = lambda: reader_with_name()[0]
 
-        summary = (
-            f"{len(final_docs)} docs | "
-            f"pages={sum(len(d.get('pages_text') or []) or 1 for d in final_docs)}"
-        )
+        def _doc_pages_count(row: Dict[str, Any]) -> int:
+            raw = row.get("page_count_total")
+            if isinstance(raw, int) and raw >= 0:
+                return raw
+            return len(row.get("pages_text") or [])
+
+        summary = f"{len(final_docs)} docs | pages={sum(_doc_pages_count(d) for d in final_docs)}"
         self._report(final_docs, summary)
         return final_docs
 
@@ -284,6 +284,7 @@ class ElasticsearchComponent(Component):
         doc_ids = ctx.get("ES_DOC_IDS") or []
         cls_docs = ctx.get("ES_CLASSIFICATION_DOCS") or []
         ext_docs = ctx.get("ES_EXTRACTION_DOCS") or []
+        nlp_sync = ctx.get("ES_NLP_SYNC") if isinstance(ctx.get("ES_NLP_SYNC"), dict) else {}
 
         output = {
             "enabled": enabled,
@@ -293,10 +294,19 @@ class ElasticsearchComponent(Component):
             "doc_ids": len(doc_ids),
             "classification_docs": len(cls_docs),
             "extraction_docs": len(ext_docs),
+            "nlp_level": nlp_sync.get("level"),
+            "nlp_docs_synced": int(nlp_sync.get("docs_synced") or 0),
+            "nlp_tokens_indexed": int(nlp_sync.get("tokens_indexed") or 0),
+            "nlp_token_errors": int(nlp_sync.get("token_index_errors") or 0),
+            "nlp_unresolved_rows": int(nlp_sync.get("unresolved_rows") or 0),
+            "nlp_tokens_index": nlp_sync.get("tokens_index"),
         }
         summary = (
             f"enabled={enabled} | available={available} | indexed={len(doc_ids)} | "
-            f"cls_docs={len(cls_docs)} | ext_docs={len(ext_docs)}"
+            f"cls_docs={len(cls_docs)} | ext_docs={len(ext_docs)} | "
+            f"nlp={nlp_sync.get('level')} docs={int(nlp_sync.get('docs_synced') or 0)} "
+            f"tokens={int(nlp_sync.get('tokens_indexed') or 0)} "
+            f"errors={int(nlp_sync.get('token_index_errors') or 0)}"
         )
         self._report(output, summary)
         return output

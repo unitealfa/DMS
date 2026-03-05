@@ -245,6 +245,40 @@ def _basename(val) -> Optional[str]:
         return s.replace("\\", "/").split("/")[-1]
 
 
+def _safe_file_size(path: Optional[str]) -> Optional[int]:
+    if not path:
+        return None
+    try:
+        return int(Path(path).stat().st_size)
+    except Exception:
+        return None
+
+
+def _doc_size_from_sources(doc: dict) -> Optional[int]:
+    paths: List[str] = []
+    for page in doc.get("pages", []) or []:
+        src_path = page.get("source_path") or page.get("path")
+        if src_path:
+            paths.append(str(src_path))
+
+    unique_paths: List[str] = []
+    seen = set()
+    for p in paths:
+        if p in seen:
+            continue
+        seen.add(p)
+        unique_paths.append(p)
+
+    if not unique_paths:
+        return None
+
+    sizes = [_safe_file_size(p) for p in unique_paths]
+    valid = [s for s in sizes if isinstance(s, int)]
+    if not valid:
+        return None
+    return int(sum(valid))
+
+
 # Si DOCS est une liste de "pages" legacy, on pack en docs
 if DOCS and isinstance(DOCS[0], dict) and "pages" not in DOCS[0]:
     groups = {}
@@ -302,6 +336,9 @@ for doc in DOCS:
             doc["filename"] = doc["source_files"][0]
         elif len(doc.get("source_files", [])) > 1:
             doc["filename"] = "batch"
+
+    if not isinstance(doc.get("size"), int):
+        doc["size"] = _doc_size_from_sources(doc)
 
 
 # OCR chaque page prepped
@@ -510,6 +547,7 @@ def extract_text_native(path: str) -> dict:
     ft = detect_path_type(path)
     ext = ft.ext.lower()
     filename = Path(path).name
+    file_size = _safe_file_size(path)
 
     # PDF
     if ext == ".pdf":
@@ -533,6 +571,7 @@ def extract_text_native(path: str) -> dict:
                 "doc_id": str(uuid.uuid4()),
                 "filename": filename,
                 "source_path": path,
+                "size": file_size,
                 "content": "text",
                 "extraction": f"native:pdf:{backend}",
                 "text": full,
@@ -559,6 +598,7 @@ def extract_text_native(path: str) -> dict:
                 "doc_id": str(uuid.uuid4()),
                 "filename": filename,
                 "source_path": path,
+                "size": file_size,
                 "content": "text",
                 "extraction": "native:pdf:pdfminer",
                 "text": full2,
@@ -570,6 +610,7 @@ def extract_text_native(path: str) -> dict:
                 "doc_id": str(uuid.uuid4()),
                 "filename": filename,
                 "source_path": path,
+                "size": file_size,
                 "content": "text",
                 "extraction": "native:pdf:none",
                 "text": "",
@@ -597,6 +638,7 @@ def extract_text_native(path: str) -> dict:
                         "doc_id": str(uuid.uuid4()),
                         "filename": filename,
                         "source_path": path,
+                        "size": file_size,
                         "content": "text",
                         "extraction": "native:docx:xml",
                         "text": text,
@@ -626,6 +668,7 @@ def extract_text_native(path: str) -> dict:
                         "doc_id": str(uuid.uuid4()),
                         "filename": filename,
                         "source_path": path,
+                        "size": file_size,
                         "content": "text",
                         "extraction": "native:xlsx:xml",
                         "text": text,
@@ -645,6 +688,7 @@ def extract_text_native(path: str) -> dict:
                         "doc_id": str(uuid.uuid4()),
                         "filename": filename,
                         "source_path": path,
+                        "size": file_size,
                         "content": "text",
                         "extraction": "native:pptx:xml",
                         "text": text,
@@ -660,6 +704,7 @@ def extract_text_native(path: str) -> dict:
                         "doc_id": str(uuid.uuid4()),
                         "filename": filename,
                         "source_path": path,
+                        "size": file_size,
                         "content": "text",
                         "extraction": f"native:{ext[1:]}:xml",
                         "text": text,
@@ -683,6 +728,7 @@ def extract_text_native(path: str) -> dict:
                         "doc_id": str(uuid.uuid4()),
                         "filename": filename,
                         "source_path": path,
+                        "size": file_size,
                         "content": "text",
                         "extraction": "native:epub:html",
                         "text": text,
@@ -695,6 +741,7 @@ def extract_text_native(path: str) -> dict:
                 "doc_id": str(uuid.uuid4()),
                 "filename": filename,
                 "source_path": path,
+                "size": file_size,
                 "content": "text",
                 "extraction": "native:zip:error",
                 "text": "",
@@ -707,6 +754,7 @@ def extract_text_native(path: str) -> dict:
         "doc_id": str(uuid.uuid4()),
         "filename": filename,
         "source_path": path,
+        "size": file_size,
         "content": "text",
         "extraction": "native:unsupported",
         "text": "",
@@ -728,6 +776,7 @@ for p in TEXT_FILES:
             "doc_id": str(uuid.uuid4()),
             "filename": Path(p).name,
             "source_path": p,
+            "size": _safe_file_size(p),
             "content": "text",
             "extraction": "native:error",
             "text": "",
@@ -743,10 +792,19 @@ FINAL_DOCS: List[dict] = []
 # OCR docs (images)
 for d in DOCS:
     pages_text = d.get("pages_text") or []
+
+    # Garde-fou: ignorer les faux docs OCR vides (placeholders sans pages).
+    if not pages_text and not str(d.get("ocr_text") or "").strip():
+        continue
+
+    if not pages_text and str(d.get("ocr_text") or "").strip():
+        pages_text = [str(d.get("ocr_text") or "")]
+
     page_count_total = d.get("page_count_total") or len(pages_text) or 1
     FINAL_DOCS.append({
         "doc_id": d.get("doc_id"),
         "filename": d.get("filename"),
+        "size": d.get("size"),
         "content": "image_only",
         "extraction": "ocr:tesseract",
         "text": d.get("ocr_text", ""),
@@ -761,6 +819,7 @@ for d in TEXT_DOCS:
     FINAL_DOCS.append({
         "doc_id": d.get("doc_id"),
         "filename": d.get("filename"),
+        "size": d.get("size"),
         "content": "text",
         "extraction": d.get("extraction"),
         "text": d.get("text", ""),

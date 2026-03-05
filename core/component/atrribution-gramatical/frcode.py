@@ -1,6 +1,6 @@
 import os, re, sys
 from dataclasses import dataclass
-from typing import List, Tuple, Optional, Dict
+from typing import Any, List, Tuple, Optional, Dict
 
 # ============================================================
 # 0) Option deps local (sans venv)
@@ -894,6 +894,19 @@ def run_one(text: str, ner_pipe=None):
         for v in ents[k]:
             print(f"  {k}: {v}")
 
+    return {
+        "lang": "fr",
+        "text": text,
+        "tokens": [t.text for t in toks],
+        "pos": pos2,
+        "lemmas": lem2,
+        "ner_labels": labels,
+        "entities": ents,
+        "modes": {
+            "ner": ner_mode,
+        },
+    }
+
 
 # ============================================================
 # 11) Split multi-sentences
@@ -970,6 +983,13 @@ def run_from_previous_cell(data=None, max_sentences=None):
         print("#" * 90)
 
         out = run_one_auto(sent)
+        if isinstance(out, dict):
+            out = dict(out)
+            out["doc"] = doc_name
+            out["filename"] = doc_name
+            out["page"] = page_idx
+            out["page_index"] = page_idx
+            out["sent_index"] = sent_idx
         results.append(out)
 
         count += 1

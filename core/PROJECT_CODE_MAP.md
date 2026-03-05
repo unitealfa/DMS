@@ -5,7 +5,7 @@ Date d'audit: 2026-03-05
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
 - Python files analyses: 19
-- Fonctions/classes indexees: 305 (voir `FUNCTION_INDEX.txt`)
+- Fonctions/classes indexees: 346 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON: `rules/*.json` + `classification/*.json` + `config/ruleset_routes.json`
 
 ## 2) Points d'entree
@@ -35,6 +35,7 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
 ### 4.1 Entree / pretraitement
 - Entree user: `INPUT_FILE`
 - Sortie pretraitement type de contenu: `PRETRAITEMENT_RESULT`
+- Chaque entree `PRETRAITEMENT_RESULT[]` expose `size` (octets)
 
 ### 4.2 Routage OCR vs natif
 - `TEXT_FILES`
@@ -45,23 +46,35 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
 ### 4.3 Extraction texte
 - sortie combinee OCR + natif: `FINAL_DOCS`
 - documents natifs: `TEXT_DOCS`
+- `FINAL_DOCS` / `TEXT_DOCS` propagent `size`
 
 ### 4.4 Tokenisation + layout
 - sortie principale: `TOK_DOCS`
 - alias utilise dans certains scripts: `selected`
+- `TOK_DOCS` inclut `size` (source pour ES et fusion)
 
 ### 4.5 Attribution grammaticale (EN/FR/AR)
 - consomme `selected`/`TOK_DOCS`/`FINAL_DOCS`
-- affiche des resultats linguistiques (pas de structure unique normalisee ecrite dans context)
+- ecrit des sorties structurees normalisees dans le context:
+  - `NLP_ANALYSES`
+  - `NLP_SENTENCES`
+  - `NLP_ENTITIES`
+  - `NLP_POS`
+  - `NLP_LEMMA`
+  - `NLP_LANGUAGE`, `NLP_LANGUAGE_STATS`, `DETECTED_LANGUAGES`
 
 ### 4.6 Elasticsearch (optionnel)
 - activation: `USE_ELASTICSEARCH`
 - conf: `ES_URL`, `ES_INDEX`
-- auto-start: `ES_AUTO_START`, `ES_START_COMMAND`, `ES_START_COMMANDS`, `ES_AUTO_START_WAIT_SECONDS`, `ES_AUTO_START_LAUNCH_TIMEOUT`
+- auth HTTP: `ES_USER`, `ES_PASSWORD`, `ES_API_KEY`
+- conf NLP: `ES_NLP_LEVEL` (`off|summary|full`), `ES_NLP_INDEX`, `ES_NLP_MAX_FULL_TOKENS`
+- auto-start: `ES_AUTO_START`, `ES_START_COMMAND`, `ES_START_COMMANDS`, `ES_START_COMMAND_POSIX`, `ES_START_COMMAND_WINDOWS`, `ES_START_PASSWORD`, `ES_AUTO_START_WAIT_SECONDS`, `ES_AUTO_START_LAUNCH_TIMEOUT`
+  - comportement par defaut: auto-start Windows uniquement, Linux/macOS en demarrage manuel.
 - sorties: `ES_AVAILABLE`, `ES_DOC_IDS`, `ES_CLASSIFICATION_DOCS`, `ES_EXTRACTION_DOCS`, `ES_AUTO_STARTED`, `ES_AUTO_START_CMD`
+- sorties NLP ES: `ES_NLP_SYNC`, `ES_NLP_DOCS_SYNCED`, `ES_NLP_TOKENS_SYNCED`, `ES_NLP_TOKEN_ERRORS`, `ES_NLP_LEVEL_EFFECTIVE`, `ES_NLP_INDEX_EFFECTIVE`
 
 ### 4.7 Classification
-- sortie: `RESULTS` (doc_type, status, scores)
+- sortie: `RESULTS` (doc_type, status, scores, `classification_log`, `keyword_matches`, `anti_confusion_targets`)
 - sync ES: `ES_CLASSIFICATION_SYNCED`
 
 ### 4.8 Extraction regex
@@ -71,6 +84,7 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
 ### 4.9 Fusion finale
 - sortie fichier: `fusion_output.json`
 - flags contexte: `FUSION_RESULT`, `FUSION_PAYLOAD`, `FUSION_PAYLOADS`, `FUSION_SOURCE`, `ES_FUSION_SYNCED`
+- structure finale: `documents[]` (un bloc complet par document, avec `components`, `text`, `document_structure`, `extraction`, `nlp`, `quality_checks`)
 
 ## 5) Ou modifier selon le besoin
 
@@ -78,9 +92,10 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
 - `pipeline/cli.py`
 - `pipeline/orchestrator.py`
 - `pipeline/components.py`
+- chargement `.env` global (optionnel): `pipeline/settings.py:load_dotenv` appele par `pipeline/cli.py`
 
 ### 5.2 Changer la detection text vs image
-- `component/pretraitement-de-docs.py`
+- `component/pretraitement-de-docs.py` (dont extraction `size`)
 - `component/si-image-pretraiter-sinonpass-le-doc.py`
 
 ### 5.3 Changer preprocessing OCR (contrast, threshold, rotate, etc.)
@@ -93,6 +108,7 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
 - `component/output-txt.py`
   - `extract_text_native`
   - helpers `_docx_xml_to_text`, `_xlsx_sheet_to_text`, etc.
+  - propagation `size` dans `TEXT_DOCS` et `FINAL_DOCS`
 
 ### 5.5 Changer segmentation layout / tables / multi-colonnes / bruit
 - `component/tokenisation-layout.py`
@@ -114,10 +130,24 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
 ### 5.8 Changer logique Elasticsearch
 - composant pont: `component/elasticsearch.py`
 - client + mapping + index/update logic: `pipeline/elasticsearch.py`
+- `pipeline/elasticsearch.py`: indexation du champ documentaire `size`
 - auto-demarrage local d'Elasticsearch quand indisponible: `pipeline/elasticsearch.py` (`_try_auto_start_elasticsearch`, `_resolve_auto_start_commands`, `maybe_build_store`)
+- auto-start cross-platform: commandes dediees POSIX/Windows via variables d'environnement (ou `.env` optionnel)
+- par defaut: Windows tente auto-start; Linux/macOS n'essaie pas sans commande explicite
+- auth HTTP ES (Basic/API key): `ElasticsearchStore._request`
+- sync NLP vers ES:
+  - mode performant par defaut `summary` (stats linguistiques par document dans `dms_documents`)
+  - mode `full` (tokens POS/lemma/NER dans index dedie, ex: `dms_nlp_tokens`)
+  - fonction centrale: `sync_nlp_results` dans `pipeline/elasticsearch.py`
 
 ### 5.9 Changer fusion JSON finale
 - `component/fusion_resultats.py`
+- en mode `NLP full`, la fusion charge aussi les tokens NLP depuis ES (`dms_nlp_tokens`) pour le document courant et les structure par page/sentence.
+- schema fusion lisible humain + exploitable code:
+  - top-level: `schema_version`, `generated_at`, `source`, `documents_count`, `documents`
+  - par document: `components` detaille tous les composants du pipeline
+- classification detaillee exposee (`scores`, `classification_log`, `keyword_matches`, `anti_confusion_targets`) + `file.size`
+- deduplication active: `components` reste volontairement compact (resume) et les details complets restent au niveau document (`classification`, `extraction`, `nlp`, `file`)
 
 ### 5.10 Changer logique linguistique EN/FR/AR
 - orchestrateur langues: `component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py`
@@ -128,22 +158,22 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
 ## 6) Cartographie des fichiers Python (roles)
 
 ### 6.1 Orchestration (`pipeline/`)
-- `pipeline/settings.py`: logging, normalize input, context managers cwd/argv.
+- `pipeline/settings.py`: logging, normalize input, context managers cwd/argv, chargement `.env` optionnel.
 - `pipeline/components.py`: wrappers des composants scripts + resumes + sync ES.
 - `pipeline/orchestrator.py`: ordre des etapes, selection `only/upto/start`.
-- `pipeline/cli.py`: CLI + tee print vers `outputgeneralterminal.txt`.
-- `pipeline/elasticsearch.py`: store HTTP ES + flatten/index + auto-start local ES + fallback docs + sync classification/extraction.
+- `pipeline/cli.py`: CLI + chargement `.env` + tee print vers `outputgeneralterminal.txt`.
+- `pipeline/elasticsearch.py`: store HTTP ES + auth + flatten/index + auto-start local ES (POSIX/Windows) + fallback docs + sync classification/extraction + sync NLP (summary/full).
 
 ### 6.2 Composants metier (`component/`)
-- `pretraitement-de-docs.py`: detect format, determine `text` vs `image_only`.
+- `pretraitement-de-docs.py`: detect format, determine `text` vs `image_only`, extrait `size`.
 - `si-image-pretraiter-sinonpass-le-doc.py`: split OCR/native + preprocess image.
-- `output-txt.py`: OCR tesseract + extraction native multi-format + `FINAL_DOCS`.
-- `tokenisation-layout.py`: language detect + sentence/layout chunking + table/multicol + TOK_DOCS.
+- `output-txt.py`: OCR tesseract + extraction native multi-format + `FINAL_DOCS` (+ `size`).
+- `tokenisation-layout.py`: language detect + sentence/layout chunking + table/multicol + `TOK_DOCS` (+ `size`).
 - `atrribution-gramatical/*.py`: POS/lemma/NER per language + notebook style runners.
 - `elasticsearch.py`: step script pour index/fetch docs ES.
-- `clasification.py`: keyword scoring classification.
+- `clasification.py`: keyword scoring classification + details matches (`classification_log`, `keyword_matches`).
 - `extraction-regles.py`: regex extractors selon doc_type.
-- `fusion_resultats.py`: build JSON fusion from context or ES.
+- `fusion_resultats.py`: build JSON fusion structure par document (`documents[]`) depuis context + ES.
 
 ## 7) Fichiers metier JSON
 - `classification/common.json`: poids/penalites/seuil/marge globaux.
@@ -178,6 +208,71 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
   - `component/extraction-regles.py`: correction de `_get_input_docs` pour ignorer les listes vides (ex: `ES_EXTRACTION_DOCS=[]`) et prendre la source suivante.
   - Effet: suppression du crash `Format d'entree non supporte: <class 'list'>` en mode `--use-elasticsearch` avec ES down.
   - `pipeline/elasticsearch.py`: ajout de `_same_es_target` et memo de disponibilite dans `maybe_build_store` pour eviter les warnings repetes sur les composants suivants (notamment `fusion-resultats`) quand ES est deja marque indisponible.
+  - `pipeline/components.py`: suppression de l'injection de `DOCS` placeholder pour les fichiers detectes `text` (evite la creation d'un faux document OCR vide).
+  - `component/output-txt.py`: garde-fou sur la construction `FINAL_DOCS` pour ignorer les docs OCR vides et ne pas forcer `image_only` quand il n'y a aucune page OCR.
+  - Effet valide sur `contrat_regex_test_corpus_fr_en_ar.pdf`: pretraitement `text=1 image=0`, preprocess `docs_prepped=0`, output-txt `1 docs | pages=12` avec `content='text'`.
+  - `component/atrribution-gramatical/engcode.py`, `frcode.py`, `arabcode.py`: normalisation des sorties par phrase (`lang`, `tokens`, `pos`, `lemmas`, `ner_labels`, `entities`, metadata doc/page/sentence).
+  - `component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py`:
+    - correction de la reprise d'entree (ignore les listes vides),
+    - publication de structures globales `NLP_ANALYSES`, `NLP_SENTENCES`, `NLP_ENTITIES`, `NLP_POS`, `NLP_LEMMA`, `NLP_LANGUAGE_STATS`.
+  - `pipeline/cli.py`: nouvelles options `--es-nlp-level` et `--es-nlp-index`.
+  - `pipeline/settings.py`: ajout `load_dotenv` pour charger automatiquement `.env` si present au lancement.
+  - `pipeline/cli.py`:
+    - lit maintenant les defaults depuis `.env` (`ES_URL`, `ES_INDEX`, `ES_NLP_*`, `USE_ELASTICSEARCH`),
+    - ajoute les options `--es-user`, `--es-password`, `--es-api-key`,
+    - passe `ES_AUTO_START*`/`ES_START_*`/`ES_START_PASSWORD` dans le context.
+  - `pipeline/elasticsearch.py`:
+    - ajout auth HTTP Basic/API key dans `ElasticsearchStore`,
+    - auto-start compatible `.env` multi-commandes (`ES_START_COMMANDS=cmd1 || cmd2`) et commandes dediees POSIX/Windows,
+    - support `sudo -S` via `ES_START_PASSWORD`,
+    - parsing commandes plus robuste (`expandvars`, `shlex` adapte OS).
+  - `pipeline/elasticsearch.py` + `pipeline/cli.py`:
+    - comportement ajuste selon besoin utilisateur: auto-start par defaut uniquement sur Windows,
+    - Linux/macOS en demarrage manuel Elasticsearch (pas de tentative auto sans commande explicite).
+  - `pipeline/elasticsearch.py`:
+    - correction compatibilite mapping ES existant: remplacement de `nlp.entities_sample` par `nlp.entities_sample_flat`,
+    - evite l'erreur `mapper [nlp.entities_sample.text] cannot be changed from type [date] to [text]` sur index deja cree.
+  - `pipeline/elasticsearch.py`:
+    - ajout de `sync_nlp_results` (sync des analyses grammaticales vers ES),
+    - mode `summary` (stats/doc) et mode `full` (index tokens dedie via bulk NDJSON),
+    - nouvelles aides `_normalize_nlp_level`, `_extract_entities`, `_bulk_index_nlp_tokens`, etc.,
+    - extension `ElasticsearchStore` (`ensure_custom_index`, `delete_by_query`, `bulk_ndjson`).
+  - `component/elasticsearch.py`: appel de `sync_nlp_results` + exposition des compteurs `ES_NLP_*`.
+  - `pipeline/components.py`: reporting enrichi du composant `elasticsearch` avec statut NLP.
+  - `component/fusion_resultats.py`:
+    - enrichissement de la sortie `fusion_output.json` avec les donnees NLP ES par document,
+    - section `nlp.summary` alimentee depuis `dms_documents.nlp`,
+    - section `nlp.full` (mode full) contenant:
+      - `index`, `doc_id`, `count`, `returned`, `truncated`,
+      - `tokens` (liste a plat token/lemma/pos/ner),
+      - `structure` (groupement par `page_index` puis `sent_index`).
+    - fallback intelligent par `filename` quand l'identifiant document diverge entre index docs et index tokens.
+  - `component/fusion_resultats.py`:
+    - refonte de la structure finale `fusion_output.json` pour une lecture humaine + usage code:
+      - toujours un tableau `documents[]`,
+      - un bloc `components` par document (`pretraitement`, `ocr routing`, `output_txt`, `tokenisation`, `attribution_grammaticale`, `elasticsearch`, `classification`, `extraction_regles`, `fusion`),
+      - conservation des donnees metier (`text`, `document_structure`, `extraction`, `nlp`, `quality_checks`) sous le meme document.
+  - `component/fusion_resultats.py`:
+    - suppression de redondances dans la sortie finale:
+      - suppression de l'alias top-level `document` (doublon de `documents[0]`),
+      - suppression de doublons volumineux dans `components` (`doc`, `prepared_doc`, payloads complets classification/extraction),
+      - conservation de resumes compacts dans `components` + donnees detaillees uniques dans `classification` / `extraction` / `nlp`.
+  - `component/pretraitement-de-docs.py`: `PRETRAITEMENT_RESULT[]` inclut maintenant `size` (octets).
+  - `component/output-txt.py`: propagation de `size` dans `TEXT_DOCS` et `FINAL_DOCS`.
+  - `component/tokenisation-layout.py`: propagation de `size` dans `DOC_PACK` puis `TOK_DOCS`.
+  - `pipeline/elasticsearch.py`: ajout du champ `size` dans les documents indexes (`flatten_tok_doc_for_index` + mapping `size: long`).
+  - `component/clasification.py`:
+    - `RESULTS` enrichi avec `winning_score`,
+    - ajout `classification_log`, `keyword_matches` (strong/medium/weak/negative/strong_negative/anti_confusion_hits),
+    - ajout `anti_confusion_targets`.
+  - `component/fusion_resultats.py`:
+    - remplit `file.size` depuis contexte/pretraitement/ES,
+    - enrichit `classification` au niveau document (scores/log/matches/anti-confusion),
+    - corrige la vue `components.pretraitement_de_docs` (ext/mime/label/content),
+    - en mode ES: priorite aux donnees `classification`/`rule_extraction` deja stockees dans ES.
+  - `component/fusion_resultats.py`:
+    - optimisation anti-redondance supplementaire: retrait des champs lourds dupliques dans `components` (`scores`, `keyword_matches`, `classification_log`, `anti_confusion_targets`, tailles dupliquees),
+    - conservation des details complets uniquement dans les blocs principaux du document.
 
 ## 12) Regle de maintenance
 - A chaque modification de code Python dans `pipeline/` ou `component/`:

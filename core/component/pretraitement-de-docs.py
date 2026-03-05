@@ -74,6 +74,13 @@ def resolve_path(p: str) -> Optional[str]:
     return None
 
 
+def _safe_file_size(path: str) -> Optional[int]:
+    try:
+        return int(os.path.getsize(path))
+    except Exception:
+        return None
+
+
 # ----------------- format detection -----------------
 
 def _read_head(path: str, n: int = 16384) -> bytes:
@@ -354,6 +361,7 @@ def analyze_many_two_states(input_file: Optional[Union[str, Sequence[str]]]) -> 
             "ext": ft.ext,
             "mime": ft.mime,
             "label": ft.label,
+            "size": _safe_file_size(p),
             "content": content_kind_two_states(p, ft),
         })
 

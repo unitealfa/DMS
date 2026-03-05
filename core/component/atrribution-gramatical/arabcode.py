@@ -1,7 +1,7 @@
 ﻿import os
 import re
 import sys
-from typing import List, Tuple, Dict, Optional
+from typing import Any, List, Tuple, Dict, Optional
 
 
 LOCAL_DEPS_DIR = os.path.join(os.getcwd(), ".pylibs")
@@ -820,6 +820,9 @@ def analyze_sentence(text: str):
         print(f"{t:>{maxw}}  {tag:<6}  lemma={lem}")
 
     # ---- NER pretrained + deterministic fixes ----
+    ner_labels = ["O"] * len(toks)
+    ents: List[Tuple[str, str]] = []
+    ner_mode = "fallback (none)"
     try:
         ner_labels = ner_predict_tokens(toks)
         ner_labels = fix_titles(toks, ner_labels)
@@ -827,6 +830,7 @@ def analyze_sentence(text: str):
         ner_labels = add_currency_codes(toks, ner_labels)
         ner_labels = enforce_bio(ner_labels)
         ner_labels = drop_false_pers(toks, ner_labels)
+        ner_mode = "camel_tools"
 
         print("\nNER (pretrained + deterministic fixes) (token, label):")
         print(list(zip(toks, ner_labels)))
@@ -838,6 +842,7 @@ def analyze_sentence(text: str):
 
     except Exception as e:
         print("\nNER skipped (reason):", str(e))
+        ner_mode = f"fallback (none): {e}"
 
     # ---- Audits (heuristiques) ----
     total_seg = max(1, seg_ok + seg_err)
@@ -847,6 +852,21 @@ def analyze_sentence(text: str):
         print(f"  Lemma suspect: {lem_susp}/{lem_total} = {(lem_susp/lem_total*100):.2f} %")
     else:
         print("  Lemma suspect: n/a")
+
+    return {
+        "lang": "ar",
+        "text": text,
+        "tokens": toks,
+        "pos": [str(r.get("tag") or "NN") for r in morph_rows_for_ner],
+        "lemmas": [str(r.get("lemma") or "") for r in morph_rows_for_ner],
+        "ner_labels": ner_labels,
+        "entities": {
+            "flat": [{"type": typ, "text": val} for typ, val in ents],
+        },
+        "modes": {
+            "ner": ner_mode,
+        },
+    }
 
 def split_input_into_sentences(s: str) -> List[str]:
     s = (s or "").strip()
@@ -907,7 +927,9 @@ def run_from_previous_cell(data=None, max_sentences=None):
         if isinstance(out, dict):
             out = dict(out)
             out["doc"] = doc_name
+            out["filename"] = doc_name
             out["page"] = page_idx
+            out["page_index"] = page_idx
             out["sent_index"] = sent_idx
         results.append(out)
 
@@ -941,4 +963,3 @@ def main(argv=None) -> None:
 
 if __name__ == "__main__":
     main()
-

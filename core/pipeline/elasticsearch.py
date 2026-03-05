@@ -3,14 +3,23 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import os
 import re
+import shlex
+import shutil
+import subprocess
+import time
 from datetime import datetime, timezone
 from typing import Any, Dict, Iterable, List, Optional
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 from urllib.request import Request, urlopen
 
 WORD_RE = re.compile(r"[0-9A-Za-zÀ-ÖØ-öø-ÿ\u0600-\u06FF]+", flags=re.UNICODE)
+LOCAL_ES_HOSTS = {"localhost", "127.0.0.1", "::1"}
+AUTO_START_DEFAULT_WAIT_SECONDS = 45
+AUTO_START_DEFAULT_LAUNCH_TIMEOUT = 20
+_AUTO_START_ATTEMPTED: set[str] = set()
 
 
 def _iso_now() -> str:
@@ -33,6 +42,174 @@ def _safe_int(value: Any, default: int = 0) -> int:
         return int(value)
     except Exception:
         return default
+
+
+def _safe_positive_int(value: Any, default: int) -> int:
+    try:
+        parsed = int(value)
+        if parsed > 0:
+            return parsed
+    except Exception:
+        pass
+    return default
+
+
+def _is_local_es_url(base_url: str) -> bool:
+    host = (urlparse(base_url).hostname or "").lower()
+    return host in LOCAL_ES_HOSTS
+
+
+def _normalize_command(raw: Any) -> List[str]:
+    if isinstance(raw, (list, tuple)):
+        cmd = [str(part).strip() for part in raw if str(part).strip()]
+        return cmd
+    if isinstance(raw, str):
+        try:
+            return shlex.split(raw.strip())
+        except Exception:
+            return []
+    return []
+
+
+def _format_command(cmd: List[str]) -> str:
+    return " ".join(shlex.quote(part) for part in cmd)
+
+
+def _resolve_auto_start_commands(context: Dict[str, Any]) -> List[List[str]]:
+    commands: List[List[str]] = []
+
+    raw_commands = context.get("ES_START_COMMANDS")
+    if isinstance(raw_commands, list):
+        for item in raw_commands:
+            cmd = _normalize_command(item)
+            if cmd:
+                commands.append(cmd)
+
+    if not commands:
+        raw_single = context.get("ES_START_COMMAND")
+        cmd = _normalize_command(raw_single)
+        if not cmd:
+            cmd = _normalize_command(os.environ.get("ES_START_COMMAND"))
+        if cmd:
+            commands.append(cmd)
+
+    if commands:
+        return commands
+
+    defaults: List[List[str]] = [
+        ["docker", "start", "elasticsearch"],
+        ["docker", "start", "es01"],
+        ["docker", "compose", "up", "-d", "elasticsearch"],
+        ["docker-compose", "up", "-d", "elasticsearch"],
+    ]
+
+    if os.name != "nt":
+        defaults.append(["elasticsearch", "-d", "-p", "/tmp/dms-elasticsearch.pid"])
+
+    return defaults
+
+
+def _run_auto_start_command(cmd: List[str], timeout_seconds: int) -> tuple[bool, str]:
+    if not cmd:
+        return False, "commande vide"
+
+    executable = cmd[0]
+    if shutil.which(executable) is None:
+        return False, f"binaire introuvable: {executable}"
+
+    try:
+        proc = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            text=True,
+            timeout=timeout_seconds,
+        )
+    except subprocess.TimeoutExpired:
+        return False, f"timeout apres {timeout_seconds}s"
+    except Exception as exc:
+        return False, str(exc)
+
+    if proc.returncode != 0:
+        details = (proc.stderr or proc.stdout or "").strip()
+        details = details[:240] if details else "aucun detail"
+        return False, f"code={proc.returncode} ({details})"
+
+    return True, "ok"
+
+
+def _wait_for_es_ping(store: "ElasticsearchStore", wait_seconds: int) -> bool:
+    deadline = time.time() + wait_seconds
+    while time.time() < deadline:
+        if store.ping():
+            return True
+        time.sleep(1.0)
+    return store.ping()
+
+
+def _try_auto_start_elasticsearch(store: "ElasticsearchStore", context: Dict[str, Any]) -> bool:
+    if context.get("ES_AUTO_START") is False:
+        return False
+
+    if not _is_local_es_url(store.base_url):
+        logging.warning(
+            "Elasticsearch indisponible (%s): auto-start ignore car l'URL n'est pas locale.",
+            store.base_url,
+        )
+        return False
+
+    attempt_key = store.base_url
+    if attempt_key in _AUTO_START_ATTEMPTED:
+        return False
+    _AUTO_START_ATTEMPTED.add(attempt_key)
+
+    commands = _resolve_auto_start_commands(context)
+    if not commands:
+        return False
+
+    launch_timeout = _safe_positive_int(
+        context.get("ES_AUTO_START_LAUNCH_TIMEOUT"),
+        AUTO_START_DEFAULT_LAUNCH_TIMEOUT,
+    )
+    wait_seconds = _safe_positive_int(
+        context.get("ES_AUTO_START_WAIT_SECONDS"),
+        AUTO_START_DEFAULT_WAIT_SECONDS,
+    )
+
+    logging.warning(
+        "Elasticsearch indisponible (%s). Tentative de demarrage automatique...",
+        store.base_url,
+    )
+
+    for cmd in commands:
+        cmd_text = _format_command(cmd)
+        ok, detail = _run_auto_start_command(cmd, timeout_seconds=launch_timeout)
+        if not ok:
+            logging.info("[es-auto-start] Echec: %s | %s", cmd_text, detail)
+            continue
+
+        logging.info("[es-auto-start] Commande executee: %s", cmd_text)
+        if _wait_for_es_ping(store, wait_seconds):
+            context["ES_AUTO_STARTED"] = True
+            context["ES_AUTO_START_CMD"] = cmd_text
+            logging.info("[es-auto-start] Elasticsearch actif sur %s.", store.base_url)
+            return True
+
+        logging.info(
+            "[es-auto-start] Commande ok mais ping KO apres %ss: %s",
+            wait_seconds,
+            cmd_text,
+        )
+
+    context["ES_AUTO_STARTED"] = False
+    return False
+
+
+def _same_es_target(context: Dict[str, Any], base_url: str, index: str) -> bool:
+    ctx_url = str(context.get("ES_URL") or "http://localhost:9200").rstrip("/")
+    ctx_index = str(context.get("ES_INDEX") or "dms_documents").strip()
+    return ctx_url == base_url.rstrip("/") and ctx_index == index.strip()
 
 
 def _split_words(text: str) -> List[str]:
@@ -516,8 +693,18 @@ def maybe_build_store(context: Dict[str, Any]) -> Optional[ElasticsearchStore]:
         return None
     base_url = str(context.get("ES_URL") or "http://localhost:9200")
     index = str(context.get("ES_INDEX") or "dms_documents")
+
+    # Evite de re-tenter/re-logguer sur les appels suivants (classification/extraction/fusion)
+    # quand la meme cible ES est deja marquee indisponible dans ce run.
+    if context.get("ES_AVAILABLE") is False and _same_es_target(context, base_url, index):
+        return None
+
     store = ElasticsearchStore(base_url=base_url, index=index)
     if not store.ping():
+        _try_auto_start_elasticsearch(store, context)
+    if not store.ping():
+        context["ES_AVAILABLE"] = False
         logging.warning("Elasticsearch indisponible (%s). Fallback sur flux local.", base_url)
         return None
+    context["ES_AVAILABLE"] = True
     return store

@@ -1043,7 +1043,7 @@ Output: [{'content': 'image_only',
   'pages_text': [],
   'text': ''},
  {'content': 'text',
-  'doc_id': 'cfa53eda-7226-4e59-836f-c5510422e021',
+  'doc_id': '8adb9263-a9ef-47f4-98ad-550a359a3133',
   'extraction': 'native:pdf:pypdf',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'page_count_total': 12,
@@ -3143,7 +3143,7 @@ Output: [{'content': 'image_only',
 ------------------------------------------------------------------------------------------------------------------------
 ========================================================================================================================
 [doc] contrat_regex_test_corpus_fr_en_ar.pdf
-  doc_id       : cfa53eda-7226-4e59-836f-c5510422e021
+  doc_id       : 8adb9263-a9ef-47f4-98ad-550a359a3133
   content      : text
   extraction   : native:pdf:pypdf
   pages_total  : 12
@@ -3931,7 +3931,7 @@ Type: list
 Summary: 1 docs | sentences=72
 Output: [{'chars_total': 11256,
   'content': 'text',
-  'doc_id': 'cfa53eda-7226-4e59-836f-c5510422e021',
+  'doc_id': '8adb9263-a9ef-47f4-98ad-550a359a3133',
   'extraction': 'native:pdf:pypdf',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'page_count_total': 12,
@@ -8758,7 +8758,7 @@ Type: list
 Summary: Langues executees: en, fr | docs=1
 Output: [{'chars_total': 11256,
   'content': 'text',
-  'doc_id': 'cfa53eda-7226-4e59-836f-c5510422e021',
+  'doc_id': '8adb9263-a9ef-47f4-98ad-550a359a3133',
   'extraction': 'native:pdf:pypdf',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'page_count_total': 12,
@@ -12037,17 +12037,17 @@ Output: [{'chars_total': 11256,
   'paths': ['/home/mourad/Bureau/DMS/core/documents/contrat_regex_test_corpus_fr_en_ar.pdf'],
   'recompose_ok': False}]
 
-[elasticsearch] index=dms_documents | docs_indexed=1 | classification_docs=1 | extraction_docs=1
+[elasticsearch] desactive ou indisponible -> fallback flux local.
 [Component: elasticsearch]
 Type: dict
-Summary: enabled=True | available=True | indexed=1 | cls_docs=1 | ext_docs=1
-Output: {'available': True,
- 'classification_docs': 1,
- 'doc_ids': 1,
+Summary: enabled=True | available=False | indexed=0 | cls_docs=0 | ext_docs=0
+Output: {'available': False,
+ 'classification_docs': 0,
+ 'doc_ids': 0,
  'enabled': True,
  'es_index': 'dms_documents',
  'es_url': 'http://localhost:9200',
- 'extraction_docs': 1}
+ 'extraction_docs': 0}
 
 [classification] contrat_regex_test_corpus_fr_en_ar.pdf -> best=CONTRAT | status=OK | scores: {'ARTICLE': -43, 'BON_DE_COMMANDE': -202, 'CONTRAT': 202, 'FACTURE': -179, 'FORMULAIRE': 21}
   keywords: strong=[CONTRAT(x21), AGREEMENT(x14), PARTIES(x15), ENTRE LES SOUSSIGNES(x1), THIS AGREEMENT(x1), BETWEEN THE UNDERSIGNED(x1), LES PARTIES(x1)] medium=[DATE D EFFET(x2), OBLIGATIONS(x1), EFFECTIVE DATE(x4), CLAUSE(x1), TERMINATION(x1), DURATION(x1)] weak=[OBJET(x8), DUREE(x4), OBJET DU CONTRAT(x1), DUREE DU CONTRAT(x1), AVENANT(x1), DATE DE SIGNATURE(x1), REPRESENTED BY(x2), ADRESSE(x2)] negative=[PO(x1), BON DE COMMANDE(x4), FACTURE(x6), BON DE LIVRAISON(x4), DELIVERY NOTE(x3), INVOICE(x1), MONTANT TTC(x1), TVA(x1), PURCHASE ORDER(x1), DATE DE COMMANDE(x1), BL(x1)]
@@ -12057,7 +12057,7 @@ Output: {'available': True,
 Type: list
 Summary: 1 docs classes | contrat_regex_test_corpus_fr_en_ar.pdf->CONTRAT
 Output: [{'decision_debug': {'diff': 181, 'second_score': 21, 'top_score': 202},
-  'doc_id': 'cfa53eda-7226-4e59-836f-c5510422e021',
+  'doc_id': '8adb9263-a9ef-47f4-98ad-550a359a3133',
   'doc_type': 'CONTRAT',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'margin': 3,
@@ -12177,7 +12177,7 @@ Output: [{'decision_debug': {'diff': 181, 'second_score': 21, 'top_score': 202},
 Type: list
 Summary: 1 docs | fields=11 | contrat_regex_test_corpus_fr_en_ar.pdf->CONTRAT
 Output: [{'classification_status': 'OK',
-  'doc_id': 'cfa53eda-7226-4e59-836f-c5510422e021',
+  'doc_id': '8adb9263-a9ef-47f4-98ad-550a359a3133',
   'doc_type': 'CONTRAT',
   'fields': {'date_effet': {'many': True,
                             'matches': [{'end': 337,
@@ -12966,14 +12966,14 @@ Output: [{'classification_status': 'OK',
                                                     'FACTURE': ['FACTURE.json']}}}}]
 
 [Component: fusion-resultats]
-[fusion-result] source=elasticsearch | docs=1 | es_synced=0
+[fusion-result] source=local-context | docs=1 | es_synced=0
 [fusion-result] JSON fusionne ecrit dans /home/mourad/Bureau/DMS/core/fusion_output.json
 [Component: fusion-resultats]
 Type: dict
-Summary: fusion -> /home/mourad/Bureau/DMS/core/fusion_output.json | source=elasticsearch | docs=1 | es_synced=0
+Summary: fusion -> /home/mourad/Bureau/DMS/core/fusion_output.json | source=local-context | docs=1 | es_synced=0
 Output: {'docs': 1,
  'es_synced': 0,
  'path': '/home/mourad/Bureau/DMS/core/fusion_output.json',
  'skipped': False,
- 'source': 'elasticsearch'}
+ 'source': 'local-context'}
 

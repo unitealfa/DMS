@@ -108,7 +108,7 @@ def _get_input_docs(globals_dict: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
     for key in ("ES_EXTRACTION_DOCS", "selected", "TOK_DOCS", "FINAL_DOCS", "DOCS", "TEXT_DOCS"):
         val = globals_dict.get(key)
-        if isinstance(val, list):
+        if isinstance(val, list) and val:
             return val
     raise RuntimeError("Aucune structure de document trouvée (selected/TOK_DOCS/FINAL_DOCS/DOCS/TEXT_DOCS).")
 

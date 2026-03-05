@@ -47,3 +47,7 @@ python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf \
 --use-elasticsearch \
 --es-url http://localhost:9200 \
 --es-index dms_documents
+
+
+source .venv/bin/activate
+

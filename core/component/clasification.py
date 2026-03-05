@@ -92,8 +92,14 @@ def load_classification_configs():
 def _get_previous_cell_input():
     g = globals()
     for k in ("ES_CLASSIFICATION_DOCS", "selected", "TOK_DOCS", "FINAL_DOCS", "DOCS", "TEXT_DOCS", "_"):
-        if k in g and g[k] is not None:
-            return g[k]
+        if k not in g or g[k] is None:
+            continue
+        val = g[k]
+        # Important: ignorer les listes vides (ex: fallback ES indisponible)
+        # pour continuer sur la prochaine source utile (selected/TOK_DOCS...).
+        if isinstance(val, list) and not val:
+            continue
+        return val
     return None
 
 def _build_DOCS_from_input(data) -> List[Dict[str, Any]]:

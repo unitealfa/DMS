@@ -32,9 +32,11 @@ component/atrribution-gramatical/arabcode.py:871:def split_input_into_sentences(
 component/atrribution-gramatical/arabcode.py:881:def run_one_auto(sentence: str):
 component/atrribution-gramatical/arabcode.py:885:def run_from_previous_cell(data=None, max_sentences=None):
 component/atrribution-gramatical/arabcode.py:942:def main(argv=None) -> None:
-component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:30:def detect_lang(text: str) -> str:
-component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:43:def get_previous_cell_input():
-component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:54:def iter_sentences_from_input(data):
+component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:30:def _is_punct_like_token(token: object) -> bool:
+component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:47:def _normalize_token_fields(token: object, pos_value: object, lemma_value: object):
+component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:60:def detect_lang(text: str) -> str:
+component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:73:def get_previous_cell_input():
+component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:84:def iter_sentences_from_input(data):
 component/atrribution-gramatical/engcode.py:12:def print_install_help():
 component/atrribution-gramatical/engcode.py:39:def _ensure_nltk():
 component/atrribution-gramatical/engcode.py:88:class Tok:
@@ -160,25 +162,25 @@ component/fusion_resultats.py:200:def _search_index(
 component/fusion_resultats.py:220:def _fetch_nlp_tokens(
 component/fusion_resultats.py:297:def _structure_nlp_tokens(tokens: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 component/fusion_resultats.py:345:def _nlp_from_es_and_ctx(
-component/fusion_resultats.py:460:def _build_map(rows: Any) -> Dict[str, Dict[str, Dict[str, Any]]]:
-component/fusion_resultats.py:475:def _pick_from_map(
-component/fusion_resultats.py:487:def _same_doc_hint(value: Any, filename: str, first_path: str) -> bool:
-component/fusion_resultats.py:496:def _extract_component_views(
-component/fusion_resultats.py:640:def _to_document_output(
-component/fusion_resultats.py:682:def _final_output(
-component/fusion_resultats.py:709:def extract_text_raw(ctx: Dict[str, Any]) -> str:
-component/fusion_resultats.py:738:def extract_pages_meta(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:744:def extract_pages(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:749:def extract_classification(ctx: Dict[str, Any]) -> Dict[str, Any]:
-component/fusion_resultats.py:755:def extract_doc_type(cls: Dict[str, Any]) -> str:
-component/fusion_resultats.py:759:def extract_extractions(ctx: Dict[str, Any]) -> Any:
-component/fusion_resultats.py:763:def extract_detected_languages(ctx: Dict[str, Any]) -> List[str]:
-component/fusion_resultats.py:767:def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
-component/fusion_resultats.py:871:def _es_text_from_pages(src: Dict[str, Any]) -> str:
-component/fusion_resultats.py:882:def _es_pages(src: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:898:def build_payload_from_es_source(
-component/fusion_resultats.py:1004:def build_payloads_from_es(ctx: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], int]:
-component/fusion_resultats.py:1031:def main() -> None:
+component/fusion_resultats.py:521:def _build_map(rows: Any) -> Dict[str, Dict[str, Dict[str, Any]]]:
+component/fusion_resultats.py:536:def _pick_from_map(
+component/fusion_resultats.py:548:def _same_doc_hint(value: Any, filename: str, first_path: str) -> bool:
+component/fusion_resultats.py:557:def _extract_component_views(
+component/fusion_resultats.py:701:def _to_document_output(
+component/fusion_resultats.py:743:def _final_output(
+component/fusion_resultats.py:770:def extract_text_raw(ctx: Dict[str, Any]) -> str:
+component/fusion_resultats.py:799:def extract_pages_meta(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:805:def extract_pages(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:810:def extract_classification(ctx: Dict[str, Any]) -> Dict[str, Any]:
+component/fusion_resultats.py:816:def extract_doc_type(cls: Dict[str, Any]) -> str:
+component/fusion_resultats.py:820:def extract_extractions(ctx: Dict[str, Any]) -> Any:
+component/fusion_resultats.py:824:def extract_detected_languages(ctx: Dict[str, Any]) -> List[str]:
+component/fusion_resultats.py:828:def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
+component/fusion_resultats.py:995:def _es_text_from_pages(src: Dict[str, Any]) -> str:
+component/fusion_resultats.py:1006:def _es_pages(src: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:1022:def build_payload_from_es_source(
+component/fusion_resultats.py:1128:def build_payloads_from_es(ctx: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], int]:
+component/fusion_resultats.py:1155:def main() -> None:
 component/output-txt.py:72:def _median(values):
 component/output-txt.py:83:def _estimate_char_metrics(data: dict) -> Tuple[float, float]:
 component/output-txt.py:127:def _render_layout_from_data(data: dict, img_w: int, img_h: int) -> str:

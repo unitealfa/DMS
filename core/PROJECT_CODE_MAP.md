@@ -59,8 +59,10 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
   - `NLP_ANALYSES`
   - `NLP_SENTENCES`
   - `NLP_ENTITIES`
-  - `NLP_POS`
-  - `NLP_LEMMA`
+  - `NLP_TOKENS` (sortie unifiee token-level: `filename`, `page_index`, `sent_index`, `tok_index`, `token`, `pos`, `lemma`, `ner`, `lang`)
+    - normalisation punctuation: tokens `_` / `∅` (ou lemma `_` / `∅`) forces en `pos=PUNCT` avec lemma coherent
+    - robustesse: nlp tokens conserve tous les tokens meme si `pos`/`lemmas` en entree sont plus courts
+  - compat legacy: `NLP_POS` et `NLP_LEMMA` pointent vers la meme sortie unifiee
   - `NLP_LANGUAGE`, `NLP_LANGUAGE_STATS`, `DETECTED_LANGUAGES`
 
 ### 4.6 Elasticsearch (optionnel)
@@ -244,7 +246,7 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
     - section `nlp.summary` alimentee depuis `dms_documents.nlp`,
     - section `nlp.full` (mode full) contenant:
       - `index`, `doc_id`, `count`, `returned`, `truncated`,
-      - `tokens` (liste a plat token/lemma/pos/ner),
+      - `tokens` (liste a plat unifiee `filename/page_index/sent_index/tok_index/token/pos/lemma/ner/lang`),
       - `structure` (groupement par `page_index` puis `sent_index`).
     - fallback intelligent par `filename` quand l'identifiant document diverge entre index docs et index tokens.
   - `component/fusion_resultats.py`:
@@ -278,6 +280,17 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
     - ajout de 2 scenarios visuels (`es_off` reel fallback local / `es_on` cible ES disponible),
     - ajout des vues explicatives `Sequence`, `Context Keys`, `Run Trace`,
     - clic sur un composant: affichage d'un output exemple + explication de chaque champ.
+- 2026-03-15:
+  - `component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py`:
+    - fusion des anciennes sorties separees `NLP_POS` et `NLP_LEMMA` en une sortie unique `NLP_TOKENS`,
+    - format unifie par token: `filename`, `page_index`, `sent_index`, `tok_index`, `token`, `pos`, `lemma`, `ner`, `lang`,
+    - normalisation punctuation: `_` / `∅` (token ou lemma) force `pos=PUNCT`,
+    - ne drop plus les tokens quand longueurs `tokens`, `pos`, `lemmas` divergent,
+    - maintien compatibilite descendante: `NLP_POS` et `NLP_LEMMA` aliases de `NLP_TOKENS`.
+  - `component/fusion_resultats.py`:
+    - consommation prioritaire de `NLP_TOKENS` pour la sortie `nlp.tokens`,
+    - fallback automatique pour anciens runs (merge `NLP_POS` + `NLP_LEMMA` par cle token),
+    - suppression de la redondance de sortie en separant plus `nlp.pos`/`nlp.lemma` (une seule liste `nlp.tokens`).
 
 ## 12) Regle de maintenance
 - A chaque modification de code Python dans `pipeline/` ou `component/`:

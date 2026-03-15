@@ -1,7 +1,7 @@
 # =========================
 # 1) Chemin vers tes .py
 # =========================
-import sys, types, re, importlib, os
+import sys, types, re, importlib, os, unicodedata
 from collections import Counter
 from pathlib import Path
 
@@ -26,6 +26,36 @@ _AR_RE = re.compile(r"[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]")
 _WORD_RE = re.compile(r"[A-Za-zÀ-ÖØ-öø-ÿ]+", flags=re.UNICODE)
 _FR_HINT = {"le","la","les","des","une","un","est","avec","pour","dans","sur","facture","date","total","tva","montant"}
 _EN_HINT = {"the","and","to","of","in","is","for","with","invoice","date","total","vat","amount"}
+
+def _is_punct_like_token(token: object) -> bool:
+    txt = str(token or "").strip()
+    if not txt:
+        return False
+    if txt in {"_", "∅"}:
+        return True
+    for ch in txt:
+        if ch.isspace():
+            continue
+        cat = unicodedata.category(ch)
+        if cat.startswith("P"):
+            continue
+        if ch in {"∅"}:
+            continue
+        return False
+    return True
+
+def _normalize_token_fields(token: object, pos_value: object, lemma_value: object):
+    tok = str(token or "")
+    pos_txt = str(pos_value or "")
+    lemma_txt = str(lemma_value or "")
+    punct_from_token = _is_punct_like_token(tok)
+    punct_from_lemma = lemma_txt.strip() in {"_", "∅"}
+
+    if punct_from_token or punct_from_lemma:
+        pos_txt = "PUNCT"
+        if not lemma_txt.strip() or lemma_txt.strip() in {"_", "∅"}:
+            lemma_txt = tok.strip() or "_"
+    return tok, pos_txt, lemma_txt
 
 def detect_lang(text: str) -> str:
     t = text or ""
@@ -162,8 +192,7 @@ if HAVE_AR:
 NLP_ANALYSES = [x for x in (EN_RESULTS + FR_RESULTS + AR_RESULTS) if isinstance(x, dict)]
 NLP_SENTENCES = []
 NLP_ENTITIES = []
-NLP_POS = []
-NLP_LEMMA = []
+NLP_TOKENS = []
 _lang_counter = Counter()
 
 for row in NLP_ANALYSES:
@@ -220,34 +249,28 @@ for row in NLP_ANALYSES:
     pos = row.get("pos") or []
     lemmas = row.get("lemmas") or []
     ner = row.get("ner_labels") or []
-    size = min(len(tokens), len(pos), len(lemmas))
-    if isinstance(ner, list) and len(ner) >= size:
+    size = len(tokens)
+    if isinstance(ner, list):
         ner_view = ner
     else:
-        ner_view = ["O"] * size
+        ner_view = []
 
     for i in range(size):
         tok = tokens[i]
-        NLP_POS.append(
+        base_pos = pos[i] if i < len(pos) else ("PUNCT" if _is_punct_like_token(tok) else "X")
+        base_lemma = lemmas[i] if i < len(lemmas) else (str(tok or "").strip() or "_")
+        tok, norm_pos, norm_lemma = _normalize_token_fields(tok, base_pos, base_lemma)
+        ner_value = ner_view[i] if i < len(ner_view) else "O"
+        NLP_TOKENS.append(
             {
                 "filename": filename,
                 "page_index": page_index,
                 "sent_index": sent_index,
                 "tok_index": i,
                 "token": tok,
-                "pos": pos[i],
-                "lang": lang,
-                "ner": ner_view[i],
-            }
-        )
-        NLP_LEMMA.append(
-            {
-                "filename": filename,
-                "page_index": page_index,
-                "sent_index": sent_index,
-                "tok_index": i,
-                "token": tok,
-                "lemma": lemmas[i],
+                "pos": norm_pos,
+                "lemma": norm_lemma,
+                "ner": ner_value,
                 "lang": lang,
             }
         )
@@ -255,3 +278,7 @@ for row in NLP_ANALYSES:
 NLP_LANGUAGE = ",".join(sorted(_lang_counter.keys())) if _lang_counter else None
 NLP_LANGUAGE_STATS = dict(_lang_counter)
 DETECTED_LANGUAGES = sorted(_lang_counter.keys())
+
+# Compat descendante: anciennes cles conservees, mais alimentees par la sortie combinee.
+NLP_POS = NLP_TOKENS
+NLP_LEMMA = NLP_TOKENS

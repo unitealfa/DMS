@@ -356,8 +356,70 @@ def _nlp_from_es_and_ctx(
 
     sentences = _filter_rows_for_doc(ctx.get("NLP_SENTENCES"), doc_id, filename)
     entities = _filter_rows_for_doc(ctx.get("NLP_ENTITIES"), doc_id, filename)
-    pos_rows = _filter_rows_for_doc(ctx.get("NLP_POS"), doc_id, filename)
-    lemma_rows = _filter_rows_for_doc(ctx.get("NLP_LEMMA"), doc_id, filename)
+    tokens_rows = _filter_rows_for_doc(ctx.get("NLP_TOKENS"), doc_id, filename)
+    if not tokens_rows:
+        # Fallback compat si des runs anciens n'ont que NLP_POS/NLP_LEMMA.
+        pos_rows = _filter_rows_for_doc(ctx.get("NLP_POS"), doc_id, filename)
+        lemma_rows = _filter_rows_for_doc(ctx.get("NLP_LEMMA"), doc_id, filename)
+        merged: Dict[Tuple[Any, Any, Any, Any, Any, Any], Dict[str, Any]] = {}
+        for row in pos_rows:
+            if not isinstance(row, dict):
+                continue
+            key = (
+                row.get("filename"),
+                row.get("page_index"),
+                row.get("sent_index"),
+                row.get("tok_index"),
+                row.get("token"),
+                row.get("lang"),
+            )
+            merged[key] = {
+                "filename": row.get("filename"),
+                "page_index": row.get("page_index"),
+                "sent_index": row.get("sent_index"),
+                "tok_index": row.get("tok_index"),
+                "token": row.get("token"),
+                "pos": row.get("pos"),
+                "lemma": None,
+                "ner": row.get("ner"),
+                "lang": row.get("lang"),
+            }
+        for row in lemma_rows:
+            if not isinstance(row, dict):
+                continue
+            key = (
+                row.get("filename"),
+                row.get("page_index"),
+                row.get("sent_index"),
+                row.get("tok_index"),
+                row.get("token"),
+                row.get("lang"),
+            )
+            cur = merged.get(key)
+            if cur is None:
+                merged[key] = {
+                    "filename": row.get("filename"),
+                    "page_index": row.get("page_index"),
+                    "sent_index": row.get("sent_index"),
+                    "tok_index": row.get("tok_index"),
+                    "token": row.get("token"),
+                    "pos": None,
+                    "lemma": row.get("lemma"),
+                    "ner": row.get("ner"),
+                    "lang": row.get("lang"),
+                }
+            else:
+                cur["lemma"] = row.get("lemma")
+                if cur.get("ner") is None:
+                    cur["ner"] = row.get("ner")
+        tokens_rows = sorted(
+            merged.values(),
+            key=lambda x: (
+                _safe_int(x.get("page_index"), 0),
+                _safe_int(x.get("sent_index"), 0),
+                _safe_int(x.get("tok_index"), 0),
+            ),
+        )
 
     out: Dict[str, Any] = {
         "source": "elasticsearch",
@@ -367,7 +429,7 @@ def _nlp_from_es_and_ctx(
             "languages": _safe_list(es_nlp.get("languages")) or _safe_list(src.get("detected_languages")),
             "language_stats": es_nlp.get("language_stats") if isinstance(es_nlp, dict) else {},
             "sentences_count": _safe_int(es_nlp.get("sentences_count"), len(sentences)),
-            "tokens_count": _safe_int(es_nlp.get("tokens_count"), len(pos_rows)),
+            "tokens_count": _safe_int(es_nlp.get("tokens_count"), len(tokens_rows)),
             "entities_count": _safe_int(es_nlp.get("entities_count"), len(entities)),
             "top_pos": _safe_list(es_nlp.get("top_pos")),
             "top_ner": _safe_list(es_nlp.get("top_ner")),
@@ -378,8 +440,7 @@ def _nlp_from_es_and_ctx(
         "sentences": sentences,
         "entities": entities,
         "matches": _filter_rows_for_doc(ctx.get("NLP_MATCHES"), doc_id, filename),
-        "pos": pos_rows,
-        "lemma": lemma_rows,
+        "tokens": tokens_rows,
     }
 
     if level == "full":
@@ -787,6 +848,70 @@ def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
         file_name,
         first_doc.get("size"),
     )
+    nlp_tokens = _safe_list(ctx.get("NLP_TOKENS"))
+    if not nlp_tokens:
+        # Fallback compat runs anciens: fusionne NLP_POS + NLP_LEMMA.
+        pos_rows = _safe_list(ctx.get("NLP_POS"))
+        lemma_rows = _safe_list(ctx.get("NLP_LEMMA"))
+        merged: Dict[Tuple[Any, Any, Any, Any, Any, Any], Dict[str, Any]] = {}
+        for row in pos_rows:
+            if not isinstance(row, dict):
+                continue
+            key = (
+                row.get("filename"),
+                row.get("page_index"),
+                row.get("sent_index"),
+                row.get("tok_index"),
+                row.get("token"),
+                row.get("lang"),
+            )
+            merged[key] = {
+                "filename": row.get("filename"),
+                "page_index": row.get("page_index"),
+                "sent_index": row.get("sent_index"),
+                "tok_index": row.get("tok_index"),
+                "token": row.get("token"),
+                "pos": row.get("pos"),
+                "lemma": None,
+                "ner": row.get("ner"),
+                "lang": row.get("lang"),
+            }
+        for row in lemma_rows:
+            if not isinstance(row, dict):
+                continue
+            key = (
+                row.get("filename"),
+                row.get("page_index"),
+                row.get("sent_index"),
+                row.get("tok_index"),
+                row.get("token"),
+                row.get("lang"),
+            )
+            cur = merged.get(key)
+            if cur is None:
+                merged[key] = {
+                    "filename": row.get("filename"),
+                    "page_index": row.get("page_index"),
+                    "sent_index": row.get("sent_index"),
+                    "tok_index": row.get("tok_index"),
+                    "token": row.get("token"),
+                    "pos": None,
+                    "lemma": row.get("lemma"),
+                    "ner": row.get("ner"),
+                    "lang": row.get("lang"),
+                }
+            else:
+                cur["lemma"] = row.get("lemma")
+                if cur.get("ner") is None:
+                    cur["ner"] = row.get("ner")
+        nlp_tokens = sorted(
+            merged.values(),
+            key=lambda x: (
+                _safe_int(x.get("page_index"), 0),
+                _safe_int(x.get("sent_index"), 0),
+                _safe_int(x.get("tok_index"), 0),
+            ),
+        )
 
     payload: Dict[str, Any] = {
         "document_id": ctx.get("DOC_ID") or ns(),
@@ -849,8 +974,7 @@ def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
             "sentences": ctx.get("NLP_SENTENCES") or [],
             "entities": ctx.get("NLP_ENTITIES") or [],
             "matches": ctx.get("NLP_MATCHES") or [],
-            "pos": ctx.get("NLP_POS") or [],
-            "lemma": ctx.get("NLP_LEMMA") or [],
+            "tokens": nlp_tokens,
         },
         "processing": {
             "warnings": ctx.get("PROCESS_WARNINGS") or [],

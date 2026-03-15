@@ -284,6 +284,8 @@ class ElasticsearchComponent(Component):
         doc_ids = ctx.get("ES_DOC_IDS") or []
         cls_docs = ctx.get("ES_CLASSIFICATION_DOCS") or []
         ext_docs = ctx.get("ES_EXTRACTION_DOCS") or []
+        class_results = ctx.get("RESULTS") if isinstance(ctx.get("RESULTS"), list) else []
+        class_synced = int(ctx.get("ES_CLASSIFICATION_SYNCED") or 0)
         nlp_sync = ctx.get("ES_NLP_SYNC") if isinstance(ctx.get("ES_NLP_SYNC"), dict) else {}
 
         output = {
@@ -292,6 +294,8 @@ class ElasticsearchComponent(Component):
             "es_url": ctx.get("ES_URL"),
             "es_index": ctx.get("ES_INDEX"),
             "doc_ids": len(doc_ids),
+            "classification_input": len(class_results),
+            "classification_synced": class_synced,
             "classification_docs": len(cls_docs),
             "extraction_docs": len(ext_docs),
             "nlp_level": nlp_sync.get("level"),
@@ -303,6 +307,7 @@ class ElasticsearchComponent(Component):
         }
         summary = (
             f"enabled={enabled} | available={available} | indexed={len(doc_ids)} | "
+            f"cls_input={len(class_results)} | cls_synced={class_synced} | "
             f"cls_docs={len(cls_docs)} | ext_docs={len(ext_docs)} | "
             f"nlp={nlp_sync.get('level')} docs={int(nlp_sync.get('docs_synced') or 0)} "
             f"tokens={int(nlp_sync.get('tokens_indexed') or 0)} "
@@ -339,12 +344,19 @@ class ClassificationComponent(Component):
             raise ValueError("clasification n'a retourne aucun resultat.")
 
         if store is not None:
-            try:
-                synced = update_classification_results(store, results)
-                ctx["ES_CLASSIFICATION_SYNCED"] = synced
-                logging.info("Classification synchronisee vers Elasticsearch: %d document(s).", synced)
-            except Exception as exc:
-                logging.warning("Sync classification vers Elasticsearch echouee: %s", exc)
+            es_ids = [str(x) for x in (ctx.get("ES_DOC_IDS") or []) if x]
+            if es_ids:
+                try:
+                    synced = update_classification_results(store, results)
+                    ctx["ES_CLASSIFICATION_SYNCED"] = synced
+                    logging.info("Classification synchronisee vers Elasticsearch: %d document(s).", synced)
+                except Exception as exc:
+                    logging.warning("Sync classification vers Elasticsearch echouee: %s", exc)
+            else:
+                ctx["ES_CLASSIFICATION_SYNCED"] = int(ctx.get("ES_CLASSIFICATION_SYNCED") or 0)
+                logging.info(
+                    "Classification calculee mais sync Elasticsearch differee: indexation docs non executee (etape elasticsearch plus tard)."
+                )
 
         labels = ", ".join(f"{r.get('filename')}->{r.get('doc_type')}" for r in results)
         summary = f"{len(results)} docs classes | {labels}"

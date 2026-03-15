@@ -130,8 +130,8 @@ component/clasification.py:161:def _doc_text_len(doc: Dict[str, Any]) -> int:
 component/clasification.py:169:def _drop_empty_duplicates(docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 component/clasification.py:185:def classify_scores(DOCS: List[Dict[str, Any]], common: Dict[str, Any], configs: Dict[str, Any]) -> None:
 component/clasification.py:246:def decide(scores: Dict[str, int], configs: Dict[str, Any], common: Dict[str, Any]) -> Dict[str, Any]:
-component/elasticsearch.py:21:def _normalize_ids(values: Any) -> List[str]:
-component/elasticsearch.py:31:def run(ctx: Dict[str, Any]) -> Dict[str, Any]:
+component/elasticsearch.py:22:def _normalize_ids(values: Any) -> List[str]:
+component/elasticsearch.py:32:def run(ctx: Dict[str, Any]) -> Dict[str, Any]:
 component/extraction-regles.py:25:def _load_json(path: Path) -> Dict[str, Any]:
 component/extraction-regles.py:32:def _compile_regex(pattern: str, flags_list: Optional[List[str]]) -> re.Pattern:
 component/extraction-regles.py:48:def _load_routes() -> Dict[str, Any]:
@@ -318,9 +318,9 @@ pipeline/components.py:209:class OutputTxtComponent(Component):
 pipeline/components.py:231:class TokenisationLayoutComponent(Component):
 pipeline/components.py:258:class GrammarComponent(Component):
 pipeline/components.py:279:class ElasticsearchComponent(Component):
-pipeline/components.py:315:class ClassificationComponent(Component):
-pipeline/components.py:355:class RuleExtractionComponent(Component):
-pipeline/components.py:405:class FusionResultComponent(Component):
+pipeline/components.py:320:class ClassificationComponent(Component):
+pipeline/components.py:367:class RuleExtractionComponent(Component):
+pipeline/components.py:417:class FusionResultComponent(Component):
 pipeline/elasticsearch.py:33:def _iso_now() -> str:
 pipeline/elasticsearch.py:37:def _unique_keep_order(items: Iterable[str]) -> List[str]:
 pipeline/elasticsearch.py:48:def _safe_int(value: Any, default: int = 0) -> int:

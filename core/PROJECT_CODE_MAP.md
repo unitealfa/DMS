@@ -19,10 +19,10 @@ Date d'audit: 2026-03-05
 1. `pretraitement-de-docs`
 2. `si-image-pretraiter-sinonpass-le-doc`
 3. `output-txt`
-4. `tokenisation-layout`
-5. `atripusion-gramatical-en-utilisant-les3ficherla`
-6. `elasticsearch`
-7. `clasification`
+4. `clasification`
+5. `tokenisation-layout`
+6. `atripusion-gramatical-en-utilisant-les3ficherla`
+7. `elasticsearch`
 8. `extraction-regles`
 9. `fusion-resultats` (debug/fusion finale, non bloquant en erreur)
 
@@ -281,6 +281,14 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
     - ajout des vues explicatives `Sequence`, `Context Keys`, `Run Trace`,
     - clic sur un composant: affichage d'un output exemple + explication de chaque champ.
 - 2026-03-15:
+  - `pipeline/orchestrator.py` + `pipeline/cli.py`:
+    - nouvel ordre pipeline: `clasification` executee juste apres `output-txt`, avant `tokenisation-layout`.
+  - `pipeline/components.py`:
+    - `ClassificationComponent`: sync ES differee tant que les docs ne sont pas indexes (`ES_DOC_IDS` absents) pour eviter une sync prematuree.
+    - `ElasticsearchComponent`: reporting enrichi avec `classification_input` et `classification_synced`.
+  - `component/elasticsearch.py`:
+    - ajoute la sync classification (`RESULTS`) directement dans l'etape Elasticsearch apres indexation des documents,
+    - expose `ES_CLASSIFICATION_SYNCED` dans le contexte et le log composant.
   - `component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py`:
     - fusion des anciennes sorties separees `NLP_POS` et `NLP_LEMMA` en une sortie unique `NLP_TOKENS`,
     - format unifie par token: `filename`, `page_index`, `sent_index`, `tok_index`, `token`, `pos`, `lemma`, `ner`, `lang`,

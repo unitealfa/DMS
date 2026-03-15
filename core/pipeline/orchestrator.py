@@ -24,10 +24,10 @@ class PipelineOrchestrator:
             PretraitementComponent("pretraitement-de-docs", COMPONENT_DIR / "pretraitement-de-docs.py"),
             OCRPreprocessComponent("si-image-pretraiter-sinonpass-le-doc", COMPONENT_DIR / "si-image-pretraiter-sinonpass-le-doc.py"),
             OutputTxtComponent("output-txt", COMPONENT_DIR / "output-txt.py"),
+            ClassificationComponent("clasification", COMPONENT_DIR / "clasification.py"),
             TokenisationLayoutComponent("tokenisation-layout", COMPONENT_DIR / "tokenisation-layout.py"),
             GrammarComponent("atripusion-gramatical-en-utilisant-les3ficherla", COMPONENT_DIR / "atrribution-gramatical" / "atripusion-gramatical-en-utilisant-les3ficherla.py"),
             ElasticsearchComponent("elasticsearch", COMPONENT_DIR / "elasticsearch.py"),
-            ClassificationComponent("clasification", COMPONENT_DIR / "clasification.py"),
             RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction-regles.py"),
             FusionResultComponent("fusion-resultats", COMPONENT_DIR / "fusion_resultats.py"),
         ]

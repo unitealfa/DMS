@@ -15,6 +15,7 @@ from pipeline.elasticsearch import (  # noqa: E402
     sync_nlp_results,
     to_classification_docs,
     to_extraction_docs,
+    update_classification_results,
 )
 
 
@@ -36,6 +37,7 @@ def run(ctx: Dict[str, Any]) -> Dict[str, Any]:
         ctx.setdefault("ES_DOC_IDS", [])
         ctx.setdefault("ES_CLASSIFICATION_DOCS", [])
         ctx.setdefault("ES_EXTRACTION_DOCS", [])
+        ctx.setdefault("ES_CLASSIFICATION_SYNCED", 0)
         return ctx
 
     ctx["ES_AVAILABLE"] = True
@@ -45,6 +47,16 @@ def run(ctx: Dict[str, Any]) -> Dict[str, Any]:
     es_doc_ids = index_tok_docs(store, base_docs)
     if not es_doc_ids:
         es_doc_ids = _normalize_ids(ctx.get("ES_DOC_IDS"))
+
+    class_results = ctx.get("RESULTS") if isinstance(ctx.get("RESULTS"), list) else []
+    class_synced = 0
+    if class_results:
+        try:
+            class_synced = update_classification_results(store, class_results)
+        except Exception as exc:
+            print(f"[elasticsearch] sync classification ignoree: {exc}")
+            class_synced = 0
+    ctx["ES_CLASSIFICATION_SYNCED"] = int(class_synced)
 
     sources = fetch_sources_for_ids(store, es_doc_ids)
     cls_docs = to_classification_docs(sources)
@@ -65,6 +77,7 @@ def run(ctx: Dict[str, Any]) -> Dict[str, Any]:
     print(
         "[elasticsearch] index="
         f"{store.index} | docs_indexed={len(es_doc_ids)} | "
+        f"classification_input={len(class_results)} | classification_synced={ctx['ES_CLASSIFICATION_SYNCED']} | "
         f"classification_docs={len(cls_docs)} | extraction_docs={len(ext_docs)} | "
         f"nlp_level={nlp_sync.get('level')} | nlp_docs={ctx['ES_NLP_DOCS_SYNCED']} | "
         f"nlp_tokens={ctx['ES_NLP_TOKENS_SYNCED']} | nlp_errors={ctx['ES_NLP_TOKEN_ERRORS']}"

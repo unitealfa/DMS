@@ -4,9 +4,9 @@ Date d'audit: 2026-03-15
 
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
-- Python files analyses: 24
-- Fonctions/classes indexees: 425 (voir `FUNCTION_INDEX.txt`)
-- Regles metier JSON: `rules/*.json` + `classification/*.json` + `config/ruleset_routes.json`
+- Python files analyses: 25
+- Fonctions/classes indexees: 455 (voir `FUNCTION_INDEX.txt`)
+- Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 
 ## 2) Points d'entree
 - CLI principal: `main.py` -> `pipeline.cli:main`
@@ -39,7 +39,7 @@ Date d'audit: 2026-03-15
      - generation `NLP_*` minimale (sans composant grammaire).
   6. `elasticsearch`
   7. `extraction-regles` (`component/extraction-regles-50ml.py`):
-     - extraction regex standard + scoring BM25 par chunk.
+     - extraction YAML (sans regex de champs) pilotee par classification/doc_type + scoring BM25 par chunk.
   8. `fusion-resultats` (`component/fusion_resultats-50ml.py`):
      - fusion standard + ajout `ml50` + BM25 dans `fusion_output.json`.
 - Pipeline `pipeline100ml`:
@@ -55,7 +55,7 @@ Date d'audit: 2026-03-15
      - fallback hash local si modele indisponible.
   6. `elasticsearch`
   7. `extraction-regles` (`component/extraction-regles-100ml.py`):
-     - extraction regex standard + scoring BM25 par chunk.
+     - extraction YAML (sans regex de champs) pilotee par classification/doc_type + scoring BM25 par chunk.
   8. `fusion-resultats` (`component/fusion_resultats-100ml.py`):
      - fusion standard + ajout `ml100` + BM25 dans `fusion_output.json`.
 
@@ -129,11 +129,11 @@ Reference implementation:
 - sortie: `RESULTS` (doc_type, status, scores, `classification_log`, `keyword_matches`, `anti_confusion_targets`)
 - sync ES: `ES_CLASSIFICATION_SYNCED`
 
-### 4.8 Extraction regex
+### 4.8 Extraction metier
 - sortie: `EXTRACTIONS`
 - sync ES: `ES_EXTRACTION_SYNCED`
-- en `pipeline50ml`: `EXTRACTIONS[].bm25` + `BM25_RESULTS`
-- en `pipeline100ml`: `EXTRACTIONS[].bm25` + `BM25_RESULTS`
+- en `pipeline50ml`: extraction basee YAML (`rules/*.yaml`, `config/ruleset_routes.yaml`) + `EXTRACTIONS[].bm25` + `BM25_RESULTS`
+- en `pipeline100ml`: extraction basee YAML (`rules/*.yaml`, `config/ruleset_routes.yaml`) + `EXTRACTIONS[].bm25` + `BM25_RESULTS`
 
 ### 4.9 Fusion finale
 - sortie fichier: `fusion_output.json`
@@ -185,10 +185,13 @@ Reference implementation:
 - code: `component/clasification.py`
 - config: `classification/common.json`, `classification/*.json`
 
-### 5.7 Changer extraction regex metier
-- moteur: `component/extraction-regles.py`
-- routage rulesets: `config/ruleset_routes.json`
-- patterns metier: `rules/*.json`
+### 5.7 Changer extraction metier
+- moteur regex (pipeline default): `component/extraction-regles.py`
+- moteur YAML (pipelines 50ml/100ml): `component/extraction-regles-yaml.py`
+- routage rulesets regex: `config/ruleset_routes.json`
+- routage rulesets YAML: `config/ruleset_routes.yaml`
+- patterns metier regex: `rules/*.json`
+- patterns metier YAML: `rules/*.yaml`
 - variante ML50 avec BM25:
   - `component/extraction-regles-50ml.py`
 - variante ML100 avec BM25:
@@ -250,8 +253,9 @@ Reference implementation:
 - `elasticsearch.py`: step script pour index/fetch docs ES.
 - `clasification.py`: keyword scoring classification + details matches (`classification_log`, `keyword_matches`).
 - `extraction-regles.py`: regex extractors selon doc_type.
-- `extraction-regles-50ml.py`: extraction-regles + scoring BM25 sur chunks.
-- `extraction-regles-100ml.py`: extraction-regles + scoring BM25 sur chunks.
+- `extraction-regles-yaml.py`: extraction sans regex de champs (labels/detecteurs) selon doc_type via YAML.
+- `extraction-regles-50ml.py`: extraction-regles-yaml + scoring BM25 sur chunks.
+- `extraction-regles-100ml.py`: extraction-regles-yaml + scoring BM25 sur chunks.
 - `fusion_resultats.py`: build JSON fusion structure par document (`documents[]`) depuis context + ES.
 - `fusion_resultats-50ml.py`: fusion_resultats + enrichissement ML50/BM25.
   - force la visibilite `ml50.document_topics`/`ml50.document_primary_topics` dans `fusion_output.json` (fallback depuis les topics de chunks si `ML50_TOPICS` absent/mal aligne).
@@ -259,14 +263,19 @@ Reference implementation:
 - `fusion_resultats-100ml.py`: fusion_resultats + enrichissement ML100/BM25.
   - produit `document.ml100` + `components.tokenisation_layout_100ml` + `components.extraction_regles_100ml`.
 
-## 7) Fichiers metier JSON
+## 7) Fichiers metier JSON/YAML
 - `classification/common.json`: poids/penalites/seuil/marge globaux.
 - `classification/*.json`: classes documentaires + keywords + anti-confusion.
 - `config/ruleset_routes.json`: mapping doc_type -> rulesets.
+- `config/ruleset_routes.yaml`: mapping doc_type -> rulesets YAML (utilise par pipelines 50ml/100ml).
 - `rules/common.json`: extracteurs communs (date/email/phone/url).
 - `rules/FACTURE.json`: extracteurs facture FR/EN/AR.
 - `rules/BON_DE_COMMANDE.json`: extracteurs BC FR/EN/AR.
 - `rules/CONTRAT.json`: extracteurs contrat FR/EN/AR.
+- `rules/common.yaml`: extracteurs communs YAML (detectors simples).
+- `rules/FACTURE.yaml`: extracteurs facture YAML (labels metier).
+- `rules/BON_DE_COMMANDE.yaml`: extracteurs BC YAML (labels metier).
+- `rules/CONTRAT.yaml`: extracteurs contrat YAML (labels metier).
 
 ## 8) Artefacts d'execution
 - `orchestre.log`: log Python (logging)
@@ -387,7 +396,7 @@ Reference implementation:
     - ajoute un affichage terminal explicite par document: `[topic-doc] ... document_primary_topics/document_top_topics`.
     - genere `NLP_ANALYSES`/`NLP_TOKENS` minimaux pour la sync ES sans composant grammaire.
   - `component/extraction-regles-50ml.py`:
-    - execute extraction regex standard puis ajoute un scoring BM25 par chunk,
+    - execute extraction YAML (sans regex de champs) via `extraction-regles-yaml.py` puis ajoute un scoring BM25 par chunk,
     - enrichit `EXTRACTIONS[].bm25` + publie `BM25_RESULTS`.
   - `component/fusion_resultats-50ml.py`:
     - execute la fusion standard puis enrichit `fusion_output.json` avec:
@@ -404,7 +413,13 @@ Reference implementation:
     - fallback hash local automatique si modele indisponible,
     - ajoute un topic extractor (`ML100_TOPICS`) + `document_primary_topics`/`document_topics`.
   - `component/extraction-regles-100ml.py`:
-    - execute extraction regex standard puis ajoute un scoring BM25 par chunk (tag log 100ml).
+    - execute extraction YAML (sans regex de champs) via `extraction-regles-yaml.py` puis ajoute un scoring BM25 par chunk (tag log 100ml).
+  - `component/extraction-regles-yaml.py`:
+    - nouveau moteur d'extraction par YAML (labels + detecteurs date/email/telephone/url/amount/currency),
+    - selection des champs selon `classification.doc_type`,
+    - sortie compatible `EXTRACTIONS` (rule_id/type/matches) pour fusion + BM25.
+  - `config/ruleset_routes.yaml` + `rules/*.yaml`:
+    - ajout du routage et des regles metier YAML (`common.yaml`, `CONTRAT.yaml`, `FACTURE.yaml`, `BON_DE_COMMANDE.yaml`) utilises par les pipelines 50ml/100ml.
   - `component/fusion_resultats-100ml.py`:
     - execute la fusion standard puis enrichit `fusion_output.json` avec:
       - `document.ml100` (vectors/topics),

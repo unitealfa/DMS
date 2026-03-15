@@ -1,0 +1,104 @@
+ruleset_id: BON_DE_COMMANDE_YAML_V1
+extractors:
+  numero_bc:
+    rule_id: BC_NUM_YAML_01
+    type: string
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    min_chars: 2
+    max_chars: 80
+    labels:
+      - "bon de commande"
+      - "numero de commande"
+      - "n° commande"
+      - "purchase order"
+      - "order number"
+      - "po"
+      - "رقم الطلب"
+      - "رقم أمر الشراء"
+      - "رقم امر الشراء"
+
+  date_commande:
+    rule_id: BC_ORDER_DATE_YAML_01
+    type: date
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    labels:
+      - "date de commande"
+      - "date commande"
+      - "order date"
+      - "purchase order date"
+      - "تاريخ الطلب"
+      - "تاريخ أمر الشراء"
+      - "تاريخ امر الشراء"
+
+  date_livraison:
+    rule_id: BC_DELIVERY_DATE_YAML_01
+    type: date
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    labels:
+      - "date de livraison"
+      - "livraison prevue"
+      - "livraison prévue"
+      - "delivery date"
+      - "expected delivery date"
+      - "تاريخ التسليم"
+      - "موعد التسليم"
+      - "تاريخ التوريد"
+
+  fournisseur_nom:
+    rule_id: BC_SUPPLIER_NAME_YAML_01
+    type: string
+    strategy: label_value
+    many: true
+    lookahead_lines: 2
+    min_chars: 2
+    max_chars: 180
+    labels:
+      - "nom du fournisseur"
+      - "fournisseur"
+      - "supplier name"
+      - "supplier"
+      - "vendor"
+      - "اسم المورد"
+      - "المورد"
+      - "اسم البائع"
+      - "البائع"
+
+  total_ht:
+    rule_id: BC_TOTAL_HT_YAML_01
+    type: amount
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    labels:
+      - "total ht"
+      - "montant ht"
+      - "total hors taxe"
+      - "subtotal"
+      - "order subtotal"
+      - "total excl tax"
+      - "المجموع دون الضريبة"
+      - "المبلغ دون الضريبة"
+
+  total_ttc:
+    rule_id: BC_TOTAL_TTC_YAML_01
+    type: amount
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    labels:
+      - "total ttc"
+      - "montant ttc"
+      - "order total"
+      - "grand total"
+      - "total incl tax"
+      - "amount due"
+      - "الاجمالي شامل الضريبة"
+      - "الإجمالي شامل الضريبة"
+      - "المبلغ المستحق"
+

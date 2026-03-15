@@ -1030,7 +1030,7 @@ Regex Test Corpus - Contracts (FR/EN/AR)                                        
 Type: list
 Summary: 1 docs | pages=12
 Output: [{'content': 'text',
-  'doc_id': 'a1e8535d-4506-4b6d-a24f-29bd2f6dfd46',
+  'doc_id': '111ecdca-a4d8-41f9-9920-56870cb1b0be',
   'extraction': 'native:pdf:pypdf',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'page_count_total': 12,
@@ -3130,7 +3130,7 @@ Output: [{'anti_confusion_targets': ['BON_DE_COMMANDE', 'FACTURE', 'DEVIS', 'BON
                         "status=OK | scores: {'ARTICLE': -48, 'BON_DE_COMMANDE': -223, 'CONTRAT': "
                         "229, 'FACTURE': -197, 'FORMULAIRE': 28}",
   'decision_debug': {'diff': 201, 'second_score': 28, 'top_score': 229},
-  'doc_id': 'a1e8535d-4506-4b6d-a24f-29bd2f6dfd46',
+  'doc_id': '111ecdca-a4d8-41f9-9920-56870cb1b0be',
   'doc_type': 'CONTRAT',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'keyword_matches': {'anti_confusion_hits': [{'count': 6, 'keyword': 'FACTURE'},
@@ -3180,7 +3180,7 @@ Output: [{'anti_confusion_targets': ['BON_DE_COMMANDE', 'FACTURE', 'DEVIS', 'BON
 
 ========================================================================================================================
 [doc] contrat_regex_test_corpus_fr_en_ar.pdf
-  doc_id       : a1e8535d-4506-4b6d-a24f-29bd2f6dfd46
+  doc_id       : 111ecdca-a4d8-41f9-9920-56870cb1b0be
   content      : image_only
   extraction   : ocr:tesseract
   pages_total  : 1
@@ -3892,7 +3892,7 @@ Regex Test Corpus - Contracts (FR/EN/AR)                                        
 
 ========================================================================================================================
 [doc] contrat_regex_test_corpus_fr_en_ar.pdf
-  doc_id       : a1e8535d-4506-4b6d-a24f-29bd2f6dfd46
+  doc_id       : 111ecdca-a4d8-41f9-9920-56870cb1b0be
   content      : text
   extraction   : native:pdf:pypdf
   pages_total  : 12
@@ -4675,17 +4675,15 @@ NEGATIVE
 Regex Test Corpus - Contracts (FR/EN/AR)                                                                    Page 12
 --------------------------------------------------------------------------------
 
-[tokenisation-100ml] transformer indisponible, fallback hash | reason=CUDA error: no kernel image is available for execution on the device
-Search for `cudaErrorNoKernelImageForDevice' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TY
 [topic-doc-100] contrat_regex_test_corpus_fr_en_ar.pdf | document_primary_topics=['date', 'تاريخ'] | document_top_topics=['date', 'تاريخ', 'contract', 'agreement', 'contrat']
 [topic-doc-100] contrat_regex_test_corpus_fr_en_ar.pdf | document_primary_topics=['date', 'تاريخ'] | document_top_topics=['date', 'تاريخ', 'contract', 'contrat', 'agreement']
-[tokenisation-100ml] docs=2 | chunks=86 | words=0 | topics=24 | nlp_rows=86 | vector_dim=768 | backend=hash-fallback
+[tokenisation-100ml] docs=2 | chunks=86 | words=0 | topics=24 | nlp_rows=86 | vector_dim=768 | backend=transformer:xlm-roberta-base
 [Component: tokenisation-layout]
 Type: list
 Summary: 2 docs | sentences=122
 Output: [{'chars_total': 11278,
   'content': 'image_only',
-  'doc_id': 'a1e8535d-4506-4b6d-a24f-29bd2f6dfd46',
+  'doc_id': '111ecdca-a4d8-41f9-9920-56870cb1b0be',
   'extraction': 'ocr:tesseract',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'page_count_total': 1,
@@ -9658,7 +9656,7 @@ Output: [{'chars_total': 11278,
   'size': None},
  {'chars_total': 11256,
   'content': 'text',
-  'doc_id': 'a1e8535d-4506-4b6d-a24f-29bd2f6dfd46',
+  'doc_id': '111ecdca-a4d8-41f9-9920-56870cb1b0be',
   'extraction': 'native:pdf:pypdf',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'page_count_total': 12,
@@ -12959,125 +12957,107 @@ Output: {'available': False,
  'nlp_unresolved_rows': 0}
 
 
-[extraction]
+[extraction-yaml]
   doc: contrat_regex_test_corpus_fr_en_ar.pdf | type=CONTRAT | status=OK
-  rulesets: common.json, CONTRAT.json
-    - doc_date (rule_id=CMN_DATE_01)  x18
-        p2: 25/02/2026  [rule_id=CMN_DATE_01]
-        p2: 01/03/2026  [rule_id=CMN_DATE_01]
-        p2: 28/02/2027  [rule_id=CMN_DATE_01]
-        p5: 24-02-2026  [rule_id=CMN_DATE_01]
-        p6: 25/02/2026  [rule_id=CMN_DATE_01]
-        p6: 01-03-2026  [rule_id=CMN_DATE_01]
-        p7: 25/02/2026  [rule_id=CMN_DATE_01]
-        p7: 01/03/2026  [rule_id=CMN_DATE_01]
-        p7: 01/03/2028  [rule_id=CMN_DATE_01]
-        p7: 15/03/2026  [rule_id=CMN_DATE_01]
-        p8: 24-02-2026  [rule_id=CMN_DATE_01]
-        p8: 25-02-2026  [rule_id=CMN_DATE_01]
-        p9: 25/02/2026  [rule_id=CMN_DATE_01]
-        p9: 12/03/2026  [rule_id=CMN_DATE_01]
-        p10: 25/02/2026  [rule_id=CMN_DATE_01]
-        p10: 03/03/2026  [rule_id=CMN_DATE_01]
-        p11: 05/03/2026  [rule_id=CMN_DATE_01]
-        p12: 26/02/2026  [rule_id=CMN_DATE_01]
-    - titre_contrat (rule_id=CTR_TITLE_01)  x20
-        p2: None  [rule_id=CTR_TITLE_01]
-        p2: Contrat de prestation de services informatiques et maintenance applicative  [rule_id=CTR_TITLE_01]
-        p3: None  [rule_id=CTR_TITLE_01]
-        p3: IT Services Agreement for Application Support and Preventive Maintenance  [rule_id=CTR_TITLE_01]
-        p3: None  [rule_id=CTR_TITLE_01]
-        p3: None  [rule_id=CTR_TITLE_01]
-        p4: None  [rule_id=CTR_TITLE_01]
-        p4: عقد خدمات الصيانة والدعم التقني للأنظمة المعلوماتية  [rule_id=CTR_TITLE_01]
-        p4: يحدد هذا العقد شروط تقديم خدمات الصيانة والدعم الفني والتدخلات  [rule_id=CTR_TITLE_01]
-        p5: None  [rule_id=CTR_TITLE_01]
-        p5: None  [rule_id=CTR_TITLE_01]
-        p5: Convention de services et de maintenance multi-sites  [rule_id=CTR_TITLE_01]
-        p6: None  [rule_id=CTR_TITLE_01]
-        p6: None  [rule_id=CTR_TITLE_01]
-        p6: Regional Network Equipment Supply and Support Agreement  [rule_id=CTR_TITLE_01]
-        p7: None  [rule_id=CTR_TITLE_01]
-        p7: None  [rule_id=CTR_TITLE_01]
-        p7: توريد معدات اتصالات صناعية مع خدمات التركيب والدعم  [rule_id=CTR_TITLE_01]
-        p8: Regional Services Agreement / اتفاقية خدمات إقليمية  [rule_id=CTR_TITLE_01]
-        p8: None  [rule_id=CTR_TITLE_01]
-    - date_signature (rule_id=CTR_SIGN_DATE_01)  x6
-        p2: 25/02/2026  [rule_id=CTR_SIGN_DATE_01]
-        p3: 2026-02-24  [rule_id=CTR_SIGN_DATE_01]
-        p5: 24-02-2026  [rule_id=CTR_SIGN_DATE_01]
-        p6: 25/02/2026  [rule_id=CTR_SIGN_DATE_01]
-        p7: 25/02/2026  [rule_id=CTR_SIGN_DATE_01]
-        p8: 2026.02.26  [rule_id=CTR_SIGN_DATE_01]
-    - date_effet (rule_id=CTR_EFFECTIVE_DATE_01)  x6
-        p2: 01/03/2026  [rule_id=CTR_EFFECTIVE_DATE_01]
-        p3: 2026-03-01  [rule_id=CTR_EFFECTIVE_DATE_01]
-        p5: 2026/03/01  [rule_id=CTR_EFFECTIVE_DATE_01]
-        p6: 01-03-2026  [rule_id=CTR_EFFECTIVE_DATE_01]
-        p7: 01/03/2026  [rule_id=CTR_EFFECTIVE_DATE_01]
-        p8: 2026/03/01  [rule_id=CTR_EFFECTIVE_DATE_01]
-    - parties (rule_id=CTR_PARTIES_01)  x17
-        p2: SARL Atlas Informatique et EURL Horizon Retail  [rule_id=CTR_PARTIES_01]
-        p2: SARL Atlas Informatique  [rule_id=CTR_PARTIES_01]
-        p2: EURL Horizon Retail  [rule_id=CTR_PARTIES_01]
-        p3: Northshore Industrial Supplies Ltd and Blue Harbor Electronics  [rule_id=CTR_PARTIES_01]
-        p3: Northshore Industrial Supplies Ltd  [rule_id=CTR_PARTIES_01]
-        p3: Blue Harbor Electronics - Export Division  [rule_id=CTR_PARTIES_01]
-        p4: شركة الواحة الرقمية و مؤسسة النور التجارية  [rule_id=CTR_PARTIES_01]
-        p4: شركة الواحة الرقمية  [rule_id=CTR_PARTIES_01]
-        p4: مؤسسة النور التجارية  [rule_id=CTR_PARTIES_01]
-        p4: كل من:  [rule_id=CTR_PARTIES_01]
-        p5: Partie 1 : EPE Techno Sud SPA  [rule_id=CTR_PARTIES_01]
-        p5: SARL Data Logistics  [rule_id=CTR_PARTIES_01]
-        p6: Party 1: Blue Harbor Electronics  [rule_id=CTR_PARTIES_01]
-        p6: Northshore Industrial Supplies Ltd  [rule_id=CTR_PARTIES_01]
-        p7: طرف 1: شركة المغرب للكابلات الصناعية  [rule_id=CTR_PARTIES_01]
-        p7: مؤسسة الميناء الأزرق للإلكترونيات  [rule_id=CTR_PARTIES_01]
-        p8: Atlas Cloud Services SPA ; Greenline Retail LLC  [rule_id=CTR_PARTIES_01]
-    - duree (rule_id=CTR_DURATION_01)  x7
-        p2: : 12 mois renouvelable une fois par avenant  [rule_id=CTR_DURATION_01]
-        p3: 12 months from the Effective Date  [rule_id=CTR_DURATION_01]
-        p4: 12 شهرًا قابلة للتجديد باتفاق مكتوب  [rule_id=CTR_DURATION_01]
-        p5: de validite : un (1) an a compter de la date d'effet  [rule_id=CTR_DURATION_01]
-        p6: 24 months unless terminated earlier in accordance with Clause 18.  [rule_id=CTR_DURATION_01]
-        p7: 24 شهرا تبدأ من تاريخ السريان  [rule_id=CTR_DURATION_01]
-        p8: .... 24 months  [rule_id=CTR_DURATION_01]
-    - date_fin (rule_id=CTR_END_DATE_01)  x6
-        p2: 28/02/2027  [rule_id=CTR_END_DATE_01]
-        p3: 2027-02-28  [rule_id=CTR_END_DATE_01]
-        p5: 2027/03/01  [rule_id=CTR_END_DATE_01]
-        p6: 2027-03-01  [rule_id=CTR_END_DATE_01]
-        p7: 01/03/2028  [rule_id=CTR_END_DATE_01]
-        p8: 2028-02-29  [rule_id=CTR_END_DATE_01]
-    - objet_contrat (rule_id=CTR_OBJECT_01)  x9
-        p2: Le present contrat a pour objet la maintenance corrective et evolutive du  [rule_id=CTR_OBJECT_01]
-        p3: This Agreement governs software support, incident handling, patch  [rule_id=CTR_OBJECT_01]
-        p4: يحدد هذا العقد شروط تقديم خدمات الصيانة والدعم الفني والتدخلات  [rule_id=CTR_OBJECT_01]
-        p5: Fourniture, installation, mise en service et maintenance preventive d'equipements  [rule_id=CTR_OBJECT_01]
-        p6: Supply of industrial communication modules, on-site commissioning, operator  [rule_id=CTR_OBJECT_01]
-        p7: توريد معدات اتصالات صناعية مع خدمات التركيب والدعم  [rule_id=CTR_OBJECT_01]
-        p7: التوريد والتركيب والتشغيل التجريبي والتكوين والدعم الميداني.  [rule_id=CTR_OBJECT_01]
-        p8: Managed services, monitoring, backup verification, and quarterly  [rule_id=CTR_OBJECT_01]
-        p10: Achat de 25 commutateurs reseau 24 ports  [rule_id=CTR_OBJECT_01]
-    - email (rule_id=CMN_EMAIL_01)  x0
-    - telephone (rule_id=CMN_PHONE_01)  x0
-    - site (rule_id=CMN_URL_01)  x0
+  rulesets: common.yaml, CONTRAT.yaml
+    - doc_date (rule_id=CMN_DATE_YAML_01)  x6
+        p2: 25/02/2026  [rule_id=CMN_DATE_YAML_01]
+        p3: 2026-02-24  [rule_id=CMN_DATE_YAML_01]
+        p4: 24/02/2026  [rule_id=CMN_DATE_YAML_01]
+        p8: 2026-02-26  [rule_id=CMN_DATE_YAML_01]
+        p11: 05/03/2026  [rule_id=CMN_DATE_YAML_01]
+        p12: 26/02/2026  [rule_id=CMN_DATE_YAML_01]
+    - email (rule_id=CMN_EMAIL_YAML_01)  x0
+    - telephone (rule_id=CMN_PHONE_YAML_01)  x0
+    - site (rule_id=CMN_URL_YAML_01)  x0
+    - titre_contrat (rule_id=CTR_TITLE_YAML_01)  x8
+        p2: Contrat de prestation de services informatiques et maintenance applicative  [rule_id=CTR_TITLE_YAML_01]
+        p3: IT Services Agreement for Application Support and Preventive Maintenance  [rule_id=CTR_TITLE_YAML_01]
+        p4: عقد خدمات الصيانة والدعم التقني للأنظمة المعلوماتية  [rule_id=CTR_TITLE_YAML_01]
+        p4: يحدد هذا العقد شروط تقديم خدمات الصيانة والدعم الفني والتدخلات  [rule_id=CTR_TITLE_YAML_01]
+        p5: Convention de services et de maintenance multi-sites  [rule_id=CTR_TITLE_YAML_01]
+        p6: Regional Network Equipment Supply and Support Agreement  [rule_id=CTR_TITLE_YAML_01]
+        p7: توريد معدات اتصالات صناعية مع خدمات التركيب والدعم  [rule_id=CTR_TITLE_YAML_01]
+        p8: Regional Services Agreement / اتفاقية خدمات إقليمية  [rule_id=CTR_TITLE_YAML_01]
+    - date_signature (rule_id=CTR_SIGN_DATE_YAML_01)  x4
+        p2: 25/02/2026  [rule_id=CTR_SIGN_DATE_YAML_01]
+        p3: 2026-02-24  [rule_id=CTR_SIGN_DATE_YAML_01]
+        p4: 24/02/2026  [rule_id=CTR_SIGN_DATE_YAML_01]
+        p8: 2026-02-26  [rule_id=CTR_SIGN_DATE_YAML_01]
+    - date_effet (rule_id=CTR_EFFECTIVE_DATE_YAML_01)  x2
+        p2: 01/03/2026  [rule_id=CTR_EFFECTIVE_DATE_YAML_01]
+        p3: 2026-03-01  [rule_id=CTR_EFFECTIVE_DATE_YAML_01]
+    - parties (rule_id=CTR_PARTIES_YAML_01)  x25
+        p1: duree, date_fin  [rule_id=CTR_PARTIES_YAML_01]
+        p1: (noms / lignes parties)  [rule_id=CTR_PARTIES_YAML_01]
+        p1: multiline)  [rule_id=CTR_PARTIES_YAML_01]
+        p2: SARL Atlas Informatique et EURL Horizon Retail  [rule_id=CTR_PARTIES_YAML_01]
+        p2: SARL Atlas Informatique  [rule_id=CTR_PARTIES_YAML_01]
+        p2: EURL Horizon Retail  [rule_id=CTR_PARTIES_YAML_01]
+        p2: Entre les soussignes  [rule_id=CTR_PARTIES_YAML_01]
+        p3: Northshore Industrial Supplies Ltd and Blue Harbor Electronics  [rule_id=CTR_PARTIES_YAML_01]
+        p3: Between the undersigned  [rule_id=CTR_PARTIES_YAML_01]
+        p4: شركة الواحة الرقمية و مؤسسة النور التجارية  [rule_id=CTR_PARTIES_YAML_01]
+        p5: Document positif (francais) - labels alternatifs + blocs parties  [rule_id=CTR_PARTIES_YAML_01]
+        p5: Les parties  [rule_id=CTR_PARTIES_YAML_01]
+        p5: EPE Techno Sud SPA  [rule_id=CTR_PARTIES_YAML_01]
+        p5: SARL Data Logistics  [rule_id=CTR_PARTIES_YAML_01]
+        p5: Zone Industrielle, Blida  [rule_id=CTR_PARTIES_YAML_01]
+        p5: Parc d'Activites, Setif  [rule_id=CTR_PARTIES_YAML_01]
+        p6: Positive document (English) - alternative labels and split parties  [rule_id=CTR_PARTIES_YAML_01]
+        p6: ' if your ranking prefers party labels  [rule_id=CTR_PARTIES_YAML_01]
+        p6: to the Contract  [rule_id=CTR_PARTIES_YAML_01]
+        p6: Blue Harbor Electronics  [rule_id=CTR_PARTIES_YAML_01]
+        p6: Northshore Industrial Supplies Ltd  [rule_id=CTR_PARTIES_YAML_01]
+        p7: أطراف العقد  [rule_id=CTR_PARTIES_YAML_01]
+        p8: Atlas Cloud Services SPA ; Greenline Retail LLC  [rule_id=CTR_PARTIES_YAML_01]
+        p10: fournisseur, dates) mais ce n'est pas  [rule_id=CTR_PARTIES_YAML_01]
+        p11: et dates mais pas contrat  [rule_id=CTR_PARTIES_YAML_01]
+    - duree (rule_id=CTR_DURATION_YAML_01)  x9
+        p1: date_fin  [rule_id=CTR_DURATION_YAML_01]
+        p1: / date_fin  [rule_id=CTR_DURATION_YAML_01]
+        p2: 12 mois renouvelable une fois par avenant  [rule_id=CTR_DURATION_YAML_01]
+        p3: 12 months from the Effective Date  [rule_id=CTR_DURATION_YAML_01]
+        p4: 12 شهرًا قابلة للتجديد باتفاق مكتوب  [rule_id=CTR_DURATION_YAML_01]
+        p5: un (1) an a compter de la date d'effet  [rule_id=CTR_DURATION_YAML_01]
+        p6: 24 months unless terminated earlier in accordance with Clause 18  [rule_id=CTR_DURATION_YAML_01]
+        p7: 24 شهرا تبدأ من تاريخ السريان  [rule_id=CTR_DURATION_YAML_01]
+        p8: 24 months  [rule_id=CTR_DURATION_YAML_01]
+    - date_fin (rule_id=CTR_END_DATE_YAML_01)  x5
+        p2: 28/02/2027  [rule_id=CTR_END_DATE_YAML_01]
+        p3: 2027-02-28  [rule_id=CTR_END_DATE_YAML_01]
+        p5: 2027-03-01  [rule_id=CTR_END_DATE_YAML_01]
+        p7: 01/03/2028  [rule_id=CTR_END_DATE_YAML_01]
+        p8: 2028-02-29  [rule_id=CTR_END_DATE_YAML_01]
+    - objet_contrat (rule_id=CTR_OBJECT_YAML_01)  x12
+        p1: _contrat  [rule_id=CTR_OBJECT_YAML_01]
+        p2: Le present contrat a pour objet la maintenance corrective et evolutive du  [rule_id=CTR_OBJECT_YAML_01]
+        p3: This Agreement governs software support, incident handling, patch  [rule_id=CTR_OBJECT_YAML_01]
+        p4: يحدد هذا العقد شروط تقديم خدمات الصيانة والدعم الفني والتدخلات  [rule_id=CTR_OBJECT_YAML_01]
+        p5: Fourniture, installation, mise en service et maintenance preventive d'equipements  [rule_id=CTR_OBJECT_YAML_01]
+        p6: Supply of industrial communication modules, on-site commissioning, operator  [rule_id=CTR_OBJECT_YAML_01]
+        p7: توريد معدات اتصالات صناعية مع خدمات التركيب والدعم  [rule_id=CTR_OBJECT_YAML_01]
+        p7: التوريد والتركيب والتشغيل التجريبي والتكوين والدعم الميداني  [rule_id=CTR_OBJECT_YAML_01]
+        p8: Managed services, monitoring, backup verification, and quarterly  [rule_id=CTR_OBJECT_YAML_01]
+        p9: prestation de maintenance mensuelle  [rule_id=CTR_OBJECT_YAML_01]
+        p10: Achat de 25 commutateurs reseau 24 ports  [rule_id=CTR_OBJECT_YAML_01]
+        p11: Industrial communication modules - Batch A  [rule_id=CTR_OBJECT_YAML_01]
 [extraction-regles-100ml] docs=1 | bm25_top_score=29.341771
 [Component: extraction-regles]
 Type: list
 Summary: 1 docs | fields=11 | contrat_regex_test_corpus_fr_en_ar.pdf->CONTRAT
-Output: [{'bm25': {'avg_top3_score': 27.244952,
+Output: [{'bm25': {'avg_top3_score': 25.705349,
            'b': 0.75,
            'best_score': 29.341771,
            'chunks_total': 54,
            'k1': 1.5,
-           'query_terms': ['doc', 'date', '25', '02', '2026', '01', '03', '28', '2027', '24',
-                           '2028', '15', '12', '05', '26', 'titre', 'contrat', 'de', 'prestation',
-                           'services', 'informatiques', 'et', 'maintenance', 'applicative', 'it',
-                           'agreement', 'for', 'application', 'support', 'and', 'preventive', 'عقد',
-                           'خدمات', 'الصيانة', 'والدعم', 'التقني', 'للأنظمة', 'المعلوماتية', 'يحدد',
-                           'هذا', 'العقد', 'شروط', 'تقديم', 'الفني', 'والتدخلات', 'convention',
-                           'multi', 'sites'],
+           'query_terms': ['doc', 'date', '25', '02', '2026', '24', '26', '05', '03', 'email',
+                           'telephone', 'site', 'titre', 'contrat', 'de', 'prestation', 'services',
+                           'informatiques', 'et', 'maintenance', 'applicative', 'it', 'agreement',
+                           'for', 'application', 'support', 'and', 'preventive', 'عقد', 'خدمات',
+                           'الصيانة', 'والدعم', 'التقني', 'للأنظمة', 'المعلوماتية', 'يحدد', 'هذا',
+                           'العقد', 'شروط', 'تقديم', 'الفني', 'والتدخلات', 'convention', 'multi',
+                           'sites', 'regional', 'network', 'equipment'],
            'top_chunks': [{'page_index': 2,
                            'score': 29.341771,
                            'sent_index': 0,
@@ -13087,7 +13067,7 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                            'Titre du contrat : Contrat de prestation de services '
                                            'informatiques et maintenance applicative\n'},
                           {'page_index': 4,
-                           'score': 27.34189,
+                           'score': 26.450524,
                            'sent_index': 0,
                            'text_preview': 'عقد خدمات - عربي\n'
                                            'وثيقة إيجابية (عربي) - تسميات مباشرة\n'
@@ -13102,7 +13082,7 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                            '\n'
                                            'الأطرا'},
                           {'page_index': 3,
-                           'score': 25.051196,
+                           'score': 21.323751,
                            'sent_index': 0,
                            'text_preview': 'Contract EN - IT Services Agreement\n'
                                            'Positive document (English) - standard labels\n'
@@ -13114,17 +13094,8 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                            'Effective Date: 2026-03-01\n'
                                            'End Date: 2027-02-28\n'
                                            'Cont'},
-                          {'page_index': 2,
-                           'score': 23.689643,
-                           'sent_index': 4,
-                           'text_preview': 'Date de signature : 25/02/2026\n'
-                                           "Date d'effet : 01/03/2026\n"
-                                           'Date de fin : 28/02/2027\n'
-                                           'Duree du contrat : 12 mois renouvelable une fois par '
-                                           'avenant\n'
-                                           '\n'},
                           {'page_index': 5,
-                           'score': 23.422209,
+                           'score': 21.159238,
                            'sent_index': 0,
                            'text_preview': 'Contrat-cadre FR - Variantes et lignes separees\n'
                                            'Document positif (francais) - labels alternatifs + '
@@ -13136,33 +13107,8 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                            'tester mixte.\n'
                                            '\n'
                                            'CONTRAT-CADRE DE FOURNITURE ET DE'},
-                          {'page_index': 8,
-                           'score': 20.090133,
-                           'sent_index': 3,
-                           'text_preview': 'date of signature : 2026.02.26\n'
-                                           'effective date : 2026/03/01\n'
-                                           'end date : 2028-02-29\n'
-                                           'contract duration .... 24 months\n'
-                                           'parties - Atlas Cloud Services SPA ; Greenline Retail '
-                                           'LLC\n'
-                                           'purpose of the contract : Managed services, '
-                                           'monitoring, backup verification, and quarterly\n'
-                                           'security hardenin'},
-                          {'page_index': 7,
-                           'score': 19.488154,
-                           'sent_index': 0,
-                           'text_preview': 'اتفاقية توريد - عربي (بدائل تسميات)\n'
-                                           'وثيقة إيجابية - تسميات بديلة للحقل نفسه\n'
-                                           '\n'
-                                           'اتفاقية توريد وتجهيز وصيانة\n'
-                                           'موضوع العقد: توريد معدات اتصالات صناعية مع خدمات '
-                                           'التركيب والدعم\n'
-                                           'تاريخ الإمضاء: 25/02/2026\n'
-                                           'تاريخ بدء السريان: 01/03/2026\n'
-                                           'تاريخ نهاية العقد: 01/03/2028\n'
-                                           'فترة السريان: 24 شهرا تبد'},
                           {'page_index': 6,
-                           'score': 17.799438,
+                           'score': 20.788405,
                            'sent_index': 0,
                            'text_preview': 'Agreement EN - Supply and Support\n'
                                            'Positive document (English) - alternative labels and '
@@ -13174,9 +13120,43 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                            '\n'
                                            'AGREEMENT FOR SUPPLY, INSTALLATION AND AFTER-SALES '
                                            'SUPPORT\n'
-                                           'Agr'}]},
+                                           'Agr'},
+                          {'page_index': 8,
+                           'score': 16.02192,
+                           'sent_index': 3,
+                           'text_preview': 'date of signature : 2026.02.26\n'
+                                           'effective date : 2026/03/01\n'
+                                           'end date : 2028-02-29\n'
+                                           'contract duration .... 24 months\n'
+                                           'parties - Atlas Cloud Services SPA ; Greenline Retail '
+                                           'LLC\n'
+                                           'purpose of the contract : Managed services, '
+                                           'monitoring, backup verification, and quarterly\n'
+                                           'security hardenin'},
+                          {'page_index': 7,
+                           'score': 14.854717,
+                           'sent_index': 0,
+                           'text_preview': 'اتفاقية توريد - عربي (بدائل تسميات)\n'
+                                           'وثيقة إيجابية - تسميات بديلة للحقل نفسه\n'
+                                           '\n'
+                                           'اتفاقية توريد وتجهيز وصيانة\n'
+                                           'موضوع العقد: توريد معدات اتصالات صناعية مع خدمات '
+                                           'التركيب والدعم\n'
+                                           'تاريخ الإمضاء: 25/02/2026\n'
+                                           'تاريخ بدء السريان: 01/03/2026\n'
+                                           'تاريخ نهاية العقد: 01/03/2028\n'
+                                           'فترة السريان: 24 شهرا تبد'},
+                          {'page_index': 2,
+                           'score': 14.309873,
+                           'sent_index': 4,
+                           'text_preview': 'Date de signature : 25/02/2026\n'
+                                           "Date d'effet : 01/03/2026\n"
+                                           'Date de fin : 28/02/2027\n'
+                                           'Duree du contrat : 12 mois renouvelable une fois par '
+                                           'avenant\n'
+                                           '\n'}]},
   'classification_status': 'OK',
-  'doc_id': 'a1e8535d-4506-4b6d-a24f-29bd2f6dfd46',
+  'doc_id': '111ecdca-a4d8-41f9-9920-56870cb1b0be',
   'doc_type': 'CONTRAT',
   'fields': {'date_effet': {'many': True,
                             'matches': [{'end': 337,
@@ -13194,40 +13174,8 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                                     'End Date: 2027-02-28\n'
                                                     'Contract Term: 12 ',
                                          'start': 318,
-                                         'value': '2026-03-01'},
-                                        {'end': 488,
-                                         'page_index': 5,
-                                         'snippet': ' signature : 24-02-2026\n'
-                                                    "Prise d'effet : 2026/03/01\n"
-                                                    'Expiration date : 2027/03/01\n'
-                                                    'Duree de v',
-                                         'start': 478,
-                                         'value': '2026/03/01'},
-                                        {'end': 477,
-                                         'page_index': 6,
-                                         'snippet': 'igned on: 25/02/2026\n'
-                                                    'Commencement Date: 01-03-2026\n'
-                                                    'Termination Date: 2027-03-01\n'
-                                                    'Validity P',
-                                         'start': 467,
-                                         'value': '01-03-2026'},
-                                        {'end': 285,
-                                         'page_index': 7,
-                                         'snippet': ' الإمضاء: 25/02/2026\n'
-                                                    'تاريخ بدء السريان: 01/03/2026\n'
-                                                    'تاريخ نهاية العقد: 01/03/2028\n'
-                                                    'فترة السر',
-                                         'start': 275,
-                                         'value': '01/03/2026'},
-                                        {'end': 400,
-                                         'page_index': 8,
-                                         'snippet': 'signature : 2026.02.26\n'
-                                                    'effective date : 2026/03/01\n'
-                                                    'end date : 2028-02-29\n'
-                                                    'contract duration',
-                                         'start': 390,
-                                         'value': '2026/03/01'}],
-                            'rule_id': 'CTR_EFFECTIVE_DATE_01',
+                                         'value': '2026-03-01'}],
+                            'rule_id': 'CTR_EFFECTIVE_DATE_YAML_01',
                             'type': 'date'},
              'date_fin': {'many': True,
                           'matches': [{'end': 362,
@@ -13245,19 +13193,10 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                                   'Contract Term: 12 months from the Effec',
                                        'start': 339,
                                        'value': '2027-02-28'},
-                                      {'end': 517,
+                                      {'end': -1,
                                        'page_index': 5,
-                                       'snippet': " d'effet : 2026/03/01\n"
-                                                  'Expiration date : 2027/03/01\n'
-                                                  'Duree de validite : un (1) an a compter',
-                                       'start': 507,
-                                       'value': '2027/03/01'},
-                                      {'end': 506,
-                                       'page_index': 6,
-                                       'snippet': 'ment Date: 01-03-2026\n'
-                                                  'Termination Date: 2027-03-01\n'
-                                                  'Validity Period: 24 months unless termi',
-                                       'start': 496,
+                                       'snippet': 'Expiration date : 2027/03/01',
+                                       'start': -1,
                                        'value': '2027-03-01'},
                                       {'end': 315,
                                        'page_index': 7,
@@ -13275,7 +13214,7 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                                   'partie',
                                        'start': 412,
                                        'value': '2028-02-29'}],
-                          'rule_id': 'CTR_END_DATE_01',
+                          'rule_id': 'CTR_END_DATE_YAML_01',
                           'type': 'date'},
              'date_signature': {'many': True,
                                 'matches': [{'end': 311,
@@ -13294,39 +13233,17 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                                         'End Date: 20',
                                              'start': 291,
                                              'value': '2026-02-24'},
-                                            {'end': 461,
-                                             'page_index': 5,
-                                             'snippet': 'aintenance multi-sites\n'
-                                                        'Date signature : 24-02-2026\n'
-                                                        "Prise d'effet : 2026/03/01\n"
-                                                        'Expiration d',
-                                             'start': 451,
-                                             'value': '24-02-2026'},
-                                            {'end': 447,
-                                             'page_index': 6,
-                                             'snippet': 'Supply and Support Agreement\n'
-                                                        'Signed on: 25/02/2026\n'
-                                                        'Commencement Date: 01-03-2026\n'
-                                                        'Terminati',
-                                             'start': 437,
-                                             'value': '25/02/2026'},
-                                            {'end': 255,
-                                             'page_index': 7,
-                                             'snippet': ' مع خدمات التركيب والدعم\n'
-                                                        'تاريخ الإمضاء: 25/02/2026\n'
-                                                        'تاريخ بدء السريان: 01/03/2026\n'
-                                                        'تاريخ نها',
-                                             'start': 245,
-                                             'value': '25/02/2026'},
-                                            {'end': 372,
+                                            {'end': -1,
+                                             'page_index': 4,
+                                             'snippet': 'تاريخ التوقيع: ٢٤/٠٢/٢٠٢٦',
+                                             'start': -1,
+                                             'value': '24/02/2026'},
+                                            {'end': -1,
                                              'page_index': 8,
-                                             'snippet': 'فاقية خدمات إقليمية\n'
-                                                        'date of signature : 2026.02.26\n'
-                                                        'effective date : 2026/03/01\n'
-                                                        'end date : ',
-                                             'start': 362,
-                                             'value': '2026.02.26'}],
-                                'rule_id': 'CTR_SIGN_DATE_01',
+                                             'snippet': 'date of signature : 2026.02.26',
+                                             'start': -1,
+                                             'value': '2026-02-26'}],
+                                'rule_id': 'CTR_SIGN_DATE_YAML_01',
                                 'type': 'date'},
              'doc_date': {'many': True,
                           'matches': [{'end': 311,
@@ -13337,123 +13254,24 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                                   'Date de fin :',
                                        'start': 301,
                                        'value': '25/02/2026'},
-                                      {'end': 337,
-                                       'page_index': 2,
-                                       'snippet': 'e signature : 25/02/2026\n'
-                                                  "Date d'effet : 01/03/2026\n"
-                                                  'Date de fin : 28/02/2027\n'
-                                                  'Duree du contr',
-                                       'start': 327,
-                                       'value': '01/03/2026'},
-                                      {'end': 362,
-                                       'page_index': 2,
-                                       'snippet': "Date d'effet : 01/03/2026\n"
-                                                  'Date de fin : 28/02/2027\n'
-                                                  'Duree du contrat : 12 mois renouvelable',
-                                       'start': 352,
-                                       'value': '28/02/2027'},
-                                      {'end': 461,
-                                       'page_index': 5,
-                                       'snippet': 'aintenance multi-sites\n'
-                                                  'Date signature : 24-02-2026\n'
-                                                  "Prise d'effet : 2026/03/01\n"
-                                                  'Expiration d',
-                                       'start': 451,
-                                       'value': '24-02-2026'},
-                                      {'end': 447,
-                                       'page_index': 6,
-                                       'snippet': 'Supply and Support Agreement\n'
-                                                  'Signed on: 25/02/2026\n'
-                                                  'Commencement Date: 01-03-2026\n'
-                                                  'Terminati',
-                                       'start': 437,
-                                       'value': '25/02/2026'},
-                                      {'end': 477,
-                                       'page_index': 6,
-                                       'snippet': 'igned on: 25/02/2026\n'
-                                                  'Commencement Date: 01-03-2026\n'
-                                                  'Termination Date: 2027-03-01\n'
-                                                  'Validity P',
-                                       'start': 467,
-                                       'value': '01-03-2026'},
-                                      {'end': 255,
-                                       'page_index': 7,
-                                       'snippet': ' مع خدمات التركيب والدعم\n'
-                                                  'تاريخ الإمضاء: 25/02/2026\n'
-                                                  'تاريخ بدء السريان: 01/03/2026\n'
-                                                  'تاريخ نها',
-                                       'start': 245,
-                                       'value': '25/02/2026'},
-                                      {'end': 285,
-                                       'page_index': 7,
-                                       'snippet': ' الإمضاء: 25/02/2026\n'
-                                                  'تاريخ بدء السريان: 01/03/2026\n'
-                                                  'تاريخ نهاية العقد: 01/03/2028\n'
-                                                  'فترة السر',
-                                       'start': 275,
-                                       'value': '01/03/2026'},
-                                      {'end': 315,
-                                       'page_index': 7,
-                                       'snippet': ' السريان: 01/03/2026\n'
-                                                  'تاريخ نهاية العقد: 01/03/2028\n'
-                                                  'فترة السريان: 24 شهرا تبدأ من تاريخ الس',
-                                       'start': 305,
-                                       'value': '01/03/2028'},
-                                      {'end': 566,
-                                       'page_index': 7,
-                                       'snippet': 'لميداني.\n'
-                                                  '\n'
-                                                  'ملاحظة: تاريخ التوريد المتوقع 15/03/2026 (هذا '
-                                                  'ليس تاريخ التوقيع ولا تاريخ السريا',
-                                       'start': 556,
-                                       'value': '15/03/2026'},
-                                      {'end': 675,
+                                      {'end': 301,
+                                       'page_index': 3,
+                                       'snippet': 'act No.: AGR-IT-2026-09\n'
+                                                  'Signature Date: 2026-02-24\n'
+                                                  'Effective Date: 2026-03-01\n'
+                                                  'End Date: 20',
+                                       'start': 291,
+                                       'value': '2026-02-24'},
+                                      {'end': -1,
+                                       'page_index': 4,
+                                       'snippet': '24/02/2026',
+                                       'start': -1,
+                                       'value': '24/02/2026'},
+                                      {'end': -1,
                                        'page_index': 8,
-                                       'snippet': '\n'
-                                                  'ملاحظة داخلية: تاريخ الاجتماع التحضيري '
-                                                  '24-02-2026\n'
-                                                  'ملاحظة: تاريخ اعتماد الميزانية 25-02-20',
-                                       'start': 665,
-                                       'value': '24-02-2026'},
-                                      {'end': 717,
-                                       'page_index': 8,
-                                       'snippet': '-02-2026\n'
-                                                  'ملاحظة: تاريخ اعتماد الميزانية 25-02-2026\n'
-                                                  'This page intentionally contains extra ',
-                                       'start': 707,
-                                       'value': '25-02-2026'},
-                                      {'end': 206,
-                                       'page_index': 9,
-                                       'snippet': '\n'
-                                                  'FACTURE N° INV-2026-331\n'
-                                                  'Date facture : 25/02/2026\n'
-                                                  "Date d'echeance : 12/03/2026\n"
-                                                  'Client : E',
-                                       'start': 196,
-                                       'value': '25/02/2026'},
-                                      {'end': 235,
-                                       'page_index': 9,
-                                       'snippet': ' facture : 25/02/2026\n'
-                                                  "Date d'echeance : 12/03/2026\n"
-                                                  'Client : EURL Horizon Retail\n'
-                                                  'Fournisseu',
-                                       'start': 225,
-                                       'value': '12/03/2026'},
-                                      {'end': 261,
-                                       'page_index': 10,
-                                       'snippet': 'MANDE N° BC-2026-088\n'
-                                                  'Date de commande : 25/02/2026\n'
-                                                  'Date de livraison : 03/03/2026\n'
-                                                  'Nom du f',
-                                       'start': 251,
-                                       'value': '25/02/2026'},
-                                      {'end': 292,
-                                       'page_index': 10,
-                                       'snippet': 'mmande : 25/02/2026\n'
-                                                  'Date de livraison : 03/03/2026\n'
-                                                  'Nom du fournisseur : SARL Atlas Informa',
-                                       'start': 282,
-                                       'value': '03/03/2026'},
+                                       'snippet': '2026-02-26',
+                                       'start': -1,
+                                       'value': '2026-02-26'},
                                       {'end': 262,
                                        'page_index': 11,
                                        'snippet': 'te No.: DN-2026-102\n'
@@ -13468,18 +13286,36 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                                   'Participants: James Turner, Olivia Reed',
                                        'start': 394,
                                        'value': '26/02/2026'}],
-                          'rule_id': 'CMN_DATE_01',
+                          'rule_id': 'CMN_DATE_YAML_01',
                           'type': 'date'},
              'duree': {'many': True,
-                       'matches': [{'end': 423,
+                       'matches': [{'end': 192,
+                                    'page_index': 1,
+                                    'snippet': ': titre_contrat, dates, parties, duree, date_fin,\n'
+                                               'objet_contrat\n'
+                                               '\n'
+                                               '\n'
+                                               'Note: Ce corpus contie',
+                                    'start': 184,
+                                    'value': 'date_fin'},
+                                   {'end': 483,
+                                    'page_index': 1,
+                                    'snippet': 'parties (noms / lignes parties)\n'
+                                               '- duree / date_fin\n'
+                                               '- objet_contrat\n'
+                                               '\n'
+                                               "Conseils d'evaluation\n",
+                                    'start': 473,
+                                    'value': '/ date_fin'},
+                                   {'end': 423,
                                     'page_index': 2,
-                                    'snippet': 'te de fin : 28/02/2027\n'
+                                    'snippet': ' de fin : 28/02/2027\n'
                                                'Duree du contrat : 12 mois renouvelable une fois '
                                                'par avenant\n'
                                                '\n'
                                                'Parties : SARL Atlas Informatique et E',
-                                    'start': 380,
-                                    'value': ': 12 mois renouvelable une fois par avenant'},
+                                    'start': 382,
+                                    'value': '12 mois renouvelable une fois par avenant'},
                                    {'end': 398,
                                     'page_index': 3,
                                     'snippet': '-01\n'
@@ -13500,27 +13336,25 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                     'value': '12 شهرًا قابلة للتجديد باتفاق مكتوب'},
                                    {'end': 576,
                                     'page_index': 5,
-                                    'snippet': '3/01\n'
-                                               'Expiration date : 2027/03/01\n'
+                                    'snippet': 'n date : 2027/03/01\n'
                                                'Duree de validite : un (1) an a compter de la date '
                                                "d'effet\n"
                                                '\n'
                                                'Les parties :\n'
                                                'Partie 1 : EPE Techno Su',
-                                    'start': 524,
-                                    'value': 'de validite : un (1) an a compter de la date '
-                                             "d'effet"},
-                                   {'end': 589,
+                                    'start': 538,
+                                    'value': "un (1) an a compter de la date d'effet"},
+                                   {'end': 588,
                                     'page_index': 6,
                                     'snippet': 'ation Date: 2027-03-01\n'
                                                'Validity Period: 24 months unless terminated '
                                                'earlier in accordance with Clause 18.\n'
                                                '\n'
                                                'Parties to the Contract:\n'
-                                               'Party 1: Blue',
+                                               'Party 1: Blu',
                                     'start': 524,
                                     'value': '24 months unless terminated earlier in accordance '
-                                             'with Clause 18.'},
+                                             'with Clause 18'},
                                    {'end': 359,
                                     'page_index': 7,
                                     'snippet': 'خ نهاية العقد: 01/03/2028\n'
@@ -13532,16 +13366,27 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                     'value': '24 شهرا تبدأ من تاريخ السريان'},
                                    {'end': 455,
                                     'page_index': 8,
-                                    'snippet': 'end date : 2028-02-29\n'
+                                    'snippet': 'ate : 2028-02-29\n'
                                                'contract duration .... 24 months\n'
                                                'parties - Atlas Cloud Services SPA ; Gr',
-                                    'start': 441,
-                                    'value': '.... 24 months'}],
-                       'rule_id': 'CTR_DURATION_01',
-                       'type': 'duration_or_term'},
-             'email': {'many': True, 'matches': [], 'rule_id': 'CMN_EMAIL_01', 'type': 'email'},
+                                    'start': 446,
+                                    'value': '24 months'}],
+                       'rule_id': 'CTR_DURATION_YAML_01',
+                       'type': 'string'},
+             'email': {'many': True,
+                       'matches': [],
+                       'rule_id': 'CMN_EMAIL_YAML_01',
+                       'type': 'email'},
              'objet_contrat': {'many': True,
-                               'matches': [{'end': 641,
+                               'matches': [{'end': 159,
+                                            'page_index': 1,
+                                            'snippet': "u de test pour regex d'extraction: "
+                                                       'titre_contrat, dates, parties, duree, '
+                                                       'date_fin,\n'
+                                                       'objet',
+                                            'start': 151,
+                                            'value': '_contrat'},
+                                           {'end': 641,
                                             'page_index': 2,
                                             'snippet': 'EURL Horizon Retail\n'
                                                        '\n'
@@ -13610,17 +13455,17 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                             'start': 179,
                                             'value': 'توريد معدات اتصالات صناعية مع خدمات التركيب '
                                                      'والدعم'},
-                                           {'end': 524,
+                                           {'end': 523,
                                             'page_index': 7,
                                             'snippet': 'الميناء الأزرق للإلكترونيات\n'
                                                        '\n'
                                                        'محل العقد: التوريد والتركيب والتشغيل '
                                                        'التجريبي والتكوين والدعم الميداني.\n'
                                                        '\n'
-                                                       'ملاحظة: تاريخ التوريد المتوقع 15/03/20',
+                                                       'ملاحظة: تاريخ التوريد المتوقع 15/03/2',
                                             'start': 464,
                                             'value': 'التوريد والتركيب والتشغيل التجريبي والتكوين '
-                                                     'والدعم الميداني.'},
+                                                     'والدعم الميداني'},
                                            {'end': 604,
                                             'page_index': 8,
                                             'snippet': 'ne Retail LLC\n'
@@ -13633,6 +13478,27 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                             'start': 540,
                                             'value': 'Managed services, monitoring, backup '
                                                      'verification, and quarterly'},
+                                           {'end': 434,
+                                            'page_index': 9,
+                                            'snippet': 'C : 14 875,00 EUR\n'
+                                                       'Objet de la facture : prestation de '
+                                                       'maintenance mensuelle\n'
+                                                       '\n'
+                                                       'Terms of payment: 15 days\n'
+                                                       '\n'
+                                                       '\n'
+                                                       '\n'
+                                                       '\n'
+                                                       '\n'
+                                                       '\n'
+                                                       '\n'
+                                                       '\n'
+                                                       '\n'
+                                                       '\n'
+                                                       '\n'
+                                                       '\n',
+                                            'start': 399,
+                                            'value': 'prestation de maintenance mensuelle'},
                                            {'end': 415,
                                             'page_index': 10,
                                             'snippet': 'ue\n'
@@ -13642,11 +13508,48 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                                        'Total HT : 125 000,00 DZD\n'
                                                        'Total TTC : 1',
                                             'start': 375,
-                                            'value': 'Achat de 25 commutateurs reseau 24 ports'}],
-                               'rule_id': 'CTR_OBJECT_01',
-                               'type': 'contract_object'},
+                                            'value': 'Achat de 25 commutateurs reseau 24 ports'},
+                                           {'end': 400,
+                                            'page_index': 11,
+                                            'snippet': 'Harbor Electronics\n'
+                                                       'Objet / Description: Industrial '
+                                                       'communication modules - Batch A\n'
+                                                       '\n'
+                                                       'Signature reception client : _________',
+                                            'start': 358,
+                                            'value': 'Industrial communication modules - Batch A'}],
+                               'rule_id': 'CTR_OBJECT_YAML_01',
+                               'type': 'string'},
              'parties': {'many': True,
-                         'matches': [{'end': 481,
+                         'matches': [{'end': 192,
+                                      'page_index': 1,
+                                      'snippet': 'raction: titre_contrat, dates, parties, duree, '
+                                                 'date_fin,\n'
+                                                 'objet_contrat\n'
+                                                 '\n'
+                                                 '\n'
+                                                 'Note: Ce corpus contie',
+                                      'start': 177,
+                                      'value': 'duree, date_fin'},
+                                     {'end': 464,
+                                      'page_index': 1,
+                                      'snippet': '- date_signature\n'
+                                                 '- date_effet\n'
+                                                 '- parties (noms / lignes parties)\n'
+                                                 '- duree / date_fin\n'
+                                                 '- objet_contrat\n'
+                                                 '\n'
+                                                 'Con',
+                                      'start': 441,
+                                      'value': '(noms / lignes parties)'},
+                                     {'end': 1071,
+                                      'page_index': 1,
+                                      'snippet': ' عقد خدمات\n'
+                                                 'p5 FR contrat-cadre (parties multiline)\n'
+                                                 'p6 EN supply agreement (alternative lab',
+                                      'start': 1061,
+                                      'value': 'multiline)'},
+                                     {'end': 481,
                                       'page_index': 2,
                                       'snippet': 'velable une fois par avenant\n'
                                                  '\n'
@@ -13656,23 +13559,33 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                                  'Part',
                                       'start': 435,
                                       'value': 'SARL Atlas Informatique et EURL Horizon Retail'},
-                                     {'end': 516,
+                                     {'end': 458,
                                       'page_index': 2,
-                                      'snippet': 'tique et EURL Horizon Retail\n'
-                                                 'Partie 1 : SARL Atlas Informatique\n'
-                                                 'Partie 2 : EURL Horizon Retail\n'
+                                      'snippet': 'velable une fois par avenant\n'
                                                  '\n'
-                                                 'Objet d',
-                                      'start': 493,
+                                                 'Parties : SARL Atlas Informatique et EURL '
+                                                 'Horizon Retail\n'
+                                                 'Partie 1 : SARL ',
+                                      'start': 435,
                                       'value': 'SARL Atlas Informatique'},
-                                     {'end': 547,
+                                     {'end': 481,
                                       'page_index': 2,
-                                      'snippet': ' 1 : SARL Atlas Informatique\n'
-                                                 'Partie 2 : EURL Horizon Retail\n'
+                                      'snippet': 't\n'
                                                  '\n'
-                                                 'Objet du contrat : Le present contrat ',
-                                      'start': 528,
+                                                 'Parties : SARL Atlas Informatique et EURL '
+                                                 'Horizon Retail\n'
+                                                 'Partie 1 : SARL Atlas Informatique\n'
+                                                 'Part',
+                                      'start': 462,
                                       'value': 'EURL Horizon Retail'},
+                                     {'end': 747,
+                                      'page_index': 2,
+                                      'snippet': 'sistance utilisateur de niveau 2 et 3.\n'
+                                                 '\n'
+                                                 'Entre les soussignes :\n'
+                                                 'SARL Atlas Informatique, societe a re',
+                                      'start': 727,
+                                      'value': 'Entre les soussignes'},
                                      {'end': 483,
                                       'page_index': 3,
                                       'snippet': 'he Effective Date\n'
@@ -13683,22 +13596,14 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                       'start': 421,
                                       'value': 'Northshore Industrial Supplies Ltd and Blue Harbor '
                                                'Electronics'},
-                                     {'end': 531,
+                                     {'end': 769,
                                       'page_index': 3,
-                                      'snippet': 'nd Blue Harbor Electronics\n'
-                                                 'First Party: Northshore Industrial Supplies Ltd\n'
-                                                 'Second Party: Blue Harbor Electronics -',
-                                      'start': 497,
-                                      'value': 'Northshore Industrial Supplies Ltd'},
-                                     {'end': 587,
-                                      'page_index': 3,
-                                      'snippet': 'e Industrial Supplies Ltd\n'
-                                                 'Second Party: Blue Harbor Electronics - Export '
-                                                 'Division\n'
+                                      'snippet': 's, and periodic reporting obligations.\n'
                                                  '\n'
-                                                 'Purpose of the Agreement: This Agreeme',
-                                      'start': 546,
-                                      'value': 'Blue Harbor Electronics - Export Division'},
+                                                 'Between the undersigned:\n'
+                                                 'Northshore Industrial Supplies Ltd, re',
+                                      'start': 746,
+                                      'value': 'Between the undersigned'},
                                      {'end': 410,
                                       'page_index': 4,
                                       'snippet': 'ًا قابلة للتجديد باتفاق مكتوب\n'
@@ -13709,42 +13614,38 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                                  'الطرف ',
                                       'start': 368,
                                       'value': 'شركة الواحة الرقمية و مؤسسة النور التجارية'},
-                                     {'end': 443,
-                                      'page_index': 4,
-                                      'snippet': 'مية و مؤسسة النور التجارية\n'
-                                                 'الطرف الأول: شركة الواحة الرقمية\n'
-                                                 'الطرف الثاني: مؤسسة النور التجارية\n'
+                                     {'end': 176,
+                                      'page_index': 5,
+                                      'snippet': '                                 TRICKY\n'
+                                                 'Document positif (francais) - labels alternatifs '
+                                                 '+ blocs parties\n'
                                                  '\n'
-                                                 'موض',
-                                      'start': 424,
-                                      'value': 'شركة الواحة الرقمية'},
-                                     {'end': 478,
-                                      'page_index': 4,
-                                      'snippet': 'لأول: شركة الواحة الرقمية\n'
-                                                 'الطرف الثاني: مؤسسة النور التجارية\n'
                                                  '\n'
-                                                 'موضوع العقد: يحدد هذا العقد شروط تقديم',
-                                      'start': 458,
-                                      'value': 'مؤسسة النور التجارية'},
-                                     {'end': 604,
-                                      'page_index': 4,
-                                      'snippet': 'تصحيحية والتحديثات الدورية للنظام.\n'
                                                  '\n'
-                                                 'بين كل من:\n'
-                                                 'شركة الواحة الرقمية، يمثلها السيد أحمد ',
-                                      'start': 598,
-                                      'value': 'كل من:'},
+                                                 'Note: Contient un titre en majuscule',
+                                      'start': 112,
+                                      'value': 'Document positif (francais) - labels alternatifs + '
+                                               'blocs parties'},
+                                     {'end': 589,
+                                      'page_index': 5,
+                                      'snippet': "un (1) an a compter de la date d'effet\n"
+                                                 '\n'
+                                                 'Les parties :\n'
+                                                 'Partie 1 : EPE Techno Sud SPA\n'
+                                                 'Partie ',
+                                      'start': 578,
+                                      'value': 'Les parties'},
                                      {'end': 621,
                                       'page_index': 5,
-                                      'snippet': "mpter de la date d'effet\n"
+                                      'snippet': " date d'effet\n"
                                                  '\n'
                                                  'Les parties :\n'
                                                  'Partie 1 : EPE Techno Sud SPA\n'
                                                  'Partie 2 : SARL Data Logistics\n'
                                                  '\n'
                                                  'Objet :',
-                                      'start': 592,
-                                      'value': 'Partie 1 : EPE Techno Sud SPA'},
+                                      'start': 603,
+                                      'value': 'EPE Techno Sud SPA'},
                                      {'end': 652,
                                       'page_index': 5,
                                       'snippet': 'artie 1 : EPE Techno Sud SPA\n'
@@ -13753,15 +13654,97 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                                  'Objet : Fourniture, installation, mise',
                                       'start': 633,
                                       'value': 'SARL Data Logistics'},
+                                     {'end': 821,
+                                      'page_index': 5,
+                                      'snippet': 'nq sites regionaux.\n'
+                                                 '\n'
+                                                 'Adresse Partie 1 : Zone Industrielle, Blida\n'
+                                                 "Adresse Partie 2 : Parc d'Activites, Se",
+                                      'start': 797,
+                                      'value': 'Zone Industrielle, Blida'},
+                                     {'end': 864,
+                                      'page_index': 5,
+                                      'snippet': ' Industrielle, Blida\n'
+                                                 "Adresse Partie 2 : Parc d'Activites, Setif\n"
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n',
+                                      'start': 841,
+                                      'value': "Parc d'Activites, Setif"},
+                                     {'end': 174,
+                                      'page_index': 6,
+                                      'snippet': '                                 TRICKY\n'
+                                                 'Positive document (English) - alternative labels '
+                                                 'and split parties\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 'Note: Includes Buyer/Seller lines wh',
+                                      'start': 108,
+                                      'value': 'Positive document (English) - alternative labels '
+                                               'and split parties'},
+                                     {'end': 291,
+                                      'page_index': 6,
+                                      'snippet': "hich should ideally not replace 'parties' if "
+                                                 'your ranking prefers party labels.\n'
+                                                 '\n'
+                                                 'AGREEMENT FOR SUPPLY, INSTALLATION AN',
+                                      'start': 253,
+                                      'value': "' if your ranking prefers party labels"},
+                                     {'end': 614,
+                                      'page_index': 6,
+                                      'snippet': ' in accordance with Clause 18.\n'
+                                                 '\n'
+                                                 'Parties to the Contract:\n'
+                                                 'Party 1: Blue Harbor Electronics\n'
+                                                 'Party',
+                                      'start': 599,
+                                      'value': 'to the Contract'},
                                      {'end': 648,
                                       'page_index': 6,
-                                      'snippet': 'th Clause 18.\n'
+                                      'snippet': ' 18.\n'
                                                  '\n'
                                                  'Parties to the Contract:\n'
                                                  'Party 1: Blue Harbor Electronics\n'
                                                  'Party 2: Northshore Industrial Supplies',
-                                      'start': 616,
-                                      'value': 'Party 1: Blue Harbor Electronics'},
+                                      'start': 625,
+                                      'value': 'Blue Harbor Electronics'},
                                      {'end': 692,
                                       'page_index': 6,
                                       'snippet': 'rty 1: Blue Harbor Electronics\n'
@@ -13770,23 +13753,15 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                                  'Subject Matter: Supply of industrial c',
                                       'start': 658,
                                       'value': 'Northshore Industrial Supplies Ltd'},
-                                     {'end': 410,
+                                     {'end': 372,
                                       'page_index': 7,
-                                      'snippet': 'هرا تبدأ من تاريخ السريان\n'
+                                      'snippet': 'السريان: 24 شهرا تبدأ من تاريخ السريان\n'
                                                  '\n'
                                                  'أطراف العقد:\n'
                                                  'طرف 1: شركة المغرب للكابلات الصناعية\n'
-                                                 'طرف 2: مؤسسة الميناء الأزرق للإلكترونيا',
-                                      'start': 374,
-                                      'value': 'طرف 1: شركة المغرب للكابلات الصناعية'},
-                                     {'end': 451,
-                                      'page_index': 7,
-                                      'snippet': '1: شركة المغرب للكابلات الصناعية\n'
-                                                 'طرف 2: مؤسسة الميناء الأزرق للإلكترونيات\n'
-                                                 '\n'
-                                                 'محل العقد: التوريد والتركيب والتشغيل ا',
-                                      'start': 418,
-                                      'value': 'مؤسسة الميناء الأزرق للإلكترونيات'},
+                                                 'ط',
+                                      'start': 361,
+                                      'value': 'أطراف العقد'},
                                      {'end': 513,
                                       'page_index': 8,
                                       'snippet': 'tract duration .... 24 months\n'
@@ -13794,18 +13769,38 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                                  'Retail LLC\n'
                                                  'purpose of the contract : Managed servi',
                                       'start': 466,
-                                      'value': 'Atlas Cloud Services SPA ; Greenline Retail LLC'}],
-                         'rule_id': 'CTR_PARTIES_01',
-                         'type': 'party_name_or_block'},
-             'site': {'many': True, 'matches': [], 'rule_id': 'CMN_URL_01', 'type': 'url'},
-             'telephone': {'many': True, 'matches': [], 'rule_id': 'CMN_PHONE_01', 'type': 'phone'},
+                                      'value': 'Atlas Cloud Services SPA ; Greenline Retail LLC'},
+                                     {'end': 187,
+                                      'page_index': 10,
+                                      'snippet': 'ment negatif - labels proches (parties, '
+                                                 "fournisseur, dates) mais ce n'est pas\n"
+                                                 'un contrat\n'
+                                                 '\n'
+                                                 '\n'
+                                                 'BON DE COMMANDE N° BC-2026',
+                                      'start': 150,
+                                      'value': "fournisseur, dates) mais ce n'est pas"},
+                                     {'end': 168,
+                                      'page_index': 11,
+                                      'snippet': 'IVE\n'
+                                                 'Document negatif - contient parties et dates '
+                                                 'mais pas contrat\n'
+                                                 '\n'
+                                                 '\n'
+                                                 '\n'
+                                                 'BON DE LIVRAISON BL-2026-102\n'
+                                                 'Deliver',
+                                      'start': 143,
+                                      'value': 'et dates mais pas contrat'}],
+                         'rule_id': 'CTR_PARTIES_YAML_01',
+                         'type': 'string'},
+             'site': {'many': True, 'matches': [], 'rule_id': 'CMN_URL_YAML_01', 'type': 'url'},
+             'telephone': {'many': True,
+                           'matches': [],
+                           'rule_id': 'CMN_PHONE_YAML_01',
+                           'type': 'phone'},
              'titre_contrat': {'many': True,
-                               'matches': [{'end': -1,
-                                            'page_index': 2,
-                                            'snippet': 'Contrat FR - Prestation de services inf',
-                                            'start': -1,
-                                            'value': None},
-                                           {'end': 255,
+                               'matches': [{'end': 255,
                                             'page_index': 2,
                                             'snippet': 'labels classiques\n'
                                                        '\n'
@@ -13819,11 +13814,6 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                             'start': 181,
                                             'value': 'Contrat de prestation de services '
                                                      'informatiques et maintenance applicative'},
-                                           {'end': -1,
-                                            'page_index': 3,
-                                            'snippet': 'Contract EN - IT Services Agreement    ',
-                                            'start': -1,
-                                            'value': None},
                                            {'end': 245,
                                             'page_index': 3,
                                             'snippet': 'h) - standard labels\n'
@@ -13838,21 +13828,6 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                             'start': 173,
                                             'value': 'IT Services Agreement for Application '
                                                      'Support and Preventive Maintenance'},
-                                           {'end': -1,
-                                            'page_index': 3,
-                                            'snippet': 'Contract EN - IT Services Agreement    ',
-                                            'start': -1,
-                                            'value': None},
-                                           {'end': -1,
-                                            'page_index': 3,
-                                            'snippet': 'Contract EN - IT Services Agreement    ',
-                                            'start': -1,
-                                            'value': None},
-                                           {'end': -1,
-                                            'page_index': 4,
-                                            'snippet': 'عقد خدمات - عربي                       ',
-                                            'start': -1,
-                                            'value': None},
                                            {'end': 204,
                                             'page_index': 4,
                                             'snippet': ' (عربي) - تسميات مباشرة\n'
@@ -13878,16 +13853,6 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                             'start': 493,
                                             'value': 'يحدد هذا العقد شروط تقديم خدمات الصيانة '
                                                      'والدعم الفني والتدخلات'},
-                                           {'end': -1,
-                                            'page_index': 5,
-                                            'snippet': 'Contrat-cadre FR - Variantes et lignes ',
-                                            'start': -1,
-                                            'value': None},
-                                           {'end': -1,
-                                            'page_index': 5,
-                                            'snippet': 'Contrat-cadre FR - Variantes et lignes ',
-                                            'start': -1,
-                                            'value': None},
                                            {'end': 433,
                                             'page_index': 5,
                                             'snippet': 'ET DE MAINTENANCE\n'
@@ -13898,16 +13863,6 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                             'start': 381,
                                             'value': 'Convention de services et de maintenance '
                                                      'multi-sites'},
-                                           {'end': -1,
-                                            'page_index': 6,
-                                            'snippet': 'Agreement EN - Supply and Support      ',
-                                            'start': -1,
-                                            'value': None},
-                                           {'end': -1,
-                                            'page_index': 6,
-                                            'snippet': 'Agreement EN - Supply and Support      ',
-                                            'start': -1,
-                                            'value': None},
                                            {'end': 425,
                                             'page_index': 6,
                                             'snippet': 'ND AFTER-SALES SUPPORT\n'
@@ -13918,16 +13873,6 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                             'start': 370,
                                             'value': 'Regional Network Equipment Supply and '
                                                      'Support Agreement'},
-                                           {'end': -1,
-                                            'page_index': 7,
-                                            'snippet': 'اتفاقية توريد - عربي (بدائل تسميات)    ',
-                                            'start': -1,
-                                            'value': None},
-                                           {'end': -1,
-                                            'page_index': 7,
-                                            'snippet': 'اتفاقية توريد - عربي (بدائل تسميات)    ',
-                                            'start': -1,
-                                            'value': None},
                                            {'end': 229,
                                             'page_index': 7,
                                             'snippet': 'تفاقية توريد وتجهيز وصيانة\n'
@@ -13948,21 +13893,16 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                                        'effectiv',
                                             'start': 290,
                                             'value': 'Regional Services Agreement / اتفاقية خدمات '
-                                                     'إقليمية'},
-                                           {'end': -1,
-                                            'page_index': 8,
-                                            'snippet': 'Mixed Contract - OCR-like formatting   ',
-                                            'start': -1,
-                                            'value': None}],
-                               'rule_id': 'CTR_TITLE_01',
+                                                     'إقليمية'}],
+                               'rule_id': 'CTR_TITLE_YAML_01',
                                'type': 'string'}},
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
-  'ruleset': {'applied_rulesets': ['common.json', 'CONTRAT.json'],
-              'routes_config': {'default_rulesets': ['{doc_type}.json'],
+  'ruleset': {'applied_rulesets': ['common.yaml', 'CONTRAT.yaml'],
+              'routes_config': {'default_rulesets': ['{doc_type}.yaml'],
                                 'include_common': True,
-                                'ruleset_mapping': {'BON_DE_COMMANDE': ['BON_DE_COMMANDE.json'],
-                                                    'CONTRAT': ['CONTRAT.json'],
-                                                    'FACTURE': ['FACTURE.json']}}}}]
+                                'ruleset_mapping': {'BON_DE_COMMANDE': ['BON_DE_COMMANDE.yaml'],
+                                                    'CONTRAT': ['CONTRAT.yaml'],
+                                                    'FACTURE': ['FACTURE.yaml']}}}}]
 
 [Component: fusion-resultats]
 [fusion-result] source=local-context | docs=1 | es_synced=0

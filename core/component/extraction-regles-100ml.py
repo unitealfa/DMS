@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Tuple
 
 
-BASE_SCRIPT = Path(__file__).resolve().with_name("extraction-regles.py")
+BASE_SCRIPT = Path(__file__).resolve().with_name("extraction-regles-yaml.py")
 TOKEN_RE = re.compile(r"[A-Za-z0-9_\u00C0-\u024F\u0600-\u06FF]+", re.UNICODE)
 
 

@@ -1,0 +1,138 @@
+ruleset_id: CONTRAT_YAML_V1
+extractors:
+  titre_contrat:
+    rule_id: CTR_TITLE_YAML_01
+    type: string
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    min_chars: 4
+    max_chars: 260
+    labels:
+      - "titre du contrat"
+      - "intitule du contrat"
+      - "intitulé du contrat"
+      - "contract title"
+      - "agreement title"
+      - "title"
+      - "عنوان العقد"
+      - "موضوع العقد"
+
+  date_signature:
+    rule_id: CTR_SIGN_DATE_YAML_01
+    type: date
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    labels:
+      - "date de signature"
+      - "date signature"
+      - "signature date"
+      - "signed on"
+      - "date of signature"
+      - "تاريخ التوقيع"
+      - "تاريخ الإمضاء"
+      - "تاريخ الامضاء"
+
+  date_effet:
+    rule_id: CTR_EFFECTIVE_DATE_YAML_01
+    type: date
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    labels:
+      - "date d'effet"
+      - "date d eff et"
+      - "prise d'effet"
+      - "prise d effet"
+      - "effective date"
+      - "commencement date"
+      - "entry into force date"
+      - "start date"
+      - "تاريخ السريان"
+      - "تاريخ النفاذ"
+      - "تاريخ بدء السريان"
+
+  parties:
+    rule_id: CTR_PARTIES_YAML_01
+    type: string
+    strategy: label_value
+    many: true
+    lookahead_lines: 2
+    min_chars: 3
+    max_chars: 260
+    labels:
+      - "parties"
+      - "les parties"
+      - "parties contractantes"
+      - "between the undersigned"
+      - "entre les soussignes"
+      - "entre les soussignés"
+      - "الأطراف"
+      - "اطراف العقد"
+      - "أطراف العقد"
+      - "party 1"
+      - "party 2"
+      - "partie 1"
+      - "partie 2"
+
+  duree:
+    rule_id: CTR_DURATION_YAML_01
+    type: string
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    min_chars: 2
+    max_chars: 180
+    labels:
+      - "durée"
+      - "duree"
+      - "durée du contrat"
+      - "duree du contrat"
+      - "contract term"
+      - "duration"
+      - "validity period"
+      - "مدة العقد"
+      - "مدة السريان"
+      - "فترة السريان"
+
+  date_fin:
+    rule_id: CTR_END_DATE_YAML_01
+    type: date
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    labels:
+      - "date de fin"
+      - "date d'expiration"
+      - "date d expiration"
+      - "fin du contrat"
+      - "end date"
+      - "expiration date"
+      - "expiry date"
+      - "termination date"
+      - "تاريخ الانتهاء"
+      - "تاريخ نهاية العقد"
+      - "تاريخ انتهاء العقد"
+
+  objet_contrat:
+    rule_id: CTR_OBJECT_YAML_01
+    type: string
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    min_chars: 3
+    max_chars: 520
+    labels:
+      - "objet du contrat"
+      - "objet"
+      - "purpose of the agreement"
+      - "purpose of the contract"
+      - "contract purpose"
+      - "subject matter"
+      - "scope of work"
+      - "scope of services"
+      - "موضوع العقد"
+      - "غرض العقد"
+      - "محل العقد"
+

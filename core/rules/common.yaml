@@ -1,0 +1,34 @@
+ruleset_id: COMMON_YAML_V1
+extractors:
+  doc_date:
+    rule_id: CMN_DATE_YAML_01
+    type: date
+    strategy: detector
+    many: true
+    min_chars: 8
+    max_chars: 24
+
+  email:
+    rule_id: CMN_EMAIL_YAML_01
+    type: email
+    strategy: detector
+    many: true
+    min_chars: 6
+    max_chars: 120
+
+  telephone:
+    rule_id: CMN_PHONE_YAML_01
+    type: phone
+    strategy: detector
+    many: true
+    min_chars: 10
+    max_chars: 40
+
+  site:
+    rule_id: CMN_URL_YAML_01
+    type: url
+    strategy: detector
+    many: true
+    min_chars: 8
+    max_chars: 220
+

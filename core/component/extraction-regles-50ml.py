@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Tuple
 
 
-BASE_SCRIPT = Path(__file__).resolve().with_name("extraction-regles.py")
+BASE_SCRIPT = Path(__file__).resolve().with_name("extraction-regles-yaml.py")
 TOKEN_RE = re.compile(r"[A-Za-z0-9_\u00C0-\u024F\u0600-\u06FF]+", re.UNICODE)
 
 
@@ -241,4 +241,3 @@ def _add_bm25(ctx: Dict[str, Any]) -> None:
 _CTX = globals()
 _run_base_extraction(_CTX)
 _add_bm25(_CTX)
-

@@ -1,0 +1,117 @@
+ruleset_id: FACTURE_YAML_V1
+extractors:
+  numero_facture:
+    rule_id: INV_NUM_YAML_01
+    type: string
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    min_chars: 2
+    max_chars: 80
+    labels:
+      - "numero facture"
+      - "numéro facture"
+      - "n° facture"
+      - "invoice number"
+      - "invoice no"
+      - "رقم الفاتورة"
+      - "فاتورة رقم"
+
+  date_facture:
+    rule_id: INV_DATE_YAML_01
+    type: date
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    labels:
+      - "date facture"
+      - "invoice date"
+      - "date d'émission"
+      - "date d'emission"
+      - "تاريخ الفاتورة"
+      - "تاريخ الإصدار"
+      - "تاريخ الاصدار"
+
+  date_echeance:
+    rule_id: INV_DUE_DATE_YAML_01
+    type: date
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    labels:
+      - "date d'échéance"
+      - "date d'echeance"
+      - "échéance"
+      - "echeance"
+      - "due date"
+      - "payment due date"
+      - "تاريخ الاستحقاق"
+      - "تاريخ الدفع"
+
+  montant_ht:
+    rule_id: INV_AMOUNT_HT_YAML_01
+    type: amount
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    labels:
+      - "montant ht"
+      - "total ht"
+      - "total hors taxe"
+      - "subtotal"
+      - "amount before tax"
+      - "total excl tax"
+      - "المبلغ دون الضريبة"
+      - "المجموع دون الضريبة"
+
+  montant_tva:
+    rule_id: INV_AMOUNT_TVA_YAML_01
+    type: amount
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    labels:
+      - "montant tva"
+      - "total tva"
+      - "vat amount"
+      - "tax amount"
+      - "ضريبة القيمة المضافة"
+      - "مبلغ الضريبة"
+      - "قيمة الضريبة"
+
+  montant_ttc:
+    rule_id: INV_AMOUNT_TTC_YAML_01
+    type: amount
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    labels:
+      - "montant ttc"
+      - "total ttc"
+      - "total toutes taxes comprises"
+      - "net a payer"
+      - "total a payer"
+      - "amount due"
+      - "total due"
+      - "grand total"
+      - "المبلغ الإجمالي"
+      - "المبلغ الاجمالي"
+      - "المبلغ المستحق"
+
+  devise:
+    rule_id: INV_CURRENCY_YAML_01
+    type: currency
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    labels:
+      - "devise"
+      - "currency"
+      - "monnaie"
+      - "العملة"
+      - "عملة"
+      - "montant ttc"
+      - "total ttc"
+      - "amount due"
+      - "total due"
+

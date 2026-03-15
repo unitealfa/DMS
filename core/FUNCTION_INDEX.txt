@@ -132,6 +132,15 @@ component/clasification.py:185:def classify_scores(DOCS: List[Dict[str, Any]], c
 component/clasification.py:246:def decide(scores: Dict[str, int], configs: Dict[str, Any], common: Dict[str, Any]) -> Dict[str, Any]:
 component/elasticsearch.py:22:def _normalize_ids(values: Any) -> List[str]:
 component/elasticsearch.py:32:def run(ctx: Dict[str, Any]) -> Dict[str, Any]:
+component/extraction-regles-50ml.py:15:def _tokenize(text: str) -> List[str]:
+component/extraction-regles-50ml.py:19:def _safe_int(value: Any, default: int) -> int:
+component/extraction-regles-50ml.py:26:def _doc_key(doc_id: Any, filename: Any) -> str:
+component/extraction-regles-50ml.py:34:def _iter_doc_chunks(doc: Dict[str, Any]) -> Iterable[Dict[str, Any]]:
+component/extraction-regles-50ml.py:77:def _build_docs_lookup(ctx: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+component/extraction-regles-50ml.py:96:def _collect_query_terms(fields: Dict[str, Any], doc_type: str) -> List[str]:
+component/extraction-regles-50ml.py:125:def _bm25_scores(
+component/extraction-regles-50ml.py:166:def _run_base_extraction(ctx: Dict[str, Any]) -> None:
+component/extraction-regles-50ml.py:172:def _add_bm25(ctx: Dict[str, Any]) -> None:
 component/extraction-regles.py:25:def _load_json(path: Path) -> Dict[str, Any]:
 component/extraction-regles.py:32:def _compile_regex(pattern: str, flags_list: Optional[List[str]]) -> re.Pattern:
 component/extraction-regles.py:48:def _load_routes() -> Dict[str, Any]:
@@ -145,6 +154,16 @@ component/extraction-regles.py:193:def _classification_for(doc: Dict[str, Any], 
 component/extraction-regles.py:203:def _doc_text_score(doc: Dict[str, Any]) -> int:
 component/extraction-regles.py:216:def _dedupe_docs(docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 component/extraction-regles.py:244:def run() -> List[Dict[str, Any]]:
+component/fusion_resultats-50ml.py:14:def _ml50_safe_list(value: Any) -> List[Any]:
+component/fusion_resultats-50ml.py:18:def _ml50_doc_key(doc_id: Any, filename: Any) -> str:
+component/fusion_resultats-50ml.py:28:def _ml50_index_rows(rows: Any) -> Dict[str, Any]:
+component/fusion_resultats-50ml.py:44:def _ml50_group_rows(rows: Any) -> Dict[str, List[Dict[str, Any]]]:
+component/fusion_resultats-50ml.py:61:def _ml50_pick_bm25(extractions: Dict[str, Any], key: str) -> Dict[str, Any]:
+component/fusion_resultats-50ml.py:69:def _augment_payload(ctx: Dict[str, Any], payload: Dict[str, Any]) -> Dict[str, Any]:
+component/fusion_resultats-50ml.py:187:def _run_base_fusion(ctx: Dict[str, Any]) -> None:
+component/fusion_resultats-50ml.py:193:def _load_payload(path: Path) -> Dict[str, Any]:
+component/fusion_resultats-50ml.py:202:def _save_payload(path: Path, payload: Dict[str, Any]) -> None:
+component/fusion_resultats-50ml.py:206:def _run() -> None:
 component/fusion_resultats.py:31:def ns() -> str:
 component/fusion_resultats.py:35:def first(lst: List[Any]) -> Any:
 component/fusion_resultats.py:39:def merge_list(*args: Optional[List[Any]]) -> List[Any]:
@@ -234,6 +253,20 @@ component/si-image-pretraiter-sinonpass-le-doc.py:407:def preprocess_image(image
 component/si-image-pretraiter-sinonpass-le-doc.py:488:def parse_args(argv: Optional[Iterable[str]] = None) -> argparse.Namespace:
 component/si-image-pretraiter-sinonpass-le-doc.py:561:def _normalize_input_files(val):
 component/si-image-pretraiter-sinonpass-le-doc.py:593:def _load_images_from_path(path: Path, dpi: int):
+component/tokenisation-layout-50ml.py:25:def _safe_int(value: Any, default: int) -> int:
+component/tokenisation-layout-50ml.py:32:def _norm_token(token: str) -> str:
+component/tokenisation-layout-50ml.py:36:def _tokenize(text: str) -> List[str]:
+component/tokenisation-layout-50ml.py:40:def _char_ngrams(token: str, min_n: int = 3, max_n: int = 5) -> Iterable[str]:
+component/tokenisation-layout-50ml.py:56:def _hash_index_sign(value: str, dim: int) -> Tuple[int, float]:
+component/tokenisation-layout-50ml.py:63:def _fasttext_like_vector(token: str, dim: int) -> np.ndarray:
+component/tokenisation-layout-50ml.py:75:def _mean_vectors(vectors: List[np.ndarray], dim: int) -> np.ndarray:
+component/tokenisation-layout-50ml.py:88:def _to_list(vec: np.ndarray, precision: int = 6) -> List[float]:
+component/tokenisation-layout-50ml.py:92:def _iter_doc_chunks(doc: Dict[str, Any]) -> Iterable[Tuple[int, int, str, str]]:
+component/tokenisation-layout-50ml.py:113:def _extract_topics_from_chunks(tokenized_chunks: List[List[str]], max_topics: int = 12) -> List[Dict[str, Any]]:
+component/tokenisation-layout-50ml.py:143:def _extract_chunk_topics(tokens: List[str], max_topics: int = 3) -> List[Dict[str, Any]]:
+component/tokenisation-layout-50ml.py:156:def _doc_key(doc_id: Any, filename: Any) -> str:
+component/tokenisation-layout-50ml.py:164:def _run_base_tokenisation(ctx: Dict[str, Any]) -> None:
+component/tokenisation-layout-50ml.py:170:def _augment_with_ml50(ctx: Dict[str, Any]) -> None:
 component/tokenisation-layout.py:39:def _ensure_nltk():
 component/tokenisation-layout.py:58:def detect_lang(text: str) -> str:
 component/tokenisation-layout.py:86:def split_ar_layout(text: str):
@@ -288,34 +321,13 @@ component/tokenisation-layout.py:1205:def _doc_size_from_paths(paths):
 component/tokenisation-layout.py:1433:def _sort_key(x):
 component/tokenisation-layout.py:1444:def _select_doc(target):
 component/tokenisation-layout.py:1471:def print_one_doc(doc):
-graphecode.html:1014:function init()
-graphecode.html:1025:function buildFilters()
-graphecode.html:1047:function makeTogglePill(name, color, checked, onChange)
-graphecode.html:1065:function buildTabs()
-graphecode.html:1078:function buildTables()
-graphecode.html:1120:function bindEvents()
-graphecode.html:1202:function rebuildIndexes()
-graphecode.html:1220:function hasScenario(flags, active)
-graphecode.html:1224:function layoutNodes()
-graphecode.html:1233:function render()
-graphecode.html:1364:function selectNode(nodeId)
-graphecode.html:1408:function renderComponentDoc(nodeId)
-graphecode.html:1425:function getComponentSample(doc)
-graphecode.html:1434:function applyCriticalPathHighlight()
-graphecode.html:1450:function fitView()
-graphecode.html:1470:function curvedPath(x1, y1, x2, y2)
-graphecode.html:1477:function trimLabel(text, maxLen)
-graphecode.html:1482:function nodeLabel(idValue)
-graphecode.html:1487:function edgeId(e)
-graphecode.html:1491:function id(v)
-graphecode.html:1495:function esc(v)
-graphecode.html:1499:function css(name)
-graphecode.html:1503:function clamp(v, min, max)
-pipeline/cli.py:13:def _env_bool(name: str, default: bool = False) -> bool:
-pipeline/cli.py:20:def _env_int(name: str, default: int) -> int:
-pipeline/cli.py:30:def _env_optional(name: str) -> str | None:
-pipeline/cli.py:38:def parse_cli() -> argparse.Namespace:
-pipeline/cli.py:132:def main() -> None:
+pipeline/cli.py:17:def _env_bool(name: str, default: bool = False) -> bool:
+pipeline/cli.py:24:def _env_int(name: str, default: int) -> int:
+pipeline/cli.py:34:def _env_optional(name: str) -> str | None:
+pipeline/cli.py:42:def _normalize_pipeline_name(raw: str | None, default: str = "default") -> str:
+pipeline/cli.py:57:def _env_pipeline(default: str | None = None) -> str:
+pipeline/cli.py:65:def parse_cli() -> argparse.Namespace:
+pipeline/cli.py:168:def main() -> None:
 pipeline/components.py:32:def _doc_has_meaningful_text(doc: Dict[str, Any]) -> bool:
 pipeline/components.py:59:def _drop_empty_duplicate_docs(docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 pipeline/components.py:84:class Component:
@@ -369,6 +381,7 @@ pipeline/elasticsearch.py:1049:def _bulk_index_nlp_tokens(
 pipeline/elasticsearch.py:1079:def sync_nlp_results(store: ElasticsearchStore, context: Dict[str, Any], tok_docs: Any) -> Dict[str, Any]:
 pipeline/elasticsearch.py:1254:def maybe_build_store(context: Dict[str, Any]) -> Optional[ElasticsearchStore]:
 pipeline/orchestrator.py:20:class PipelineOrchestrator:
+pipeline/orchestrator.py:77:class Pipeline50MLOrchestrator:
 pipeline/settings.py:20:def load_dotenv(path: Union[str, Path, None] = None, override: bool = False) -> Dict[str, str]:
 pipeline/settings.py:55:def configure_logging(level: str = "INFO") -> None:
 pipeline/settings.py:66:def normalize_input(input_data: InputLike) -> List[str]:

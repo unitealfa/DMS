@@ -1,32 +1,54 @@
 # Project Code Map (DMS Core)
 
-Date d'audit: 2026-03-05
+Date d'audit: 2026-03-15
 
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
-- Python files analyses: 19
-- Fonctions/classes indexees: 346 (voir `FUNCTION_INDEX.txt`)
+- Python files analyses: 22
+- Fonctions/classes indexees: 391 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON: `rules/*.json` + `classification/*.json` + `config/ruleset_routes.json`
 
 ## 2) Points d'entree
 - CLI principal: `main.py` -> `pipeline.cli:main`
 - CLI package: `orchestre` (defini dans `pyproject.toml`)
 - Parsing des options: `pipeline/cli.py`
-- Orchestrateur: `pipeline/orchestrator.py`
+- Orchestrateurs:
+  - `pipeline/orchestrator.py` (contient `PipelineOrchestrator` + `Pipeline50MLOrchestrator`)
 - Wrappers d'execution des composants: `pipeline/components.py`
 
 ## 3) Pipeline reel (ordre d'execution)
-1. `pretraitement-de-docs`
-2. `si-image-pretraiter-sinonpass-le-doc`
-3. `output-txt`
-4. `clasification`
-5. `tokenisation-layout`
-6. `atripusion-gramatical-en-utilisant-les3ficherla`
-7. `elasticsearch`
-8. `extraction-regles`
-9. `fusion-resultats` (debug/fusion finale, non bloquant en erreur)
+- Pipeline `default`:
+  1. `pretraitement-de-docs`
+  2. `si-image-pretraiter-sinonpass-le-doc`
+  3. `output-txt`
+  4. `clasification`
+  5. `tokenisation-layout`
+  6. `atripusion-gramatical-en-utilisant-les3ficherla`
+  7. `elasticsearch`
+  8. `extraction-regles`
+  9. `fusion-resultats` (debug/fusion finale, non bloquant en erreur)
+- Pipeline `pipeline50ml`:
+  1. `pretraitement-de-docs`
+  2. `si-image-pretraiter-sinonpass-le-doc`
+  3. `output-txt`
+  4. `clasification`
+  5. `tokenisation-layout` (`component/tokenisation-layout-50ml.py`):
+     - tokenisation/layout standard + enrichissement FastText-like (subword hashing),
+     - vecteurs mot/chunk/document,
+     - topic extraction par chunk (`chunk_primary_topic`, `chunk_topics`) + topics document,
+     - generation `NLP_*` minimale (sans composant grammaire).
+  6. `elasticsearch`
+  7. `extraction-regles` (`component/extraction-regles-50ml.py`):
+     - extraction regex standard + scoring BM25 par chunk.
+  8. `fusion-resultats` (`component/fusion_resultats-50ml.py`):
+     - fusion standard + ajout `ml50` + BM25 dans `fusion_output.json`.
 
-Reference implementation de l'ordre: `pipeline/orchestrator.py`
+Selection runtime:
+- CLI: `--pipeline default|pipelinorchestrator|pipeline50ml`
+- variable d'environnement par defaut: `PIPELINE_DEFAULT` (ex: `pipelinorchestrator` ou `pipeline50ml`; fallback `PIPELINE_PROFILE`)
+
+Reference implementation:
+- `pipeline/orchestrator.py`
 
 ## 4) Flux des donnees (context globals)
 - Le pipeline repose sur un `context` dict partage entre composants (exec via `runpy.run_path`).
@@ -52,6 +74,12 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
 - sortie principale: `TOK_DOCS`
 - alias utilise dans certains scripts: `selected`
 - `TOK_DOCS` inclut `size` (source pour ES et fusion)
+- en `pipeline50ml`:
+  - `ML50_EMBEDDING_METHOD`, `ML50_VECTOR_DIM`
+  - `ML50_DOC_VECTORS`, `ML50_CHUNK_VECTORS`, `ML50_WORD_VECTORS`, `ML50_TOPICS`
+  - `ML50_CHUNK_VECTORS[]` inclut `chunk_primary_topic` + `chunk_topics`
+  - `ML50_TOPICS[]` inclut `document_primary_topics` (top 2 du document) + `document_topics`
+  - `NLP_ANALYSES`/`NLP_TOKENS` construits par tokenisation 50ml (sans grammaire)
 
 ### 4.5 Attribution grammaticale (EN/FR/AR)
 - consomme `selected`/`TOK_DOCS`/`FINAL_DOCS`
@@ -82,16 +110,20 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
 ### 4.8 Extraction regex
 - sortie: `EXTRACTIONS`
 - sync ES: `ES_EXTRACTION_SYNCED`
+- en `pipeline50ml`: `EXTRACTIONS[].bm25` + `BM25_RESULTS`
 
 ### 4.9 Fusion finale
 - sortie fichier: `fusion_output.json`
 - flags contexte: `FUSION_RESULT`, `FUSION_PAYLOAD`, `FUSION_PAYLOADS`, `FUSION_SOURCE`, `ES_FUSION_SYNCED`
 - structure finale: `documents[]` (un bloc complet par document, avec `components`, `text`, `document_structure`, `extraction`, `nlp`, `quality_checks`)
+- en `pipeline50ml`: bloc supplementaire `document.ml50`, `pipeline.profile="pipeline50ml"` et `pipeline.ml50`
+  - `document.ml50.document_primary_topics`: 2 topics principaux du document
 
 ## 5) Ou modifier selon le besoin
 
 ### 5.1 Changer la CLI, options, sequence des etapes
 - `pipeline/cli.py`
+- default pipeline hardcodee modifiable dans le code: `PIPELINE_DEFAULT_CODE`
 - `pipeline/orchestrator.py`
 - `pipeline/components.py`
 - chargement `.env` global (optionnel): `pipeline/settings.py:load_dotenv` appele par `pipeline/cli.py`
@@ -119,6 +151,8 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
   - `_collect_table_block`
   - `chunk_layout_universal`
   - `chunk_is_noise`
+- variante ML50 (embedding/topic/doc-vector):
+  - `component/tokenisation-layout-50ml.py`
 
 ### 5.6 Changer classification documentaire (scores, threshold, priorites)
 - code: `component/clasification.py`
@@ -128,6 +162,8 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
 - moteur: `component/extraction-regles.py`
 - routage rulesets: `config/ruleset_routes.json`
 - patterns metier: `rules/*.json`
+- variante ML50 avec BM25:
+  - `component/extraction-regles-50ml.py`
 
 ### 5.8 Changer logique Elasticsearch
 - composant pont: `component/elasticsearch.py`
@@ -150,6 +186,9 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
   - par document: `components` detaille tous les composants du pipeline
 - classification detaillee exposee (`scores`, `classification_log`, `keyword_matches`, `anti_confusion_targets`) + `file.size`
 - deduplication active: `components` reste volontairement compact (resume) et les details complets restent au niveau document (`classification`, `extraction`, `nlp`, `file`)
+- variante ML50:
+  - `component/fusion_resultats-50ml.py`
+  - enrichit la fusion avec `ml50` (vectors/topics) + BM25
 
 ### 5.10 Changer logique linguistique EN/FR/AR
 - orchestrateur langues: `component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py`
@@ -162,7 +201,7 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
 ### 6.1 Orchestration (`pipeline/`)
 - `pipeline/settings.py`: logging, normalize input, context managers cwd/argv, chargement `.env` optionnel.
 - `pipeline/components.py`: wrappers des composants scripts + resumes + sync ES.
-- `pipeline/orchestrator.py`: ordre des etapes, selection `only/upto/start`.
+- `pipeline/orchestrator.py`: contient les 2 orchestrateurs (`PipelineOrchestrator` et `Pipeline50MLOrchestrator`) + selection `only/upto/start`.
 - `pipeline/cli.py`: CLI + chargement `.env` + tee print vers `outputgeneralterminal.txt`.
 - `pipeline/elasticsearch.py`: store HTTP ES + auth + flatten/index + auto-start local ES (POSIX/Windows) + fallback docs + sync classification/extraction + sync NLP (summary/full).
 
@@ -171,11 +210,17 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
 - `si-image-pretraiter-sinonpass-le-doc.py`: split OCR/native + preprocess image.
 - `output-txt.py`: OCR tesseract + extraction native multi-format + `FINAL_DOCS` (+ `size`).
 - `tokenisation-layout.py`: language detect + sentence/layout chunking + table/multicol + `TOK_DOCS` (+ `size`).
+- `tokenisation-layout-50ml.py`: tokenisation/layout + embeddings FastText-like + topics + vectors doc/chunk/word + `NLP_*` minimal.
+  - topics chunk-level (`chunk_primary_topic`, `chunk_topics`) + top-2 document (`document_primary_topics`).
 - `atrribution-gramatical/*.py`: POS/lemma/NER per language + notebook style runners.
 - `elasticsearch.py`: step script pour index/fetch docs ES.
 - `clasification.py`: keyword scoring classification + details matches (`classification_log`, `keyword_matches`).
 - `extraction-regles.py`: regex extractors selon doc_type.
+- `extraction-regles-50ml.py`: extraction-regles + scoring BM25 sur chunks.
 - `fusion_resultats.py`: build JSON fusion structure par document (`documents[]`) depuis context + ES.
+- `fusion_resultats-50ml.py`: fusion_resultats + enrichissement ML50/BM25.
+  - force la visibilite `ml50.document_topics`/`ml50.document_primary_topics` dans `fusion_output.json` (fallback depuis les topics de chunks si `ML50_TOPICS` absent/mal aligne).
+  - affiche un resume terminal par document: `[ml50-topic] <filename> | document_primary_topics=[...] | document_top_topics=[...]`.
 
 ## 7) Fichiers metier JSON
 - `classification/common.json`: poids/penalites/seuil/marge globaux.
@@ -281,8 +326,36 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
     - ajout des vues explicatives `Sequence`, `Context Keys`, `Run Trace`,
     - clic sur un composant: affichage d'un output exemple + explication de chaque champ.
 - 2026-03-15:
+  - `pipeline/cli.py`:
+    - ajout de la selection pipeline `--pipeline default|pipelinorchestrator|pipeline50ml`,
+    - ajout du pilotage par variable d'environnement `PIPELINE_DEFAULT` (ex: `pipelinorchestrator` ou `pipeline50ml`; fallback `PIPELINE_PROFILE`),
+    - ajout du pilotage direct dans le code via `PIPELINE_DEFAULT_CODE` (utilise si aucune variable n'est fournie),
+    - log explicite de la pipeline selectionnee.
+  - `pipeline/orchestrator.py`:
+    - nouvel orchestrateur `Pipeline50MLOrchestrator`,
+    - pipeline alternative sans composant grammaire,
+    - etapes: pretraitement -> ocr routing -> output-txt -> classification -> tokenisation 50ml -> elasticsearch -> extraction 50ml -> fusion 50ml.
   - `pipeline/orchestrator.py` + `pipeline/cli.py`:
     - nouvel ordre pipeline: `clasification` executee juste apres `output-txt`, avant `tokenisation-layout`.
+    - expose desormais `PIPELINE_PROFILE` et `PIPELINE_STEPS` dans le contexte.
+  - `component/tokenisation-layout-50ml.py`:
+    - execute la tokenisation/layout standard puis enrichit avec embeddings FastText-like (subword hashing),
+    - produit des vecteurs `mot/chunk/document` (`ML50_*`),
+    - ajoute un topic extractor (`ML50_TOPICS`) + topics par chunk (`ML50_CHUNK_VECTORS.chunk_primary_topic/chunk_topics`) + `document_primary_topics` document (top 2),
+    - ajoute un affichage terminal explicite par document: `[topic-doc] ... document_primary_topics/document_top_topics`.
+    - genere `NLP_ANALYSES`/`NLP_TOKENS` minimaux pour la sync ES sans composant grammaire.
+  - `component/extraction-regles-50ml.py`:
+    - execute extraction regex standard puis ajoute un scoring BM25 par chunk,
+    - enrichit `EXTRACTIONS[].bm25` + publie `BM25_RESULTS`.
+  - `component/fusion_resultats-50ml.py`:
+    - execute la fusion standard puis enrichit `fusion_output.json` avec:
+      - `document.ml50` (vectors/topics),
+      - `document.ml50.document_primary_topics` (2 topics principaux),
+      - `document.ml50.document_topics` toujours renseigne (fallback depuis chunks si besoin),
+      - `extraction.bm25` (score retrieval),
+      - `components.tokenisation_layout_50ml` et `components.extraction_regles_50ml`,
+      - `pipeline.profile=\"pipeline50ml\"` + `pipeline.ml50`.
+    - ajoute un print terminal par document `[ml50-topic]` pour rendre visibles les topics dans `outputgeneralterminal.txt`.
   - `pipeline/components.py`:
     - `ClassificationComponent`: sync ES differee tant que les docs ne sont pas indexes (`ES_DOC_IDS` absents) pour eviter une sync prematuree.
     - `ElasticsearchComponent`: reporting enrichi avec `classification_input` et `classification_synced`.

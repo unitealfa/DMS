@@ -1,0 +1,350 @@
+from __future__ import annotations
+
+import hashlib
+import math
+import re
+import runpy
+from collections import Counter
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Tuple
+
+import numpy as np
+
+
+BASE_SCRIPT = Path(__file__).resolve().with_name("tokenisation-layout.py")
+TOKEN_RE = re.compile(r"[A-Za-z0-9_\u00C0-\u024F\u0600-\u06FF]+", re.UNICODE)
+
+_STOPWORDS = {
+    "the", "and", "for", "with", "from", "that", "this", "are", "was", "were", "will", "shall", "must",
+    "dans", "avec", "pour", "par", "les", "des", "une", "sur", "aux", "est", "sont", "sera", "etre", "ce",
+    "de", "du", "la", "le", "un", "en", "et", "ou", "au", "aux",
+    "في", "من", "على", "الى", "إلى", "عن", "مع", "و", "او", "أو", "هذا", "هذه",
+}
+
+
+def _safe_int(value: Any, default: int) -> int:
+    try:
+        return int(value)
+    except Exception:
+        return default
+
+
+def _norm_token(token: str) -> str:
+    return str(token or "").strip().lower()
+
+
+def _tokenize(text: str) -> List[str]:
+    return [_norm_token(t) for t in TOKEN_RE.findall(str(text or "")) if _norm_token(t)]
+
+
+def _char_ngrams(token: str, min_n: int = 3, max_n: int = 5) -> Iterable[str]:
+    token = _norm_token(token)
+    if not token:
+        return []
+    framed = f"<{token}>"
+    grams: List[str] = []
+    for n in range(min_n, max_n + 1):
+        if len(framed) < n:
+            continue
+        for i in range(len(framed) - n + 1):
+            grams.append(framed[i:i + n])
+    if not grams:
+        grams.append(token)
+    return grams
+
+
+def _hash_index_sign(value: str, dim: int) -> Tuple[int, float]:
+    digest = hashlib.blake2b(value.encode("utf-8"), digest_size=16).digest()
+    idx = int.from_bytes(digest[:8], "big") % dim
+    sign = 1.0 if (digest[8] & 1) == 0 else -1.0
+    return idx, sign
+
+
+def _fasttext_like_vector(token: str, dim: int) -> np.ndarray:
+    vec = np.zeros(dim, dtype=np.float32)
+    grams = _char_ngrams(token)
+    for gram in grams:
+        idx, sign = _hash_index_sign(gram, dim)
+        vec[idx] += sign
+    norm = float(np.linalg.norm(vec))
+    if norm > 0.0:
+        vec /= norm
+    return vec
+
+
+def _mean_vectors(vectors: List[np.ndarray], dim: int) -> np.ndarray:
+    if not vectors:
+        return np.zeros(dim, dtype=np.float32)
+    out = np.zeros(dim, dtype=np.float32)
+    for v in vectors:
+        out += v
+    out /= float(len(vectors))
+    norm = float(np.linalg.norm(out))
+    if norm > 0.0:
+        out /= norm
+    return out
+
+
+def _to_list(vec: np.ndarray, precision: int = 6) -> List[float]:
+    return [round(float(x), precision) for x in vec.tolist()]
+
+
+def _iter_doc_chunks(doc: Dict[str, Any]) -> Iterable[Tuple[int, int, str, str]]:
+    for page in doc.get("pages") or []:
+        if not isinstance(page, dict):
+            continue
+        page_index = _safe_int(page.get("page_index"), 1)
+        lang = str(page.get("lang") or "")
+        sents = page.get("sentences_layout")
+        if isinstance(sents, list) and sents:
+            for sent_index, sent in enumerate(sents):
+                if not isinstance(sent, dict):
+                    continue
+                text = str(sent.get("text") or "")
+                if text.strip():
+                    yield page_index, sent_index, text, lang
+            continue
+
+        page_text = str(page.get("page_text") or page.get("text") or "")
+        if page_text.strip():
+            yield page_index, 0, page_text, lang
+
+
+def _extract_topics_from_chunks(tokenized_chunks: List[List[str]], max_topics: int = 12) -> List[Dict[str, Any]]:
+    if not tokenized_chunks:
+        return []
+
+    filtered_chunks: List[List[str]] = []
+    for chunk in tokenized_chunks:
+        terms = [
+            t for t in chunk
+            if len(t) >= 3 and t not in _STOPWORDS and not t.isdigit()
+        ]
+        filtered_chunks.append(terms)
+
+    tf = Counter()
+    df = Counter()
+    for terms in filtered_chunks:
+        tf.update(terms)
+        df.update(set(terms))
+
+    total_chunks = max(1, len(filtered_chunks))
+    scored: List[Tuple[str, float]] = []
+    for term, freq in tf.items():
+        term_df = max(1, int(df.get(term) or 1))
+        idf = math.log(1.0 + (total_chunks + 1.0) / term_df)
+        score = float(freq) * idf
+        scored.append((term, score))
+
+    scored.sort(key=lambda x: x[1], reverse=True)
+    return [{"term": term, "score": round(score, 6)} for term, score in scored[:max_topics]]
+
+
+def _extract_chunk_topics(tokens: List[str], max_topics: int = 3) -> List[Dict[str, Any]]:
+    terms = [t for t in tokens if len(t) >= 3 and t not in _STOPWORDS and not t.isdigit()]
+    if not terms:
+        return []
+    counts = Counter(terms)
+    total = float(sum(counts.values()) or 1.0)
+    scored: List[Tuple[str, float]] = []
+    for term, freq in counts.items():
+        scored.append((term, float(freq) / total))
+    scored.sort(key=lambda x: x[1], reverse=True)
+    return [{"term": term, "score": round(score, 6)} for term, score in scored[:max_topics]]
+
+
+def _doc_key(doc_id: Any, filename: Any) -> str:
+    sid = str(doc_id or "").strip()
+    if sid:
+        return f"id:{sid}"
+    sfn = str(filename or "").strip().lower()
+    return f"fn:{sfn}"
+
+
+def _run_base_tokenisation(ctx: Dict[str, Any]) -> None:
+    result = runpy.run_path(str(BASE_SCRIPT), run_name="__main__", init_globals=ctx)
+    if isinstance(result, dict):
+        ctx.update(result)
+
+
+def _augment_with_ml50(ctx: Dict[str, Any]) -> None:
+    tok_docs = ctx.get("TOK_DOCS") or ctx.get("selected") or []
+    if not isinstance(tok_docs, list):
+        tok_docs = []
+
+    dim = _safe_int(ctx.get("ML50_VECTOR_DIM"), 64)
+    if dim < 8:
+        dim = 64
+    max_word_vectors = _safe_int(ctx.get("ML50_MAX_WORD_VECTORS"), 200)
+    if max_word_vectors < 20:
+        max_word_vectors = 200
+
+    doc_vectors: List[Dict[str, Any]] = []
+    chunk_vectors: List[Dict[str, Any]] = []
+    word_vectors: List[Dict[str, Any]] = []
+    topics_rows: List[Dict[str, Any]] = []
+    nlp_analyses: List[Dict[str, Any]] = []
+    nlp_tokens: List[Dict[str, Any]] = []
+    lang_counter: Counter = Counter()
+
+    for doc in tok_docs:
+        if not isinstance(doc, dict):
+            continue
+        doc_id = doc.get("doc_id")
+        filename = str(doc.get("filename") or "")
+        key = _doc_key(doc_id, filename)
+
+        doc_chunk_vecs: List[np.ndarray] = []
+        token_counter: Counter = Counter()
+        tokenized_chunks: List[List[str]] = []
+
+        for page_index, sent_index, text, lang in _iter_doc_chunks(doc):
+            tokens = _tokenize(text)
+            if not tokens:
+                continue
+            lang_counter[lang or "unknown"] += 1
+            token_counter.update(tokens)
+            tokenized_chunks.append(tokens)
+
+            word_vecs = [_fasttext_like_vector(tok, dim) for tok in tokens]
+            chunk_vec = _mean_vectors(word_vecs, dim)
+            doc_chunk_vecs.append(chunk_vec)
+            chunk_topics = _extract_chunk_topics(tokens, max_topics=3)
+            chunk_primary_topic = chunk_topics[0]["term"] if chunk_topics else None
+
+            chunk_vectors.append(
+                {
+                    "doc_id": doc_id,
+                    "filename": filename,
+                    "doc_key": key,
+                    "page_index": page_index,
+                    "sent_index": sent_index,
+                    "lang": lang or None,
+                    "token_count": len(tokens),
+                    "text_preview": text[:240],
+                    "chunk_primary_topic": chunk_primary_topic,
+                    "chunk_topics": chunk_topics,
+                    "vector": _to_list(chunk_vec),
+                }
+            )
+
+            lemmas = [t.lower() for t in tokens]
+            pos = ["UNK"] * len(tokens)
+            ner = ["O"] * len(tokens)
+            nlp_analyses.append(
+                {
+                    "doc_id": doc_id,
+                    "filename": filename,
+                    "doc": filename,
+                    "page_index": page_index,
+                    "sent_index": sent_index,
+                    "lang": lang or None,
+                    "text": text,
+                    "tokens": tokens,
+                    "lemmas": lemmas,
+                    "pos": pos,
+                    "ner_labels": ner,
+                    "entities": [],
+                }
+            )
+            for tok_index, tok in enumerate(tokens):
+                nlp_tokens.append(
+                    {
+                        "doc_id": doc_id,
+                        "filename": filename,
+                        "page_index": page_index,
+                        "sent_index": sent_index,
+                        "tok_index": tok_index,
+                        "token": tok,
+                        "lemma": lemmas[tok_index],
+                        "pos": "UNK",
+                        "ner": "O",
+                        "lang": lang or None,
+                    }
+                )
+
+        doc_vec = _mean_vectors(doc_chunk_vecs, dim)
+        doc_vectors.append(
+            {
+                "doc_id": doc_id,
+                "filename": filename,
+                "doc_key": key,
+                "dim": dim,
+                "chunk_count": len(doc_chunk_vecs),
+                "vector": _to_list(doc_vec),
+            }
+        )
+
+        top_words = token_counter.most_common(max_word_vectors)
+        for token, freq in top_words:
+            word_vectors.append(
+                {
+                    "doc_id": doc_id,
+                    "filename": filename,
+                    "doc_key": key,
+                    "token": token,
+                    "freq": int(freq),
+                    "vector": _to_list(_fasttext_like_vector(token, dim)),
+                }
+            )
+
+        doc_topics = _extract_topics_from_chunks(tokenized_chunks)
+        topics_rows.append(
+            {
+                "doc_id": doc_id,
+                "filename": filename,
+                "doc_key": key,
+                "document_topics": doc_topics,
+                "document_primary_topics": [
+                    x.get("term") for x in doc_topics[:2] if isinstance(x, dict) and x.get("term")
+                ],
+            }
+        )
+
+    detected_languages = [lang for lang, _ in lang_counter.most_common()]
+    dominant_lang = detected_languages[0] if detected_languages else None
+
+    ctx["ML50_EMBEDDING_METHOD"] = "fasttext-subword-hash-v1"
+    ctx["ML50_VECTOR_DIM"] = dim
+    ctx["ML50_DOC_VECTORS"] = doc_vectors
+    ctx["ML50_CHUNK_VECTORS"] = chunk_vectors
+    ctx["ML50_WORD_VECTORS"] = word_vectors
+    ctx["ML50_TOPICS"] = topics_rows
+
+    # Fournit des structures NLP minimales pour rester compatible ES summary/full sans etape grammaire.
+    ctx["NLP_ANALYSES"] = nlp_analyses
+    ctx["NLP_SENTENCES"] = nlp_analyses
+    ctx["NLP_ENTITIES"] = []
+    ctx["NLP_TOKENS"] = nlp_tokens
+    ctx["NLP_POS"] = nlp_tokens
+    ctx["NLP_LEMMA"] = nlp_tokens
+    ctx["NLP_LANGUAGE"] = dominant_lang
+    ctx["NLP_LANGUAGE_STATS"] = {lang: int(cnt) for lang, cnt in lang_counter.items()}
+    ctx["DETECTED_LANGUAGES"] = detected_languages
+
+    for row in topics_rows:
+        if not isinstance(row, dict):
+            continue
+        filename = str(row.get("filename") or row.get("doc_id") or "unknown")
+        document_primary_topics = [str(x) for x in (row.get("document_primary_topics") or []) if x]
+        top_topics = [
+            str(item.get("term"))
+            for item in (row.get("document_topics") or [])[:5]
+            if isinstance(item, dict) and item.get("term")
+        ]
+        print(
+            f"[topic-doc] {filename} | document_primary_topics={document_primary_topics} | "
+            f"document_top_topics={top_topics}"
+        )
+
+    print(
+        "[tokenisation-50ml] "
+        f"docs={len(doc_vectors)} | chunks={len(chunk_vectors)} | "
+        f"words={len(word_vectors)} | topics={sum(len(x.get('document_topics') or []) for x in topics_rows)} | "
+        f"nlp_rows={len(nlp_analyses)} | vector_dim={dim}"
+    )
+
+
+_CTX = globals()
+_run_base_tokenisation(_CTX)
+_augment_with_ml50(_CTX)

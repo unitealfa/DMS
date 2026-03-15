@@ -6,8 +6,12 @@ import builtins
 import os
 from pathlib import Path
 
-from .orchestrator import PipelineOrchestrator
+from .orchestrator import PipelineOrchestrator, Pipeline50MLOrchestrator
 from .settings import configure_logging, load_dotenv, normalize_input
+
+# Pipeline par defaut configurable directement dans le code.
+# Valeurs supportees: "pipelinorchestrator" | "default" | "pipeline50ml"
+PIPELINE_DEFAULT_CODE = "pipeline50ml"
 
 
 def _env_bool(name: str, default: bool = False) -> bool:
@@ -35,6 +39,29 @@ def _env_optional(name: str) -> str | None:
     return raw or None
 
 
+def _normalize_pipeline_name(raw: str | None, default: str = "default") -> str:
+    aliases = {
+        "default": "default",
+        "pipelineorchestrator": "default",
+        "pipelinorchestrator": "default",
+        "orchestrator": "default",
+        "pipeline50ml": "pipeline50ml",
+        "50ml": "pipeline50ml",
+    }
+    if raw is None:
+        return default
+    value = str(raw).strip().lower()
+    return aliases.get(value, default)
+
+
+def _env_pipeline(default: str | None = None) -> str:
+    base_default = _normalize_pipeline_name(default or PIPELINE_DEFAULT_CODE, "default")
+    raw = os.environ.get("PIPELINE_DEFAULT")
+    if raw is None:
+        raw = os.environ.get("PIPELINE_PROFILE")
+    return _normalize_pipeline_name(raw, base_default)
+
+
 def parse_cli() -> argparse.Namespace:
     repo_root = Path(__file__).resolve().parent.parent
     load_dotenv(repo_root / ".env", override=False)
@@ -44,6 +71,15 @@ def parse_cli() -> argparse.Namespace:
         "inputs",
         nargs="*",
         help="Chemins des fichiers a traiter (separes par des virgules ou des espaces).",
+    )
+    parser.add_argument(
+        "--pipeline",
+        choices=["default", "pipelinorchestrator", "pipeline50ml"],
+        default=_env_pipeline(),
+        help=(
+            "Pipeline a executer: default/pipelinorchestrator (pipeline actuelle) ou pipeline50ml "
+            "(sans grammaire + tokenisation/extraction/fusion enrichies ML)."
+        ),
     )
     parser.add_argument("--log-level", default="INFO", help="Niveau de log (DEBUG, INFO, WARNING, ERROR).")
     parser.add_argument("--only", choices=[
@@ -135,7 +171,12 @@ def main() -> None:
 
     inputs = normalize_input(args.inputs) if args.inputs else []
     repo_root = Path(__file__).resolve().parent.parent
-    orchestrator = PipelineOrchestrator(repo_root)
+    pipeline_name = _normalize_pipeline_name(args.pipeline, "default")
+    if pipeline_name == "pipeline50ml":
+        orchestrator = Pipeline50MLOrchestrator(repo_root)
+    else:
+        orchestrator = PipelineOrchestrator(repo_root)
+    logging.info("Pipeline selection: %s", pipeline_name)
 
     # Tee all prints to file + console
     log_file = (repo_root / "outputgeneralterminal.txt").open("w", encoding="utf-8")
@@ -182,6 +223,7 @@ def main() -> None:
                 "ES_START_PASSWORD": _env_optional("ES_START_PASSWORD"),
                 "ES_AUTO_START_WAIT_SECONDS": _env_int("ES_AUTO_START_WAIT_SECONDS", 45),
                 "ES_AUTO_START_LAUNCH_TIMEOUT": _env_int("ES_AUTO_START_LAUNCH_TIMEOUT", 20),
+                "PIPELINE_PROFILE": pipeline_name,
             },
         )
     except Exception as exc:

@@ -142,7 +142,9 @@ component/extraction-regles.py:116:def _page_text_from_page(pg: Dict[str, Any]) 
 component/extraction-regles.py:133:def apply_extractors_to_page(text: str, extractors: Dict[str, Any]) -> Dict[str, List[Dict[str, Any]]]:
 component/extraction-regles.py:182:def _build_cls_map(results: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
 component/extraction-regles.py:193:def _classification_for(doc: Dict[str, Any], cls_map: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
-component/extraction-regles.py:203:def run() -> List[Dict[str, Any]]:
+component/extraction-regles.py:203:def _doc_text_score(doc: Dict[str, Any]) -> int:
+component/extraction-regles.py:216:def _dedupe_docs(docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+component/extraction-regles.py:244:def run() -> List[Dict[str, Any]]:
 component/fusion_resultats.py:31:def ns() -> str:
 component/fusion_resultats.py:35:def first(lst: List[Any]) -> Any:
 component/fusion_resultats.py:39:def merge_list(*args: Optional[List[Any]]) -> List[Any]:
@@ -157,30 +159,35 @@ component/fusion_resultats.py:114:def _size_maps_from_pretraitement(ctx: Dict[st
 component/fusion_resultats.py:145:def _resolve_file_size(
 component/fusion_resultats.py:170:def _row_belongs_to_doc(row: Any, doc_id: Optional[str], filename: Optional[str]) -> bool:
 component/fusion_resultats.py:182:def _filter_rows_for_doc(rows: Any, doc_id: Optional[str], filename: Optional[str]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:192:def _default_nlp_tokens_index(ctx: Dict[str, Any]) -> str:
-component/fusion_resultats.py:200:def _search_index(
-component/fusion_resultats.py:220:def _fetch_nlp_tokens(
-component/fusion_resultats.py:297:def _structure_nlp_tokens(tokens: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:345:def _nlp_from_es_and_ctx(
-component/fusion_resultats.py:521:def _build_map(rows: Any) -> Dict[str, Dict[str, Dict[str, Any]]]:
-component/fusion_resultats.py:536:def _pick_from_map(
-component/fusion_resultats.py:548:def _same_doc_hint(value: Any, filename: str, first_path: str) -> bool:
-component/fusion_resultats.py:557:def _extract_component_views(
-component/fusion_resultats.py:701:def _to_document_output(
-component/fusion_resultats.py:743:def _final_output(
-component/fusion_resultats.py:770:def extract_text_raw(ctx: Dict[str, Any]) -> str:
-component/fusion_resultats.py:799:def extract_pages_meta(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:805:def extract_pages(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:810:def extract_classification(ctx: Dict[str, Any]) -> Dict[str, Any]:
-component/fusion_resultats.py:816:def extract_doc_type(cls: Dict[str, Any]) -> str:
-component/fusion_resultats.py:820:def extract_extractions(ctx: Dict[str, Any]) -> Any:
-component/fusion_resultats.py:824:def extract_detected_languages(ctx: Dict[str, Any]) -> List[str]:
-component/fusion_resultats.py:828:def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
-component/fusion_resultats.py:995:def _es_text_from_pages(src: Dict[str, Any]) -> str:
-component/fusion_resultats.py:1006:def _es_pages(src: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:1022:def build_payload_from_es_source(
-component/fusion_resultats.py:1128:def build_payloads_from_es(ctx: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], int]:
-component/fusion_resultats.py:1155:def main() -> None:
+component/fusion_resultats.py:192:def _doc_key(row: Dict[str, Any], index: int) -> str:
+component/fusion_resultats.py:205:def _doc_text_score(row: Dict[str, Any]) -> int:
+component/fusion_resultats.py:222:def _dedupe_docs(rows: Any) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:262:def _normalize_pages_from_doc(row: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:276:def _filter_and_dedupe_extractions(
+component/fusion_resultats.py:317:def _default_nlp_tokens_index(ctx: Dict[str, Any]) -> str:
+component/fusion_resultats.py:325:def _search_index(
+component/fusion_resultats.py:345:def _fetch_nlp_tokens(
+component/fusion_resultats.py:422:def _structure_nlp_tokens(tokens: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:470:def _nlp_from_es_and_ctx(
+component/fusion_resultats.py:646:def _build_map(rows: Any) -> Dict[str, Dict[str, Dict[str, Any]]]:
+component/fusion_resultats.py:661:def _pick_from_map(
+component/fusion_resultats.py:673:def _same_doc_hint(value: Any, filename: str, first_path: str) -> bool:
+component/fusion_resultats.py:682:def _extract_component_views(
+component/fusion_resultats.py:826:def _to_document_output(
+component/fusion_resultats.py:868:def _final_output(
+component/fusion_resultats.py:895:def extract_text_raw(ctx: Dict[str, Any]) -> str:
+component/fusion_resultats.py:924:def extract_pages_meta(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:930:def extract_pages(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:957:def extract_classification(ctx: Dict[str, Any]) -> Dict[str, Any]:
+component/fusion_resultats.py:963:def extract_doc_type(cls: Dict[str, Any]) -> str:
+component/fusion_resultats.py:967:def extract_extractions(ctx: Dict[str, Any]) -> Any:
+component/fusion_resultats.py:971:def extract_detected_languages(ctx: Dict[str, Any]) -> List[str]:
+component/fusion_resultats.py:975:def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
+component/fusion_resultats.py:1147:def _es_text_from_pages(src: Dict[str, Any]) -> str:
+component/fusion_resultats.py:1158:def _es_pages(src: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:1174:def build_payload_from_es_source(
+component/fusion_resultats.py:1280:def build_payloads_from_es(ctx: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], int]:
+component/fusion_resultats.py:1307:def main() -> None:
 component/output-txt.py:72:def _median(values):
 component/output-txt.py:83:def _estimate_char_metrics(data: dict) -> Tuple[float, float]:
 component/output-txt.py:127:def _render_layout_from_data(data: dict, img_w: int, img_h: int) -> str:

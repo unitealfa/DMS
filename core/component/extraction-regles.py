@@ -200,8 +200,49 @@ def _classification_for(doc: Dict[str, Any], cls_map: Dict[str, Dict[str, Any]])
     return {"doc_type": "UNCLASSIFIED", "status": "REVIEW"}
 
 
+def _doc_text_score(doc: Dict[str, Any]) -> int:
+    pages = doc.get("pages")
+    if isinstance(pages, list) and pages:
+        total = 0
+        for pg in pages:
+            if not isinstance(pg, dict):
+                continue
+            total += len(str(_page_text_from_page(pg)).strip())
+        if total > 0:
+            return total
+    return len(str(doc.get("text") or "").strip())
+
+
+def _dedupe_docs(docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    best: Dict[str, Dict[str, Any]] = {}
+    order: List[str] = []
+    for i, doc in enumerate(docs):
+        if not isinstance(doc, dict):
+            continue
+        key = str(doc.get("doc_id") or "").strip() or str(doc.get("filename") or "").strip() or f"doc#{i}"
+        if key not in best:
+            best[key] = doc
+            order.append(key)
+            continue
+        cur = best[key]
+        cur_score = _doc_text_score(cur)
+        new_score = _doc_text_score(doc)
+        cur_content = str(cur.get("content") or "").strip().lower()
+        new_content = str(doc.get("content") or "").strip().lower()
+        replace = False
+        if cur_content == "image_only" and new_content != "image_only":
+            replace = True
+        elif cur_content != "image_only" and new_content == "image_only":
+            replace = False
+        elif new_score > cur_score:
+            replace = True
+        if replace:
+            best[key] = doc
+    return [best[k] for k in order]
+
+
 def run() -> List[Dict[str, Any]]:
-    docs = _get_input_docs(globals())
+    docs = _dedupe_docs(_get_input_docs(globals()))
     results_cls = globals().get("RESULTS") or []
     cls_map = _build_cls_map(results_cls)
 

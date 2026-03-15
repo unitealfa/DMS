@@ -289,6 +289,13 @@ Reference implementation de l'ordre: `pipeline/orchestrator.py`
   - `component/elasticsearch.py`:
     - ajoute la sync classification (`RESULTS`) directement dans l'etape Elasticsearch apres indexation des documents,
     - expose `ES_CLASSIFICATION_SYNCED` dans le contexte et le log composant.
+  - `component/fusion_resultats.py`:
+    - corrige `file.page_count` (base sur les vraies pages document et plus sur des wrappers doc),
+    - corrige `document_structure.pages` (retourne des pages reelles avec `page_index`, plus des objets document),
+    - dedup des `regex_extractions` sur le document courant pour supprimer les doublons.
+  - `component/extraction-regles.py`:
+    - dedup des documents d'entree (meme doc_id/filename) avec priorite a la version `text` vs `image_only`,
+    - evite les sorties `EXTRACTIONS` dupliquees sur un meme fichier.
   - `component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py`:
     - fusion des anciennes sorties separees `NLP_POS` et `NLP_LEMMA` en une sortie unique `NLP_TOKENS`,
     - format unifie par token: `filename`, `page_index`, `sent_index`, `tok_index`, `token`, `pos`, `lemma`, `ner`, `lang`,

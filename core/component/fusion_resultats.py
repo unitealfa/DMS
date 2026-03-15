@@ -189,6 +189,131 @@ def _filter_rows_for_doc(rows: Any, doc_id: Optional[str], filename: Optional[st
     return out
 
 
+def _doc_key(row: Dict[str, Any], index: int) -> str:
+    doc_id = str(row.get("doc_id") or "").strip()
+    if doc_id:
+        return f"id:{doc_id}"
+    filename = str(row.get("filename") or "").strip()
+    if filename:
+        return f"fn:{filename}"
+    paths = _safe_list(row.get("paths"))
+    if paths:
+        return f"path:{_basename(paths[0])}"
+    return f"idx:{index}"
+
+
+def _doc_text_score(row: Dict[str, Any]) -> int:
+    total = 0
+    for page in _safe_list(row.get("pages")):
+        if not isinstance(page, dict):
+            continue
+        txt = page.get("page_text") or page.get("text") or page.get("ocr_text") or ""
+        if not txt and isinstance(page.get("sentences_layout"), list):
+            txt = "\n".join(
+                str(s.get("text") or "") if isinstance(s, dict) else str(s)
+                for s in (page.get("sentences_layout") or [])
+            )
+        total += len(str(txt).strip())
+    if total > 0:
+        return total
+    return len(str(row.get("text") or "").strip())
+
+
+def _dedupe_docs(rows: Any) -> List[Dict[str, Any]]:
+    if not isinstance(rows, list):
+        return []
+    best: Dict[str, Dict[str, Any]] = {}
+    order: List[str] = []
+    for i, row in enumerate(rows):
+        if not isinstance(row, dict):
+            continue
+        key = _doc_key(row, i)
+        if key not in best:
+            best[key] = row
+            order.append(key)
+            continue
+
+        current = best[key]
+        cur_score = _doc_text_score(current)
+        new_score = _doc_text_score(row)
+        cur_pages = len(_safe_list(current.get("pages")))
+        new_pages = len(_safe_list(row.get("pages")))
+        cur_content = str(current.get("content") or "").strip().lower()
+        new_content = str(row.get("content") or "").strip().lower()
+
+        replace = False
+        if cur_content == "image_only" and new_content != "image_only":
+            replace = True
+        elif cur_content != "image_only" and new_content == "image_only":
+            replace = False
+        elif new_pages > cur_pages and new_content != "image_only":
+            replace = True
+        elif new_score > cur_score:
+            replace = True
+        elif new_score == cur_score and new_pages > cur_pages:
+            replace = True
+
+        if replace:
+            best[key] = row
+
+    return [best[k] for k in order]
+
+
+def _normalize_pages_from_doc(row: Dict[str, Any]) -> List[Dict[str, Any]]:
+    out: List[Dict[str, Any]] = []
+    for i, page in enumerate(_safe_list(row.get("pages")), start=1):
+        if not isinstance(page, dict):
+            continue
+        item = dict(page)
+        if item.get("page_index") is None:
+            item["page_index"] = i
+        if "text" not in item:
+            item["text"] = page.get("page_text") or page.get("ocr_text") or ""
+        out.append(item)
+    return out
+
+
+def _filter_and_dedupe_extractions(
+    rows: Any,
+    doc_id: Optional[str],
+    filename: Optional[str],
+) -> List[Dict[str, Any]]:
+    if isinstance(rows, dict):
+        raw = [rows]
+    elif isinstance(rows, list):
+        raw = [r for r in rows if isinstance(r, dict)]
+    else:
+        return []
+
+    filtered: List[Dict[str, Any]] = []
+    for row in raw:
+        row_doc_id = str(row.get("doc_id") or "").strip()
+        row_filename = str(row.get("filename") or "").strip()
+        if doc_id and row_doc_id and row_doc_id == doc_id:
+            filtered.append(row)
+            continue
+        if filename and row_filename and row_filename == filename:
+            filtered.append(row)
+
+    if not filtered:
+        filtered = raw
+
+    best: Dict[str, Dict[str, Any]] = {}
+    order: List[str] = []
+    for i, row in enumerate(filtered):
+        key = str(row.get("doc_id") or "").strip() or str(row.get("filename") or "").strip() or f"row#{i}"
+        fields = row.get("fields") if isinstance(row.get("fields"), dict) else {}
+        score = len(fields)
+        if key not in best:
+            best[key] = row
+            order.append(key)
+            continue
+        cur_fields = best[key].get("fields") if isinstance(best[key].get("fields"), dict) else {}
+        if score > len(cur_fields):
+            best[key] = row
+    return [best[k] for k in order]
+
+
 def _default_nlp_tokens_index(ctx: Dict[str, Any]) -> str:
     idx = str(ctx.get("ES_NLP_INDEX_EFFECTIVE") or ctx.get("ES_NLP_INDEX") or "").strip()
     if idx:
@@ -803,8 +928,30 @@ def extract_pages_meta(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
 
 
 def extract_pages(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
-    # Prefer TOK_DOCS or selected.
-    return ctx.get("TOK_DOCS") or ctx.get("selected") or []
+    tok_docs = _dedupe_docs(_safe_list(ctx.get("TOK_DOCS") or ctx.get("selected")))
+    if tok_docs:
+        pages = _normalize_pages_from_doc(tok_docs[0])
+        if pages:
+            return pages
+
+    finals = _safe_list(ctx.get("FINAL_DOCS"))
+    if finals and isinstance(finals[0], dict):
+        first_final = finals[0]
+        pages_text = _safe_list(first_final.get("pages_text"))
+        if pages_text:
+            source_path = str(first_final.get("source_path") or "")
+            return [
+                {
+                    "page_index": i,
+                    "text": str(txt or ""),
+                    "source_path": source_path,
+                }
+                for i, txt in enumerate(pages_text, start=1)
+            ]
+        text = str(first_final.get("text") or "")
+        if text.strip():
+            return [{"page_index": 1, "text": text, "source_path": str(first_final.get("source_path") or "")}]
+    return []
 
 
 def extract_classification(ctx: Dict[str, Any]) -> Dict[str, Any]:
@@ -831,9 +978,8 @@ def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
     text_raw = extract_text_raw(ctx)
     pages_meta = extract_pages_meta(ctx)
     pages = extract_pages(ctx)
-    extractions = extract_extractions(ctx)
     detected_langs = extract_detected_languages(ctx)
-    tok_docs = _safe_list(ctx.get("TOK_DOCS") or ctx.get("selected"))
+    tok_docs = _dedupe_docs(_safe_list(ctx.get("TOK_DOCS") or ctx.get("selected")))
     first_doc = first(tok_docs) if tok_docs else {}
     first_doc = first_doc if isinstance(first_doc, dict) else {}
     file_paths = _safe_list(ctx.get("INPUT_FILE")) or _safe_list(first_doc.get("paths"))
@@ -847,6 +993,12 @@ def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
         file_paths,
         file_name,
         first_doc.get("size"),
+    )
+    doc_id_hint = str(first_doc.get("doc_id") or "").strip() or None
+    extractions = _filter_and_dedupe_extractions(
+        extract_extractions(ctx),
+        doc_id_hint,
+        file_name,
     )
     nlp_tokens = _safe_list(ctx.get("NLP_TOKENS"))
     if not nlp_tokens:

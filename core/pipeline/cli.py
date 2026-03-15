@@ -6,12 +6,12 @@ import builtins
 import os
 from pathlib import Path
 
-from .orchestrator import PipelineOrchestrator, Pipeline50MLOrchestrator
+from .orchestrator import PipelineOrchestrator, Pipeline50MLOrchestrator, Pipeline100MLOrchestrator
 from .settings import configure_logging, load_dotenv, normalize_input
 
 # Pipeline par defaut configurable directement dans le code.
-# Valeurs supportees: "pipelinorchestrator" | "default" | "pipeline50ml"
-PIPELINE_DEFAULT_CODE = "pipeline50ml"
+# Valeurs supportees: "pipelinorchestrator" | "default" | "pipeline50ml" | "pipeline100ml"
+PIPELINE_DEFAULT_CODE = "pipeline100ml"
 
 
 def _env_bool(name: str, default: bool = False) -> bool:
@@ -47,6 +47,8 @@ def _normalize_pipeline_name(raw: str | None, default: str = "default") -> str:
         "orchestrator": "default",
         "pipeline50ml": "pipeline50ml",
         "50ml": "pipeline50ml",
+        "pipeline100ml": "pipeline100ml",
+        "100ml": "pipeline100ml",
     }
     if raw is None:
         return default
@@ -74,11 +76,12 @@ def parse_cli() -> argparse.Namespace:
     )
     parser.add_argument(
         "--pipeline",
-        choices=["default", "pipelinorchestrator", "pipeline50ml"],
+        choices=["default", "pipelinorchestrator", "pipeline50ml", "pipeline100ml"],
         default=_env_pipeline(),
         help=(
             "Pipeline a executer: default/pipelinorchestrator (pipeline actuelle) ou pipeline50ml "
-            "(sans grammaire + tokenisation/extraction/fusion enrichies ML)."
+            "(sans grammaire + tokenisation/extraction/fusion enrichies ML FastText-like) ou "
+            "pipeline100ml (sans grammaire + embeddings Transformer BERT/XLM-R + pooling)."
         ),
     )
     parser.add_argument("--log-level", default="INFO", help="Niveau de log (DEBUG, INFO, WARNING, ERROR).")
@@ -172,7 +175,9 @@ def main() -> None:
     inputs = normalize_input(args.inputs) if args.inputs else []
     repo_root = Path(__file__).resolve().parent.parent
     pipeline_name = _normalize_pipeline_name(args.pipeline, "default")
-    if pipeline_name == "pipeline50ml":
+    if pipeline_name == "pipeline100ml":
+        orchestrator = Pipeline100MLOrchestrator(repo_root)
+    elif pipeline_name == "pipeline50ml":
         orchestrator = Pipeline50MLOrchestrator(repo_root)
     else:
         orchestrator = PipelineOrchestrator(repo_root)
@@ -223,6 +228,10 @@ def main() -> None:
                 "ES_START_PASSWORD": _env_optional("ES_START_PASSWORD"),
                 "ES_AUTO_START_WAIT_SECONDS": _env_int("ES_AUTO_START_WAIT_SECONDS", 45),
                 "ES_AUTO_START_LAUNCH_TIMEOUT": _env_int("ES_AUTO_START_LAUNCH_TIMEOUT", 20),
+                "ML100_MODEL_NAME": _env_optional("ML100_MODEL_NAME") or "xlm-roberta-base",
+                "ML100_MAX_LENGTH": _env_int("ML100_MAX_LENGTH", 256),
+                "ML100_BATCH_SIZE": _env_int("ML100_BATCH_SIZE", 8),
+                "ML100_HASH_FALLBACK_DIM": _env_int("ML100_HASH_FALLBACK_DIM", 384),
                 "PIPELINE_PROFILE": pipeline_name,
             },
         )

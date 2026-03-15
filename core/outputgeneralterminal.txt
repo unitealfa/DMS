@@ -1030,7 +1030,7 @@ Regex Test Corpus - Contracts (FR/EN/AR)                                        
 Type: list
 Summary: 1 docs | pages=12
 Output: [{'content': 'text',
-  'doc_id': 'adf9f71f-9d81-4e2a-b289-d370d7ed5ec0',
+  'doc_id': 'a1e8535d-4506-4b6d-a24f-29bd2f6dfd46',
   'extraction': 'native:pdf:pypdf',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'page_count_total': 12,
@@ -3130,7 +3130,7 @@ Output: [{'anti_confusion_targets': ['BON_DE_COMMANDE', 'FACTURE', 'DEVIS', 'BON
                         "status=OK | scores: {'ARTICLE': -48, 'BON_DE_COMMANDE': -223, 'CONTRAT': "
                         "229, 'FACTURE': -197, 'FORMULAIRE': 28}",
   'decision_debug': {'diff': 201, 'second_score': 28, 'top_score': 229},
-  'doc_id': 'adf9f71f-9d81-4e2a-b289-d370d7ed5ec0',
+  'doc_id': 'a1e8535d-4506-4b6d-a24f-29bd2f6dfd46',
   'doc_type': 'CONTRAT',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'keyword_matches': {'anti_confusion_hits': [{'count': 6, 'keyword': 'FACTURE'},
@@ -3180,7 +3180,7 @@ Output: [{'anti_confusion_targets': ['BON_DE_COMMANDE', 'FACTURE', 'DEVIS', 'BON
 
 ========================================================================================================================
 [doc] contrat_regex_test_corpus_fr_en_ar.pdf
-  doc_id       : adf9f71f-9d81-4e2a-b289-d370d7ed5ec0
+  doc_id       : a1e8535d-4506-4b6d-a24f-29bd2f6dfd46
   content      : image_only
   extraction   : ocr:tesseract
   pages_total  : 1
@@ -3892,7 +3892,7 @@ Regex Test Corpus - Contracts (FR/EN/AR)                                        
 
 ========================================================================================================================
 [doc] contrat_regex_test_corpus_fr_en_ar.pdf
-  doc_id       : adf9f71f-9d81-4e2a-b289-d370d7ed5ec0
+  doc_id       : a1e8535d-4506-4b6d-a24f-29bd2f6dfd46
   content      : text
   extraction   : native:pdf:pypdf
   pages_total  : 12
@@ -4675,15 +4675,17 @@ NEGATIVE
 Regex Test Corpus - Contracts (FR/EN/AR)                                                                    Page 12
 --------------------------------------------------------------------------------
 
-[topic-doc] contrat_regex_test_corpus_fr_en_ar.pdf | document_primary_topics=['date', 'تاريخ'] | document_top_topics=['date', 'تاريخ', 'contract', 'agreement', 'contrat']
-[topic-doc] contrat_regex_test_corpus_fr_en_ar.pdf | document_primary_topics=['date', 'تاريخ'] | document_top_topics=['date', 'تاريخ', 'contract', 'contrat', 'agreement']
-[tokenisation-50ml] docs=2 | chunks=86 | words=400 | topics=24 | nlp_rows=86 | vector_dim=64
+[tokenisation-100ml] transformer indisponible, fallback hash | reason=CUDA error: no kernel image is available for execution on the device
+Search for `cudaErrorNoKernelImageForDevice' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TY
+[topic-doc-100] contrat_regex_test_corpus_fr_en_ar.pdf | document_primary_topics=['date', 'تاريخ'] | document_top_topics=['date', 'تاريخ', 'contract', 'agreement', 'contrat']
+[topic-doc-100] contrat_regex_test_corpus_fr_en_ar.pdf | document_primary_topics=['date', 'تاريخ'] | document_top_topics=['date', 'تاريخ', 'contract', 'contrat', 'agreement']
+[tokenisation-100ml] docs=2 | chunks=86 | words=0 | topics=24 | nlp_rows=86 | vector_dim=768 | backend=hash-fallback
 [Component: tokenisation-layout]
 Type: list
 Summary: 2 docs | sentences=122
 Output: [{'chars_total': 11278,
   'content': 'image_only',
-  'doc_id': 'adf9f71f-9d81-4e2a-b289-d370d7ed5ec0',
+  'doc_id': 'a1e8535d-4506-4b6d-a24f-29bd2f6dfd46',
   'extraction': 'ocr:tesseract',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'page_count_total': 1,
@@ -9656,7 +9658,7 @@ Output: [{'chars_total': 11278,
   'size': None},
  {'chars_total': 11256,
   'content': 'text',
-  'doc_id': 'adf9f71f-9d81-4e2a-b289-d370d7ed5ec0',
+  'doc_id': 'a1e8535d-4506-4b6d-a24f-29bd2f6dfd46',
   'extraction': 'native:pdf:pypdf',
   'filename': 'contrat_regex_test_corpus_fr_en_ar.pdf',
   'page_count_total': 12,
@@ -13060,7 +13062,7 @@ Output: {'available': False,
     - email (rule_id=CMN_EMAIL_01)  x0
     - telephone (rule_id=CMN_PHONE_01)  x0
     - site (rule_id=CMN_URL_01)  x0
-[extraction-regles-50ml] docs=1 | bm25_top_score=29.341771
+[extraction-regles-100ml] docs=1 | bm25_top_score=29.341771
 [Component: extraction-regles]
 Type: list
 Summary: 1 docs | fields=11 | contrat_regex_test_corpus_fr_en_ar.pdf->CONTRAT
@@ -13174,7 +13176,7 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
                                            'SUPPORT\n'
                                            'Agr'}]},
   'classification_status': 'OK',
-  'doc_id': 'adf9f71f-9d81-4e2a-b289-d370d7ed5ec0',
+  'doc_id': 'a1e8535d-4506-4b6d-a24f-29bd2f6dfd46',
   'doc_type': 'CONTRAT',
   'fields': {'date_effet': {'many': True,
                             'matches': [{'end': 337,
@@ -13965,8 +13967,8 @@ Output: [{'bm25': {'avg_top3_score': 27.244952,
 [Component: fusion-resultats]
 [fusion-result] source=local-context | docs=1 | es_synced=0
 [fusion-result] JSON fusionne ecrit dans /home/mourad/Bureau/DMS/core/fusion_output.json
-[ml50-topic] contrat_regex_test_corpus_fr_en_ar.pdf | document_primary_topics=['date', 'تاريخ'] | document_top_topics=['date', 'تاريخ', 'contract', 'contrat', 'agreement']
-[fusion-resultats-50ml] docs=1 | doc_vectors=2 | bm25_docs=1
+[ml100-topic] contrat_regex_test_corpus_fr_en_ar.pdf | document_primary_topics=['date', 'تاريخ'] | document_top_topics=['date', 'تاريخ', 'contract', 'contrat', 'agreement']
+[fusion-resultats-100ml] docs=1 | doc_vectors=2 | bm25_docs=1
 [Component: fusion-resultats]
 Type: dict
 Summary: fusion -> /home/mourad/Bureau/DMS/core/fusion_output.json | source=local-context | docs=1 | es_synced=0

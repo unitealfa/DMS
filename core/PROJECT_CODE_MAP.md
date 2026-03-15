@@ -4,8 +4,8 @@ Date d'audit: 2026-03-15
 
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
-- Python files analyses: 22
-- Fonctions/classes indexees: 391 (voir `FUNCTION_INDEX.txt`)
+- Python files analyses: 24
+- Fonctions/classes indexees: 425 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON: `rules/*.json` + `classification/*.json` + `config/ruleset_routes.json`
 
 ## 2) Points d'entree
@@ -13,7 +13,7 @@ Date d'audit: 2026-03-15
 - CLI package: `orchestre` (defini dans `pyproject.toml`)
 - Parsing des options: `pipeline/cli.py`
 - Orchestrateurs:
-  - `pipeline/orchestrator.py` (contient `PipelineOrchestrator` + `Pipeline50MLOrchestrator`)
+  - `pipeline/orchestrator.py` (contient `PipelineOrchestrator` + `Pipeline50MLOrchestrator` + `Pipeline100MLOrchestrator`)
 - Wrappers d'execution des composants: `pipeline/components.py`
 
 ## 3) Pipeline reel (ordre d'execution)
@@ -42,10 +42,26 @@ Date d'audit: 2026-03-15
      - extraction regex standard + scoring BM25 par chunk.
   8. `fusion-resultats` (`component/fusion_resultats-50ml.py`):
      - fusion standard + ajout `ml50` + BM25 dans `fusion_output.json`.
+- Pipeline `pipeline100ml`:
+  1. `pretraitement-de-docs`
+  2. `si-image-pretraiter-sinonpass-le-doc`
+  3. `output-txt`
+  4. `clasification`
+  5. `tokenisation-layout` (`component/tokenisation-layout-100ml.py`):
+     - tokenisation/layout standard + embeddings Transformer (BERT/XLM-R) avec mean pooling,
+     - 1 embedding par chunk + 1 embedding document,
+     - topic extraction par chunk (`chunk_primary_topic`, `chunk_topics`) + topics document,
+     - generation `NLP_*` minimale (sans composant grammaire),
+     - fallback hash local si modele indisponible.
+  6. `elasticsearch`
+  7. `extraction-regles` (`component/extraction-regles-100ml.py`):
+     - extraction regex standard + scoring BM25 par chunk.
+  8. `fusion-resultats` (`component/fusion_resultats-100ml.py`):
+     - fusion standard + ajout `ml100` + BM25 dans `fusion_output.json`.
 
 Selection runtime:
-- CLI: `--pipeline default|pipelinorchestrator|pipeline50ml`
-- variable d'environnement par defaut: `PIPELINE_DEFAULT` (ex: `pipelinorchestrator` ou `pipeline50ml`; fallback `PIPELINE_PROFILE`)
+- CLI: `--pipeline default|pipelinorchestrator|pipeline50ml|pipeline100ml`
+- variable d'environnement par defaut: `PIPELINE_DEFAULT` (ex: `pipelinorchestrator`, `pipeline50ml` ou `pipeline100ml`; fallback `PIPELINE_PROFILE`)
 
 Reference implementation:
 - `pipeline/orchestrator.py`
@@ -80,6 +96,12 @@ Reference implementation:
   - `ML50_CHUNK_VECTORS[]` inclut `chunk_primary_topic` + `chunk_topics`
   - `ML50_TOPICS[]` inclut `document_primary_topics` (top 2 du document) + `document_topics`
   - `NLP_ANALYSES`/`NLP_TOKENS` construits par tokenisation 50ml (sans grammaire)
+- en `pipeline100ml`:
+  - `ML100_EMBEDDING_METHOD`, `ML100_EMBEDDING_BACKEND`, `ML100_MODEL_NAME`, `ML100_VECTOR_DIM`
+  - `ML100_DOC_VECTORS`, `ML100_CHUNK_VECTORS`, `ML100_WORD_VECTORS`, `ML100_TOPICS`
+  - `ML100_CHUNK_VECTORS[]` inclut `chunk_primary_topic` + `chunk_topics`
+  - `ML100_TOPICS[]` inclut `document_primary_topics` (top 2 du document) + `document_topics`
+  - `NLP_ANALYSES`/`NLP_TOKENS` construits par tokenisation 100ml (sans grammaire)
 
 ### 4.5 Attribution grammaticale (EN/FR/AR)
 - consomme `selected`/`TOK_DOCS`/`FINAL_DOCS`
@@ -111,6 +133,7 @@ Reference implementation:
 - sortie: `EXTRACTIONS`
 - sync ES: `ES_EXTRACTION_SYNCED`
 - en `pipeline50ml`: `EXTRACTIONS[].bm25` + `BM25_RESULTS`
+- en `pipeline100ml`: `EXTRACTIONS[].bm25` + `BM25_RESULTS`
 
 ### 4.9 Fusion finale
 - sortie fichier: `fusion_output.json`
@@ -118,6 +141,8 @@ Reference implementation:
 - structure finale: `documents[]` (un bloc complet par document, avec `components`, `text`, `document_structure`, `extraction`, `nlp`, `quality_checks`)
 - en `pipeline50ml`: bloc supplementaire `document.ml50`, `pipeline.profile="pipeline50ml"` et `pipeline.ml50`
   - `document.ml50.document_primary_topics`: 2 topics principaux du document
+- en `pipeline100ml`: bloc supplementaire `document.ml100`, `pipeline.profile="pipeline100ml"` et `pipeline.ml100`
+  - `document.ml100.document_primary_topics`: 2 topics principaux du document
 
 ## 5) Ou modifier selon le besoin
 
@@ -153,6 +178,8 @@ Reference implementation:
   - `chunk_is_noise`
 - variante ML50 (embedding/topic/doc-vector):
   - `component/tokenisation-layout-50ml.py`
+- variante ML100 (Transformer BERT/XLM-R + pooling):
+  - `component/tokenisation-layout-100ml.py`
 
 ### 5.6 Changer classification documentaire (scores, threshold, priorites)
 - code: `component/clasification.py`
@@ -164,6 +191,8 @@ Reference implementation:
 - patterns metier: `rules/*.json`
 - variante ML50 avec BM25:
   - `component/extraction-regles-50ml.py`
+- variante ML100 avec BM25:
+  - `component/extraction-regles-100ml.py`
 
 ### 5.8 Changer logique Elasticsearch
 - composant pont: `component/elasticsearch.py`
@@ -189,6 +218,9 @@ Reference implementation:
 - variante ML50:
   - `component/fusion_resultats-50ml.py`
   - enrichit la fusion avec `ml50` (vectors/topics) + BM25
+- variante ML100:
+  - `component/fusion_resultats-100ml.py`
+  - enrichit la fusion avec `ml100` (vectors/topics) + BM25
 
 ### 5.10 Changer logique linguistique EN/FR/AR
 - orchestrateur langues: `component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py`
@@ -201,7 +233,7 @@ Reference implementation:
 ### 6.1 Orchestration (`pipeline/`)
 - `pipeline/settings.py`: logging, normalize input, context managers cwd/argv, chargement `.env` optionnel.
 - `pipeline/components.py`: wrappers des composants scripts + resumes + sync ES.
-- `pipeline/orchestrator.py`: contient les 2 orchestrateurs (`PipelineOrchestrator` et `Pipeline50MLOrchestrator`) + selection `only/upto/start`.
+- `pipeline/orchestrator.py`: contient les 3 orchestrateurs (`PipelineOrchestrator`, `Pipeline50MLOrchestrator`, `Pipeline100MLOrchestrator`) + selection `only/upto/start`.
 - `pipeline/cli.py`: CLI + chargement `.env` + tee print vers `outputgeneralterminal.txt`.
 - `pipeline/elasticsearch.py`: store HTTP ES + auth + flatten/index + auto-start local ES (POSIX/Windows) + fallback docs + sync classification/extraction + sync NLP (summary/full).
 
@@ -212,15 +244,20 @@ Reference implementation:
 - `tokenisation-layout.py`: language detect + sentence/layout chunking + table/multicol + `TOK_DOCS` (+ `size`).
 - `tokenisation-layout-50ml.py`: tokenisation/layout + embeddings FastText-like + topics + vectors doc/chunk/word + `NLP_*` minimal.
   - topics chunk-level (`chunk_primary_topic`, `chunk_topics`) + top-2 document (`document_primary_topics`).
+- `tokenisation-layout-100ml.py`: tokenisation/layout + embeddings Transformer (BERT/XLM-R) + pooling mean + vectors chunk/doc + topics + `NLP_*` minimal.
+  - fallback hash si modele non disponible localement.
 - `atrribution-gramatical/*.py`: POS/lemma/NER per language + notebook style runners.
 - `elasticsearch.py`: step script pour index/fetch docs ES.
 - `clasification.py`: keyword scoring classification + details matches (`classification_log`, `keyword_matches`).
 - `extraction-regles.py`: regex extractors selon doc_type.
 - `extraction-regles-50ml.py`: extraction-regles + scoring BM25 sur chunks.
+- `extraction-regles-100ml.py`: extraction-regles + scoring BM25 sur chunks.
 - `fusion_resultats.py`: build JSON fusion structure par document (`documents[]`) depuis context + ES.
 - `fusion_resultats-50ml.py`: fusion_resultats + enrichissement ML50/BM25.
   - force la visibilite `ml50.document_topics`/`ml50.document_primary_topics` dans `fusion_output.json` (fallback depuis les topics de chunks si `ML50_TOPICS` absent/mal aligne).
   - affiche un resume terminal par document: `[ml50-topic] <filename> | document_primary_topics=[...] | document_top_topics=[...]`.
+- `fusion_resultats-100ml.py`: fusion_resultats + enrichissement ML100/BM25.
+  - produit `document.ml100` + `components.tokenisation_layout_100ml` + `components.extraction_regles_100ml`.
 
 ## 7) Fichiers metier JSON
 - `classification/common.json`: poids/penalites/seuil/marge globaux.
@@ -327,14 +364,19 @@ Reference implementation:
     - clic sur un composant: affichage d'un output exemple + explication de chaque champ.
 - 2026-03-15:
   - `pipeline/cli.py`:
-    - ajout de la selection pipeline `--pipeline default|pipelinorchestrator|pipeline50ml`,
-    - ajout du pilotage par variable d'environnement `PIPELINE_DEFAULT` (ex: `pipelinorchestrator` ou `pipeline50ml`; fallback `PIPELINE_PROFILE`),
+    - ajout de la selection pipeline `--pipeline default|pipelinorchestrator|pipeline50ml|pipeline100ml`,
+    - ajout du pilotage par variable d'environnement `PIPELINE_DEFAULT` (ex: `pipelinorchestrator`, `pipeline50ml` ou `pipeline100ml`; fallback `PIPELINE_PROFILE`),
     - ajout du pilotage direct dans le code via `PIPELINE_DEFAULT_CODE` (utilise si aucune variable n'est fournie),
-    - log explicite de la pipeline selectionnee.
+    - log explicite de la pipeline selectionnee,
+    - ajout des options de contexte `ML100_MODEL_NAME`, `ML100_MAX_LENGTH`, `ML100_BATCH_SIZE`, `ML100_HASH_FALLBACK_DIM`.
   - `pipeline/orchestrator.py`:
     - nouvel orchestrateur `Pipeline50MLOrchestrator`,
     - pipeline alternative sans composant grammaire,
     - etapes: pretraitement -> ocr routing -> output-txt -> classification -> tokenisation 50ml -> elasticsearch -> extraction 50ml -> fusion 50ml.
+  - `pipeline/orchestrator.py`:
+    - nouvel orchestrateur `Pipeline100MLOrchestrator`,
+    - pipeline alternative sans composant grammaire,
+    - etapes: pretraitement -> ocr routing -> output-txt -> classification -> tokenisation 100ml -> elasticsearch -> extraction 100ml -> fusion 100ml.
   - `pipeline/orchestrator.py` + `pipeline/cli.py`:
     - nouvel ordre pipeline: `clasification` executee juste apres `output-txt`, avant `tokenisation-layout`.
     - expose desormais `PIPELINE_PROFILE` et `PIPELINE_STEPS` dans le contexte.
@@ -356,6 +398,19 @@ Reference implementation:
       - `components.tokenisation_layout_50ml` et `components.extraction_regles_50ml`,
       - `pipeline.profile=\"pipeline50ml\"` + `pipeline.ml50`.
     - ajoute un print terminal par document `[ml50-topic]` pour rendre visibles les topics dans `outputgeneralterminal.txt`.
+  - `component/tokenisation-layout-100ml.py`:
+    - execute la tokenisation/layout standard puis calcule des embeddings Transformer (BERT/XLM-R) avec mean pooling,
+    - produit 1 embedding par chunk + 1 embedding document (`ML100_*`),
+    - fallback hash local automatique si modele indisponible,
+    - ajoute un topic extractor (`ML100_TOPICS`) + `document_primary_topics`/`document_topics`.
+  - `component/extraction-regles-100ml.py`:
+    - execute extraction regex standard puis ajoute un scoring BM25 par chunk (tag log 100ml).
+  - `component/fusion_resultats-100ml.py`:
+    - execute la fusion standard puis enrichit `fusion_output.json` avec:
+      - `document.ml100` (vectors/topics),
+      - `components.tokenisation_layout_100ml` et `components.extraction_regles_100ml`,
+      - `pipeline.profile=\"pipeline100ml\"` + `pipeline.ml100`.
+    - ajoute un print terminal par document `[ml100-topic]`.
   - `pipeline/components.py`:
     - `ClassificationComponent`: sync ES differee tant que les docs ne sont pas indexes (`ES_DOC_IDS` absents) pour eviter une sync prematuree.
     - `ElasticsearchComponent`: reporting enrichi avec `classification_input` et `classification_synced`.

@@ -4,6 +4,7 @@ import hashlib
 import math
 import re
 import runpy
+import unicodedata
 from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Tuple
@@ -19,6 +20,17 @@ _STOPWORDS = {
     "dans", "avec", "pour", "par", "les", "des", "une", "sur", "aux", "est", "sont", "sera", "etre", "ce",
     "de", "du", "la", "le", "un", "en", "et", "ou", "au", "aux",
     "في", "من", "على", "الى", "إلى", "عن", "مع", "و", "او", "أو", "هذا", "هذه",
+    "qui", "que", "quoi", "dont", "where", "when", "what", "which", "who", "whom", "whose",
+    "je", "tu", "il", "elle", "nous", "vous", "ils", "elles", "i", "you", "he", "she", "it", "we", "they",
+    "plus", "moins", "tres", "très",
+    "page", "pages", "document", "documents", "corpus", "test", "tests", "positive", "negative",
+    "regex", "info", "valeur", "reference", "references", "note", "notes", "file", "files",
+    "section", "annexe", "annex", "article", "chapitre",
+}
+
+_TOPIC_NOISE_TERMS = {
+    "http", "https", "www", "com", "net", "org", "pdf", "doc", "image", "text",
+    "unknown", "none", "null", "true", "false", "nan",
 }
 
 
@@ -35,6 +47,151 @@ def _norm_token(token: str) -> str:
 
 def _tokenize(text: str) -> List[str]:
     return [_norm_token(t) for t in TOKEN_RE.findall(str(text or "")) if _norm_token(t)]
+
+
+def _norm_topic_term(term: str) -> str:
+    val = _norm_token(term)
+    if not val:
+        return ""
+    # Normalise les accents pour dedoublonner contrat/contrát, etc.
+    val = unicodedata.normalize("NFKD", val)
+    val = "".join(ch for ch in val if not unicodedata.combining(ch))
+    val = val.replace("’", "'").replace("`", "'")
+    return val
+
+
+def _is_topic_candidate(term: str) -> bool:
+    t = _norm_topic_term(term)
+    if not t:
+        return False
+    if t in _STOPWORDS or t in _TOPIC_NOISE_TERMS:
+        return False
+    if len(t) < 3 or len(t) > 48:
+        return False
+    if t.isdigit():
+        return False
+    if t.count("_") > 1:
+        return False
+    alpha_count = sum(1 for ch in t if ch.isalpha())
+    if alpha_count == 0:
+        return False
+    digit_count = sum(1 for ch in t if ch.isdigit())
+    if digit_count > alpha_count:
+        return False
+    return True
+
+
+def _tokens_to_topic_terms(tokens: List[str], max_ngram: int = 2) -> List[str]:
+    base = [_norm_topic_term(t) for t in tokens]
+    base = [t for t in base if _is_topic_candidate(t)]
+    if not base:
+        return []
+
+    out: List[str] = list(base)
+    if max_ngram >= 2:
+        for i in range(len(base) - 1):
+            a, b = base[i], base[i + 1]
+            if a in _STOPWORDS or b in _STOPWORDS:
+                continue
+            bigram = f"{a} {b}"
+            if _is_topic_candidate(a) and _is_topic_candidate(b):
+                out.append(bigram)
+    return out
+
+
+def _score_term_quality(term: str) -> float:
+    if not term:
+        return 0.0
+    words = term.split()
+    length = len(term)
+    if length > 42:
+        return 0.7
+    if len(words) >= 2:
+        return 1.2
+    return 1.0
+
+
+def _prune_topic_redundancy(scored_terms: List[Tuple[str, float]], max_topics: int) -> List[Tuple[str, float]]:
+    kept: List[Tuple[str, float]] = []
+    kept_set = set()
+    for term, score in scored_terms:
+        if term in kept_set:
+            continue
+        # Evite de garder un unigramme si le bigramme dominant est deja garde.
+        if " " not in term:
+            skip = False
+            for kterm, _ in kept:
+                if " " in kterm and term in kterm.split():
+                    skip = True
+                    break
+            if skip:
+                continue
+        kept.append((term, score))
+        kept_set.add(term)
+        if len(kept) >= max_topics:
+            break
+    return kept
+
+
+def _extract_terms_from_keyword_item(item: Any) -> List[str]:
+    text = ""
+    if isinstance(item, dict):
+        text = str(item.get("keyword") or item.get("value") or item.get("term") or "")
+    else:
+        text = str(item or "")
+    if not text:
+        return []
+    # Retire le suffixe "(x12)" souvent present dans les logs de classification.
+    text = re.sub(r"\(x\d+\)$", "", text.strip(), flags=re.IGNORECASE)
+    return [_norm_topic_term(t) for t in _tokenize(text) if _is_topic_candidate(t)]
+
+
+def _build_topic_boost_terms(ctx: Dict[str, Any], doc_id: Any, filename: str) -> Dict[str, float]:
+    results = ctx.get("RESULTS") or []
+    if not isinstance(results, list):
+        return {}
+
+    selected: Dict[str, Any] = {}
+    sid = str(doc_id or "").strip()
+    sfn = str(filename or "").strip()
+    for row in results:
+        if not isinstance(row, dict):
+            continue
+        if sid and str(row.get("doc_id") or "").strip() == sid:
+            selected = row
+            break
+        if sfn and str(row.get("filename") or "").strip() == sfn:
+            selected = row
+            break
+
+    if not selected:
+        return {}
+
+    boost: Dict[str, float] = {}
+
+    def _apply(items: Any, factor: float) -> None:
+        if not isinstance(items, list):
+            return
+        for it in items:
+            for term in _extract_terms_from_keyword_item(it):
+                boost[term] = max(boost.get(term, 1.0), factor)
+
+    doc_type = str(selected.get("doc_type") or "").strip().lower()
+    if doc_type:
+        for term in [_norm_topic_term(t) for t in _tokenize(doc_type)]:
+            if _is_topic_candidate(term):
+                boost[term] = max(boost.get(term, 1.0), 1.25)
+
+    kw = selected.get("keyword_matches")
+    if isinstance(kw, dict):
+        _apply(kw.get("strong"), 1.65)
+        _apply(kw.get("medium"), 1.35)
+        _apply(kw.get("weak"), 1.12)
+        _apply(kw.get("negative"), 0.8)
+        _apply(kw.get("strong_negative"), 0.65)
+        _apply(kw.get("anti_confusion_hits"), 0.72)
+
+    return boost
 
 
 def _char_ngrams(token: str, min_n: int = 3, max_n: int = 5) -> Iterable[str]:
@@ -110,17 +267,18 @@ def _iter_doc_chunks(doc: Dict[str, Any]) -> Iterable[Tuple[int, int, str, str]]
             yield page_index, 0, page_text, lang
 
 
-def _extract_topics_from_chunks(tokenized_chunks: List[List[str]], max_topics: int = 12) -> List[Dict[str, Any]]:
+def _extract_topics_from_chunks(
+    tokenized_chunks: List[List[str]],
+    max_topics: int = 12,
+    boost_terms: Dict[str, float] | None = None,
+) -> List[Dict[str, Any]]:
     if not tokenized_chunks:
         return []
 
-    filtered_chunks: List[List[str]] = []
-    for chunk in tokenized_chunks:
-        terms = [
-            t for t in chunk
-            if len(t) >= 3 and t not in _STOPWORDS and not t.isdigit()
-        ]
-        filtered_chunks.append(terms)
+    filtered_chunks: List[List[str]] = [_tokens_to_topic_terms(chunk, max_ngram=2) for chunk in tokenized_chunks]
+    filtered_chunks = [c for c in filtered_chunks if c]
+    if not filtered_chunks:
+        return []
 
     tf = Counter()
     df = Counter()
@@ -130,27 +288,47 @@ def _extract_topics_from_chunks(tokenized_chunks: List[List[str]], max_topics: i
 
     total_chunks = max(1, len(filtered_chunks))
     scored: List[Tuple[str, float]] = []
+    boosts = boost_terms or {}
     for term, freq in tf.items():
         term_df = max(1, int(df.get(term) or 1))
         idf = math.log(1.0 + (total_chunks + 1.0) / term_df)
-        score = float(freq) * idf
+        boost = float(boosts.get(term, 1.0))
+        quality = _score_term_quality(term)
+        score = float(freq) * idf * quality * boost
         scored.append((term, score))
 
     scored.sort(key=lambda x: x[1], reverse=True)
-    return [{"term": term, "score": round(score, 6)} for term, score in scored[:max_topics]]
+    pruned = _prune_topic_redundancy(scored, max_topics)
+    return [{"term": term, "score": round(score, 6)} for term, score in pruned]
 
 
-def _extract_chunk_topics(tokens: List[str], max_topics: int = 3) -> List[Dict[str, Any]]:
-    terms = [t for t in tokens if len(t) >= 3 and t not in _STOPWORDS and not t.isdigit()]
+def _extract_chunk_topics(
+    tokens: List[str],
+    max_topics: int = 3,
+    doc_df: Counter | None = None,
+    doc_chunks_count: int = 1,
+    boost_terms: Dict[str, float] | None = None,
+) -> List[Dict[str, Any]]:
+    terms = _tokens_to_topic_terms(tokens, max_ngram=2)
     if not terms:
         return []
     counts = Counter(terms)
     total = float(sum(counts.values()) or 1.0)
     scored: List[Tuple[str, float]] = []
+    boosts = boost_terms or {}
+    total_chunks = max(1, int(doc_chunks_count))
     for term, freq in counts.items():
-        scored.append((term, float(freq) / total))
+        idf = 1.0
+        if isinstance(doc_df, Counter):
+            term_df = max(1, int(doc_df.get(term) or 1))
+            idf = math.log(1.0 + (total_chunks + 1.0) / term_df)
+        tf_norm = float(freq) / total
+        boost = float(boosts.get(term, 1.0))
+        quality = _score_term_quality(term)
+        scored.append((term, tf_norm * idf * quality * boost))
     scored.sort(key=lambda x: x[1], reverse=True)
-    return [{"term": term, "score": round(score, 6)} for term, score in scored[:max_topics]]
+    pruned = _prune_topic_redundancy(scored, max_topics)
+    return [{"term": term, "score": round(score, 6)} for term, score in pruned]
 
 
 def _doc_key(doc_id: Any, filename: Any) -> str:
@@ -193,8 +371,10 @@ def _augment_with_ml50(ctx: Dict[str, Any]) -> None:
         doc_id = doc.get("doc_id")
         filename = str(doc.get("filename") or "")
         key = _doc_key(doc_id, filename)
+        doc_boost_terms = _build_topic_boost_terms(ctx, doc_id, filename)
 
         doc_chunk_vecs: List[np.ndarray] = []
+        doc_chunk_payloads: List[Dict[str, Any]] = []
         token_counter: Counter = Counter()
         tokenized_chunks: List[List[str]] = []
 
@@ -209,10 +389,7 @@ def _augment_with_ml50(ctx: Dict[str, Any]) -> None:
             word_vecs = [_fasttext_like_vector(tok, dim) for tok in tokens]
             chunk_vec = _mean_vectors(word_vecs, dim)
             doc_chunk_vecs.append(chunk_vec)
-            chunk_topics = _extract_chunk_topics(tokens, max_topics=3)
-            chunk_primary_topic = chunk_topics[0]["term"] if chunk_topics else None
-
-            chunk_vectors.append(
+            doc_chunk_payloads.append(
                 {
                     "doc_id": doc_id,
                     "filename": filename,
@@ -222,8 +399,7 @@ def _augment_with_ml50(ctx: Dict[str, Any]) -> None:
                     "lang": lang or None,
                     "token_count": len(tokens),
                     "text_preview": text[:240],
-                    "chunk_primary_topic": chunk_primary_topic,
-                    "chunk_topics": chunk_topics,
+                    "tokens": tokens,
                     "vector": _to_list(chunk_vec),
                 }
             )
@@ -263,6 +439,37 @@ def _augment_with_ml50(ctx: Dict[str, Any]) -> None:
                     }
                 )
 
+        doc_df: Counter = Counter()
+        for chunk_tokens in tokenized_chunks:
+            terms = set(_tokens_to_topic_terms(chunk_tokens, max_ngram=2))
+            if terms:
+                doc_df.update(terms)
+
+        total_doc_chunks = max(1, len(tokenized_chunks))
+        for payload in doc_chunk_payloads:
+            ctopics = _extract_chunk_topics(
+                payload.get("tokens") or [],
+                max_topics=3,
+                doc_df=doc_df,
+                doc_chunks_count=total_doc_chunks,
+                boost_terms=doc_boost_terms,
+            )
+            chunk_vectors.append(
+                {
+                    "doc_id": payload.get("doc_id"),
+                    "filename": payload.get("filename"),
+                    "doc_key": payload.get("doc_key"),
+                    "page_index": payload.get("page_index"),
+                    "sent_index": payload.get("sent_index"),
+                    "lang": payload.get("lang"),
+                    "token_count": payload.get("token_count"),
+                    "text_preview": payload.get("text_preview"),
+                    "chunk_primary_topic": ctopics[0]["term"] if ctopics else None,
+                    "chunk_topics": ctopics,
+                    "vector": payload.get("vector"),
+                }
+            )
+
         doc_vec = _mean_vectors(doc_chunk_vecs, dim)
         doc_vectors.append(
             {
@@ -288,7 +495,7 @@ def _augment_with_ml50(ctx: Dict[str, Any]) -> None:
                 }
             )
 
-        doc_topics = _extract_topics_from_chunks(tokenized_chunks)
+        doc_topics = _extract_topics_from_chunks(tokenized_chunks, boost_terms=doc_boost_terms)
         topics_rows.append(
             {
                 "doc_id": doc_id,

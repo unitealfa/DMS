@@ -77,7 +77,7 @@ class PipelineOrchestrator:
 class Pipeline50MLOrchestrator:
     """
     Variante de pipeline orientee ML retrieval:
-    - retire l'etape grammaire classique
+    - conserve l'etape grammaire pour raffiner les sorties NLP/topics
     - remplace tokenisation/extraction/fusion par versions 50ml
     """
 
@@ -89,6 +89,7 @@ class Pipeline50MLOrchestrator:
             OutputTxtComponent("output-txt", COMPONENT_DIR / "output-txt.py"),
             ClassificationComponent("clasification", COMPONENT_DIR / "clasification.py"),
             TokenisationLayoutComponent("tokenisation-layout", COMPONENT_DIR / "tokenisation-layout-50ml.py"),
+            GrammarComponent("atripusion-gramatical-en-utilisant-les3ficherla", COMPONENT_DIR / "atrribution-gramatical" / "atripusion-gramatical-en-utilisant-les3ficherla.py"),
             ElasticsearchComponent("elasticsearch", COMPONENT_DIR / "elasticsearch.py"),
             RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction-regles-50ml.py"),
             FusionResultComponent("fusion-resultats", COMPONENT_DIR / "fusion_resultats-50ml.py"),
@@ -139,7 +140,7 @@ class Pipeline50MLOrchestrator:
 class Pipeline100MLOrchestrator:
     """
     Variante de pipeline orientee embeddings Transformer:
-    - retire l'etape grammaire classique
+    - conserve l'etape grammaire pour raffiner les sorties NLP/topics
     - remplace tokenisation/extraction/fusion par versions 100ml
     """
 
@@ -151,6 +152,7 @@ class Pipeline100MLOrchestrator:
             OutputTxtComponent("output-txt", COMPONENT_DIR / "output-txt.py"),
             ClassificationComponent("clasification", COMPONENT_DIR / "clasification.py"),
             TokenisationLayoutComponent("tokenisation-layout", COMPONENT_DIR / "tokenisation-layout-100ml.py"),
+            GrammarComponent("atripusion-gramatical-en-utilisant-les3ficherla", COMPONENT_DIR / "atrribution-gramatical" / "atripusion-gramatical-en-utilisant-les3ficherla.py"),
             ElasticsearchComponent("elasticsearch", COMPONENT_DIR / "elasticsearch.py"),
             RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction-regles-100ml.py"),
             FusionResultComponent("fusion-resultats", COMPONENT_DIR / "fusion_resultats-100ml.py"),

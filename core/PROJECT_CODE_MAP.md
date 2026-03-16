@@ -1,11 +1,11 @@
 # Project Code Map (DMS Core)
 
-Date d'audit: 2026-03-15
+Date d'audit: 2026-03-16
 
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
-- Python files analyses: 25
-- Fonctions/classes indexees: 455 (voir `FUNCTION_INDEX.txt`)
+- Python files analyses: 26
+- Fonctions/classes indexees: 485 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 
 ## 2) Points d'entree
@@ -36,12 +36,14 @@ Date d'audit: 2026-03-15
      - tokenisation/layout standard + enrichissement FastText-like (subword hashing),
      - vecteurs mot/chunk/document,
      - topic extraction par chunk (`chunk_primary_topic`, `chunk_topics`) + topics document,
-     - generation `NLP_*` minimale (sans composant grammaire).
-  6. `elasticsearch`
-  7. `extraction-regles` (`component/extraction-regles-50ml.py`):
+     - generation `NLP_*` minimale (provisoire, puis remplacee par la sortie grammaire).
+  6. `atripusion-gramatical-en-utilisant-les3ficherla`
+  7. `elasticsearch`
+  8. `extraction-regles` (`component/extraction-regles-50ml.py`):
      - extraction YAML (sans regex de champs) pilotee par classification/doc_type + scoring BM25 par chunk.
-  8. `fusion-resultats` (`component/fusion_resultats-50ml.py`):
-     - fusion standard + ajout `ml50` + BM25 dans `fusion_output.json`.
+  9. `fusion-resultats` (`component/fusion_resultats-50ml.py`):
+     - fusion standard + ajout `ml50` + BM25 dans `fusion_output.json`,
+     - filtrage des topics grammaticaux (pronoms/determinants/conjonctions/adverbes) via `NLP_TOKENS` du composant grammaire.
 - Pipeline `pipeline100ml`:
   1. `pretraitement-de-docs`
   2. `si-image-pretraiter-sinonpass-le-doc`
@@ -51,13 +53,15 @@ Date d'audit: 2026-03-15
      - tokenisation/layout standard + embeddings Transformer (BERT/XLM-R) avec mean pooling,
      - 1 embedding par chunk + 1 embedding document,
      - topic extraction par chunk (`chunk_primary_topic`, `chunk_topics`) + topics document,
-     - generation `NLP_*` minimale (sans composant grammaire),
+     - generation `NLP_*` minimale (provisoire, puis remplacee par la sortie grammaire),
      - fallback hash local si modele indisponible.
-  6. `elasticsearch`
-  7. `extraction-regles` (`component/extraction-regles-100ml.py`):
+  6. `atripusion-gramatical-en-utilisant-les3ficherla`
+  7. `elasticsearch`
+  8. `extraction-regles` (`component/extraction-regles-100ml.py`):
      - extraction YAML (sans regex de champs) pilotee par classification/doc_type + scoring BM25 par chunk.
-  8. `fusion-resultats` (`component/fusion_resultats-100ml.py`):
-     - fusion standard + ajout `ml100` + BM25 dans `fusion_output.json`.
+  9. `fusion-resultats` (`component/fusion_resultats-100ml.py`):
+     - fusion standard + ajout `ml100` + BM25 dans `fusion_output.json`,
+     - filtrage des topics grammaticaux (pronoms/determinants/conjonctions/adverbes) via `NLP_TOKENS` du composant grammaire.
 
 Selection runtime:
 - CLI: `--pipeline default|pipelinorchestrator|pipeline50ml|pipeline100ml`
@@ -95,13 +99,15 @@ Reference implementation:
   - `ML50_DOC_VECTORS`, `ML50_CHUNK_VECTORS`, `ML50_WORD_VECTORS`, `ML50_TOPICS`
   - `ML50_CHUNK_VECTORS[]` inclut `chunk_primary_topic` + `chunk_topics`
   - `ML50_TOPICS[]` inclut `document_primary_topics` (top 2 du document) + `document_topics`
-  - `NLP_ANALYSES`/`NLP_TOKENS` construits par tokenisation 50ml (sans grammaire)
+  - topic extractor ameliore: filtrage bruit OCR + n-grams + scoring TF-IDF pondere + boost classification
+  - `NLP_ANALYSES`/`NLP_TOKENS` provisoires construits par tokenisation 50ml (puis remplaces par la sortie grammaire dans la pipeline complete)
 - en `pipeline100ml`:
   - `ML100_EMBEDDING_METHOD`, `ML100_EMBEDDING_BACKEND`, `ML100_MODEL_NAME`, `ML100_VECTOR_DIM`
   - `ML100_DOC_VECTORS`, `ML100_CHUNK_VECTORS`, `ML100_WORD_VECTORS`, `ML100_TOPICS`
   - `ML100_CHUNK_VECTORS[]` inclut `chunk_primary_topic` + `chunk_topics`
   - `ML100_TOPICS[]` inclut `document_primary_topics` (top 2 du document) + `document_topics`
-  - `NLP_ANALYSES`/`NLP_TOKENS` construits par tokenisation 100ml (sans grammaire)
+  - topic extractor ameliore: filtrage bruit OCR + n-grams + scoring TF-IDF pondere + boost classification
+  - `NLP_ANALYSES`/`NLP_TOKENS` provisoires construits par tokenisation 100ml (puis remplaces par la sortie grammaire dans la pipeline complete)
 
 ### 4.5 Attribution grammaticale (EN/FR/AR)
 - consomme `selected`/`TOK_DOCS`/`FINAL_DOCS`
@@ -245,10 +251,12 @@ Reference implementation:
 - `si-image-pretraiter-sinonpass-le-doc.py`: split OCR/native + preprocess image.
 - `output-txt.py`: OCR tesseract + extraction native multi-format + `FINAL_DOCS` (+ `size`).
 - `tokenisation-layout.py`: language detect + sentence/layout chunking + table/multicol + `TOK_DOCS` (+ `size`).
-- `tokenisation-layout-50ml.py`: tokenisation/layout + embeddings FastText-like + topics + vectors doc/chunk/word + `NLP_*` minimal.
+- `tokenisation-layout-50ml.py`: tokenisation/layout + embeddings FastText-like + topics + vectors doc/chunk/word + `NLP_*` minimal (provisoire avant grammaire).
   - topics chunk-level (`chunk_primary_topic`, `chunk_topics`) + top-2 document (`document_primary_topics`).
-- `tokenisation-layout-100ml.py`: tokenisation/layout + embeddings Transformer (BERT/XLM-R) + pooling mean + vectors chunk/doc + topics + `NLP_*` minimal.
+  - scoring topics ameliore (n-grams, dedupe semantique, boost keywords classification, anti-bruit OCR).
+- `tokenisation-layout-100ml.py`: tokenisation/layout + embeddings Transformer (BERT/XLM-R) + pooling mean + vectors chunk/doc + topics + `NLP_*` minimal (provisoire avant grammaire).
   - fallback hash si modele non disponible localement.
+  - scoring topics ameliore (n-grams, dedupe semantique, boost keywords classification, anti-bruit OCR).
 - `atrribution-gramatical/*.py`: POS/lemma/NER per language + notebook style runners.
 - `elasticsearch.py`: step script pour index/fetch docs ES.
 - `clasification.py`: keyword scoring classification + details matches (`classification_log`, `keyword_matches`).
@@ -259,9 +267,11 @@ Reference implementation:
 - `fusion_resultats.py`: build JSON fusion structure par document (`documents[]`) depuis context + ES.
 - `fusion_resultats-50ml.py`: fusion_resultats + enrichissement ML50/BM25.
   - force la visibilite `ml50.document_topics`/`ml50.document_primary_topics` dans `fusion_output.json` (fallback depuis les topics de chunks si `ML50_TOPICS` absent/mal aligne).
+  - applique un filtrage grammatical des topics via `NLP_TOKENS` (POS/lemma) pour retirer pronoms/mots-outils.
   - affiche un resume terminal par document: `[ml50-topic] <filename> | document_primary_topics=[...] | document_top_topics=[...]`.
 - `fusion_resultats-100ml.py`: fusion_resultats + enrichissement ML100/BM25.
   - produit `document.ml100` + `components.tokenisation_layout_100ml` + `components.extraction_regles_100ml`.
+  - applique un filtrage grammatical des topics via `NLP_TOKENS` (POS/lemma) pour retirer pronoms/mots-outils.
 
 ## 7) Fichiers metier JSON/YAML
 - `classification/common.json`: poids/penalites/seuil/marge globaux.
@@ -293,6 +303,24 @@ Reference implementation:
 - Ce fichier est la reference la plus rapide pour localiser une modification precise.
 
 ## 11) Changelog code
+- 2026-03-16:
+  - `pipeline/orchestrator.py`:
+    - pipelines `Pipeline50MLOrchestrator` et `Pipeline100MLOrchestrator` incluent explicitement l'etape grammaire (`atripusion-gramatical-en-utilisant-les3ficherla`) dans la sequence runtime.
+  - `pipeline/cli.py`:
+    - help `--pipeline` corrigee pour reflecter l'usage de la grammaire dans `pipeline50ml` et `pipeline100ml`.
+  - `component/fusion_resultats-50ml.py`:
+    - ajout d'un filtre grammatical des topics bases sur `NLP_TOKENS` (POS + token/lemma) pour retirer pronoms, determinants, conjonctions, auxiliaires, adverbes et ponctuation.
+    - filtrage applique aux niveaux document et chunk (`document_topics`, `document_primary_topics`, `chunk_topics`, `chunk_primary_topic`).
+    - ajout du compteur `components.tokenisation_layout_50ml.topics_removed_by_grammar`.
+  - `component/fusion_resultats-100ml.py`:
+    - meme filtrage grammatical des topics que la version 50ml (document + chunk).
+    - ajout du compteur `components.tokenisation_layout_100ml.topics_removed_by_grammar`.
+  - `component/tokenisation-layout-50ml.py` + `component/tokenisation-layout-100ml.py`:
+    - enrichment de `_STOPWORDS` (pronoms/mots-outils FR/EN + `plus`, `qui`, `que`, etc.) pour eviter des topics grammaticaux des l'etape `[topic-doc]`.
+  - validation runtime:
+    - `python main.py documents/testword.docx --pipeline pipeline50ml --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens`
+    - `python main.py documents/testword.docx --pipeline pipeline100ml --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens`
+    - resultat observe: suppression des topics grammaticaux (ex: `plus`) des sorties `[topic-doc]`, `[ml50-topic]`, `[ml100-topic]` et `fusion_output.json`.
 - 2026-03-05:
   - `pipeline/elasticsearch.py`: ajout d'un auto-demarrage Elasticsearch local avant fallback.
   - Nouvelles fonctions: `_safe_positive_int`, `_is_local_es_url`, `_normalize_command`, `_format_command`, `_resolve_auto_start_commands`, `_run_auto_start_command`, `_wait_for_es_ping`, `_try_auto_start_elasticsearch`.
@@ -393,6 +421,7 @@ Reference implementation:
     - execute la tokenisation/layout standard puis enrichit avec embeddings FastText-like (subword hashing),
     - produit des vecteurs `mot/chunk/document` (`ML50_*`),
     - ajoute un topic extractor (`ML50_TOPICS`) + topics par chunk (`ML50_CHUNK_VECTORS.chunk_primary_topic/chunk_topics`) + `document_primary_topics` document (top 2),
+    - topic extractor renforce: normalisation linguistique, filtrage bruit OCR, n-grams, scoring TF-IDF pondere, boost via `RESULTS.keyword_matches`,
     - ajoute un affichage terminal explicite par document: `[topic-doc] ... document_primary_topics/document_top_topics`.
     - genere `NLP_ANALYSES`/`NLP_TOKENS` minimaux pour la sync ES sans composant grammaire.
   - `component/extraction-regles-50ml.py`:
@@ -411,6 +440,7 @@ Reference implementation:
     - execute la tokenisation/layout standard puis calcule des embeddings Transformer (BERT/XLM-R) avec mean pooling,
     - produit 1 embedding par chunk + 1 embedding document (`ML100_*`),
     - fallback hash local automatique si modele indisponible,
+    - topic extractor renforce: normalisation linguistique, filtrage bruit OCR, n-grams, scoring TF-IDF pondere, boost via `RESULTS.keyword_matches`,
     - ajoute un topic extractor (`ML100_TOPICS`) + `document_primary_topics`/`document_topics`.
   - `component/extraction-regles-100ml.py`:
     - execute extraction YAML (sans regex de champs) via `extraction-regles-yaml.py` puis ajoute un scoring BM25 par chunk (tag log 100ml).

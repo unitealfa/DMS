@@ -11,7 +11,7 @@ from .settings import configure_logging, load_dotenv, normalize_input
 
 # Pipeline par defaut configurable directement dans le code.
 # Valeurs supportees: "pipelinorchestrator" | "default" | "pipeline50ml" | "pipeline100ml"
-PIPELINE_DEFAULT_CODE = "pipeline100ml"
+PIPELINE_DEFAULT_CODE = "pipeline50ml"
 
 
 def _env_bool(name: str, default: bool = False) -> bool:
@@ -80,8 +80,8 @@ def parse_cli() -> argparse.Namespace:
         default=_env_pipeline(),
         help=(
             "Pipeline a executer: default/pipelinorchestrator (pipeline actuelle) ou pipeline50ml "
-            "(sans grammaire + tokenisation/extraction/fusion enrichies ML FastText-like) ou "
-            "pipeline100ml (sans grammaire + embeddings Transformer BERT/XLM-R + pooling)."
+            "(tokenisation/extraction/fusion enrichies ML FastText-like + grammaire EN/FR/AR) ou "
+            "pipeline100ml (embeddings Transformer BERT/XLM-R + pooling + grammaire EN/FR/AR)."
         ),
     )
     parser.add_argument("--log-level", default="INFO", help="Niveau de log (DEBUG, INFO, WARNING, ERROR).")

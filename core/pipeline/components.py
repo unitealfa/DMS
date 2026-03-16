@@ -276,6 +276,29 @@ class GrammarComponent(Component):
         return data
 
 
+class InterDocLinkingComponent(Component):
+    def run(self, context: Context) -> Any:
+        ctx = self._execute_script(context)
+        analysis = ctx.get("INTERDOC_ANALYSIS") if isinstance(ctx.get("INTERDOC_ANALYSIS"), dict) else {}
+        links = ctx.get("INTERDOC_LINKS")
+        if not isinstance(links, list):
+            links = analysis.get("links") if isinstance(analysis.get("links"), list) else []
+
+        output = {
+            "method": analysis.get("method"),
+            "documents_analyzed": int(analysis.get("documents_analyzed") or 0),
+            "pairs_evaluated": int(analysis.get("pairs_evaluated") or 0),
+            "sentence_pairs_scored": int(analysis.get("sentence_pairs_scored") or 0),
+            "links_count": int(analysis.get("links_count") or len(links)),
+        }
+        summary = (
+            f"docs={output['documents_analyzed']} | pairs={output['pairs_evaluated']} | "
+            f"links={output['links_count']} | sentence_pairs={output['sentence_pairs_scored']}"
+        )
+        self._report(output, summary)
+        return output
+
+
 class ElasticsearchComponent(Component):
     def run(self, context: Context) -> Any:
         ctx = self._execute_script(context)

@@ -64,6 +64,70 @@ def _safe_int(value: Any, default: int = 0) -> int:
         return default
 
 
+def _interdoc_aliases(doc_id: Optional[str], filename: Optional[str]) -> List[str]:
+    aliases: List[str] = []
+    sid = str(doc_id or "").strip()
+    sfn = str(filename or "").strip()
+    if sid:
+        aliases.append(f"id:{sid}")
+    if sfn:
+        aliases.append(f"fn:{sfn}")
+        aliases.append(f"fn:{Path(sfn).name}")
+    if not aliases:
+        return []
+    # dedupe en conservant l'ordre
+    out: List[str] = []
+    seen = set()
+    for key in aliases:
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(key)
+    return out
+
+
+def _interdoc_link_ids_for_doc(ctx: Dict[str, Any], doc_id: Optional[str], filename: Optional[str]) -> List[str]:
+    mapping = ctx.get("INTERDOC_DOC_LINKS")
+    if not isinstance(mapping, dict):
+        return []
+    ids: List[str] = []
+    seen = set()
+    for alias in _interdoc_aliases(doc_id, filename):
+        rows = mapping.get(alias)
+        if not isinstance(rows, list):
+            continue
+        for value in rows:
+            sval = str(value or "").strip()
+            if not sval or sval in seen:
+                continue
+            seen.add(sval)
+            ids.append(sval)
+    return ids
+
+
+def _interdoc_output(ctx: Dict[str, Any]) -> Dict[str, Any]:
+    analysis = ctx.get("INTERDOC_ANALYSIS")
+    if not isinstance(analysis, dict):
+        return {
+            "method": None,
+            "documents_analyzed": 0,
+            "pairs_evaluated": 0,
+            "sentence_pairs_scored": 0,
+            "links_count": 0,
+            "links": [],
+            "generated_at": None,
+        }
+    return {
+        "method": analysis.get("method"),
+        "documents_analyzed": _safe_int(analysis.get("documents_analyzed"), 0),
+        "pairs_evaluated": _safe_int(analysis.get("pairs_evaluated"), 0),
+        "sentence_pairs_scored": _safe_int(analysis.get("sentence_pairs_scored"), 0),
+        "links_count": _safe_int(analysis.get("links_count"), 0),
+        "links": _safe_list(analysis.get("links")),
+        "generated_at": analysis.get("generated_at"),
+    }
+
+
 def _iso_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -75,6 +139,16 @@ def _basename(value: Any) -> str:
         return Path(str(value)).name
     except Exception:
         return str(value)
+
+
+def _norm_filename(value: Any) -> str:
+    return _basename(value).strip().lower()
+
+
+def _same_filename(a: Any, b: Any) -> bool:
+    na = _norm_filename(a)
+    nb = _norm_filename(b)
+    return bool(na and nb and na == nb)
 
 
 def _safe_non_negative_int(value: Any) -> Optional[int]:
@@ -174,7 +248,7 @@ def _row_belongs_to_doc(row: Any, doc_id: Optional[str], filename: Optional[str]
     row_filename = str(row.get("filename") or row.get("doc") or "").strip()
     if doc_id and row_doc_id and row_doc_id == doc_id:
         return True
-    if filename and row_filename and row_filename == filename:
+    if filename and row_filename and (row_filename == filename or _same_filename(row_filename, filename)):
         return True
     return False
 
@@ -676,7 +750,7 @@ def _same_doc_hint(value: Any, filename: str, first_path: str) -> bool:
     txt = str(value)
     if first_path and txt == first_path:
         return True
-    return bool(filename and _basename(txt) == filename)
+    return bool(filename and (txt == filename or _same_filename(txt, filename)))
 
 
 def _extract_component_views(
@@ -686,6 +760,8 @@ def _extract_component_views(
     document_id = str(doc_payload.get("document_id") or "")
     file_obj = doc_payload.get("file") if isinstance(doc_payload.get("file"), dict) else {}
     filename = str(file_obj.get("name") or "")
+    interdoc_link_ids = _interdoc_link_ids_for_doc(ctx, document_id, filename)
+    interdoc = _interdoc_output(ctx)
     first_path = ""
     paths = _safe_list(file_obj.get("path"))
     if paths:
@@ -794,6 +870,11 @@ def _extract_component_views(
             "tokens_count": _safe_int(nlp_summary.get("tokens_count"), len(_safe_list((nlp_obj.get("full") or {}).get("tokens")))),
             "entities_count": _safe_int(nlp_summary.get("entities_count"), len(_safe_list(nlp_obj.get("entities")))),
         },
+        "liaison_inter_docs": {
+            "method": interdoc.get("method"),
+            "links_count_total": _safe_int(interdoc.get("links_count"), 0),
+            "linked_documents_count": len(interdoc_link_ids),
+        },
         "elasticsearch": {
             "enabled": bool(ctx.get("USE_ELASTICSEARCH")),
             "available": bool(ctx.get("ES_AVAILABLE")),
@@ -834,12 +915,15 @@ def _to_document_output(
     extraction_obj = doc_payload.get("extraction") if isinstance(doc_payload.get("extraction"), dict) else {}
     text_obj = doc_payload.get("text") if isinstance(doc_payload.get("text"), dict) else {}
     structure_obj = doc_payload.get("document_structure") if isinstance(doc_payload.get("document_structure"), dict) else {}
+    document_id = str(doc_payload.get("document_id") or "")
+    filename = str(file_obj.get("name") or "")
+    interdoc_link_ids = _interdoc_link_ids_for_doc(ctx, document_id, filename)
 
     components = _extract_component_views(ctx, doc_payload)
     page_count = len(_safe_list(structure_obj.get("pages")))
 
     return {
-        "document_id": doc_payload.get("document_id"),
+        "document_id": document_id or doc_payload.get("document_id"),
         "file": {
             "name": file_obj.get("name"),
             "paths": _safe_list(file_obj.get("path")),
@@ -848,6 +932,10 @@ def _to_document_output(
         },
         "classification": content_obj.get("classification"),
         "doc_type": content_obj.get("document_kind") or content_obj.get("content_type"),
+        "cross_document": {
+            "linked_documents_count": len(interdoc_link_ids),
+            "link_ids": interdoc_link_ids,
+        },
         "components": components,
         "text": text_obj,
         "document_structure": structure_obj,
@@ -871,12 +959,14 @@ def _final_output(
     source: str,
 ) -> Dict[str, Any]:
     docs = [_to_document_output(ctx, p, source) for p in payloads if isinstance(p, dict)]
+    interdoc = _interdoc_output(ctx)
     out: Dict[str, Any] = {
         "schema_version": "2.0",
         "generated_at": _iso_now(),
         "source": source,
         "documents_count": len(docs),
         "documents": docs,
+        "cross_document_analysis": interdoc,
         "pipeline": {
             "es_enabled": bool(ctx.get("USE_ELASTICSEARCH")),
             "es_available": bool(ctx.get("ES_AVAILABLE")),
@@ -970,6 +1060,275 @@ def extract_extractions(ctx: Dict[str, Any]) -> Any:
 
 def extract_detected_languages(ctx: Dict[str, Any]) -> List[str]:
     return ctx.get("DETECTED_LANGUAGES") or []
+
+
+def _text_from_tok_pages(pages: List[Dict[str, Any]]) -> str:
+    chunks: List[str] = []
+    for page in pages:
+        if not isinstance(page, dict):
+            continue
+        txt = str(page.get("text") or page.get("page_text") or page.get("ocr_text") or "")
+        if txt.strip():
+            chunks.append(txt)
+    return "\n\n".join(chunks)
+
+
+def _pages_from_final_doc(final_doc: Dict[str, Any]) -> List[Dict[str, Any]]:
+    pages_text = _safe_list(final_doc.get("pages_text"))
+    if not pages_text:
+        text = str(final_doc.get("text") or "")
+        if not text.strip():
+            return []
+        pages_text = [text]
+    source_path = str(final_doc.get("source_path") or "")
+    return [
+        {"page_index": i, "text": str(txt or ""), "source_path": source_path}
+        for i, txt in enumerate(pages_text, start=1)
+    ]
+
+
+def _collect_local_tokens_for_doc(ctx: Dict[str, Any], doc_id: Optional[str], filename: Optional[str]) -> List[Dict[str, Any]]:
+    tokens_rows = _filter_rows_for_doc(ctx.get("NLP_TOKENS"), doc_id, filename)
+    if tokens_rows:
+        return tokens_rows
+
+    # Fallback compat runs anciens: merge NLP_POS + NLP_LEMMA pour CE document.
+    pos_rows = _filter_rows_for_doc(ctx.get("NLP_POS"), doc_id, filename)
+    lemma_rows = _filter_rows_for_doc(ctx.get("NLP_LEMMA"), doc_id, filename)
+    merged: Dict[Tuple[Any, Any, Any, Any, Any, Any], Dict[str, Any]] = {}
+    for row in pos_rows:
+        if not isinstance(row, dict):
+            continue
+        key = (
+            row.get("filename"),
+            row.get("page_index"),
+            row.get("sent_index"),
+            row.get("tok_index"),
+            row.get("token"),
+            row.get("lang"),
+        )
+        merged[key] = {
+            "filename": row.get("filename"),
+            "page_index": row.get("page_index"),
+            "sent_index": row.get("sent_index"),
+            "tok_index": row.get("tok_index"),
+            "token": row.get("token"),
+            "pos": row.get("pos"),
+            "lemma": None,
+            "ner": row.get("ner"),
+            "lang": row.get("lang"),
+        }
+    for row in lemma_rows:
+        if not isinstance(row, dict):
+            continue
+        key = (
+            row.get("filename"),
+            row.get("page_index"),
+            row.get("sent_index"),
+            row.get("tok_index"),
+            row.get("token"),
+            row.get("lang"),
+        )
+        cur = merged.get(key)
+        if cur is None:
+            merged[key] = {
+                "filename": row.get("filename"),
+                "page_index": row.get("page_index"),
+                "sent_index": row.get("sent_index"),
+                "tok_index": row.get("tok_index"),
+                "token": row.get("token"),
+                "pos": None,
+                "lemma": row.get("lemma"),
+                "ner": row.get("ner"),
+                "lang": row.get("lang"),
+            }
+        else:
+            cur["lemma"] = row.get("lemma")
+            if cur.get("ner") is None:
+                cur["ner"] = row.get("ner")
+
+    return sorted(
+        merged.values(),
+        key=lambda x: (
+            _safe_int(x.get("page_index"), 0),
+            _safe_int(x.get("sent_index"), 0),
+            _safe_int(x.get("tok_index"), 0),
+        ),
+    )
+
+
+def _pick_local_final_doc(final_docs: List[Dict[str, Any]], doc_id: Optional[str], filename: Optional[str]) -> Dict[str, Any]:
+    for row in final_docs:
+        if not isinstance(row, dict):
+            continue
+        row_doc_id = str(row.get("doc_id") or "").strip()
+        row_filename = str(row.get("filename") or "").strip()
+        if doc_id and row_doc_id and row_doc_id == doc_id:
+            return row
+        if filename and row_filename and (row_filename == filename or _same_filename(row_filename, filename)):
+            return row
+    return {}
+
+
+def _pick_local_classification(results: List[Dict[str, Any]], doc_id: Optional[str], filename: Optional[str]) -> Dict[str, Any]:
+    for row in results:
+        if not isinstance(row, dict):
+            continue
+        row_doc_id = str(row.get("doc_id") or "").strip()
+        row_filename = str(row.get("filename") or "").strip()
+        if doc_id and row_doc_id and row_doc_id == doc_id:
+            return row
+        if filename and row_filename and (row_filename == filename or _same_filename(row_filename, filename)):
+            return row
+    return {}
+
+
+def _build_local_payload_for_doc(
+    ctx: Dict[str, Any],
+    tok_doc: Dict[str, Any],
+    final_doc: Dict[str, Any],
+    classification: Dict[str, Any],
+) -> Dict[str, Any]:
+    doc_id = str(tok_doc.get("doc_id") or final_doc.get("doc_id") or "").strip() or ns()
+    filename = str(tok_doc.get("filename") or final_doc.get("filename") or "").strip()
+    paths = _safe_list(tok_doc.get("paths"))
+    if not paths and final_doc.get("source_path"):
+        paths = [str(final_doc.get("source_path"))]
+
+    pages = _normalize_pages_from_doc(tok_doc) if isinstance(tok_doc, dict) else []
+    if not pages:
+        pages = _pages_from_final_doc(final_doc)
+
+    text_raw = _text_from_tok_pages(pages)
+    if not text_raw.strip():
+        text_raw = str(final_doc.get("text") or "")
+
+    file_size = _resolve_file_size(
+        ctx,
+        paths,
+        filename,
+        tok_doc.get("size") or final_doc.get("size"),
+    )
+
+    doc_type = str(classification.get("doc_type") or ns())
+    detected_langs = _safe_list(tok_doc.get("detected_languages")) or extract_detected_languages(ctx)
+    extraction_rows = _filter_and_dedupe_extractions(ctx.get("EXTRACTIONS"), doc_id, filename)
+
+    nlp_sentences = _filter_rows_for_doc(ctx.get("NLP_SENTENCES"), doc_id, filename)
+    nlp_entities = _filter_rows_for_doc(ctx.get("NLP_ENTITIES"), doc_id, filename)
+    nlp_matches = _filter_rows_for_doc(ctx.get("NLP_MATCHES"), doc_id, filename)
+    nlp_tokens = _collect_local_tokens_for_doc(ctx, doc_id, filename)
+
+    payload: Dict[str, Any] = {
+        "document_id": doc_id,
+        "file": {
+            "path": paths,
+            "name": filename,
+            "size": file_size,
+        },
+        "content": {
+            "content_type": doc_type,
+            "classification": classification or ns(),
+            "document_kind": doc_type,
+            "detected_languages": detected_langs,
+        },
+        "text": {
+            "text_raw": text_raw,
+            "text_normalized": ctx.get("TEXT_NORMALIZED") or "",
+            "normalization": ctx.get("TEXT_NORMALIZATION") or [],
+            "search": {
+                "full_text": text_raw,
+                "title": ctx.get("TITLE") or filename or None,
+                "keywords": ctx.get("SEARCH_KEYWORDS") or [],
+            },
+        },
+        "document_structure": {
+            "pages_meta": extract_pages_meta(ctx),
+            "pages": pages,
+            "sections": ctx.get("SECTIONS") or [],
+            "blocks": ctx.get("BLOCKS") or [],
+            "lines": ctx.get("LINES") or [],
+            "words": ctx.get("WORDS") or [],
+            "headers": ctx.get("HEADERS") or [],
+            "footers": ctx.get("FOOTERS") or [],
+            "lists": ctx.get("LISTS") or [],
+            "tables": ctx.get("TABLES") or [],
+            "figures": ctx.get("FIGURES") or [],
+            "equations": ctx.get("EQUATIONS") or [],
+            "key_value_pairs": ctx.get("KEY_VALUE_PAIRS") or [],
+            "reading_order": ctx.get("READING_ORDER") or [],
+            "detected_columns": ctx.get("DETECTED_COLUMNS") or [],
+            "non_text_regions": ctx.get("NON_TEXT_REGIONS") or [],
+        },
+        "ocr": {
+            "orientation": ctx.get("OCR_ORIENTATION"),
+            "confidence": ctx.get("OCR_CONFIDENCE"),
+            "engine": ctx.get("OCR_ENGINE"),
+        },
+        "extraction": {
+            "image_preprocessing": ctx.get("PRETRAITEMENT_RESULT") or {},
+            "method": final_doc.get("extraction"),
+            "native": ctx.get("PREPROCESS_RESULT", {}).get("NATIVE_FILES") if isinstance(ctx.get("PREPROCESS_RESULT"), dict) else None,
+            "tesseract": ctx.get("PREPROCESS_RESULT", {}).get("IMAGE_ONLY_FILES") if isinstance(ctx.get("PREPROCESS_RESULT"), dict) else None,
+            "regex_extractions": extraction_rows,
+            "business": ctx.get("BUSINESS") or {},
+            "relations": ctx.get("RELATIONS") or [],
+            "quality_checks": ctx.get("QUALITY_CHECKS") or [],
+        },
+        "nlp": {
+            "language": ctx.get("NLP_LANGUAGE"),
+            "sentences": nlp_sentences,
+            "entities": nlp_entities,
+            "matches": nlp_matches,
+            "tokens": nlp_tokens,
+        },
+        "processing": {
+            "warnings": ctx.get("PROCESS_WARNINGS") or [],
+            "logs": ctx.get("PROCESS_LOGS") or [],
+            "pipeline": ctx.get("PIPELINE_STEPS") or [],
+            "durations": ctx.get("PROCESS_DURATIONS") or {},
+            "timestamp": ctx.get("PROCESS_TIMESTAMP"),
+        },
+        "quality_checks": ctx.get("GLOBAL_QUALITY_CHECKS") or [],
+        "human_review": {
+            "required": bool(ctx.get("HUMAN_REVIEW_REQUIRED", False)),
+            "tasks": ctx.get("HUMAN_REVIEW_TASKS") or [],
+        },
+    }
+    return payload
+
+
+def build_payloads_from_context(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
+    tok_docs = _dedupe_docs(_safe_list(ctx.get("TOK_DOCS") or ctx.get("selected")))
+    final_docs = [d for d in _safe_list(ctx.get("FINAL_DOCS")) if isinstance(d, dict)]
+    results = [r for r in _safe_list(ctx.get("RESULTS")) if isinstance(r, dict)]
+
+    payloads: List[Dict[str, Any]] = []
+
+    if tok_docs:
+        for tok_doc in tok_docs:
+            doc_id = str(tok_doc.get("doc_id") or "").strip() or None
+            filename = str(tok_doc.get("filename") or "").strip() or None
+            final_doc = _pick_local_final_doc(final_docs, doc_id, filename)
+            classification = _pick_local_classification(results, doc_id, filename)
+            payloads.append(_build_local_payload_for_doc(ctx, tok_doc, final_doc, classification))
+        return payloads
+
+    if final_docs:
+        for row in final_docs:
+            doc_stub = {
+                "doc_id": row.get("doc_id"),
+                "filename": row.get("filename"),
+                "paths": [row.get("source_path")] if row.get("source_path") else [],
+                "size": row.get("size"),
+                "pages": _pages_from_final_doc(row),
+                "detected_languages": [],
+            }
+            doc_id = str(row.get("doc_id") or "").strip() or None
+            filename = str(row.get("filename") or "").strip() or None
+            classification = _pick_local_classification(results, doc_id, filename)
+            payloads.append(_build_local_payload_for_doc(ctx, doc_stub, row, classification))
+    return payloads
 
 
 def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
@@ -1317,8 +1676,10 @@ def main() -> None:
         }
     else:
         source = "local-context"
-        payload = build_payload_from_context(ctx)
-        payloads = [payload]
+        payloads = build_payloads_from_context(ctx)
+        if not payloads:
+            payload = build_payload_from_context(ctx)
+            payloads = [payload]
 
     final_payload = _final_output(ctx, payloads, source)
     OUTPUT_PATH.write_text(json.dumps(final_payload, ensure_ascii=False, indent=2), encoding="utf-8")

@@ -4,8 +4,8 @@ Date d'audit: 2026-03-16
 
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
-- Python files analyses: 26
-- Fonctions/classes indexees: 485 (voir `FUNCTION_INDEX.txt`)
+- Python files analyses: 27
+- Fonctions/classes indexees: 528 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 
 ## 2) Points d'entree
@@ -24,9 +24,10 @@ Date d'audit: 2026-03-16
   4. `clasification`
   5. `tokenisation-layout`
   6. `atripusion-gramatical-en-utilisant-les3ficherla`
-  7. `elasticsearch`
-  8. `extraction-regles`
-  9. `fusion-resultats` (debug/fusion finale, non bloquant en erreur)
+  7. `liaison-inter-docs`
+  8. `elasticsearch`
+  9. `extraction-regles`
+  10. `fusion-resultats` (debug/fusion finale, non bloquant en erreur)
 - Pipeline `pipeline50ml`:
   1. `pretraitement-de-docs`
   2. `si-image-pretraiter-sinonpass-le-doc`
@@ -38,10 +39,12 @@ Date d'audit: 2026-03-16
      - topic extraction par chunk (`chunk_primary_topic`, `chunk_topics`) + topics document,
      - generation `NLP_*` minimale (provisoire, puis remplacee par la sortie grammaire).
   6. `atripusion-gramatical-en-utilisant-les3ficherla`
-  7. `elasticsearch`
-  8. `extraction-regles` (`component/extraction-regles-50ml.py`):
+  7. `liaison-inter-docs` (`component/liaison-inter-docs.py`):
+     - detection de liens inter-documents par overlap de topics + matching phrase-a-phrase auditable.
+  8. `elasticsearch`
+  9. `extraction-regles` (`component/extraction-regles-50ml.py`):
      - extraction YAML (sans regex de champs) pilotee par classification/doc_type + scoring BM25 par chunk.
-  9. `fusion-resultats` (`component/fusion_resultats-50ml.py`):
+  10. `fusion-resultats` (`component/fusion_resultats-50ml.py`):
      - fusion standard + ajout `ml50` + BM25 dans `fusion_output.json`,
      - filtrage des topics grammaticaux (pronoms/determinants/conjonctions/adverbes) via `NLP_TOKENS` du composant grammaire.
 - Pipeline `pipeline100ml`:
@@ -56,10 +59,12 @@ Date d'audit: 2026-03-16
      - generation `NLP_*` minimale (provisoire, puis remplacee par la sortie grammaire),
      - fallback hash local si modele indisponible.
   6. `atripusion-gramatical-en-utilisant-les3ficherla`
-  7. `elasticsearch`
-  8. `extraction-regles` (`component/extraction-regles-100ml.py`):
+  7. `liaison-inter-docs` (`component/liaison-inter-docs.py`):
+     - detection de liens inter-documents par overlap de topics + matching phrase-a-phrase auditable.
+  8. `elasticsearch`
+  9. `extraction-regles` (`component/extraction-regles-100ml.py`):
      - extraction YAML (sans regex de champs) pilotee par classification/doc_type + scoring BM25 par chunk.
-  9. `fusion-resultats` (`component/fusion_resultats-100ml.py`):
+  10. `fusion-resultats` (`component/fusion_resultats-100ml.py`):
      - fusion standard + ajout `ml100` + BM25 dans `fusion_output.json`,
      - filtrage des topics grammaticaux (pronoms/determinants/conjonctions/adverbes) via `NLP_TOKENS` du composant grammaire.
 
@@ -121,7 +126,17 @@ Reference implementation:
   - compat legacy: `NLP_POS` et `NLP_LEMMA` pointent vers la meme sortie unifiee
   - `NLP_LANGUAGE`, `NLP_LANGUAGE_STATS`, `DETECTED_LANGUAGES`
 
-### 4.6 Elasticsearch (optionnel)
+### 4.6 Liaison inter-documents
+- composant: `component/liaison-inter-docs.py`
+- sortie contexte:
+  - `INTERDOC_ANALYSIS` (methode, statistiques, liens)
+  - `INTERDOC_LINKS` (liens inter-documents)
+  - `INTERDOC_DOC_LINKS` (index doc -> link_ids)
+- audit phrase-a-phrase:
+  - chaque lien contient `audit.matches[]` avec `phrase_a` / `phrase_b` (page/sentence/text_excerpt), `shared_terms`, `shared_topics`, `score`.
+  - `shared_terms` est nettoye pour garder des termes informatifs (stopwords/pronoms/mots vides exclus; priorite aux termes semantiques POS/lemma + topics + signaux classification).
+
+### 4.7 Elasticsearch (optionnel)
 - activation: `USE_ELASTICSEARCH`
 - conf: `ES_URL`, `ES_INDEX`
 - auth HTTP: `ES_USER`, `ES_PASSWORD`, `ES_API_KEY`
@@ -131,20 +146,23 @@ Reference implementation:
 - sorties: `ES_AVAILABLE`, `ES_DOC_IDS`, `ES_CLASSIFICATION_DOCS`, `ES_EXTRACTION_DOCS`, `ES_AUTO_STARTED`, `ES_AUTO_START_CMD`
 - sorties NLP ES: `ES_NLP_SYNC`, `ES_NLP_DOCS_SYNCED`, `ES_NLP_TOKENS_SYNCED`, `ES_NLP_TOKEN_ERRORS`, `ES_NLP_LEVEL_EFFECTIVE`, `ES_NLP_INDEX_EFFECTIVE`
 
-### 4.7 Classification
+### 4.8 Classification
 - sortie: `RESULTS` (doc_type, status, scores, `classification_log`, `keyword_matches`, `anti_confusion_targets`)
 - sync ES: `ES_CLASSIFICATION_SYNCED`
 
-### 4.8 Extraction metier
+### 4.9 Extraction metier
 - sortie: `EXTRACTIONS`
 - sync ES: `ES_EXTRACTION_SYNCED`
 - en `pipeline50ml`: extraction basee YAML (`rules/*.yaml`, `config/ruleset_routes.yaml`) + `EXTRACTIONS[].bm25` + `BM25_RESULTS`
 - en `pipeline100ml`: extraction basee YAML (`rules/*.yaml`, `config/ruleset_routes.yaml`) + `EXTRACTIONS[].bm25` + `BM25_RESULTS`
 
-### 4.9 Fusion finale
+### 4.10 Fusion finale
 - sortie fichier: `fusion_output.json`
 - flags contexte: `FUSION_RESULT`, `FUSION_PAYLOAD`, `FUSION_PAYLOADS`, `FUSION_SOURCE`, `ES_FUSION_SYNCED`
 - structure finale: `documents[]` (un bloc complet par document, avec `components`, `text`, `document_structure`, `extraction`, `nlp`, `quality_checks`)
+- en source `local-context`, la fusion est multi-doc (1 payload par document detecte dans `TOK_DOCS`/`FINAL_DOCS`) au lieu d'un seul document.
+- structure finale ajoutee: `cross_document_analysis` (liens inter-documents + audit des phrases match)
+- chaque document ajoute `cross_document` (`linked_documents_count`, `link_ids`) sans dupliquer l'audit complet.
 - en `pipeline50ml`: bloc supplementaire `document.ml50`, `pipeline.profile="pipeline50ml"` et `pipeline.ml50`
   - `document.ml50.document_primary_topics`: 2 topics principaux du document
 - en `pipeline100ml`: bloc supplementaire `document.ml100`, `pipeline.profile="pipeline100ml"` et `pipeline.ml100`
@@ -187,11 +205,17 @@ Reference implementation:
 - variante ML100 (Transformer BERT/XLM-R + pooling):
   - `component/tokenisation-layout-100ml.py`
 
-### 5.6 Changer classification documentaire (scores, threshold, priorites)
+### 5.6 Changer la liaison inter-documents (topics + audit phrases)
+- `component/liaison-inter-docs.py`
+  - calcul des liens entre documents,
+  - regles de score/threshold,
+  - structure de l'audit `phrase_a` / `phrase_b` et champs exposes dans la fusion.
+
+### 5.7 Changer classification documentaire (scores, threshold, priorites)
 - code: `component/clasification.py`
 - config: `classification/common.json`, `classification/*.json`
 
-### 5.7 Changer extraction metier
+### 5.8 Changer extraction metier
 - moteur regex (pipeline default): `component/extraction-regles.py`
 - moteur YAML (pipelines 50ml/100ml): `component/extraction-regles-yaml.py`
 - routage rulesets regex: `config/ruleset_routes.json`
@@ -203,7 +227,7 @@ Reference implementation:
 - variante ML100 avec BM25:
   - `component/extraction-regles-100ml.py`
 
-### 5.8 Changer logique Elasticsearch
+### 5.9 Changer logique Elasticsearch
 - composant pont: `component/elasticsearch.py`
 - client + mapping + index/update logic: `pipeline/elasticsearch.py`
 - `pipeline/elasticsearch.py`: indexation du champ documentaire `size`
@@ -216,7 +240,7 @@ Reference implementation:
   - mode `full` (tokens POS/lemma/NER dans index dedie, ex: `dms_nlp_tokens`)
   - fonction centrale: `sync_nlp_results` dans `pipeline/elasticsearch.py`
 
-### 5.9 Changer fusion JSON finale
+### 5.10 Changer fusion JSON finale
 - `component/fusion_resultats.py`
 - en mode `NLP full`, la fusion charge aussi les tokens NLP depuis ES (`dms_nlp_tokens`) pour le document courant et les structure par page/sentence.
 - schema fusion lisible humain + exploitable code:
@@ -231,7 +255,7 @@ Reference implementation:
   - `component/fusion_resultats-100ml.py`
   - enrichit la fusion avec `ml100` (vectors/topics) + BM25
 
-### 5.10 Changer logique linguistique EN/FR/AR
+### 5.11 Changer logique linguistique EN/FR/AR
 - orchestrateur langues: `component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py`
 - anglais: `component/atrribution-gramatical/engcode.py`
 - francais: `component/atrribution-gramatical/frcode.py`
@@ -258,6 +282,8 @@ Reference implementation:
   - fallback hash si modele non disponible localement.
   - scoring topics ameliore (n-grams, dedupe semantique, boost keywords classification, anti-bruit OCR).
 - `atrribution-gramatical/*.py`: POS/lemma/NER per language + notebook style runners.
+- `liaison-inter-docs.py`: lie les documents entre eux via topics + recouvrement lexical phrase-a-phrase, puis publie un audit des matches.
+  - filtre qualite `shared_terms`: supprime mots non-significatifs (`son`, `tout`, etc.) et favorise termes metier/juridiques.
 - `elasticsearch.py`: step script pour index/fetch docs ES.
 - `clasification.py`: keyword scoring classification + details matches (`classification_log`, `keyword_matches`).
 - `extraction-regles.py`: regex extractors selon doc_type.
@@ -265,6 +291,7 @@ Reference implementation:
 - `extraction-regles-50ml.py`: extraction-regles-yaml + scoring BM25 sur chunks.
 - `extraction-regles-100ml.py`: extraction-regles-yaml + scoring BM25 sur chunks.
 - `fusion_resultats.py`: build JSON fusion structure par document (`documents[]`) depuis context + ES.
+  - ajoute `cross_document_analysis` (liens + audit) et `document.cross_document` (references link_ids).
 - `fusion_resultats-50ml.py`: fusion_resultats + enrichissement ML50/BM25.
   - force la visibilite `ml50.document_topics`/`ml50.document_primary_topics` dans `fusion_output.json` (fallback depuis les topics de chunks si `ML50_TOPICS` absent/mal aligne).
   - applique un filtrage grammatical des topics via `NLP_TOKENS` (POS/lemma) pour retirer pronoms/mots-outils.
@@ -304,6 +331,21 @@ Reference implementation:
 
 ## 11) Changelog code
 - 2026-03-16:
+  - `component/liaison-inter-docs.py`:
+    - nouveau composant de liaison inter-documents base topics (`ML50_TOPICS`/`ML100_TOPICS`) + matching lexical phrase-a-phrase.
+    - produit un audit explicite des correspondances: `shared_terms`, `shared_topics`, `phrase_a`/`phrase_b` (`page_index`, `sent_index`, `text_excerpt`), `score`.
+    - publie dans le contexte: `INTERDOC_ANALYSIS`, `INTERDOC_LINKS`, `INTERDOC_DOC_LINKS`.
+    - quality boost `shared_terms`: filtrage semantique via POS/lemma (`NLP_TOKENS`), stopwords/noise et bonus des signaux `topics + classification`.
+    - enrichissement audit: `phrase_a`/`phrase_b` portent maintenant `document_id` + `filename`, et `shared_topics[]` inclut `doc_a_examples` / `doc_b_examples` (extraits de phrases par document).
+  - `pipeline/components.py` + `pipeline/orchestrator.py` + `pipeline/cli.py`:
+    - ajout de l'etape `liaison-inter-docs` dans les 3 pipelines (`default`, `pipeline50ml`, `pipeline100ml`) entre grammaire et Elasticsearch.
+    - ajout de `liaison-inter-docs` dans les options `--only`, `--upto`, `--start`.
+  - `component/fusion_resultats.py`:
+    - ajout du bloc top-level `cross_document_analysis` (liens + audit complet, sans duplication par document).
+    - ajout du bloc `document.cross_document` (`linked_documents_count`, `link_ids`) pour referencer les liens concernes.
+    - ajout du resume composant `components.liaison_inter_docs`.
+    - correction fusion locale multi-doc: construit des payloads pour chaque document (`TOK_DOCS`/`FINAL_DOCS`) au lieu de ne garder que le premier.
+    - effet: les enrichissements ML (`document_primary_topics`/`document_topics`) sont maintenant presents pour chaque document dans `fusion_output.json`.
   - `pipeline/orchestrator.py`:
     - pipelines `Pipeline50MLOrchestrator` et `Pipeline100MLOrchestrator` incluent explicitement l'etape grammaire (`atripusion-gramatical-en-utilisant-les3ficherla`) dans la sequence runtime.
   - `pipeline/cli.py`:
@@ -320,7 +362,11 @@ Reference implementation:
   - validation runtime:
     - `python main.py documents/testword.docx --pipeline pipeline50ml --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens`
     - `python main.py documents/testword.docx --pipeline pipeline100ml --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens`
+    - `python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf documents/contras-14page.pdf --pipeline pipeline50ml --es-nlp-level off`
+    - `python main.py documents/testwordaudi.docx documents/testwordlambo.docx documents/testwordvw.docx --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens`
     - resultat observe: suppression des topics grammaticaux (ex: `plus`) des sorties `[topic-doc]`, `[ml50-topic]`, `[ml100-topic]` et `fusion_output.json`.
+    - resultat observe liaison inter-docs: `links=1` avec audit phrases (`contras-14page.pdf <-> contrat_regex_test_corpus_fr_en_ar.pdf`).
+    - resultat observe fusion multi-doc: `docs=3` en sortie fusion et `document_primary_topics` visibles pour `testwordaudi.docx`, `testwordlambo.docx`, `testwordvw.docx`.
 - 2026-03-05:
   - `pipeline/elasticsearch.py`: ajout d'un auto-demarrage Elasticsearch local avant fallback.
   - Nouvelles fonctions: `_safe_positive_int`, `_is_local_es_url`, `_normalize_command`, `_format_command`, `_resolve_auto_start_commands`, `_run_auto_start_command`, `_wait_for_es_ping`, `_try_auto_start_elasticsearch`.

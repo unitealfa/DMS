@@ -1,11 +1,11 @@
 # Project Code Map (DMS Core)
 
-Date d'audit: 2026-03-16
+Date d'audit: 2026-03-17
 
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
-- Python files analyses: 27
-- Fonctions/classes indexees: 528 (voir `FUNCTION_INDEX.txt`)
+- Python files analyses: 30
+- Fonctions/classes indexees: 652 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 
 ## 2) Points d'entree
@@ -39,12 +39,16 @@ Date d'audit: 2026-03-16
      - topic extraction par chunk (`chunk_primary_topic`, `chunk_topics`) + topics document,
      - generation `NLP_*` minimale (provisoire, puis remplacee par la sortie grammaire).
   6. `atripusion-gramatical-en-utilisant-les3ficherla`
-  7. `liaison-inter-docs` (`component/liaison-inter-docs.py`):
+  7. `table-extraction` (`component/table_extraction/table-extraction.py`):
+     - extraction tableaux unifiee pour 50ml/100ml (moteur commun),
+     - meilleure detection des tableaux denses/serres OCR,
+     - sortie context: `TABLE_EXTRACTIONS_50ML` + `TABLE_EXTRACTIONS`.
+  8. `liaison-inter-docs` (`component/liaison-inter-docs.py`):
      - detection de liens inter-documents par overlap de topics + matching phrase-a-phrase auditable.
-  8. `elasticsearch`
-  9. `extraction-regles` (`component/extraction-regles-50ml.py`):
+  9. `elasticsearch`
+  10. `extraction-regles` (`component/extraction-regles-50ml.py`):
      - extraction YAML (sans regex de champs) pilotee par classification/doc_type + scoring BM25 par chunk.
-  10. `fusion-resultats` (`component/fusion_resultats-50ml.py`):
+  11. `fusion-resultats` (`component/fusion_resultats-50ml.py`):
      - fusion standard + ajout `ml50` + BM25 dans `fusion_output.json`,
      - filtrage des topics grammaticaux (pronoms/determinants/conjonctions/adverbes) via `NLP_TOKENS` du composant grammaire.
 - Pipeline `pipeline100ml`:
@@ -59,12 +63,16 @@ Date d'audit: 2026-03-16
      - generation `NLP_*` minimale (provisoire, puis remplacee par la sortie grammaire),
      - fallback hash local si modele indisponible.
   6. `atripusion-gramatical-en-utilisant-les3ficherla`
-  7. `liaison-inter-docs` (`component/liaison-inter-docs.py`):
+  7. `table-extraction` (`component/table_extraction/table-extraction.py`):
+     - extraction tableaux unifiee pour 50ml/100ml (moteur commun),
+     - meilleure detection des tableaux denses/serres OCR,
+     - sortie context: `TABLE_EXTRACTIONS_100ML` + `TABLE_EXTRACTIONS`.
+  8. `liaison-inter-docs` (`component/liaison-inter-docs.py`):
      - detection de liens inter-documents par overlap de topics + matching phrase-a-phrase auditable.
-  8. `elasticsearch`
-  9. `extraction-regles` (`component/extraction-regles-100ml.py`):
+  9. `elasticsearch`
+  10. `extraction-regles` (`component/extraction-regles-100ml.py`):
      - extraction YAML (sans regex de champs) pilotee par classification/doc_type + scoring BM25 par chunk.
-  10. `fusion-resultats` (`component/fusion_resultats-100ml.py`):
+  11. `fusion-resultats` (`component/fusion_resultats-100ml.py`):
      - fusion standard + ajout `ml100` + BM25 dans `fusion_output.json`,
      - filtrage des topics grammaticaux (pronoms/determinants/conjonctions/adverbes) via `NLP_TOKENS` du composant grammaire.
 
@@ -126,7 +134,21 @@ Reference implementation:
   - compat legacy: `NLP_POS` et `NLP_LEMMA` pointent vers la meme sortie unifiee
   - `NLP_LANGUAGE`, `NLP_LANGUAGE_STATS`, `DETECTED_LANGUAGES`
 
-### 4.6 Liaison inter-documents
+### 4.6 Extraction de tableaux (pipelines 50ml/100ml)
+- composant runtime unique: `component/table_extraction/table-extraction.py`
+- moteur commun: `component/table_extraction/table_extraction_lib.py`
+- sorties contexte:
+  - `TABLE_EXTRACTIONS` (alias commun),
+  - `TABLE_EXTRACTIONS_50ML` (pipeline50ml),
+  - `TABLE_EXTRACTIONS_100ML` (pipeline100ml).
+- objectifs:
+  - detecter tableaux espaces et tableaux OCR serres/compacts,
+  - fallback OCR multi-variants (`psm 3/4/6`, images autocontrast/threshold/sharpen/upscale) pour reconstruire des lignes/cellules quand la sortie locale est incomplète,
+  - extraire `reference`, `product`, `quantity`, `unit_price`, `total`, `total_ht`, `total_ttc`, `tax` + `raw_cells`,
+  - structurer chaque tableau avec `table_type` + `shape` (`columns_estimated`, `rows_estimated`),
+  - supprimer automatiquement les tableaux redondants/partiels quand un tableau riche est detecte.
+
+### 4.7 Liaison inter-documents
 - composant: `component/liaison-inter-docs.py`
 - sortie contexte:
   - `INTERDOC_ANALYSIS` (methode, statistiques, liens)
@@ -136,7 +158,7 @@ Reference implementation:
   - chaque lien contient `audit.matches[]` avec `phrase_a` / `phrase_b` (page/sentence/text_excerpt), `shared_terms`, `shared_topics`, `score`.
   - `shared_terms` est nettoye pour garder des termes informatifs (stopwords/pronoms/mots vides exclus; priorite aux termes semantiques POS/lemma + topics + signaux classification).
 
-### 4.7 Elasticsearch (optionnel)
+### 4.8 Elasticsearch (optionnel)
 - activation: `USE_ELASTICSEARCH`
 - conf: `ES_URL`, `ES_INDEX`
 - auth HTTP: `ES_USER`, `ES_PASSWORD`, `ES_API_KEY`
@@ -146,17 +168,17 @@ Reference implementation:
 - sorties: `ES_AVAILABLE`, `ES_DOC_IDS`, `ES_CLASSIFICATION_DOCS`, `ES_EXTRACTION_DOCS`, `ES_AUTO_STARTED`, `ES_AUTO_START_CMD`
 - sorties NLP ES: `ES_NLP_SYNC`, `ES_NLP_DOCS_SYNCED`, `ES_NLP_TOKENS_SYNCED`, `ES_NLP_TOKEN_ERRORS`, `ES_NLP_LEVEL_EFFECTIVE`, `ES_NLP_INDEX_EFFECTIVE`
 
-### 4.8 Classification
+### 4.9 Classification
 - sortie: `RESULTS` (doc_type, status, scores, `classification_log`, `keyword_matches`, `anti_confusion_targets`)
 - sync ES: `ES_CLASSIFICATION_SYNCED`
 
-### 4.9 Extraction metier
+### 4.10 Extraction metier
 - sortie: `EXTRACTIONS`
 - sync ES: `ES_EXTRACTION_SYNCED`
 - en `pipeline50ml`: extraction basee YAML (`rules/*.yaml`, `config/ruleset_routes.yaml`) + `EXTRACTIONS[].bm25` + `BM25_RESULTS`
 - en `pipeline100ml`: extraction basee YAML (`rules/*.yaml`, `config/ruleset_routes.yaml`) + `EXTRACTIONS[].bm25` + `BM25_RESULTS`
 
-### 4.10 Fusion finale
+### 4.11 Fusion finale
 - sortie fichier: `fusion_output.json`
 - flags contexte: `FUSION_RESULT`, `FUSION_PAYLOAD`, `FUSION_PAYLOADS`, `FUSION_SOURCE`, `ES_FUSION_SYNCED`
 - structure finale: `documents[]` (un bloc complet par document, avec `components`, `text`, `document_structure`, `extraction`, `nlp`, `quality_checks`)
@@ -204,6 +226,9 @@ Reference implementation:
   - `component/tokenisation-layout-50ml.py`
 - variante ML100 (Transformer BERT/XLM-R + pooling):
   - `component/tokenisation-layout-100ml.py`
+- extraction de tableaux (pipelines 50ml/100ml):
+  - `component/table_extraction/table-extraction.py` (script runtime unique),
+  - `component/table_extraction/table_extraction_lib.py` (moteur commun et heuristiques).
 
 ### 5.6 Changer la liaison inter-documents (topics + audit phrases)
 - `component/liaison-inter-docs.py`
@@ -290,6 +315,8 @@ Reference implementation:
 - `extraction-regles-yaml.py`: extraction sans regex de champs (labels/detecteurs) selon doc_type via YAML.
 - `extraction-regles-50ml.py`: extraction-regles-yaml + scoring BM25 sur chunks.
 - `extraction-regles-100ml.py`: extraction-regles-yaml + scoring BM25 sur chunks.
+- `table_extraction/table-extraction.py`: composant unique d'extraction tableaux pour pipeline50ml + pipeline100ml.
+- `table_extraction/table_extraction_lib.py`: logique commune (split lignes OCR denses, detection header, mapping colonnes, extraction line-items, fallback OCR multi-variants, dedup/pruning de tableaux redondants).
 - `fusion_resultats.py`: build JSON fusion structure par document (`documents[]`) depuis context + ES.
   - ajoute `cross_document_analysis` (liens + audit) et `document.cross_document` (references link_ids).
 - `fusion_resultats-50ml.py`: fusion_resultats + enrichissement ML50/BM25.
@@ -331,6 +358,55 @@ Reference implementation:
 
 ## 11) Changelog code
 - 2026-03-17:
+  - `component/table_extraction/table_extraction_lib.py` (amelioration extraction tableaux dense/partiels):
+    - ajout du champ `reference` (code produit) dans `line_items` + `detected_columns`,
+    - heuristiques OCR renforcees pour choisir la meilleure variante d'image (autocontrast + sharpen + upscale + fallback threshold),
+    - fallback OCR force quand extraction locale reste trop pauvre (lignes uniquement code/sans valeurs),
+    - suppression des tableaux faibles/redondants quand un tableau riche est present,
+    - normalisation des labels de petits tableaux (totaux, montant a payer, timbre),
+    - sortie table enrichie: `table_type`, `shape`, `header_map` et lignes propres pour grands/petits tableaux.
+  - validation cible `documents/image2tab.webp`:
+    - suppression du premier tableau redondant,
+    - extraction table complete: `tables=2`, `rows=13` (10 lignes produits + 3 lignes totaux),
+    - colonnes detectees: `reference`, `product`, `quantity`, `unit_price`, `total`.
+  - `component/table_extraction/table-extraction.py` + `component/table_extraction/table_extraction_lib.py`:
+    - passage a un composant runtime unique pour `pipeline50ml` et `pipeline100ml`.
+    - suppression des doublons scripts `table-extraction-50ml.py` et `table-extraction-100ml.py`.
+    - heuristiques renforcees pour tableaux OCR denses/serres:
+      - split de lignes compactes (single-space) avec detection queue numerique,
+      - detection robuste des lignes 2 colonnes (code produit + montant),
+      - recuperation de codes produits isoles sous en-tete tableau (`c1009`, `c1010`) meme sans montant OCR,
+      - fallback OCR table-first (`pytesseract --psm 3/4/6`, variantes autocontrast/threshold/sharpen/upscale) quand extraction locale trop faible,
+      - filtrage du bruit non-table (date, IBAN/SWIFT, tel, entetes administratifs),
+      - mapping colonnes ameliore pour tables 4 colonnes (`quantity/product/unit_price/total`),
+      - normalisation stricte des montants/quantites pour eviter faux positifs.
+    - sorties context conservees: `TABLE_EXTRACTIONS`, `TABLE_EXTRACTIONS_50ML`, `TABLE_EXTRACTIONS_100ML`.
+    - chaque document expose: `tables_count`, `rows_total`, `detected_columns`, `totals`, `line_items`, `tables`.
+  - `pipeline/components.py` + `pipeline/orchestrator.py` + `pipeline/cli.py`:
+    - ajout d'une nouvelle etape `table-extraction`.
+    - insertion de l'etape dans `Pipeline50MLOrchestrator` et `Pipeline100MLOrchestrator` entre grammaire et liaison inter-docs.
+    - ajout de `table-extraction` dans `--only`, `--upto`, `--start`.
+  - `component/fusion_resultats-50ml.py` + `component/fusion_resultats-100ml.py`:
+    - integration des resultats tableaux dans `documents[].extraction.table_extraction`.
+    - ajout des resumes composant:
+      - `documents[].components.table_extraction_50ml`,
+      - `documents[].components.table_extraction_100ml`.
+    - ajout du compteur pipeline:
+      - `pipeline.ml50.tables_docs_count`,
+      - `pipeline.ml100.tables_docs_count`.
+  - validation technique:
+    - `documents/image2tab.webp`:
+      - `pipeline50ml`: `docs=1 | tables=2 | rows=13`,
+      - `pipeline100ml`: `docs=1 | tables=2 | rows=13`,
+      - fallback OCR recupere les lignes produits manquantes et les colonnes numeriques.
+    - `documents/signettab.png`:
+      - `pipeline50ml`: `docs=1 | tables=1 | rows=3`,
+      - `pipeline100ml`: `docs=1 | tables=1 | rows=3`,
+      - lignes produits propres conservees (`quantity/product/unit_price/total`), bruit administratif retire.
+  - structure:
+    - creation du dossier `component/table_extraction/` pour centraliser le moteur commun.
+    - composant runtime unique: `component/table_extraction/table-extraction.py`.
+    - moteur commun: `component/table_extraction/table_extraction_lib.py`.
   - `component/clasification.py`:
     - ajout d'un audit de score par type documentaire (`scores_audit`) pour rendre chaque score explicable.
     - pour chaque type (ex: `FACTURE`, `FORMULAIRE`), stockage des mots-cles ayant contribue au score avec:

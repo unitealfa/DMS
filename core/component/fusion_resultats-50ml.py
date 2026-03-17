@@ -227,6 +227,7 @@ def _augment_payload(ctx: Dict[str, Any], payload: Dict[str, Any]) -> Dict[str, 
     chunk_map = _ml50_group_rows(ctx.get("ML50_CHUNK_VECTORS"))
     word_map = _ml50_group_rows(ctx.get("ML50_WORD_VECTORS"))
     ext_map = _ml50_index_rows(ctx.get("EXTRACTIONS"))
+    table_map = _ml50_index_rows(ctx.get("TABLE_EXTRACTIONS_50ML") or ctx.get("TABLE_EXTRACTIONS"))
     blocked_map = _ml50_build_grammar_block_map(ctx)
 
     for doc in docs:
@@ -243,6 +244,7 @@ def _augment_payload(ctx: Dict[str, Any], payload: Dict[str, Any]) -> Dict[str, 
         doc_chunks, removed_chunk_topics = _ml50_filter_chunk_topics(raw_doc_chunks, blocked_terms)
         doc_words = word_map.get(key) or []
         bm25 = _ml50_pick_bm25(ext_map, key)
+        table_row = table_map.get(key) or {}
         doc_topics = _ml50_safe_list(topic_row.get("document_topics")) or _ml50_safe_list(topic_row.get("topics"))
         if not doc_topics:
             topic_scores: Dict[str, float] = defaultdict(float)
@@ -298,6 +300,16 @@ def _augment_payload(ctx: Dict[str, Any], payload: Dict[str, Any]) -> Dict[str, 
             extraction = {}
         if bm25:
             extraction["bm25"] = bm25
+        if isinstance(table_row, dict):
+            extraction["table_extraction"] = {
+                "engine": table_row.get("engine"),
+                "tables_count": int(table_row.get("tables_count") or 0),
+                "rows_total": int(table_row.get("rows_total") or 0),
+                "detected_columns": _ml50_safe_list(table_row.get("detected_columns")),
+                "totals": table_row.get("totals") if isinstance(table_row.get("totals"), dict) else {},
+                "line_items": _ml50_safe_list(table_row.get("line_items")),
+                "tables": _ml50_safe_list(table_row.get("tables")),
+            }
         doc["extraction"] = extraction
 
         components = doc.get("components")
@@ -317,6 +329,12 @@ def _augment_payload(ctx: Dict[str, Any], payload: Dict[str, Any]) -> Dict[str, 
             "bm25_chunks_total": bm25.get("chunks_total") if isinstance(bm25, dict) else None,
             "bm25_query_terms_count": len(_ml50_safe_list(bm25.get("query_terms"))) if isinstance(bm25, dict) else 0,
         }
+        components["table_extraction_50ml"] = {
+            "engine": table_row.get("engine") if isinstance(table_row, dict) else None,
+            "tables_count": int((table_row.get("tables_count") if isinstance(table_row, dict) else 0) or 0),
+            "rows_total": int((table_row.get("rows_total") if isinstance(table_row, dict) else 0) or 0),
+            "detected_columns": _ml50_safe_list(table_row.get("detected_columns")) if isinstance(table_row, dict) else [],
+        }
         doc["components"] = components
 
         filename_label = str(filename or doc_id or "unknown")
@@ -330,6 +348,11 @@ def _augment_payload(ctx: Dict[str, Any], payload: Dict[str, Any]) -> Dict[str, 
             f"document_top_topics={top_topics} | blocked_terms={len(blocked_terms)} | "
             f"topics_removed={removed_doc_topics + removed_chunk_topics}"
         )
+        if isinstance(table_row, dict):
+            print(
+                f"[table-50ml] {filename_label} | tables={int(table_row.get('tables_count') or 0)} | "
+                f"rows={int(table_row.get('rows_total') or 0)} | cols={_ml50_safe_list(table_row.get('detected_columns'))}"
+            )
 
     pipeline = payload.get("pipeline")
     if not isinstance(pipeline, dict):
@@ -342,6 +365,7 @@ def _augment_payload(ctx: Dict[str, Any], payload: Dict[str, Any]) -> Dict[str, 
         "chunk_vectors_count": len(_ml50_safe_list(ctx.get("ML50_CHUNK_VECTORS"))),
         "word_vectors_count": len(_ml50_safe_list(ctx.get("ML50_WORD_VECTORS"))),
         "topics_docs_count": len(_ml50_safe_list(ctx.get("ML50_TOPICS"))),
+        "tables_docs_count": len(_ml50_safe_list(ctx.get("TABLE_EXTRACTIONS_50ML") or ctx.get("TABLE_EXTRACTIONS"))),
     }
     payload["pipeline"] = pipeline
     payload["documents"] = docs

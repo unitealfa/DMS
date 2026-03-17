@@ -11,7 +11,7 @@ from .settings import configure_logging, load_dotenv, normalize_input
 
 # Pipeline par defaut configurable directement dans le code.
 # Valeurs supportees: "pipelinorchestrator" | "default" | "pipeline50ml" | "pipeline100ml"
-PIPELINE_DEFAULT_CODE = "pipeline50ml"
+PIPELINE_DEFAULT_CODE = "pipeline100ml"
 
 
 def _env_bool(name: str, default: bool = False) -> bool:
@@ -92,6 +92,7 @@ def parse_cli() -> argparse.Namespace:
         "clasification",
         "tokenisation-layout",
         "atripusion-gramatical-en-utilisant-les3ficherla",
+        "table-extraction",
         "liaison-inter-docs",
         "elasticsearch",
         "extraction-regles",
@@ -104,6 +105,7 @@ def parse_cli() -> argparse.Namespace:
         "clasification",
         "tokenisation-layout",
         "atripusion-gramatical-en-utilisant-les3ficherla",
+        "table-extraction",
         "liaison-inter-docs",
         "elasticsearch",
         "extraction-regles",
@@ -116,6 +118,7 @@ def parse_cli() -> argparse.Namespace:
         "clasification",
         "tokenisation-layout",
         "atripusion-gramatical-en-utilisant-les3ficherla",
+        "table-extraction",
         "liaison-inter-docs",
         "elasticsearch",
         "extraction-regles",

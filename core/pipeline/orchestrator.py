@@ -12,6 +12,7 @@ from .components import (
     OCRPreprocessComponent,
     OutputTxtComponent,
     PretraitementComponent,
+    TableExtractionComponent,
     TokenisationLayoutComponent,
     FusionResultComponent,
 )
@@ -92,6 +93,7 @@ class Pipeline50MLOrchestrator:
             ClassificationComponent("clasification", COMPONENT_DIR / "clasification.py"),
             TokenisationLayoutComponent("tokenisation-layout", COMPONENT_DIR / "tokenisation-layout-50ml.py"),
             GrammarComponent("atripusion-gramatical-en-utilisant-les3ficherla", COMPONENT_DIR / "atrribution-gramatical" / "atripusion-gramatical-en-utilisant-les3ficherla.py"),
+            TableExtractionComponent("table-extraction", COMPONENT_DIR / "table_extraction" / "table-extraction.py"),
             InterDocLinkingComponent("liaison-inter-docs", COMPONENT_DIR / "liaison-inter-docs.py"),
             ElasticsearchComponent("elasticsearch", COMPONENT_DIR / "elasticsearch.py"),
             RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction-regles-50ml.py"),
@@ -156,6 +158,7 @@ class Pipeline100MLOrchestrator:
             ClassificationComponent("clasification", COMPONENT_DIR / "clasification.py"),
             TokenisationLayoutComponent("tokenisation-layout", COMPONENT_DIR / "tokenisation-layout-100ml.py"),
             GrammarComponent("atripusion-gramatical-en-utilisant-les3ficherla", COMPONENT_DIR / "atrribution-gramatical" / "atripusion-gramatical-en-utilisant-les3ficherla.py"),
+            TableExtractionComponent("table-extraction", COMPONENT_DIR / "table_extraction" / "table-extraction.py"),
             InterDocLinkingComponent("liaison-inter-docs", COMPONENT_DIR / "liaison-inter-docs.py"),
             ElasticsearchComponent("elasticsearch", COMPONENT_DIR / "elasticsearch.py"),
             RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction-regles-100ml.py"),

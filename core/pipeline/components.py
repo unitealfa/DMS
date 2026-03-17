@@ -276,6 +276,29 @@ class GrammarComponent(Component):
         return data
 
 
+class TableExtractionComponent(Component):
+    def run(self, context: Context) -> Any:
+        ctx = self._execute_script(context)
+        rows = ctx.get("TABLE_EXTRACTIONS")
+        if not isinstance(rows, list):
+            rows = ctx.get("TABLE_EXTRACTIONS_50ML") or ctx.get("TABLE_EXTRACTIONS_100ML") or []
+        if not isinstance(rows, list):
+            rows = []
+
+        docs = len(rows)
+        tables = 0
+        line_items = 0
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            tables += int(row.get("tables_count") or 0)
+            line_items += int(row.get("rows_total") or 0)
+
+        summary = f"docs={docs} | tables={tables} | line_items={line_items}"
+        self._report(rows, summary)
+        return rows
+
+
 class InterDocLinkingComponent(Component):
     def run(self, context: Context) -> Any:
         ctx = self._execute_script(context)

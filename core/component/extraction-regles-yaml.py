@@ -8,6 +8,7 @@ Extraction des champs metier via regles YAML (sans regex de champs).
 
 from __future__ import annotations
 
+import re
 import unicodedata
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
@@ -27,6 +28,64 @@ ROUTES_JSON_FALLBACK = CONFIG_DIR / "ruleset_routes.json"
 ARABIC_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
 SEPARATORS = [":", "=", "-", "–", "—", "؛"]
 AMOUNT_ALLOWED = set("0123456789٠١٢٣٤٥٦٧٨٩.,'٬٫ +-")
+EMAIL_RE = re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}")
+URL_RE = re.compile(r"(?:https?://|www\.)[^\s<>\"]+", re.IGNORECASE)
+
+_MONTH_TOKENS = [
+    "janvier",
+    "fevrier",
+    "février",
+    "mars",
+    "avril",
+    "mai",
+    "juin",
+    "juillet",
+    "aout",
+    "août",
+    "septembre",
+    "octobre",
+    "novembre",
+    "decembre",
+    "décembre",
+    "january",
+    "february",
+    "march",
+    "april",
+    "may",
+    "june",
+    "july",
+    "august",
+    "september",
+    "october",
+    "november",
+    "december",
+]
+_WEEKDAY_TOKENS = [
+    "lundi",
+    "mardi",
+    "mercredi",
+    "jeudi",
+    "vendredi",
+    "samedi",
+    "dimanche",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday",
+]
+_MONTH_PATTERN = "|".join(sorted((re.escape(m) for m in _MONTH_TOKENS), key=len, reverse=True))
+_WEEKDAY_PATTERN = "|".join(sorted((re.escape(d) for d in _WEEKDAY_TOKENS), key=len, reverse=True))
+DATE_WORD_DMY_RE = re.compile(
+    rf"\b(?:(?:{_WEEKDAY_PATTERN})\s+)?\d{{1,2}}(?:er)?\s+(?:de\s+)?(?:{_MONTH_PATTERN})\s+\d{{2,4}}\b",
+    re.IGNORECASE,
+)
+DATE_WORD_MDY_RE = re.compile(
+    rf"\b(?:{_MONTH_PATTERN})\s+\d{{1,2}}(?:st|nd|rd|th)?(?:,)?\s+\d{{2,4}}\b",
+    re.IGNORECASE,
+)
 
 _CURRENCY_ALIASES: List[Tuple[str, str]] = [
     ("eur", "EUR"),
@@ -162,8 +221,57 @@ def _normalize_digits(s: str) -> str:
     return str(s or "").translate(ARABIC_DIGITS)
 
 
+def _strip_control_and_escapes(value: str) -> str:
+    text = str(value or "")
+    for old, new in (
+        ("\\r\\n", " "),
+        ("\\n", " "),
+        ("\\r", " "),
+        ("\\t", " "),
+        ("\\xa0", " "),
+        ("\\u00a0", " "),
+    ):
+        text = text.replace(old, new)
+    text = text.replace("\r", " ").replace("\n", " ").replace("\t", " ").replace("\xa0", " ")
+    text = "".join(ch if (ch.isprintable() or ch.isspace()) else " " for ch in text)
+    return " ".join(text.split())
+
+
 def _clean_value(value: str) -> str:
-    return str(value or "").strip(" \t\r\n:=-–—;,.")
+    val = _strip_control_and_escapes(value).strip(" \t\r\n:=-–—;,.\"'`")
+    if len(val) >= 2 and ((val[0] == "'" and val[-1] == "'") or (val[0] == '"' and val[-1] == '"')):
+        val = val[1:-1].strip(" \t\r\n:=-–—;,.\"'`")
+    return val
+
+
+def _normalize_email_value(raw_value: str) -> str:
+    text = _strip_control_and_escapes(raw_value)
+    m = EMAIL_RE.search(text)
+    if not m:
+        return ""
+    val = str(m.group(0) or "").strip(" \t\r\n<>()[]{}\"'`,;")
+    val = val.rstrip(".")
+    return val.lower()
+
+
+def _normalize_url_value(raw_value: str) -> str:
+    text = _strip_control_and_escapes(raw_value)
+    m = URL_RE.search(text)
+    if not m:
+        return ""
+    val = str(m.group(0) or "").strip(" \t\r\n<>()[]{}\"'`,;")
+    return val.rstrip(".")
+
+
+def _normalize_phone_value(raw_value: str) -> str:
+    text = _normalize_digits(_strip_control_and_escapes(raw_value))
+    if not text:
+        return ""
+    has_plus = "+" in text
+    digits = "".join(ch for ch in text if ch.isdigit())
+    if not (10 <= len(digits) <= 15):
+        return ""
+    return f"+{digits}" if has_plus else digits
 
 
 def _first_non_empty_line(lines: List[str], start: int, max_lookahead: int) -> str:
@@ -241,7 +349,8 @@ def _split_tokens_rough(text: str) -> List[str]:
 
 
 def _extract_date_value(text: str) -> str:
-    for tok in _split_tokens_rough(_normalize_digits(text)):
+    source = _normalize_digits(_strip_control_and_escapes(text))
+    for tok in _split_tokens_rough(source):
         t = tok.strip(" .,:;")
         for sep in ("/", "-", "."):
             if t.count(sep) != 2:
@@ -254,6 +363,10 @@ def _extract_date_value(text: str) -> str:
                 return f"{int(parts[0]):02d}/{int(parts[1]):02d}/{parts[2]}"
             if len(parts[0]) == 4 and 1 <= int(parts[1]) <= 12 and 1 <= int(parts[2]) <= 31:
                 return f"{parts[0]}-{int(parts[1]):02d}-{int(parts[2]):02d}"
+    for rx in (DATE_WORD_DMY_RE, DATE_WORD_MDY_RE):
+        m = rx.search(source)
+        if m:
+            return _clean_value(m.group(0))
     return ""
 
 
@@ -280,43 +393,43 @@ def _extract_currency_value(text: str) -> str:
 
 def _detect_emails(text: str) -> List[str]:
     out: List[str] = []
-    for tok in _split_tokens_rough(text):
-        t = tok.strip(" .,:;")
-        if "@" not in t:
-            continue
-        local, _, domain = t.partition("@")
-        if not local or not domain or "." not in domain:
-            continue
-        if "@" in domain:
-            continue
-        out.append(t)
+    src = _strip_control_and_escapes(text)
+    for m in EMAIL_RE.finditer(src):
+        val = _normalize_email_value(m.group(0))
+        if val:
+            out.append(val)
+    if not out:
+        val = _normalize_email_value(src)
+        if val:
+            out.append(val)
     return _unique_keep_order(out)
 
 
 def _detect_urls(text: str) -> List[str]:
     out: List[str] = []
-    for tok in _split_tokens_rough(text):
-        t = tok.strip(" .,:;")
-        tl = t.lower()
-        if tl.startswith("http://") or tl.startswith("https://") or tl.startswith("www."):
-            out.append(t)
+    src = _strip_control_and_escapes(text)
+    for m in URL_RE.finditer(src):
+        val = _normalize_url_value(m.group(0))
+        if val:
+            out.append(val)
     return _unique_keep_order(out)
 
 
 def _detect_phones(text: str) -> List[str]:
     out: List[str] = []
     buf: List[str] = []
-    allowed = set("0123456789٠١٢٣٤٥٦٧٨٩+ .-")
-    for ch in str(text or "") + " ":
+    allowed = set("0123456789٠١٢٣٤٥٦٧٨٩+ .-()/")
+    src = _normalize_digits(_strip_control_and_escapes(text))
+    for ch in src + " ":
         if ch in allowed:
             buf.append(ch)
             continue
         if buf:
             chunk = "".join(buf).strip()
             buf = []
-            digits = "".join(ch for ch in _normalize_digits(chunk) if ch.isdigit())
-            if 10 <= len(digits) <= 14:
-                out.append(chunk)
+            val = _normalize_phone_value(chunk)
+            if val:
+                out.append(val)
     return _unique_keep_order(out)
 
 
@@ -345,6 +458,12 @@ def _normalize_value_by_type(value_type: str, raw_value: str) -> str:
     v = _clean_value(raw_value)
     if not v:
         return ""
+    if t == "email":
+        return _normalize_email_value(v) or ""
+    if t in {"url", "site"}:
+        return _normalize_url_value(v) or ""
+    if t in {"phone", "telephone"}:
+        return _normalize_phone_value(v) or ""
     if t == "date":
         return _extract_date_value(v) or ""
     if t in {"amount", "money"}:

@@ -330,6 +330,21 @@ Reference implementation:
 - Ce fichier est la reference la plus rapide pour localiser une modification precise.
 
 ## 11) Changelog code
+- 2026-03-17:
+  - `component/extraction-regles-yaml.py`:
+    - nettoyage strict des valeurs techniques pour les pipelines `pipeline50ml` et `pipeline100ml` (utilisees via `extraction-regles-50ml.py` et `extraction-regles-100ml.py`).
+    - ajout d'une normalisation robuste des caracteres parasites (`\\n`, `\\r`, `\\t`, `\\xa0`, controle Unicode) avant extraction.
+    - ajout de normaliseurs typés:
+      - `email`: conserve uniquement l'adresse email valide (sans quotes/retours ligne).
+      - `phone`: conserve uniquement le numero (digits purs ou `+digits`, sans libelles type `(Mobile ...)`).
+      - `url`: conserve uniquement l'URL brute.
+      - `date`: extraction de la date pure (formats numeriques + formats texte FR/EN, ex: `Lundi 12 mars 2024`) sans reste de phrase.
+    - `detecteurs` et `normalize_value_by_type` alignes pour garantir des valeurs propres et dedupees dans `EXTRACTIONS.fields.*.matches[].value`.
+  - validation locale:
+    - test direct moteur YAML sur exemples utilisateur:
+      - `jean-pierre.durand@service-public.fr\\n'` -> `jean-pierre.durand@service-public.fr`
+      - `0550123456\\xa0(Mobile Ooredoo)\\n` -> `0550123456`
+      - `Date de signature: Lundi 12 mars 2024 ...` -> `Lundi 12 mars 2024`
 - 2026-03-16:
   - `component/liaison-inter-docs.py`:
     - nouveau composant de liaison inter-documents base topics (`ML50_TOPICS`/`ML100_TOPICS`) + matching lexical phrase-a-phrase.

@@ -192,6 +192,23 @@ def classify_scores(DOCS: List[Dict[str, Any]], common: Dict[str, Any], configs:
             dt: {"strong": {}, "medium": {}, "weak": {}, "negative": {}, "strong_negative": {}, "anti_confusion": {}}
             for dt in configs.keys()
         }
+        score_audit_doc: Dict[str, Dict[str, Dict[str, Any]]] = {dt: {} for dt in configs.keys()}
+
+        def _push_audit(dt: str, keyword_norm: str, bucket: str, occ: int, score_delta: int) -> None:
+            if not keyword_norm or occ <= 0:
+                return
+            key = f"{bucket}::{keyword_norm}"
+            row = score_audit_doc.setdefault(dt, {}).get(key)
+            if row is None:
+                row = {
+                    "keyword": keyword_norm,
+                    "bucket": bucket,
+                    "count": 0,
+                    "score": 0,
+                }
+                score_audit_doc[dt][key] = row
+            row["count"] = int(row.get("count", 0)) + int(occ)
+            row["score"] = int(row.get("score", 0)) + int(score_delta)
 
         def add_score(text: str, keywords: List[str], delta: int, bucket: str, dt: str, weight_factor: float) -> int:
             if not keywords:
@@ -208,6 +225,7 @@ def classify_scores(DOCS: List[Dict[str, Any]], common: Dict[str, Any], configs:
                     gain = int(delta * occ * weight_factor)
                     s += gain
                     matches_doc[dt][bucket][k_norm] = matches_doc[dt][bucket].get(k_norm, 0) + occ
+                    _push_audit(dt, k_norm, bucket, occ, gain)
             return s
 
         for page in doc.get("pages", []):
@@ -237,10 +255,27 @@ def classify_scores(DOCS: List[Dict[str, Any]], common: Dict[str, Any], configs:
                         malus = int(weights.get("strong", 5)) * occ_c * weight_factor
                         score -= malus
                         matches_doc[dt]["anti_confusion"][tgt_norm] = matches_doc[dt]["anti_confusion"].get(tgt_norm, 0) + occ_c
+                        _push_audit(dt, tgt_norm, "anti_confusion", occ_c, -int(malus))
 
                 scores_doc[dt] += score
         doc["scores"] = scores_doc
         doc["score_matches"] = matches_doc
+        audit_by_type: Dict[str, Dict[str, Any]] = {}
+        for dt in configs.keys():
+            rows = [dict(v) for v in (score_audit_doc.get(dt) or {}).values() if isinstance(v, dict)]
+            rows.sort(
+                key=lambda x: (
+                    -abs(int(x.get("score", 0))),
+                    -int(x.get("count", 0)),
+                    str(x.get("keyword", "")),
+                    str(x.get("bucket", "")),
+                )
+            )
+            audit_by_type[dt] = {
+                "score_total": int(scores_doc.get(dt, 0)),
+                "matched_keywords": rows,
+            }
+        doc["scores_audit_by_type"] = audit_by_type
 
 # ========= DECISION =========
 def decide(scores: Dict[str, int], configs: Dict[str, Any], common: Dict[str, Any]) -> Dict[str, Any]:
@@ -291,6 +326,7 @@ RESULTS = []
 for doc in DOCS:
     scores = doc.get("scores", {}) or {}
     ordered_scores = {k: int(scores.get(k, 0)) for k in order}
+    score_audit_by_type = doc.get("scores_audit_by_type") or {}
 
     d = decide(scores, configs, common)
     best, status = d["best"], d["status"]
@@ -317,9 +353,47 @@ for doc in DOCS:
         f"[classification] {doc.get('filename')} -> best={best} | status={status} | scores: {ordered_scores}"
     )
 
+    scores_audit: Dict[str, Any] = {}
+    for dt in order:
+        dt_row = score_audit_by_type.get(dt) if isinstance(score_audit_by_type, dict) else None
+        if not isinstance(dt_row, dict):
+            continue
+        total = int(ordered_scores.get(dt, 0))
+        matched_keywords = [x for x in (dt_row.get("matched_keywords") or []) if isinstance(x, dict)]
+        if total == 0 and not matched_keywords:
+            continue
+        compact = []
+        for item in matched_keywords:
+            kw = str(item.get("keyword") or "").strip()
+            if not kw:
+                continue
+            cnt = int(item.get("count") or 0)
+            sc = int(item.get("score") or 0)
+            bucket = str(item.get("bucket") or "")
+            compact.append(f"{kw}(x{cnt},{sc:+d},{bucket})")
+        scores_audit[dt] = {
+            "score_total": total,
+            "matched_keywords": matched_keywords,
+            "matched_keywords_compact": compact,
+        }
+
     # ---- sortie lisible (suppress si tout est nul et UNCLASSIFIED)
     if not (best == "UNCLASSIFIED" and all(v == 0 for v in ordered_scores.values())):
         print(classification_log)
+        if scores_audit:
+            audit_parts = []
+            for dt in order:
+                if dt not in scores_audit:
+                    continue
+                dt_audit = scores_audit[dt]
+                compact_vals = (dt_audit.get("matched_keywords_compact") or [])[:4]
+                if compact_vals:
+                    shown = ", ".join(compact_vals)
+                else:
+                    shown = "aucun mot-cle"
+                audit_parts.append(f"{dt}={int(dt_audit.get('score_total', 0))} -> [{shown}]")
+            if audit_parts:
+                print("  score_audit:", " | ".join(audit_parts))
 
     # Détails: mots-clés matchés et cibles d'anti-confusion pour la classe retenue
     if best in configs:
@@ -348,6 +422,7 @@ for doc in DOCS:
         "threshold": int(common.get("threshold", 6)),
         "margin": int(common.get("margin", 3)),
         "classification_log": classification_log,
+        "scores_audit": scores_audit,
         "keyword_matches": {
             "strong": _bucket_pairs("strong"),
             "medium": _bucket_pairs("medium"),

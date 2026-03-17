@@ -1,11 +1,11 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-03-17T08:47:30.528186+00:00",
+  "generated_at": "2026-03-17T09:02:53.286566+00:00",
   "source": "local-context",
   "documents_count": 1,
   "documents": [
     {
-      "document_id": "669555b6-6818-4894-879b-224294180a3b",
+      "document_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
       "file": {
         "name": "test-regex3langue.docx",
         "paths": [
@@ -15,7 +15,7 @@
         "page_count": 1
       },
       "classification": {
-        "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+        "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
         "filename": "test-regex3langue.docx",
         "doc_type": "UNCLASSIFIED",
         "status": "REVIEW",
@@ -30,6 +30,36 @@
         "threshold": 6,
         "margin": 3,
         "classification_log": "[classification] test-regex3langue.docx -> best=UNCLASSIFIED | status=REVIEW | scores: {'ARTICLE': 0, 'BON_DE_COMMANDE': 0, 'CONTRAT': 0, 'FACTURE': 2, 'FORMULAIRE': 1}",
+        "scores_audit": {
+          "FACTURE": {
+            "score_total": 2,
+            "matched_keywords": [
+              {
+                "keyword": "MONTANT",
+                "bucket": "weak",
+                "count": 2,
+                "score": 2
+              }
+            ],
+            "matched_keywords_compact": [
+              "MONTANT(x2,+2,weak)"
+            ]
+          },
+          "FORMULAIRE": {
+            "score_total": 1,
+            "matched_keywords": [
+              {
+                "keyword": "NOM",
+                "bucket": "weak",
+                "count": 1,
+                "score": 1
+              }
+            ],
+            "matched_keywords_compact": [
+              "NOM(x1,+1,weak)"
+            ]
+          }
+        },
         "keyword_matches": {
           "strong": [],
           "medium": [],
@@ -96,7 +126,7 @@
           "available": false,
           "es_url": "http://localhost:9200",
           "es_index": "dms_documents",
-          "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+          "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
           "nlp_level": "full",
           "nlp_tokens_index": "dms_nlp_tokens",
           "nlp_docs_synced": 0,
@@ -442,7 +472,7 @@
         "tesseract": [],
         "regex_extractions": [
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
             "doc_type": "UNCLASSIFIED",
             "classification_status": "REVIEW",
@@ -10455,7 +10485,7 @@
         "timestamp": null
       },
       "meta": {
-        "generated_at": "2026-03-17T08:47:30.528172+00:00",
+        "generated_at": "2026-03-17T09:02:53.286547+00:00",
         "schema_version": "2.0",
         "source": "local-context"
       },
@@ -10531,9 +10561,9 @@
         "chunk_count": 9,
         "chunks_embeddings": [
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "page_index": 1,
             "sent_index": 0,
             "lang": "fr",
@@ -10622,9 +10652,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "page_index": 1,
             "sent_index": 1,
             "lang": "fr",
@@ -10709,9 +10739,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "page_index": 1,
             "sent_index": 2,
             "lang": "fr",
@@ -10800,9 +10830,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "page_index": 1,
             "sent_index": 3,
             "lang": "fr",
@@ -10883,9 +10913,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "page_index": 1,
             "sent_index": 4,
             "lang": "fr",
@@ -10974,9 +11004,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "page_index": 1,
             "sent_index": 5,
             "lang": "fr",
@@ -11065,9 +11095,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "page_index": 1,
             "sent_index": 6,
             "lang": "fr",
@@ -11156,9 +11186,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "page_index": 1,
             "sent_index": 7,
             "lang": "fr",
@@ -11243,9 +11273,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "page_index": 1,
             "sent_index": 8,
             "lang": "fr",
@@ -11334,9 +11364,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "page_index": 1,
             "sent_index": 0,
             "lang": "fr",
@@ -11425,9 +11455,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "page_index": 1,
             "sent_index": 1,
             "lang": "fr",
@@ -11512,9 +11542,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "page_index": 1,
             "sent_index": 2,
             "lang": "fr",
@@ -11603,9 +11633,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "page_index": 1,
             "sent_index": 3,
             "lang": "fr",
@@ -11686,9 +11716,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "page_index": 1,
             "sent_index": 4,
             "lang": "fr",
@@ -11777,9 +11807,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "page_index": 1,
             "sent_index": 5,
             "lang": "fr",
@@ -11868,9 +11898,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "page_index": 1,
             "sent_index": 6,
             "lang": "fr",
@@ -11959,9 +11989,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "page_index": 1,
             "sent_index": 7,
             "lang": "fr",
@@ -12046,9 +12076,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "page_index": 1,
             "sent_index": 8,
             "lang": "fr",
@@ -12139,9 +12169,9 @@
         ],
         "word_embeddings": [
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "pas",
             "freq": 12,
             "vector": [
@@ -12212,9 +12242,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "com",
             "freq": 10,
             "vector": [
@@ -12285,9 +12315,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "de",
             "freq": 8,
             "vector": [
@@ -12358,9 +12388,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "l",
             "freq": 7,
             "vector": [
@@ -12431,9 +12461,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "est",
             "freq": 6,
             "vector": [
@@ -12504,9 +12534,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "d",
             "freq": 6,
             "vector": [
@@ -12577,9 +12607,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "ne",
             "freq": 6,
             "vector": [
@@ -12650,9 +12680,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "extraire",
             "freq": 6,
             "vector": [
@@ -12723,9 +12753,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "format",
             "freq": 6,
             "vector": [
@@ -12796,9 +12826,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "le",
             "freq": 6,
             "vector": [
@@ -12869,9 +12899,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "objectif",
             "freq": 5,
             "vector": [
@@ -12942,9 +12972,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "valides",
             "freq": 5,
             "vector": [
@@ -13015,9 +13045,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "pièges",
             "freq": 5,
             "vector": [
@@ -13088,9 +13118,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "à",
             "freq": 5,
             "vector": [
@@ -13161,9 +13191,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "un",
             "freq": 5,
             "vector": [
@@ -13234,9 +13264,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "1",
             "freq": 4,
             "vector": [
@@ -13307,9 +13337,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "test",
             "freq": 4,
             "vector": [
@@ -13380,9 +13410,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "12",
             "freq": 4,
             "vector": [
@@ -13453,9 +13483,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "les",
             "freq": 3,
             "vector": [
@@ -13526,9 +13556,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "n",
             "freq": 3,
             "vector": [
@@ -13599,9 +13629,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "dz",
             "freq": 3,
             "vector": [
@@ -13672,9 +13702,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "fr",
             "freq": 3,
             "vector": [
@@ -13745,9 +13775,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "email",
             "freq": 3,
             "vector": [
@@ -13818,9 +13848,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "deux",
             "freq": 3,
             "vector": [
@@ -13891,9 +13921,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "et",
             "freq": 3,
             "vector": [
@@ -13964,9 +13994,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "13",
             "freq": 3,
             "vector": [
@@ -14037,9 +14067,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "2023",
             "freq": 3,
             "vector": [
@@ -14110,9 +14140,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "01",
             "freq": 3,
             "vector": [
@@ -14183,9 +14213,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "eur",
             "freq": 3,
             "vector": [
@@ -14256,9 +14286,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "usd",
             "freq": 3,
             "vector": [
@@ -14329,9 +14359,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "code",
             "freq": 3,
             "vector": [
@@ -14402,9 +14432,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "qui",
             "freq": 2,
             "vector": [
@@ -14475,9 +14505,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "valide",
             "freq": 2,
             "vector": [
@@ -14548,9 +14578,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "ou",
             "freq": 2,
             "vector": [
@@ -14621,9 +14651,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "des",
             "freq": 2,
             "vector": [
@@ -14694,9 +14724,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "interdits",
             "freq": 2,
             "vector": [
@@ -14767,9 +14797,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "user",
             "freq": 2,
             "vector": [
@@ -14840,9 +14870,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "gmail",
             "freq": 2,
             "vector": [
@@ -14913,9 +14943,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "souvent",
             "freq": 2,
             "vector": [
@@ -14986,9 +15016,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "regex",
             "freq": 2,
             "vector": [
@@ -15059,9 +15089,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "simple",
             "freq": 2,
             "vector": [
@@ -15132,9 +15162,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "2",
             "freq": 2,
             "vector": [
@@ -15205,9 +15235,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "213",
             "freq": 2,
             "vector": [
@@ -15278,9 +15308,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "11",
             "freq": 2,
             "vector": [
@@ -15351,9 +15381,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "long",
             "freq": 2,
             "vector": [
@@ -15424,9 +15454,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "trop",
             "freq": 2,
             "vector": [
@@ -15497,9 +15527,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "chiffres",
             "freq": 2,
             "vector": [
@@ -15570,9 +15600,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "ni",
             "freq": 2,
             "vector": [
@@ -15643,9 +15673,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "par",
             "freq": 2,
             "vector": [
@@ -15716,9 +15746,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "05",
             "freq": 2,
             "vector": [
@@ -15789,9 +15819,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "50",
             "freq": 2,
             "vector": [
@@ -15862,9 +15892,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "3",
             "freq": 2,
             "vector": [
@@ -15935,9 +15965,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "fichier",
             "freq": 2,
             "vector": [
@@ -16008,9 +16038,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "https",
             "freq": 2,
             "vector": [
@@ -16081,9 +16111,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "www",
             "freq": 2,
             "vector": [
@@ -16154,9 +16184,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "http",
             "freq": 2,
             "vector": [
@@ -16227,9 +16257,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "monsite",
             "freq": 2,
             "vector": [
@@ -16300,9 +16330,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "vide",
             "freq": 2,
             "vector": [
@@ -16373,9 +16403,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "url",
             "freq": 2,
             "vector": [
@@ -16446,9 +16476,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "mois",
             "freq": 2,
             "vector": [
@@ -16519,9 +16549,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "32",
             "freq": 2,
             "vector": [
@@ -16592,9 +16622,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "existe",
             "freq": 2,
             "vector": [
@@ -16665,9 +16695,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "si",
             "freq": 2,
             "vector": [
@@ -16738,9 +16768,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "cherche",
             "freq": 2,
             "vector": [
@@ -16811,9 +16841,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "dzd",
             "freq": 2,
             "vector": [
@@ -16884,9 +16914,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "montant",
             "freq": 2,
             "vector": [
@@ -16957,9 +16987,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "1500",
             "freq": 2,
             "vector": [
@@ -17030,9 +17060,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "adresses",
             "freq": 1,
             "vector": [
@@ -17103,9 +17133,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "e",
             "freq": 1,
             "vector": [
@@ -17176,9 +17206,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "mail",
             "freq": 1,
             "vector": [
@@ -17249,9 +17279,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "éliminer",
             "freq": 1,
             "vector": [
@@ -17322,9 +17352,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "formats",
             "freq": 1,
             "vector": [
@@ -17395,9 +17425,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "ont",
             "freq": 1,
             "vector": [
@@ -17468,9 +17498,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "domaine",
             "freq": 1,
             "vector": [
@@ -17541,9 +17571,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "contiennent",
             "freq": 1,
             "vector": [
@@ -17614,9 +17644,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "caractères",
             "freq": 1,
             "vector": [
@@ -17687,9 +17717,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "support123",
             "freq": 1,
             "vector": [
@@ -17760,9 +17790,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "entreprise",
             "freq": 1,
             "vector": [
@@ -17833,9 +17863,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "jean",
             "freq": 1,
             "vector": [
@@ -17906,9 +17936,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "pierre",
             "freq": 1,
             "vector": [
@@ -17979,9 +18009,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "durand",
             "freq": 1,
             "vector": [
@@ -18052,9 +18082,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "service",
             "freq": 1,
             "vector": [
@@ -18125,9 +18155,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "public",
             "freq": 1,
             "vector": [
@@ -18198,9 +18228,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "utilisateur",
             "freq": 1,
             "vector": [
@@ -18271,9 +18301,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "nomdedomaine",
             "freq": 1,
             "vector": [
@@ -18344,9 +18374,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "extension",
             "freq": 1,
             "vector": [
@@ -18417,9 +18447,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "mon",
             "freq": 1,
             "vector": [
@@ -18490,9 +18520,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "points",
             "freq": 1,
             "vector": [
@@ -18563,9 +18593,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "consécutifs",
             "freq": 1,
             "vector": [
@@ -18636,9 +18666,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "sont",
             "freq": 1,
             "vector": [
@@ -18709,9 +18739,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "symboles",
             "freq": 1,
             "vector": [
@@ -18782,9 +18812,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "example",
             "freq": 1,
             "vector": [
@@ -18855,9 +18885,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "parfois",
             "freq": 1,
             "vector": [
@@ -18928,9 +18958,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "mais",
             "freq": 1,
             "vector": [
@@ -19001,9 +19031,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "considéré",
             "freq": 1,
             "vector": [
@@ -19074,9 +19104,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "comme",
             "freq": 1,
             "vector": [
@@ -19147,9 +19177,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "piège",
             "freq": 1,
             "vector": [
@@ -19220,9 +19250,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "en",
             "freq": 1,
             "vector": [
@@ -19293,9 +19323,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "numéros",
             "freq": 1,
             "vector": [
@@ -19366,9 +19396,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "téléphone",
             "freq": 1,
             "vector": [
@@ -19439,9 +19469,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "algérie",
             "freq": 1,
             "vector": [
@@ -19512,9 +19542,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "vérifier",
             "freq": 1,
             "vector": [
@@ -19585,9 +19615,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "la",
             "freq": 1,
             "vector": [
@@ -19658,9 +19688,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "longueur",
             "freq": 1,
             "vector": [
@@ -19731,9 +19761,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "indicatif",
             "freq": 1,
             "vector": [
@@ -19804,9 +19834,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "0550123456",
             "freq": 1,
             "vector": [
@@ -19877,9 +19907,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "mobile",
             "freq": 1,
             "vector": [
@@ -19950,9 +19980,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "ooredoo",
             "freq": 1,
             "vector": [
@@ -20023,9 +20053,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "661",
             "freq": 1,
             "vector": [
@@ -20096,9 +20126,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "00",
             "freq": 1,
             "vector": [
@@ -20169,9 +20199,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "22",
             "freq": 1,
             "vector": [
@@ -20242,9 +20272,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "international",
             "freq": 1,
             "vector": [
@@ -20315,9 +20345,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "00213",
             "freq": 1,
             "vector": [
@@ -20388,9 +20418,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "770",
             "freq": 1,
             "vector": [
@@ -20461,9 +20491,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "99",
             "freq": 1,
             "vector": [
@@ -20534,9 +20564,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "88",
             "freq": 1,
             "vector": [
@@ -20607,9 +20637,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "77",
             "freq": 1,
             "vector": [
@@ -20680,9 +20710,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "055012345",
             "freq": 1,
             "vector": [
@@ -20753,9 +20783,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "court",
             "freq": 1,
             "vector": [
@@ -20826,9 +20856,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "9",
             "freq": 1,
             "vector": [
@@ -20899,9 +20929,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "05501234567",
             "freq": 1,
             "vector": [
@@ -20972,9 +21002,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "1234567890",
             "freq": 1,
             "vector": [
@@ -21045,9 +21075,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "commence",
             "freq": 1,
             "vector": [
@@ -21118,9 +21148,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "0",
             "freq": 1,
             "vector": [
@@ -21191,9 +21221,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "az",
             "freq": 1,
             "vector": [
@@ -21264,9 +21294,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "34",
             "freq": 1,
             "vector": [
@@ -21337,9 +21367,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "56",
             "freq": 1,
             "vector": [
@@ -21410,9 +21440,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "contient",
             "freq": 1,
             "vector": [
@@ -21483,9 +21513,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "lettres",
             "freq": 1,
             "vector": [
@@ -21556,9 +21586,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "urls",
             "freq": 1,
             "vector": [
@@ -21629,9 +21659,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "liens",
             "freq": 1,
             "vector": [
@@ -21702,9 +21732,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "web",
             "freq": 1,
             "vector": [
@@ -21775,9 +21805,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "distinguer",
             "freq": 1,
             "vector": [
@@ -21848,9 +21878,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "lien",
             "freq": 1,
             "vector": [
@@ -21921,9 +21951,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "nom",
             "freq": 1,
             "vector": [
@@ -21994,9 +22024,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "texte",
             "freq": 1,
             "vector": [
@@ -22067,9 +22097,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "google",
             "freq": 1,
             "vector": [
@@ -22140,9 +22170,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "express",
             "freq": 1,
             "vector": [
@@ -22213,9 +22243,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "ww",
             "freq": 1,
             "vector": [
@@ -22286,9 +22316,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "seulement",
             "freq": 1,
             "vector": [
@@ -22359,9 +22389,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "w",
             "freq": 1,
             "vector": [
@@ -22432,9 +22462,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "image",
             "freq": 1,
             "vector": [
@@ -22505,9 +22535,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "png",
             "freq": 1,
             "vector": [
@@ -22578,9 +22608,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "c",
             "freq": 1,
             "vector": [
@@ -22651,9 +22681,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "une",
             "freq": 1,
             "vector": [
@@ -22724,9 +22754,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "complète",
             "freq": 1,
             "vector": [
@@ -22797,9 +22827,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "espace",
             "freq": 1,
             "vector": [
@@ -22870,9 +22900,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "double",
             "freq": 1,
             "vector": [
@@ -22943,9 +22973,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "point",
             "freq": 1,
             "vector": [
@@ -23016,9 +23046,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "dans",
             "freq": 1,
             "vector": [
@@ -23089,9 +23119,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "4",
             "freq": 1,
             "vector": [
@@ -23162,9 +23192,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "dates",
             "freq": 1,
             "vector": [
@@ -23235,9 +23265,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "gérer",
             "freq": 1,
             "vector": [
@@ -23308,9 +23338,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "séparateurs",
             "freq": 1,
             "vector": [
@@ -23381,9 +23411,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "limites",
             "freq": 1,
             "vector": [
@@ -23454,9 +23484,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "ex",
             "freq": 1,
             "vector": [
@@ -23527,9 +23557,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "2024",
             "freq": 1,
             "vector": [
@@ -23600,9 +23630,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "31",
             "freq": 1,
             "vector": [
@@ -23673,9 +23703,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "1999",
             "freq": 1,
             "vector": [
@@ -23746,9 +23776,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "jour",
             "freq": 1,
             "vector": [
@@ -23819,9 +23849,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "15",
             "freq": 1,
             "vector": [
@@ -23892,9 +23922,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "2022",
             "freq": 1,
             "vector": [
@@ -23965,9 +23995,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "24",
             "freq": 1,
             "vector": [
@@ -24038,9 +24068,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "rejeté",
             "freq": 1,
             "vector": [
@@ -24111,9 +24141,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "on",
             "freq": 1,
             "vector": [
@@ -24184,9 +24214,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "dd",
             "freq": 1,
             "vector": [
@@ -24257,9 +24287,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "mm",
             "freq": 1,
             "vector": [
@@ -24330,9 +24360,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "yyyy",
             "freq": 1,
             "vector": [
@@ -24403,9 +24433,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "inversé",
             "freq": 1,
             "vector": [
@@ -24476,9 +24506,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "ta",
             "freq": 1,
             "vector": [
@@ -24549,9 +24579,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "5",
             "freq": 1,
             "vector": [
@@ -24622,9 +24652,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "devises",
             "freq": 1,
             "vector": [
@@ -24695,9 +24725,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "monétaire",
             "freq": 1,
             "vector": [
@@ -24768,9 +24798,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "250",
             "freq": 1,
             "vector": [
@@ -24841,9 +24871,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "10",
             "freq": 1,
             "vector": [
@@ -24914,9 +24944,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "dzd4",
             "freq": 1,
             "vector": [
@@ -24987,9 +25017,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "chiffre",
             "freq": 1,
             "vector": [
@@ -25060,9 +25090,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "collé",
             "freq": 1,
             "vector": [
@@ -25133,9 +25163,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "au",
             "freq": 1,
             "vector": [
@@ -25206,9 +25236,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "seul",
             "freq": 1,
             "vector": [
@@ -25279,9 +25309,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "sans",
             "freq": 1,
             "vector": [
@@ -25352,9 +25382,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "nombre",
             "freq": 1,
             "vector": [
@@ -25425,9 +25455,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "invalide",
             "freq": 1,
             "vector": [
@@ -25498,9 +25528,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "pas",
             "freq": 12,
             "vector": [
@@ -25571,9 +25601,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "com",
             "freq": 10,
             "vector": [
@@ -25644,9 +25674,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "de",
             "freq": 8,
             "vector": [
@@ -25717,9 +25747,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "l",
             "freq": 7,
             "vector": [
@@ -25790,9 +25820,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "est",
             "freq": 6,
             "vector": [
@@ -25863,9 +25893,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "d",
             "freq": 6,
             "vector": [
@@ -25936,9 +25966,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "ne",
             "freq": 6,
             "vector": [
@@ -26009,9 +26039,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "extraire",
             "freq": 6,
             "vector": [
@@ -26082,9 +26112,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "format",
             "freq": 6,
             "vector": [
@@ -26155,9 +26185,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "le",
             "freq": 6,
             "vector": [
@@ -26228,9 +26258,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "objectif",
             "freq": 5,
             "vector": [
@@ -26301,9 +26331,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "valides",
             "freq": 5,
             "vector": [
@@ -26374,9 +26404,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "pièges",
             "freq": 5,
             "vector": [
@@ -26447,9 +26477,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "à",
             "freq": 5,
             "vector": [
@@ -26520,9 +26550,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "un",
             "freq": 5,
             "vector": [
@@ -26593,9 +26623,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "1",
             "freq": 4,
             "vector": [
@@ -26666,9 +26696,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "test",
             "freq": 4,
             "vector": [
@@ -26739,9 +26769,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "12",
             "freq": 4,
             "vector": [
@@ -26812,9 +26842,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "les",
             "freq": 3,
             "vector": [
@@ -26885,9 +26915,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "n",
             "freq": 3,
             "vector": [
@@ -26958,9 +26988,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "dz",
             "freq": 3,
             "vector": [
@@ -27031,9 +27061,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "fr",
             "freq": 3,
             "vector": [
@@ -27104,9 +27134,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "email",
             "freq": 3,
             "vector": [
@@ -27177,9 +27207,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "deux",
             "freq": 3,
             "vector": [
@@ -27250,9 +27280,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "et",
             "freq": 3,
             "vector": [
@@ -27323,9 +27353,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "13",
             "freq": 3,
             "vector": [
@@ -27396,9 +27426,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "2023",
             "freq": 3,
             "vector": [
@@ -27469,9 +27499,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "01",
             "freq": 3,
             "vector": [
@@ -27542,9 +27572,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "eur",
             "freq": 3,
             "vector": [
@@ -27615,9 +27645,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "usd",
             "freq": 3,
             "vector": [
@@ -27688,9 +27718,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "code",
             "freq": 3,
             "vector": [
@@ -27761,9 +27791,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "qui",
             "freq": 2,
             "vector": [
@@ -27834,9 +27864,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "valide",
             "freq": 2,
             "vector": [
@@ -27907,9 +27937,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "ou",
             "freq": 2,
             "vector": [
@@ -27980,9 +28010,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "des",
             "freq": 2,
             "vector": [
@@ -28053,9 +28083,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "interdits",
             "freq": 2,
             "vector": [
@@ -28126,9 +28156,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "user",
             "freq": 2,
             "vector": [
@@ -28199,9 +28229,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "gmail",
             "freq": 2,
             "vector": [
@@ -28272,9 +28302,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "souvent",
             "freq": 2,
             "vector": [
@@ -28345,9 +28375,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "regex",
             "freq": 2,
             "vector": [
@@ -28418,9 +28448,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "simple",
             "freq": 2,
             "vector": [
@@ -28491,9 +28521,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "2",
             "freq": 2,
             "vector": [
@@ -28564,9 +28594,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "213",
             "freq": 2,
             "vector": [
@@ -28637,9 +28667,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "11",
             "freq": 2,
             "vector": [
@@ -28710,9 +28740,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "long",
             "freq": 2,
             "vector": [
@@ -28783,9 +28813,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "trop",
             "freq": 2,
             "vector": [
@@ -28856,9 +28886,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "chiffres",
             "freq": 2,
             "vector": [
@@ -28929,9 +28959,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "ni",
             "freq": 2,
             "vector": [
@@ -29002,9 +29032,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "par",
             "freq": 2,
             "vector": [
@@ -29075,9 +29105,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "05",
             "freq": 2,
             "vector": [
@@ -29148,9 +29178,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "50",
             "freq": 2,
             "vector": [
@@ -29221,9 +29251,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "3",
             "freq": 2,
             "vector": [
@@ -29294,9 +29324,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "fichier",
             "freq": 2,
             "vector": [
@@ -29367,9 +29397,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "https",
             "freq": 2,
             "vector": [
@@ -29440,9 +29470,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "www",
             "freq": 2,
             "vector": [
@@ -29513,9 +29543,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "http",
             "freq": 2,
             "vector": [
@@ -29586,9 +29616,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "monsite",
             "freq": 2,
             "vector": [
@@ -29659,9 +29689,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "vide",
             "freq": 2,
             "vector": [
@@ -29732,9 +29762,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "url",
             "freq": 2,
             "vector": [
@@ -29805,9 +29835,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "mois",
             "freq": 2,
             "vector": [
@@ -29878,9 +29908,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "32",
             "freq": 2,
             "vector": [
@@ -29951,9 +29981,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "existe",
             "freq": 2,
             "vector": [
@@ -30024,9 +30054,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "si",
             "freq": 2,
             "vector": [
@@ -30097,9 +30127,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "cherche",
             "freq": 2,
             "vector": [
@@ -30170,9 +30200,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "dzd",
             "freq": 2,
             "vector": [
@@ -30243,9 +30273,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "montant",
             "freq": 2,
             "vector": [
@@ -30316,9 +30346,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "1500",
             "freq": 2,
             "vector": [
@@ -30389,9 +30419,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "adresses",
             "freq": 1,
             "vector": [
@@ -30462,9 +30492,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "e",
             "freq": 1,
             "vector": [
@@ -30535,9 +30565,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "mail",
             "freq": 1,
             "vector": [
@@ -30608,9 +30638,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "éliminer",
             "freq": 1,
             "vector": [
@@ -30681,9 +30711,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "formats",
             "freq": 1,
             "vector": [
@@ -30754,9 +30784,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "ont",
             "freq": 1,
             "vector": [
@@ -30827,9 +30857,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "domaine",
             "freq": 1,
             "vector": [
@@ -30900,9 +30930,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "contiennent",
             "freq": 1,
             "vector": [
@@ -30973,9 +31003,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "caractères",
             "freq": 1,
             "vector": [
@@ -31046,9 +31076,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "support123",
             "freq": 1,
             "vector": [
@@ -31119,9 +31149,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "entreprise",
             "freq": 1,
             "vector": [
@@ -31192,9 +31222,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "jean",
             "freq": 1,
             "vector": [
@@ -31265,9 +31295,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "pierre",
             "freq": 1,
             "vector": [
@@ -31338,9 +31368,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "durand",
             "freq": 1,
             "vector": [
@@ -31411,9 +31441,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "service",
             "freq": 1,
             "vector": [
@@ -31484,9 +31514,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "public",
             "freq": 1,
             "vector": [
@@ -31557,9 +31587,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "utilisateur",
             "freq": 1,
             "vector": [
@@ -31630,9 +31660,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "nomdedomaine",
             "freq": 1,
             "vector": [
@@ -31703,9 +31733,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "extension",
             "freq": 1,
             "vector": [
@@ -31776,9 +31806,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "mon",
             "freq": 1,
             "vector": [
@@ -31849,9 +31879,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "points",
             "freq": 1,
             "vector": [
@@ -31922,9 +31952,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "consécutifs",
             "freq": 1,
             "vector": [
@@ -31995,9 +32025,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "sont",
             "freq": 1,
             "vector": [
@@ -32068,9 +32098,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "symboles",
             "freq": 1,
             "vector": [
@@ -32141,9 +32171,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "example",
             "freq": 1,
             "vector": [
@@ -32214,9 +32244,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "parfois",
             "freq": 1,
             "vector": [
@@ -32287,9 +32317,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "mais",
             "freq": 1,
             "vector": [
@@ -32360,9 +32390,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "considéré",
             "freq": 1,
             "vector": [
@@ -32433,9 +32463,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "comme",
             "freq": 1,
             "vector": [
@@ -32506,9 +32536,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "piège",
             "freq": 1,
             "vector": [
@@ -32579,9 +32609,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "en",
             "freq": 1,
             "vector": [
@@ -32652,9 +32682,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "numéros",
             "freq": 1,
             "vector": [
@@ -32725,9 +32755,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "téléphone",
             "freq": 1,
             "vector": [
@@ -32798,9 +32828,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "algérie",
             "freq": 1,
             "vector": [
@@ -32871,9 +32901,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "vérifier",
             "freq": 1,
             "vector": [
@@ -32944,9 +32974,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "la",
             "freq": 1,
             "vector": [
@@ -33017,9 +33047,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "longueur",
             "freq": 1,
             "vector": [
@@ -33090,9 +33120,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "indicatif",
             "freq": 1,
             "vector": [
@@ -33163,9 +33193,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "0550123456",
             "freq": 1,
             "vector": [
@@ -33236,9 +33266,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "mobile",
             "freq": 1,
             "vector": [
@@ -33309,9 +33339,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "ooredoo",
             "freq": 1,
             "vector": [
@@ -33382,9 +33412,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "661",
             "freq": 1,
             "vector": [
@@ -33455,9 +33485,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "00",
             "freq": 1,
             "vector": [
@@ -33528,9 +33558,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "22",
             "freq": 1,
             "vector": [
@@ -33601,9 +33631,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "international",
             "freq": 1,
             "vector": [
@@ -33674,9 +33704,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "00213",
             "freq": 1,
             "vector": [
@@ -33747,9 +33777,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "770",
             "freq": 1,
             "vector": [
@@ -33820,9 +33850,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "99",
             "freq": 1,
             "vector": [
@@ -33893,9 +33923,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "88",
             "freq": 1,
             "vector": [
@@ -33966,9 +33996,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "77",
             "freq": 1,
             "vector": [
@@ -34039,9 +34069,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "055012345",
             "freq": 1,
             "vector": [
@@ -34112,9 +34142,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "court",
             "freq": 1,
             "vector": [
@@ -34185,9 +34215,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "9",
             "freq": 1,
             "vector": [
@@ -34258,9 +34288,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "05501234567",
             "freq": 1,
             "vector": [
@@ -34331,9 +34361,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "1234567890",
             "freq": 1,
             "vector": [
@@ -34404,9 +34434,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "commence",
             "freq": 1,
             "vector": [
@@ -34477,9 +34507,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "0",
             "freq": 1,
             "vector": [
@@ -34550,9 +34580,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "az",
             "freq": 1,
             "vector": [
@@ -34623,9 +34653,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "34",
             "freq": 1,
             "vector": [
@@ -34696,9 +34726,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "56",
             "freq": 1,
             "vector": [
@@ -34769,9 +34799,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "contient",
             "freq": 1,
             "vector": [
@@ -34842,9 +34872,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "lettres",
             "freq": 1,
             "vector": [
@@ -34915,9 +34945,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "urls",
             "freq": 1,
             "vector": [
@@ -34988,9 +35018,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "liens",
             "freq": 1,
             "vector": [
@@ -35061,9 +35091,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "web",
             "freq": 1,
             "vector": [
@@ -35134,9 +35164,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "distinguer",
             "freq": 1,
             "vector": [
@@ -35207,9 +35237,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "lien",
             "freq": 1,
             "vector": [
@@ -35280,9 +35310,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "nom",
             "freq": 1,
             "vector": [
@@ -35353,9 +35383,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "texte",
             "freq": 1,
             "vector": [
@@ -35426,9 +35456,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "google",
             "freq": 1,
             "vector": [
@@ -35499,9 +35529,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "express",
             "freq": 1,
             "vector": [
@@ -35572,9 +35602,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "ww",
             "freq": 1,
             "vector": [
@@ -35645,9 +35675,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "seulement",
             "freq": 1,
             "vector": [
@@ -35718,9 +35748,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "w",
             "freq": 1,
             "vector": [
@@ -35791,9 +35821,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "image",
             "freq": 1,
             "vector": [
@@ -35864,9 +35894,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "png",
             "freq": 1,
             "vector": [
@@ -35937,9 +35967,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "c",
             "freq": 1,
             "vector": [
@@ -36010,9 +36040,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "une",
             "freq": 1,
             "vector": [
@@ -36083,9 +36113,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "complète",
             "freq": 1,
             "vector": [
@@ -36156,9 +36186,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "espace",
             "freq": 1,
             "vector": [
@@ -36229,9 +36259,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "double",
             "freq": 1,
             "vector": [
@@ -36302,9 +36332,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "point",
             "freq": 1,
             "vector": [
@@ -36375,9 +36405,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "dans",
             "freq": 1,
             "vector": [
@@ -36448,9 +36478,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "4",
             "freq": 1,
             "vector": [
@@ -36521,9 +36551,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "dates",
             "freq": 1,
             "vector": [
@@ -36594,9 +36624,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "gérer",
             "freq": 1,
             "vector": [
@@ -36667,9 +36697,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "séparateurs",
             "freq": 1,
             "vector": [
@@ -36740,9 +36770,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "limites",
             "freq": 1,
             "vector": [
@@ -36813,9 +36843,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "ex",
             "freq": 1,
             "vector": [
@@ -36886,9 +36916,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "2024",
             "freq": 1,
             "vector": [
@@ -36959,9 +36989,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "31",
             "freq": 1,
             "vector": [
@@ -37032,9 +37062,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "1999",
             "freq": 1,
             "vector": [
@@ -37105,9 +37135,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "jour",
             "freq": 1,
             "vector": [
@@ -37178,9 +37208,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "15",
             "freq": 1,
             "vector": [
@@ -37251,9 +37281,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "2022",
             "freq": 1,
             "vector": [
@@ -37324,9 +37354,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "24",
             "freq": 1,
             "vector": [
@@ -37397,9 +37427,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "rejeté",
             "freq": 1,
             "vector": [
@@ -37470,9 +37500,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "on",
             "freq": 1,
             "vector": [
@@ -37543,9 +37573,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "dd",
             "freq": 1,
             "vector": [
@@ -37616,9 +37646,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "mm",
             "freq": 1,
             "vector": [
@@ -37689,9 +37719,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "yyyy",
             "freq": 1,
             "vector": [
@@ -37762,9 +37792,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "inversé",
             "freq": 1,
             "vector": [
@@ -37835,9 +37865,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "ta",
             "freq": 1,
             "vector": [
@@ -37908,9 +37938,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "5",
             "freq": 1,
             "vector": [
@@ -37981,9 +38011,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "devises",
             "freq": 1,
             "vector": [
@@ -38054,9 +38084,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "monétaire",
             "freq": 1,
             "vector": [
@@ -38127,9 +38157,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "250",
             "freq": 1,
             "vector": [
@@ -38200,9 +38230,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "10",
             "freq": 1,
             "vector": [
@@ -38273,9 +38303,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "dzd4",
             "freq": 1,
             "vector": [
@@ -38346,9 +38376,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "chiffre",
             "freq": 1,
             "vector": [
@@ -38419,9 +38449,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "collé",
             "freq": 1,
             "vector": [
@@ -38492,9 +38522,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "au",
             "freq": 1,
             "vector": [
@@ -38565,9 +38595,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "seul",
             "freq": 1,
             "vector": [
@@ -38638,9 +38668,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "sans",
             "freq": 1,
             "vector": [
@@ -38711,9 +38741,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "nombre",
             "freq": 1,
             "vector": [
@@ -38784,9 +38814,9 @@
             ]
           },
           {
-            "doc_id": "669555b6-6818-4894-879b-224294180a3b",
+            "doc_id": "c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "filename": "test-regex3langue.docx",
-            "doc_key": "id:669555b6-6818-4894-879b-224294180a3b",
+            "doc_key": "id:c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a",
             "token": "invalide",
             "freq": 1,
             "vector": [
@@ -38900,7 +38930,7 @@
     "sentence_pairs_scored": 0,
     "links_count": 0,
     "links": [],
-    "generated_at": "2026-03-17T08:47:30.495481+00:00"
+    "generated_at": "2026-03-17T09:02:53.249071+00:00"
   },
   "pipeline": {
     "es_enabled": true,

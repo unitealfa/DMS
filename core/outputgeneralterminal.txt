@@ -84,7 +84,7 @@ EUR (Code seul sans montant)
 Type: list
 Summary: 1 docs | pages=1
 Output: [{'content': 'text',
-  'doc_id': '669555b6-6818-4894-879b-224294180a3b',
+  'doc_id': 'c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a',
   'extraction': 'native:docx:xml',
   'filename': 'test-regex3langue.docx',
   'page_count_total': 1,
@@ -213,6 +213,7 @@ Output: [{'content': 'text',
           '1.2.3 USD\xa0(Format de nombre invalide)\n'}]
 
 [classification] test-regex3langue.docx -> best=UNCLASSIFIED | status=REVIEW | scores: {'ARTICLE': 0, 'BON_DE_COMMANDE': 0, 'CONTRAT': 0, 'FACTURE': 2, 'FORMULAIRE': 1}
+  score_audit: FACTURE=2 -> [MONTANT(x2,+2,weak)] | FORMULAIRE=1 -> [NOM(x1,+1,weak)]
 [Component: clasification]
 Type: list
 Summary: 1 docs classes | test-regex3langue.docx->UNCLASSIFIED
@@ -221,7 +222,7 @@ Output: [{'anti_confusion_targets': [],
                         "status=REVIEW | scores: {'ARTICLE': 0, 'BON_DE_COMMANDE': 0, 'CONTRAT': "
                         "0, 'FACTURE': 2, 'FORMULAIRE': 1}",
   'decision_debug': {'diff': 1, 'second_score': 1, 'top_score': 2},
-  'doc_id': '669555b6-6818-4894-879b-224294180a3b',
+  'doc_id': 'c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a',
   'doc_type': 'UNCLASSIFIED',
   'filename': 'test-regex3langue.docx',
   'keyword_matches': {'anti_confusion_hits': [],
@@ -232,13 +233,25 @@ Output: [{'anti_confusion_targets': [],
                       'weak': []},
   'margin': 3,
   'scores': {'ARTICLE': 0, 'BON_DE_COMMANDE': 0, 'CONTRAT': 0, 'FACTURE': 2, 'FORMULAIRE': 1},
+  'scores_audit': {'FACTURE': {'matched_keywords': [{'bucket': 'weak',
+                                                     'count': 2,
+                                                     'keyword': 'MONTANT',
+                                                     'score': 2}],
+                               'matched_keywords_compact': ['MONTANT(x2,+2,weak)'],
+                               'score_total': 2},
+                   'FORMULAIRE': {'matched_keywords': [{'bucket': 'weak',
+                                                        'count': 1,
+                                                        'keyword': 'NOM',
+                                                        'score': 1}],
+                                  'matched_keywords_compact': ['NOM(x1,+1,weak)'],
+                                  'score_total': 1}},
   'status': 'REVIEW',
   'threshold': 6,
   'winning_score': 2}]
 
 ========================================================================================================================
 [doc] test-regex3langue.docx
-  doc_id       : 669555b6-6818-4894-879b-224294180a3b
+  doc_id       : c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a
   content      : image_only
   extraction   : ocr:tesseract
   pages_total  : 1
@@ -333,7 +346,7 @@ EUR (Code seul sans montant)
 
 ========================================================================================================================
 [doc] test-regex3langue.docx
-  doc_id       : 669555b6-6818-4894-879b-224294180a3b
+  doc_id       : c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a
   content      : text
   extraction   : native:docx:xml
   pages_total  : 1
@@ -434,7 +447,7 @@ Type: list
 Summary: 2 docs | sentences=18
 Output: [{'chars_total': 1872,
   'content': 'image_only',
-  'doc_id': '669555b6-6818-4894-879b-224294180a3b',
+  'doc_id': 'c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a',
   'extraction': 'ocr:tesseract',
   'filename': 'test-regex3langue.docx',
   'page_count_total': 1,
@@ -721,7 +734,7 @@ Output: [{'chars_total': 1872,
   'size': None},
  {'chars_total': 1872,
   'content': 'text',
-  'doc_id': '669555b6-6818-4894-879b-224294180a3b',
+  'doc_id': 'c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a',
   'extraction': 'native:docx:xml',
   'filename': 'test-regex3langue.docx',
   'page_count_total': 1,
@@ -2171,7 +2184,7 @@ Type: list
 Summary: Langues executees: en, fr | docs=2
 Output: [{'chars_total': 1872,
   'content': 'image_only',
-  'doc_id': '669555b6-6818-4894-879b-224294180a3b',
+  'doc_id': 'c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a',
   'extraction': 'ocr:tesseract',
   'filename': 'test-regex3langue.docx',
   'page_count_total': 1,
@@ -2458,7 +2471,7 @@ Output: [{'chars_total': 1872,
   'size': None},
  {'chars_total': 1872,
   'content': 'text',
-  'doc_id': '669555b6-6818-4894-879b-224294180a3b',
+  'doc_id': 'c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a',
   'extraction': 'native:docx:xml',
   'filename': 'test-regex3langue.docx',
   'page_count_total': 1,
@@ -2890,7 +2903,7 @@ Output: [{'bm25': {'avg_top3_score': 16.578131,
                            'sent_index': 7,
                            'text_preview': 'EUR\xa0(Code seul sans montant)\n'}]},
   'classification_status': 'REVIEW',
-  'doc_id': '669555b6-6818-4894-879b-224294180a3b',
+  'doc_id': 'c042e6ea-78fd-4d2f-a9b8-376d6f2d6e6a',
   'doc_type': 'UNCLASSIFIED',
   'fields': {'doc_date': {'many': True,
                           'matches': [{'end': 1370,

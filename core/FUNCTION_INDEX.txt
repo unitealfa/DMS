@@ -95,7 +95,7 @@ component/clasification.py:105:def _build_DOCS_from_input(data) -> List[Dict[str
 component/clasification.py:161:def _doc_text_len(doc: Dict[str, Any]) -> int:
 component/clasification.py:169:def _drop_empty_duplicates(docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 component/clasification.py:185:def classify_scores(DOCS: List[Dict[str, Any]], common: Dict[str, Any], configs: Dict[str, Any]) -> None:
-component/clasification.py:246:def decide(scores: Dict[str, int], configs: Dict[str, Any], common: Dict[str, Any]) -> Dict[str, Any]:
+component/clasification.py:281:def decide(scores: Dict[str, int], configs: Dict[str, Any], common: Dict[str, Any]) -> Dict[str, Any]:
 component/elasticsearch.py:22:def _normalize_ids(values: Any) -> List[str]:
 component/elasticsearch.py:32:def run(ctx: Dict[str, Any]) -> Dict[str, Any]:
 component/extraction-regles-100ml.py:15:def _tokenize(text: str) -> List[str]:

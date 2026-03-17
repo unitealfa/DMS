@@ -331,6 +331,15 @@ Reference implementation:
 
 ## 11) Changelog code
 - 2026-03-17:
+  - `component/clasification.py`:
+    - ajout d'un audit de score par type documentaire (`scores_audit`) pour rendre chaque score explicable.
+    - pour chaque type (ex: `FACTURE`, `FORMULAIRE`), stockage des mots-cles ayant contribue au score avec:
+      - `keyword`, `bucket` (strong/medium/weak/negative/anti_confusion), `count`, `score`.
+      - vue compacte `matched_keywords_compact` (ex: `INVOICE(x82,+492,strong)`).
+    - impression terminal enrichie:
+      - nouvelle ligne `score_audit:` apres la ligne `[classification] ... scores: {...}`.
+      - permet de voir directement quels mots ont produit les scores non nuls.
+    - `RESULTS[].scores_audit` est maintenant exporte dans la sortie fusion (`fusion_output.json`) via le bloc `documents[].classification`.
   - `component/extraction-regles-yaml.py`:
     - nettoyage strict des valeurs techniques pour les pipelines `pipeline50ml` et `pipeline100ml` (utilisees via `extraction-regles-50ml.py` et `extraction-regles-100ml.py`).
     - ajout d'une normalisation robuste des caracteres parasites (`\\n`, `\\r`, `\\t`, `\\xa0`, controle Unicode) avant extraction.

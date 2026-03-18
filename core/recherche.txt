@@ -1,0 +1,411 @@
+Oui. En te parlant comme à une machine, avec cet input exact et sans coordonnées visuelles, voilà ce que tu fais.
+
+Je pars de cette hypothèse: tu n’as que pages_text[0], donc une grande chaîne OCR avec des \n et beaucoup d’espaces. Dans ce cas, tu ne fais pas de “vision”. Tu fais de la géométrie de texte monospace reconstruite. C’est une version texte des 3 tâches classiques de la recherche: détection du tableau, reconstruction de structure, puis rôle des cellules. C’est exactement le découpage utilisé dans les travaux modernes sur l’extraction de tableaux.
+
+1. Ta représentation interne
+
+Tu transformes la page en une suite de lignes:
+
+L0  = "                                                                FACTURE"
+L1  = ""
+L2  = ""
+...
+L20 = "   Référence                     Produit                           P.Unitaire"
+L21 = ""
+L22 = "      c1001                                                            1.00"
+...
+L37 = "      c1009"
+L38 = "      c1010"
+...
+L41 = "   Non assujetti à la tva"
+...
+L45 = "                                                                                    182,006.00"
+...
+
+Tu ne dois surtout pas supprimer les espaces au début ni au milieu.
+Ces espaces sont ta seule géométrie.
+
+Chaque ligne devient:
+
+Line {
+  raw_text,
+  y_index,               # numéro de ligne
+  nonspace_spans,        # segments continus non-vides
+  token_starts,          # position x de début de chaque token
+  token_ends,            # position x de fin
+  tokens,                # mots/valeurs extraits
+  alpha_ratio,
+  digit_ratio,
+  punctuation_ratio,
+  gap_sizes,             # tailles des trous entre tokens
+  left_indent,           # nb d'espaces initiaux
+  rightmost_char,        # dernière position non vide
+}
+2. Ce que tu cherches pour dire “ici il y a peut-être un tableau”
+
+Un tableau texte n’est pas reconnu par son sens, mais par un changement brutal de régime.
+
+Dans un paragraphe normal:
+
+les mots s’enchaînent presque continûment,
+
+les gros trous d’espaces internes sont rares,
+
+l’alignement vertical entre lignes successives est faible.
+
+Dans un tableau texte OCR:
+
+plusieurs lignes ont des tokens qui commencent à des positions x semblables,
+
+il existe de gros trous récurrents entre groupes de tokens,
+
+certaines lignes sont surtout textuelles et ressemblent à un en-tête,
+
+les lignes suivantes ont une forme compatible avec cet en-tête.
+
+Donc, pour chaque ligne, tu calcules un score de “tabularité”.
+
+Exemple de features utiles:
+
+tabular_score(line) =
+  a * count_large_internal_gaps(line) +
+  b * count_tokens(line) +
+  c * alignment_with_neighbor_lines(line) +
+  d * header_likelihood(line) +
+  e * mixed_type_likelihood(line)      # texte + nombres sur colonnes différentes
+  - f * paragraph_likelihood(line)
+3. Comment tu détectes le début du tableau dans ton exemple
+
+Cette ligne est le signal principal:
+
+"   Référence                     Produit                           P.Unitaire"
+
+Pourquoi elle est spéciale ?
+
+Elle contient 3 blocs textuels séparés par de grands espaces.
+
+Ces blocs ressemblent à des noms de colonnes.
+
+Elle est suivie par des lignes plus pauvres mais compatibles avec une structure en colonnes.
+
+Elle marque une transition après du texte de facture classique.
+
+Donc tu lui donnes un très fort header_likelihood.
+
+Tu en déduis:
+
+candidate_header = L20
+candidate_columns ≈ [x_ref, x_prod, x_price]
+
+Par exemple, en positions caractères approximatives:
+
+Référence commence vers x ≈ 3
+
+Produit vers x ≈ 33
+
+P.Unitaire vers x ≈ 61
+
+Ces positions sont ton premier squelette de tableau.
+
+4. Comment tu “dessines” le tableau sans image
+
+Tu n’as pas de rectangle visuel réel.
+Tu fabriques un rectangle logique.
+
+4.1 Définir les colonnes
+
+À partir de la ligne d’en-tête, tu prends les positions x des groupes non vides.
+Tu obtiens des ancres de colonnes:
+
+columns = [
+  Col(name="Référence", x_start≈3),
+  Col(name="Produit",   x_start≈33),
+  Col(name="P.Unitaire",x_start≈61),
+]
+4.2 Définir la zone verticale
+
+Tu pars de la ligne d’en-tête et tu descends tant que les lignes suivantes sont “compatibles” avec ces colonnes.
+
+Compatibilité d’une ligne:
+
+au moins un token tombe près d’une colonne attendue,
+
+ou la ligne est vide mais située au milieu d’un bloc déjà tabulaire,
+
+ou elle ressemble à une continuation de ligne fusionnée.
+
+Dans ton exemple, ces lignes restent compatibles:
+
+c1001                           ...                           1.00
+c1009
+c1010
+
+Même si le contenu OCR est incomplet, c1001, c1009, c1010 tombent dans la colonne de gauche, et 1.00 tombe dans la colonne de droite. Donc elles appartiennent probablement au tableau.
+
+4.3 Définir la fin du tableau
+
+Tu stoppes quand plusieurs signaux disent “on sort du tableau”:
+
+ligne textuelle pleine largeur qui ne suit plus les colonnes,
+
+rupture d’alignement,
+
+apparition d’un footer ou total isolé,
+
+plusieurs lignes successives incompatibles avec les colonnes.
+
+Dans ton exemple:
+
+"   Non assujetti à la tva"
+
+est un très bon candidat de sortie de tableau:
+
+phrase libre,
+
+pas structurée selon les 3 colonnes,
+
+ressemble à une note ou mention légale.
+
+Et:
+
+"                                                                                    182,006.00"
+
+ressemble à un total isolé, pas à une ligne normale du tableau, car il n’y a plus la structure tripartite gauche-milieu-droite.
+
+Donc ta zone logique devient à peu près:
+
+table_block = {
+  start_line: L20,
+  end_line:   L38 ou L39,
+  columns: [3, 33, 61],
+}
+5. Comment tu décides qu’une ligne est une ligne du tableau
+
+Tu fais une projection de chaque token vers la colonne la plus proche.
+
+Exemple sur:
+
+"      c1001                                                            1.00"
+
+Tu extrais:
+
+c1001 à x ≈ 6
+
+1.00 à x ≈ 67
+
+Projection:
+
+c1001 va dans Référence
+
+1.00 va dans P.Unitaire
+
+Produit reste vide
+
+Tu crées donc une ligne structurée:
+
+{
+  "Référence": "c1001",
+  "Produit": null,
+  "P.Unitaire": "1.00"
+}
+
+Même logique pour:
+
+"      c1009"
+"      c1010"
+
+Tu obtiens:
+
+[
+  {"Référence": "c1009", "Produit": null, "P.Unitaire": null},
+  {"Référence": "c1010", "Produit": null, "P.Unitaire": null}
+]
+
+Donc tu ne “devines” pas le produit manquant.
+Tu notes que l’OCR l’a perdu.
+
+6. La vraie règle universelle
+
+Tu ne dois pas coder:
+
+“si facture alors tableau”
+
+“si Référence/Produit/Prix alors colonnes”
+
+Ça, ce serait spécifique au pattern.
+
+La règle universelle est:
+
+Un bloc est un tableau si
+
+plusieurs lignes proches partagent une structure horizontale stable.
+
+Plus formellement:
+
+A block B is tabular if:
+1. There exist k >= 2 stable x-anchors
+2. Multiple consecutive lines align to these anchors
+3. One or more lines behave like labels/header
+4. Neighboring non-tabular text has weaker alignment regularity
+
+Donc ton détecteur est agnostique au domaine si ses décisions reposent sur:
+
+alignement,
+
+densité de tokens,
+
+répétition de positions x,
+
+cohérence inter-lignes,
+
+typage de contenu,
+et pas sur des mots-clés métier.
+
+7. Les signaux concrets que tu calcules
+
+Pour chaque ligne, tu peux calculer ceci:
+
+features = {
+  "n_tokens": ...,
+  "token_start_positions": [...],
+  "large_gap_count": ...,
+  "max_gap": ...,
+  "alpha_token_count": ...,
+  "numeric_token_count": ...,
+  "has_currency_like_value": ...,
+  "has_date_like_value": ...,
+  "header_like": ...,
+  "alignment_with_prev": ...,
+  "alignment_with_next": ...,
+}
+
+Puis pour chaque bloc de lignes consécutives:
+
+block_features = {
+  "shared_anchor_count": ...,
+  "anchor_stability": ...,
+  "row_pattern_repeat": ...,
+  "header_plus_rows_pattern": ...,
+  "paragraph_break_before": ...,
+  "paragraph_break_after": ...,
+}
+
+Et tu déclares “tableau” si le score dépasse un seuil.
+
+8. Ce que tu ferais exactement sur ton texte
+Étape A
+
+Découper par \n.
+
+Étape B
+
+Ignorer les lignes vides pour l’analyse de structure, mais garder leur position pour la continuité verticale.
+
+Étape C
+
+Repérer les lignes avec plusieurs segments éloignés.
+La ligne:
+
+Référence                     Produit                           P.Unitaire
+
+a 3 segments bien séparés, donc forte probabilité d’en-tête.
+
+Étape D
+
+Créer des colonnes candidates aux positions des segments.
+
+Étape E
+
+Descendre ligne par ligne:
+
+si un token tombe près d’une colonne candidate, garder la ligne dans le tableau,
+
+sinon augmenter un compteur de rupture,
+
+si trop de ruptures, fermer le tableau.
+
+Étape F
+
+Construire les cellules en affectant chaque token à la colonne la plus proche.
+
+Étape G
+
+Marquer les lignes hors schéma comme:
+
+note,
+
+footer,
+
+total,
+
+texte libre.
+
+Dans ton cas, le résultat logique serait proche de:
+
+{
+  "table_detected": true,
+  "header": ["Référence", "Produit", "P.Unitaire"],
+  "rows": [
+    {"Référence": "c1001", "Produit": null, "P.Unitaire": "1.00"},
+    {"Référence": "c1009", "Produit": null, "P.Unitaire": null},
+    {"Référence": "c1010", "Produit": null, "P.Unitaire": null}
+  ],
+  "outside_table": [
+    "Non assujetti à la tva",
+    "182,006.00",
+    "Monatnt Facture en Lettre ..."
+  ]
+}
+9. Là où ça casse
+
+Avec seulement du texte OCR, tu perds beaucoup d’information:
+
+les bordures,
+
+les coordonnées exactes,
+
+les cellules fusionnées,
+
+les vraies largeurs de colonnes,
+
+les objets visuels non transcrits par l’OCR.
+
+Donc tu peux détecter et structurer souvent bien, mais pas parfaitement. Les benchmarks récents montrent d’ailleurs que les tableaux complexes et hiérarchiques restent difficiles même pour des modèles modernes, surtout quand la structure est riche ou incomplète.
+
+10. La meilleure façon de penser “comme une machine”
+
+Ne pense pas:
+“est-ce que ce texte parle d’un tableau ?”
+
+Pense:
+“est-ce que ce bloc de lignes présente une géométrie répétée de colonnes ?”
+
+Autrement dit:
+
+table = repeated_horizontal_alignment_over_consecutive_lines
+
+et ensuite:
+
+field = token_assigned_to_nearest_stable_column_anchor
+11. La version la plus propre du pipeline
+
+Si je résume ton moteur universel pour ce format d’entrée:
+
+garder le texte brut avec espaces,
+
+convertir chaque ligne en segments avec positions x,
+
+détecter les lignes à fort potentiel d’en-tête,
+
+créer des colonnes candidates,
+
+étendre vers le haut/bas pour former un bloc tabulaire,
+
+assigner les tokens aux colonnes,
+
+sortir un tableau logique,
+
+séparer ce qui est note, total, footer, ou texte libre.
+
+C’est cohérent avec la séparation moderne entre table detection, structure recognition et functional analysis. Et si ensuite tu veux extraire un JSON métier fiable, la littérature récente montre que ça marche beaucoup mieux quand tu ajoutes un schéma cible explicite, au lieu de demander une compréhension totalement libre.
+

@@ -141,6 +141,9 @@ TOTAL_FIELD_HINTS: Tuple[Tuple[Tuple[str, ...], str], ...] = (
     (("TOTAL", "MONTANT", "AMOUNT"), "total"),
 )
 
+LARGE_GAP_MIN = 3
+ANCHOR_TOL = 3
+
 
 def _safe_list(value: Any) -> List[Any]:
     return value if isinstance(value, list) else []
@@ -196,6 +199,296 @@ def _compact_spaces(value: Any) -> str:
     txt = str(value or "")
     txt = txt.replace("\xa0", " ").replace("\r", " ").replace("\t", " ")
     return " ".join(txt.split())
+
+
+def _line_token_spans(line: Any) -> List[Tuple[str, int, int]]:
+    raw = str(line or "").replace("\xa0", " ").rstrip("\r\n")
+    out: List[Tuple[str, int, int]] = []
+    for m in re.finditer(r"\S+", raw):
+        token = str(m.group(0) or "")
+        if not token:
+            continue
+        out.append((token, int(m.start()), int(m.end()) - 1))
+    return out
+
+
+def _line_segment_spans(line: Any, min_gap: int = LARGE_GAP_MIN) -> List[Dict[str, Any]]:
+    spans = _line_token_spans(line)
+    if not spans:
+        return []
+
+    groups: List[List[Tuple[str, int, int]]] = [[spans[0]]]
+    for token, start, end in spans[1:]:
+        prev_end = groups[-1][-1][2]
+        gap = int(start) - int(prev_end) - 1
+        if gap >= int(min_gap):
+            groups.append([(token, start, end)])
+        else:
+            groups[-1].append((token, start, end))
+
+    out: List[Dict[str, Any]] = []
+    for group in groups:
+        toks = [g[0] for g in group]
+        start = int(group[0][1])
+        end = int(group[-1][2])
+        out.append(
+            {
+                "text": " ".join(toks).strip(),
+                "start": start,
+                "end": end,
+                "tokens": toks,
+            }
+        )
+    return out
+
+
+def _line_geometry(line: Any) -> Dict[str, Any]:
+    raw = str(line or "").replace("\xa0", " ").rstrip("\r\n")
+    token_spans = _line_token_spans(raw)
+    segments = _line_segment_spans(raw)
+    starts = [int(s[1]) for s in token_spans]
+    ends = [int(s[2]) for s in token_spans]
+    tokens = [str(s[0]) for s in token_spans]
+
+    gaps: List[int] = []
+    for i in range(1, len(token_spans)):
+        gap = starts[i] - ends[i - 1] - 1
+        gaps.append(max(0, int(gap)))
+    large_gaps = [g for g in gaps if g >= LARGE_GAP_MIN]
+
+    alpha_tokens = sum(1 for tok in tokens if any(ch.isalpha() for ch in tok))
+    numeric_tokens = sum(1 for tok in tokens if _to_amount(tok) is not None or _to_quantity(tok) is not None)
+    punct_tokens = sum(1 for tok in tokens if not any(ch.isalnum() for ch in tok))
+    n_tokens = len(tokens)
+    alpha_ratio = (float(alpha_tokens) / float(max(1, n_tokens))) if n_tokens else 0.0
+    digit_ratio = (float(numeric_tokens) / float(max(1, n_tokens))) if n_tokens else 0.0
+    punct_ratio = (float(punct_tokens) / float(max(1, n_tokens))) if n_tokens else 0.0
+    left_indent = len(raw) - len(raw.lstrip(" "))
+    rightmost = max(ends) if ends else -1
+
+    cells = _split_line_cells(raw)
+    header_like = _is_header_like_line(raw, cells)
+    paragraph_like = float(n_tokens >= 8 and len(large_gaps) == 0 and alpha_ratio >= 0.65)
+    mixed_type_like = float(alpha_tokens >= 1 and numeric_tokens >= 1 and len(large_gaps) >= 1)
+
+    return {
+        "raw": raw,
+        "tokens": tokens,
+        "token_starts": starts,
+        "token_ends": ends,
+        "segments": segments,
+        "n_tokens": n_tokens,
+        "gap_sizes": gaps,
+        "large_gap_count": len(large_gaps),
+        "max_gap": max(large_gaps) if large_gaps else 0,
+        "alpha_ratio": alpha_ratio,
+        "digit_ratio": digit_ratio,
+        "punctuation_ratio": punct_ratio,
+        "left_indent": left_indent,
+        "rightmost_char": rightmost,
+        "cells": cells,
+        "header_like": header_like,
+        "paragraph_like": paragraph_like,
+        "mixed_type_like": mixed_type_like,
+    }
+
+
+def _alignment_with_neighbor(cur: Dict[str, Any], other: Dict[str, Any], tol: int = ANCHOR_TOL) -> float:
+    cur_starts = [int(v) for v in _safe_list(cur.get("token_starts"))]
+    other_starts = [int(v) for v in _safe_list(other.get("token_starts"))]
+    if not cur_starts or not other_starts:
+        return 0.0
+    matched = 0
+    for pos in cur_starts:
+        if any(abs(pos - p2) <= int(tol) for p2 in other_starts):
+            matched += 1
+    return float(matched) / float(max(1, len(cur_starts)))
+
+
+def _line_tabularity_score(geoms: List[Dict[str, Any]], idx: int) -> float:
+    geom = geoms[idx]
+    n_tokens = int(geom.get("n_tokens") or 0)
+    if n_tokens <= 0:
+        return -1.0
+    prev_align = _alignment_with_neighbor(geom, geoms[idx - 1]) if idx > 0 else 0.0
+    next_align = _alignment_with_neighbor(geom, geoms[idx + 1]) if idx + 1 < len(geoms) else 0.0
+
+    score = 0.0
+    score += 0.80 * float(min(4, int(geom.get("large_gap_count") or 0)))
+    score += 0.20 * float(min(8, n_tokens))
+    score += 1.40 * float(max(prev_align, next_align))
+    score += 1.90 if bool(geom.get("header_like")) else 0.0
+    score += 0.85 * float(geom.get("mixed_type_like") or 0.0)
+    score -= 1.30 * float(geom.get("paragraph_like") or 0.0)
+    if n_tokens <= 1 and not bool(geom.get("header_like")):
+        score -= 0.50
+    return score
+
+
+def _anchors_from_header_geom(header_geom: Dict[str, Any]) -> List[int]:
+    anchors: List[int] = []
+    for seg in _safe_list(header_geom.get("segments")):
+        if not isinstance(seg, dict):
+            continue
+        start = int(seg.get("start") or 0)
+        if not anchors or abs(start - anchors[-1]) > 1:
+            anchors.append(start)
+    if len(anchors) >= 2:
+        return anchors
+
+    starts = [int(v) for v in _safe_list(header_geom.get("token_starts"))]
+    for start in starts:
+        if not anchors or abs(start - anchors[-1]) > LARGE_GAP_MIN:
+            anchors.append(start)
+    return anchors
+
+
+def _anchor_matches(segments: List[Dict[str, Any]], anchors: List[int], tol: int = ANCHOR_TOL) -> Tuple[int, float]:
+    if not segments or not anchors:
+        return 0, 0.0
+    matches = 0
+    for seg in segments:
+        if not isinstance(seg, dict):
+            continue
+        start = int(seg.get("start") or 0)
+        if any(abs(start - a) <= int(tol) for a in anchors):
+            matches += 1
+    return matches, float(matches) / float(max(1, len(segments)))
+
+
+def _cells_from_anchors(segments: List[Dict[str, Any]], anchors: List[int]) -> List[str]:
+    if not anchors:
+        return []
+    cells = [""] * len(anchors)
+    for seg in segments:
+        if not isinstance(seg, dict):
+            continue
+        text = _compact_spaces(seg.get("text"))
+        if not text:
+            continue
+        start = int(seg.get("start") or 0)
+        col_idx = min(range(len(anchors)), key=lambda i: abs(start - anchors[i]))
+        if cells[col_idx]:
+            cells[col_idx] = f"{cells[col_idx]} {text}".strip()
+        else:
+            cells[col_idx] = text
+    # Trim trailing empty columns only.
+    while cells and not _compact_spaces(cells[-1]):
+        cells.pop()
+    return cells
+
+
+def _collect_blocks_anchor(lines: List[str]) -> List[List[Dict[str, Any]]]:
+    geoms = [_line_geometry(line) for line in lines]
+    if not geoms:
+        return []
+
+    for i in range(len(geoms)):
+        geoms[i]["tabular_score"] = _line_tabularity_score(geoms, i)
+
+    candidate_idxs: List[int] = []
+    for i, geom in enumerate(geoms):
+        segments_count = len(_safe_list(geom.get("segments")))
+        if segments_count < 2:
+            continue
+        header_like = bool(geom.get("header_like"))
+        score = float(geom.get("tabular_score") or 0.0)
+        if header_like and segments_count >= 2:
+            candidate_idxs.append(i)
+            continue
+        if score >= 2.6 and int(geom.get("large_gap_count") or 0) >= 1 and segments_count >= 3:
+            candidate_idxs.append(i)
+
+    blocks: List[List[Dict[str, Any]]] = []
+    occupied_until = -1
+    for header_idx in candidate_idxs:
+        if header_idx <= occupied_until:
+            continue
+        header_geom = geoms[header_idx]
+        anchors = _anchors_from_header_geom(header_geom)
+        if len(anchors) < 2:
+            continue
+
+        header_cells = _cells_from_anchors(_safe_list(header_geom.get("segments")), anchors)
+        if len(header_cells) < 2:
+            continue
+        if not _is_header_like_line(str(header_geom.get("raw") or ""), header_cells):
+            if int(header_geom.get("large_gap_count") or 0) < 2:
+                continue
+
+        block_rows: List[Dict[str, Any]] = [{"line": str(header_geom.get("raw") or ""), "cells": header_cells}]
+        miss_count = 0
+        end_idx = header_idx
+        anchor_aligned_rows = 1
+
+        for j in range(header_idx + 1, len(geoms)):
+            geom = geoms[j]
+            raw = str(geom.get("raw") or "")
+            segments = _safe_list(geom.get("segments"))
+            if not _compact_spaces(raw):
+                miss_count += 1
+                if miss_count > 1:
+                    break
+                continue
+
+            match_count, match_ratio = _anchor_matches(segments, anchors)
+            cells = _cells_from_anchors(segments, anchors)
+            if len(cells) < 2:
+                cells = _split_line_cells(raw)
+            line_tabular = _line_looks_tabular(cells, raw)
+            hard_stop = (
+                _line_header_hint_score(raw) == 0
+                and any(h in _norm_text(raw) for h in NON_TABLE_LEFT_HINTS)
+                and match_count == 0
+                and not line_tabular
+            )
+            if hard_stop:
+                break
+
+            compatible = bool(
+                (match_ratio >= 0.50)
+                or (match_count >= 2)
+                or line_tabular
+                or (match_count >= 1 and _is_probable_code(str(cells[0] if cells else "")))
+            )
+
+            if compatible:
+                block_rows.append({"line": raw, "cells": cells})
+                end_idx = j
+                miss_count = 0
+                if match_ratio >= 0.50 or match_count >= 2:
+                    anchor_aligned_rows += 1
+            else:
+                miss_count += 1
+                if miss_count >= 2:
+                    break
+
+        if len(block_rows) < 2:
+            continue
+        if anchor_aligned_rows < 2 and len(block_rows) < 3:
+            continue
+        blocks.append(block_rows)
+        occupied_until = max(occupied_until, end_idx)
+
+    return blocks
+
+
+def _merge_blocks(primary: List[List[Dict[str, Any]]], secondary: List[List[Dict[str, Any]]]) -> List[List[Dict[str, Any]]]:
+    out: List[List[Dict[str, Any]]] = []
+    seen = set()
+    for block in list(primary) + list(secondary):
+        if not isinstance(block, list) or not block:
+            continue
+        line_keys = [_compact_spaces(row.get("line")) for row in block if isinstance(row, dict)]
+        line_keys = [v for v in line_keys if v]
+        if len(line_keys) < 2:
+            continue
+        sig = (line_keys[0], line_keys[-1], len(line_keys))
+        if sig in seen:
+            continue
+        seen.add(sig)
+        out.append(block)
+    return out
 
 
 def _split_line_cells(line: str) -> List[str]:
@@ -881,7 +1174,8 @@ def _extract_doc_tables(doc: Dict[str, Any], profile: str) -> Dict[str, Any]:
 
         page_text = str(page.get("page_text") or page.get("ocr_text") or page.get("text") or "")
         if page_text:
-            lines.extend([ln for ln in page_text.splitlines() if _compact_spaces(ln)])
+            # Keep original spacing for geometric text-table reconstruction.
+            lines.extend([str(ln).replace("\r", "") for ln in page_text.splitlines()])
 
         # Add lines from structured layout when available.
         for sent in _safe_list(page.get("sentences_layout")):
@@ -929,9 +1223,11 @@ def _extract_doc_tables(doc: Dict[str, Any], profile: str) -> Dict[str, Any]:
             if not k or k in seen:
                 continue
             seen.add(k)
-            unique_lines.append(str(line).strip())
+            unique_lines.append(str(line).rstrip("\r\n"))
 
-        blocks = _collect_blocks(unique_lines)
+        anchor_blocks = _collect_blocks_anchor(lines)
+        classic_blocks = _collect_blocks(unique_lines)
+        blocks = _merge_blocks(anchor_blocks, classic_blocks)
         for block in blocks:
             if not block:
                 continue
@@ -1821,7 +2117,7 @@ def run_table_extraction(ctx: Dict[str, Any], profile: str) -> List[Dict[str, An
             {
                 "doc_id": doc_id,
                 "filename": filename,
-                "engine": f"table-{profile}-unified-v2",
+                "engine": f"table-{profile}-unified-v3-anchor-geometry",
                 "source_path": source_path,
                 "tables_count": extracted.get("tables_count"),
                 "rows_total": extracted.get("rows_total"),

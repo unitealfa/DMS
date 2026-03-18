@@ -5,7 +5,7 @@ Date d'audit: 2026-03-18
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
 - Python files analyses: 30
-- Fonctions/classes indexees: 675 (voir `FUNCTION_INDEX.txt`)
+- Fonctions/classes indexees: 685 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 
 ## 2) Points d'entree
@@ -42,6 +42,7 @@ Date d'audit: 2026-03-18
   6. `atripusion-gramatical` (`component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py`)
   7. `table-extraction` (`component/table_extraction/table-extraction.py`):
      - extraction tableaux unifiee pour 50ml/100ml (moteur commun),
+     - detection agnostique renforcee par geometrie texte (ancrages X stables + score de tabularite par ligne),
      - meilleure detection des tableaux denses/serres OCR,
      - sortie context: `TABLE_EXTRACTIONS_50ML` + `TABLE_EXTRACTIONS`.
   8. `liaison-inter-docs` (`component/liaison-inter-docs.py`):
@@ -70,6 +71,7 @@ Date d'audit: 2026-03-18
      - fallback local automatique si backend Transformer indisponible.
   7. `table-extraction` (`component/table_extraction/table-extraction.py`):
      - extraction tableaux unifiee pour 50ml/100ml (moteur commun),
+     - detection agnostique renforcee par geometrie texte (ancrages X stables + score de tabularite par ligne),
      - meilleure detection des tableaux denses/serres OCR,
      - sortie context: `TABLE_EXTRACTIONS_100ML` + `TABLE_EXTRACTIONS`.
   8. `liaison-inter-docs` (`component/liaison-inter-docs.py`):
@@ -446,6 +448,21 @@ Reference implementation:
     - ajout d'un raffinement POS 100ml (`hybrid-rules+context+xlmr-prototypes-v2`) pour ameliorer la precision des etiquettes grammaticales.
     - ajout d'un audit terminal POS explicite: `[grammar-100ml-xlmr][pos] method=... | refined=... | top=...`.
     - publication des metriques POS dans le contexte (`NLP_POS_METHOD`, `NLP_POS_REFINED_COUNT`, `NLP_POS_TOTAL`, `NLP_POS_REFINED_RATE`, `NLP_POS_TOP`).
+  - `component/table_extraction/table_extraction_lib.py`:
+    - integration des principes de `recherche.txt` pour la detection des tableaux OCR:
+      - conservation de la geometrie texte (espaces/indents) au lieu de normaliser trop tot,
+      - features par ligne (`token_starts`, `gap_sizes`, `large_gap_count`, ratios alpha/numerique, alignement voisin),
+      - score de tabularite par ligne + detection d'en-tete probable,
+      - creation d'ancrages de colonnes (positions X stables) depuis l'en-tete,
+      - affectation des segments a la colonne la plus proche (nearest anchor),
+      - extension/fermeture du bloc tableau selon compatibilite d'ancrage et ruptures.
+    - fusion des blocs `anchor-geometry` avec les blocs heuristiques historiques pour robustesse mixte.
+    - version moteur passee a `table-<profile>-unified-v3-anchor-geometry`.
+  - validation runtime:
+    - `python main.py documents/image2tab.webp --pipeline pipeline100ml --upto table-extraction --es-nlp-level off`
+      - resultat: `docs=1 | tables=2 | rows=13`.
+    - `python main.py documents/signettab.png --pipeline pipeline100ml --upto table-extraction --es-nlp-level off`
+      - resultat: `docs=1 | tables=1 | rows=3`.
   - `pipeline/components.py`:
     - le resume de l'etape `atripusion-gramatical` affiche maintenant `pos=...` et `pos_refined=...` quand disponible.
   - `component/fusion_resultats.py`:

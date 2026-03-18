@@ -267,11 +267,32 @@ class GrammarComponent(Component):
         if data is None:
             raise ValueError("atripusion-gramatical n'a pas recu de donnees.")
 
+        # Audit explicite du composant grammaire utilise.
+        ctx["NLP_GRAMMAR_COMPONENT_NAME"] = self.name
+        ctx["NLP_GRAMMAR_COMPONENT_SCRIPT"] = str(self.script)
+        if not ctx.get("NLP_GRAMMAR_BACKEND"):
+            script_name = self.script.name.lower()
+            if "attribution-gramatical-100ml-xlmr" in script_name:
+                ctx["NLP_GRAMMAR_BACKEND"] = "xlmr"
+            else:
+                ctx["NLP_GRAMMAR_BACKEND"] = "legacy-3files"
+
         langs = ["en", "fr"]
         if ctx.get("HAVE_AR"):
             langs.append("ar")
 
-        summary = f"Langues executees: {', '.join(langs)} | docs={len(data) if isinstance(data, list) else 1}"
+        backend = str(ctx.get("NLP_GRAMMAR_BACKEND") or "unknown")
+        pos_method = str(ctx.get("NLP_POS_METHOD") or "").strip()
+        pos_refined = int(ctx.get("NLP_POS_REFINED_COUNT") or 0)
+        pos_total = int(ctx.get("NLP_POS_TOTAL") or 0)
+        summary = (
+            f"Langues executees: {', '.join(langs)} | docs={len(data) if isinstance(data, list) else 1} | "
+            f"backend={backend} | component={self.name}"
+        )
+        if pos_method:
+            summary += f" | pos={pos_method}"
+        if pos_total > 0:
+            summary += f" | pos_refined={pos_refined}/{pos_total}"
         self._report(data, summary)
         return data
 

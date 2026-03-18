@@ -1,11 +1,11 @@
 # Project Code Map (DMS Core)
 
-Date d'audit: 2026-03-17
+Date d'audit: 2026-03-18
 
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
 - Python files analyses: 30
-- Fonctions/classes indexees: 652 (voir `FUNCTION_INDEX.txt`)
+- Fonctions/classes indexees: 675 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 
 ## 2) Points d'entree
@@ -23,7 +23,8 @@ Date d'audit: 2026-03-17
   3. `output-txt`
   4. `clasification`
   5. `tokenisation-layout`
-  6. `atripusion-gramatical-en-utilisant-les3ficherla`
+  6. `atripusion-gramatical` (`component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py`):
+     - attribution grammaticale legacy basee sur les 3 modules EN/FR/AR (`engcode.py`, `frcode.py`, `arabcode.py`).
   7. `liaison-inter-docs`
   8. `elasticsearch`
   9. `extraction-regles`
@@ -38,7 +39,7 @@ Date d'audit: 2026-03-17
      - vecteurs mot/chunk/document,
      - topic extraction par chunk (`chunk_primary_topic`, `chunk_topics`) + topics document,
      - generation `NLP_*` minimale (provisoire, puis remplacee par la sortie grammaire).
-  6. `atripusion-gramatical-en-utilisant-les3ficherla`
+  6. `atripusion-gramatical` (`component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py`)
   7. `table-extraction` (`component/table_extraction/table-extraction.py`):
      - extraction tableaux unifiee pour 50ml/100ml (moteur commun),
      - meilleure detection des tableaux denses/serres OCR,
@@ -62,7 +63,11 @@ Date d'audit: 2026-03-17
      - topic extraction par chunk (`chunk_primary_topic`, `chunk_topics`) + topics document,
      - generation `NLP_*` minimale (provisoire, puis remplacee par la sortie grammaire),
      - fallback hash local si modele indisponible.
-  6. `atripusion-gramatical-en-utilisant-les3ficherla`
+  6. `atripusion-gramatical` (`component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py`):
+     - attribution grammaticale XLM-R (`xlm-roberta-base`) multi-langue (FR/EN/AR),
+     - sortie `NLP_*` compatible avec le reste de la pipeline,
+     - POS 100ml renforce (hybrid rules + contexte + prototypes XLM-R),
+     - fallback local automatique si backend Transformer indisponible.
   7. `table-extraction` (`component/table_extraction/table-extraction.py`):
      - extraction tableaux unifiee pour 50ml/100ml (moteur commun),
      - meilleure detection des tableaux denses/serres OCR,
@@ -79,6 +84,7 @@ Date d'audit: 2026-03-17
 Selection runtime:
 - CLI: `--pipeline default|pipelinorchestrator|pipeline50ml|pipeline100ml`
 - variable d'environnement par defaut: `PIPELINE_DEFAULT` (ex: `pipelinorchestrator`, `pipeline50ml` ou `pipeline100ml`; fallback `PIPELINE_PROFILE`)
+- etapes CLI: `--only/--upto/--start` utilisent `atripusion-gramatical` (alias legacy accepte: `atripusion-gramatical-en-utilisant-les3ficherla`).
 
 Reference implementation:
 - `pipeline/orchestrator.py`
@@ -282,9 +288,68 @@ Reference implementation:
 
 ### 5.11 Changer logique linguistique EN/FR/AR
 - orchestrateur langues: `component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py`
+- variante dediee pipeline100 (XLM-R): `component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py`
 - anglais: `component/atrribution-gramatical/engcode.py`
 - francais: `component/atrribution-gramatical/frcode.py`
 - arabe: `component/atrribution-gramatical/arabcode.py`
+
+### 5.12 Telechargements automatiques (global)
+- 5.12.1 Grammaire pipeline100 (XLM-R)
+  - composant:
+    - `component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py`
+  - modele par defaut:
+    - `xlm-roberta-base`
+  - artefacts telecharges automatiquement si absents:
+    - `config.json`
+    - `tokenizer_config.json`
+    - `tokenizer.json`
+    - `special_tokens_map.json`
+    - `sentencepiece.bpe.model`
+    - poids (`model.safetensors` ou `pytorch_model.bin`)
+  - ou les trouver:
+    1. `ML100_MODEL_LOCAL_DIR` si defini (pas de download)
+    2. cache projet (`ML100_MODEL_CACHE_DIR` ou defaut):
+       - `/home/mourad/Bureau/DMS/core/component/atrribution-gramatical/.hf_model_cache`
+    3. fallback `transformers` direct Hub:
+       - `~/.cache/huggingface/hub` (ou `HF_HOME` / `TRANSFORMERS_CACHE`)
+  - variables:
+    - `ML100_MODEL_NAME`, `ML100_MODEL_LOCAL_DIR`, `ML100_MODEL_CACHE_DIR`
+    - offline: `HF_HUB_OFFLINE=1`, `TRANSFORMERS_OFFLINE=1`, `LANG_PIPE_OFFLINE=1`
+  - audit terminal:
+    - `[grammar-100ml-xlmr] ... source=...`
+    - `[grammar-100ml-xlmr][model] auto-installed:... | remote-hub:... | local-dir:...`
+
+- 5.12.2 Embeddings pipeline100 (tokenisation)
+  - composant:
+    - `component/tokenisation-layout-100ml.py`
+  - telechargement possible:
+    - modele `ML100_MODEL_NAME` via `AutoTokenizer.from_pretrained` + `AutoModel.from_pretrained`
+  - ou les trouver:
+    - `~/.cache/huggingface/hub` (ou `HF_HOME` / `TRANSFORMERS_CACHE`)
+
+- 5.12.3 Grammaire EN/FR (pipeline default + pipeline50ml)
+  - composants:
+    - `component/atrribution-gramatical/engcode.py`
+    - `component/atrribution-gramatical/frcode.py`
+  - telechargements automatiques:
+    - NLTK (EN): `punkt`, `averaged_perceptron_tagger`, `wordnet`, `omw-1.4`
+    - modele NER EN: `dslim/bert-base-NER`
+    - modele NER FR: `Davlan/bert-base-multilingual-cased-ner-hrl`
+  - ou les trouver:
+    - NLTK: `~/nltk_data` (ou `NLTK_DATA`)
+    - HF models: `~/.cache/huggingface/hub` (ou `HF_HOME` / `TRANSFORMERS_CACHE`)
+
+- 5.12.4 Tokenisation layout classique
+  - composant:
+    - `component/tokenisation-layout.py`
+  - telechargements automatiques:
+    - NLTK: `punkt`, `punkt_tab`
+  - ou les trouver:
+    - `~/nltk_data` (ou `NLTK_DATA`)
+
+- 5.12.5 Non auto-installe (manuel requis)
+  - `tesseract` (OCR systeme): non telecharge/installe automatiquement
+  - `camel_tools` + donnees (`morphology-db-msa-r13`, `ner-arabert`): commandes fournies, installation manuelle
 
 ## 6) Cartographie des fichiers Python (roles)
 
@@ -307,6 +372,7 @@ Reference implementation:
   - fallback hash si modele non disponible localement.
   - scoring topics ameliore (n-grams, dedupe semantique, boost keywords classification, anti-bruit OCR).
 - `atrribution-gramatical/*.py`: POS/lemma/NER per language + notebook style runners.
+- `attribution-gramatical-100ml-xlmr.py`: composant grammaire dedie `pipeline100ml`, base XLM-R (`xlm-roberta-base`) FR/EN/AR, sortie compatible `NLP_*` + fallback local.
 - `liaison-inter-docs.py`: lie les documents entre eux via topics + recouvrement lexical phrase-a-phrase, puis publie un audit des matches.
   - filtre qualite `shared_terms`: supprime mots non-significatifs (`son`, `tout`, etc.) et favorise termes metier/juridiques.
 - `elasticsearch.py`: step script pour index/fetch docs ES.
@@ -357,7 +423,44 @@ Reference implementation:
 - Ce fichier est la reference la plus rapide pour localiser une modification precise.
 
 ## 11) Changelog code
+- 2026-03-18:
+  - `.gitignore`:
+    - ajout des ignores pour caches de telechargement modeles/transformers afin d'eviter les commits de poids inutiles:
+      - `component/atrribution-gramatical/.hf_model_cache/`
+      - `.hf_model_cache/`
+      - `.cache/huggingface/`
+      - `.huggingface/`
+  - `pipeline/orchestrator.py`:
+    - renommage du nom d'etape runtime en `atripusion-gramatical` (au lieu du nom legacy long) pour les 3 pipelines.
+  - `pipeline/components.py`:
+    - audit explicite du composant grammaire utilise via `NLP_GRAMMAR_COMPONENT_NAME` et `NLP_GRAMMAR_COMPONENT_SCRIPT`.
+    - resume terminal enrichi (`backend=... | component=atripusion-gramatical`) pour confirmer l'implementation active.
+  - `component/fusion_resultats.py`:
+    - bloc `components.attribution_grammaticale` enrichi avec `component`, `script`, `backend`, `model`, `model_source`, `model_install`.
+    - en `pipeline100ml`, l'audit montre explicitement `attribution-gramatical-100ml-xlmr.py` (et non le script legacy 3 fichiers).
+  - `pipeline/cli.py`:
+    - alias de compatibilite conserve pour l'ancien nom d'etape (`atripusion-gramatical-en-utilisant-les3ficherla` -> `atripusion-gramatical`).
+  - `README.md` + `PROJECT_CODE_MAP.md`:
+    - correction des references de chemin/fichier: `atripusion-gramatical.py` remplace par les scripts reels (`atripusion-gramatical-en-utilisant-les3ficherla.py` ou `attribution-gramatical-100ml-xlmr.py` selon pipeline).
+  - `component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py`:
+    - ajout d'un raffinement POS 100ml (`hybrid-rules+context+xlmr-prototypes-v2`) pour ameliorer la precision des etiquettes grammaticales.
+    - ajout d'un audit terminal POS explicite: `[grammar-100ml-xlmr][pos] method=... | refined=... | top=...`.
+    - publication des metriques POS dans le contexte (`NLP_POS_METHOD`, `NLP_POS_REFINED_COUNT`, `NLP_POS_TOTAL`, `NLP_POS_REFINED_RATE`, `NLP_POS_TOP`).
+  - `pipeline/components.py`:
+    - le resume de l'etape `atripusion-gramatical` affiche maintenant `pos=...` et `pos_refined=...` quand disponible.
+  - `component/fusion_resultats.py`:
+    - le bloc `components.attribution_grammaticale` expose maintenant l'audit POS (`pos_method`, `pos_refined_count`, `pos_total`, `pos_refined_rate`, `pos_top_tags`).
 - 2026-03-17:
+  - `component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py`:
+    - nouveau composant d'attribution grammaticale dedie a `pipeline100ml`.
+    - backend Transformer XLM-R (`xlm-roberta-base`) multi-langue FR/EN/AR.
+    - auto-install du modele si absent localement (tentative Hub/cache), puis fallback automatique.
+    - production des sorties standard `NLP_*` (`NLP_ANALYSES`, `NLP_TOKENS`, `NLP_ENTITIES`, `NLP_LANGUAGE_STATS`) pour compatibilite totale avec le reste du pipeline.
+    - fallback hash local automatique si le modele reste indisponible.
+  - `pipeline/orchestrator.py`:
+    - `Pipeline100MLOrchestrator` branche maintenant l'etape grammaire vers `component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py` (sans impacter `default` et `pipeline50ml`).
+  - `pipeline/cli.py`:
+    - aide `--pipeline` mise a jour pour indiquer la grammaire XLM-R sur `pipeline100ml`.
   - `component/table_extraction/table_extraction_lib.py` (amelioration extraction tableaux dense/partiels):
     - ajout du champ `reference` (code produit) dans `line_items` + `detected_columns`,
     - heuristiques OCR renforcees pour choisir la meilleure variante d'image (autocontrast + sharpen + upscale + fallback threshold),
@@ -447,7 +550,7 @@ Reference implementation:
     - correction fusion locale multi-doc: construit des payloads pour chaque document (`TOK_DOCS`/`FINAL_DOCS`) au lieu de ne garder que le premier.
     - effet: les enrichissements ML (`document_primary_topics`/`document_topics`) sont maintenant presents pour chaque document dans `fusion_output.json`.
   - `pipeline/orchestrator.py`:
-    - pipelines `Pipeline50MLOrchestrator` et `Pipeline100MLOrchestrator` incluent explicitement l'etape grammaire (`atripusion-gramatical-en-utilisant-les3ficherla`) dans la sequence runtime.
+    - pipelines `Pipeline50MLOrchestrator` et `Pipeline100MLOrchestrator` incluent explicitement l'etape grammaire (`atripusion-gramatical`) dans la sequence runtime.
   - `pipeline/cli.py`:
     - help `--pipeline` corrigee pour reflecter l'usage de la grammaire dans `pipeline50ml` et `pipeline100ml`.
   - `component/fusion_resultats-50ml.py`:

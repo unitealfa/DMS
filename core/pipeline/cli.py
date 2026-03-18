@@ -13,6 +13,25 @@ from .settings import configure_logging, load_dotenv, normalize_input
 # Valeurs supportees: "pipelinorchestrator" | "default" | "pipeline50ml" | "pipeline100ml"
 PIPELINE_DEFAULT_CODE = "pipeline100ml"
 
+_STEP_ALIASES = {
+    "atripusion-gramatical-en-utilisant-les3ficherla": "atripusion-gramatical",
+}
+
+_STEP_CHOICES = [
+    "pretraitement-de-docs",
+    "si-image-pretraiter-sinonpass-le-doc",
+    "output-txt",
+    "clasification",
+    "tokenisation-layout",
+    "atripusion-gramatical",
+    "atripusion-gramatical-en-utilisant-les3ficherla",
+    "table-extraction",
+    "liaison-inter-docs",
+    "elasticsearch",
+    "extraction-regles",
+    "fusion-resultats",
+]
+
 
 def _env_bool(name: str, default: bool = False) -> bool:
     raw = os.environ.get(name)
@@ -64,6 +83,15 @@ def _env_pipeline(default: str | None = None) -> str:
     return _normalize_pipeline_name(raw, base_default)
 
 
+def _normalize_step_name(raw: str | None) -> str | None:
+    if raw is None:
+        return None
+    value = str(raw).strip()
+    if not value:
+        return None
+    return _STEP_ALIASES.get(value, value)
+
+
 def parse_cli() -> argparse.Namespace:
     repo_root = Path(__file__).resolve().parent.parent
     load_dotenv(repo_root / ".env", override=False)
@@ -81,49 +109,13 @@ def parse_cli() -> argparse.Namespace:
         help=(
             "Pipeline a executer: default/pipelinorchestrator (pipeline actuelle) ou pipeline50ml "
             "(tokenisation/extraction/fusion enrichies ML FastText-like + grammaire EN/FR/AR) ou "
-            "pipeline100ml (embeddings Transformer BERT/XLM-R + pooling + grammaire EN/FR/AR)."
+            "pipeline100ml (embeddings Transformer BERT/XLM-R + pooling + grammaire XLM-R EN/FR/AR)."
         ),
     )
     parser.add_argument("--log-level", default="INFO", help="Niveau de log (DEBUG, INFO, WARNING, ERROR).")
-    parser.add_argument("--only", choices=[
-        "pretraitement-de-docs",
-        "si-image-pretraiter-sinonpass-le-doc",
-        "output-txt",
-        "clasification",
-        "tokenisation-layout",
-        "atripusion-gramatical-en-utilisant-les3ficherla",
-        "table-extraction",
-        "liaison-inter-docs",
-        "elasticsearch",
-        "extraction-regles",
-        "fusion-resultats",
-    ], help="N'executer qu'une seule etape (par nom).")
-    parser.add_argument("--upto", choices=[
-        "pretraitement-de-docs",
-        "si-image-pretraiter-sinonpass-le-doc",
-        "output-txt",
-        "clasification",
-        "tokenisation-layout",
-        "atripusion-gramatical-en-utilisant-les3ficherla",
-        "table-extraction",
-        "liaison-inter-docs",
-        "elasticsearch",
-        "extraction-regles",
-        "fusion-resultats",
-    ], help="Executer jusqu'a et incluant cette etape.")
-    parser.add_argument("--start", choices=[
-        "pretraitement-de-docs",
-        "si-image-pretraiter-sinonpass-le-doc",
-        "output-txt",
-        "clasification",
-        "tokenisation-layout",
-        "atripusion-gramatical-en-utilisant-les3ficherla",
-        "table-extraction",
-        "liaison-inter-docs",
-        "elasticsearch",
-        "extraction-regles",
-        "fusion-resultats",
-    ], help="Commencer a partir de cette etape.")
+    parser.add_argument("--only", choices=_STEP_CHOICES, help="N'executer qu'une seule etape (par nom).")
+    parser.add_argument("--upto", choices=_STEP_CHOICES, help="Executer jusqu'a et incluant cette etape.")
+    parser.add_argument("--start", choices=_STEP_CHOICES, help="Commencer a partir de cette etape.")
     parser.add_argument("--list-steps", action="store_true", help="Lister les etapes sans executer.")
     parser.add_argument(
         "--use-elasticsearch",
@@ -176,6 +168,9 @@ def parse_cli() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_cli()
+    args.only = _normalize_step_name(args.only)
+    args.upto = _normalize_step_name(args.upto)
+    args.start = _normalize_step_name(args.start)
     configure_logging(args.log_level)
 
     inputs = normalize_input(args.inputs) if args.inputs else []

@@ -58,6 +58,12 @@ OneDriveTemp/
 *.sqlite3
 *.db
 
+# ML / Hugging Face local caches
+component/atrribution-gramatical/.hf_model_cache/
+.hf_model_cache/
+.cache/huggingface/
+.huggingface/
+
 
 
 codex.txt.txt

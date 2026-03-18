@@ -39,6 +39,28 @@ component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla
 component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:60:def detect_lang(text: str) -> str:
 component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:73:def get_previous_cell_input():
 component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:84:def iter_sentences_from_input(data):
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:86:def _env_true(name: str) -> bool:
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:91:def _is_offline_mode() -> bool:
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:101:def _resolve_model_for_loading(model_name: str) -> tuple[str, bool, str]:
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:146:def _is_punct_like_token(token: object) -> bool:
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:164:def _normalize_token_fields(token: object, pos_value: object, lemma_value: object):
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:178:def _strip_accents(text: str) -> str:
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:183:def _norm_token(text: str) -> str:
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:189:def detect_lang(text: str) -> str:
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:203:def get_previous_cell_input():
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:215:def iter_sentences_from_input(data):
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:296:def _basic_tokenize(text: str) -> List[str]:
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:300:def _normalize_lemma(token: str, lang: str) -> str:
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:311:def _guess_pos(token: str, lang: str, prev_token: str = "", next_token: str = "") -> str:
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:355:def _cosine(a: np.ndarray, b: np.ndarray) -> float:
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:367:def _build_pos_prototypes(encoder: "_XLMRContextEncoder") -> Dict[str, np.ndarray]:
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:405:def _refine_pos_tags(
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:494:def _hash_vec(text: str, dim: int) -> np.ndarray:
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:504:class _XLMRContextEncoder:
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:505:    def __init__(self, model_name: str, max_length: int, batch_size: int, fallback_dim: int):
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:552:    def encode_token_lists(self, token_lists: List[List[str]]) -> List[np.ndarray]:
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:617:def _heuristic_ner(token: str, lemma: str, pos: str, lang: str) -> str:
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:635:def _run() -> None:
 component/atrribution-gramatical/engcode.py:12:def print_install_help():
 component/atrribution-gramatical/engcode.py:39:def _ensure_nltk():
 component/atrribution-gramatical/engcode.py:88:class Tok:
@@ -276,28 +298,28 @@ component/fusion_resultats.py:720:def _build_map(rows: Any) -> Dict[str, Dict[st
 component/fusion_resultats.py:735:def _pick_from_map(
 component/fusion_resultats.py:747:def _same_doc_hint(value: Any, filename: str, first_path: str) -> bool:
 component/fusion_resultats.py:756:def _extract_component_views(
-component/fusion_resultats.py:907:def _to_document_output(
-component/fusion_resultats.py:956:def _final_output(
-component/fusion_resultats.py:985:def extract_text_raw(ctx: Dict[str, Any]) -> str:
-component/fusion_resultats.py:1014:def extract_pages_meta(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:1020:def extract_pages(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:1047:def extract_classification(ctx: Dict[str, Any]) -> Dict[str, Any]:
-component/fusion_resultats.py:1053:def extract_doc_type(cls: Dict[str, Any]) -> str:
-component/fusion_resultats.py:1057:def extract_extractions(ctx: Dict[str, Any]) -> Any:
-component/fusion_resultats.py:1061:def extract_detected_languages(ctx: Dict[str, Any]) -> List[str]:
-component/fusion_resultats.py:1065:def _text_from_tok_pages(pages: List[Dict[str, Any]]) -> str:
-component/fusion_resultats.py:1076:def _pages_from_final_doc(final_doc: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:1090:def _collect_local_tokens_for_doc(ctx: Dict[str, Any], doc_id: Optional[str], filename: Optional[str]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:1160:def _pick_local_final_doc(final_docs: List[Dict[str, Any]], doc_id: Optional[str], filename: Optional[str]) -> Dict[str, Any]:
-component/fusion_resultats.py:1173:def _pick_local_classification(results: List[Dict[str, Any]], doc_id: Optional[str], filename: Optional[str]) -> Dict[str, Any]:
-component/fusion_resultats.py:1186:def _build_local_payload_for_doc(
-component/fusion_resultats.py:1301:def build_payloads_from_context(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:1334:def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
-component/fusion_resultats.py:1506:def _es_text_from_pages(src: Dict[str, Any]) -> str:
-component/fusion_resultats.py:1517:def _es_pages(src: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:1533:def build_payload_from_es_source(
-component/fusion_resultats.py:1639:def build_payloads_from_es(ctx: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], int]:
-component/fusion_resultats.py:1666:def main() -> None:
+component/fusion_resultats.py:918:def _to_document_output(
+component/fusion_resultats.py:967:def _final_output(
+component/fusion_resultats.py:996:def extract_text_raw(ctx: Dict[str, Any]) -> str:
+component/fusion_resultats.py:1025:def extract_pages_meta(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:1031:def extract_pages(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:1058:def extract_classification(ctx: Dict[str, Any]) -> Dict[str, Any]:
+component/fusion_resultats.py:1064:def extract_doc_type(cls: Dict[str, Any]) -> str:
+component/fusion_resultats.py:1068:def extract_extractions(ctx: Dict[str, Any]) -> Any:
+component/fusion_resultats.py:1072:def extract_detected_languages(ctx: Dict[str, Any]) -> List[str]:
+component/fusion_resultats.py:1076:def _text_from_tok_pages(pages: List[Dict[str, Any]]) -> str:
+component/fusion_resultats.py:1087:def _pages_from_final_doc(final_doc: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:1101:def _collect_local_tokens_for_doc(ctx: Dict[str, Any], doc_id: Optional[str], filename: Optional[str]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:1171:def _pick_local_final_doc(final_docs: List[Dict[str, Any]], doc_id: Optional[str], filename: Optional[str]) -> Dict[str, Any]:
+component/fusion_resultats.py:1184:def _pick_local_classification(results: List[Dict[str, Any]], doc_id: Optional[str], filename: Optional[str]) -> Dict[str, Any]:
+component/fusion_resultats.py:1197:def _build_local_payload_for_doc(
+component/fusion_resultats.py:1312:def build_payloads_from_context(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:1345:def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
+component/fusion_resultats.py:1517:def _es_text_from_pages(src: Dict[str, Any]) -> str:
+component/fusion_resultats.py:1528:def _es_pages(src: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:1544:def build_payload_from_es_source(
+component/fusion_resultats.py:1650:def build_payloads_from_es(ctx: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], int]:
+component/fusion_resultats.py:1677:def main() -> None:
 component/liaison-inter-docs.py:59:def _iso_now() -> str:
 component/liaison-inter-docs.py:63:def _safe_list(value: Any) -> List[Any]:
 component/liaison-inter-docs.py:67:def _safe_int(value: Any, default: int = 0) -> int:
@@ -535,14 +557,15 @@ component/tokenisation-layout.py:1205:def _doc_size_from_paths(paths):
 component/tokenisation-layout.py:1433:def _sort_key(x):
 component/tokenisation-layout.py:1444:def _select_doc(target):
 component/tokenisation-layout.py:1471:def print_one_doc(doc):
-pipeline/cli.py:17:def _env_bool(name: str, default: bool = False) -> bool:
-pipeline/cli.py:24:def _env_int(name: str, default: int) -> int:
-pipeline/cli.py:34:def _env_optional(name: str) -> str | None:
-pipeline/cli.py:42:def _normalize_pipeline_name(raw: str | None, default: str = "default") -> str:
-pipeline/cli.py:59:def _env_pipeline(default: str | None = None) -> str:
-pipeline/cli.py:67:def parse_cli() -> argparse.Namespace:
-pipeline/cli.py:177:def main() -> None:
-pipeline/cli.py:196:    def tee_print(*pargs, **pkwargs):
+pipeline/cli.py:36:def _env_bool(name: str, default: bool = False) -> bool:
+pipeline/cli.py:43:def _env_int(name: str, default: int) -> int:
+pipeline/cli.py:53:def _env_optional(name: str) -> str | None:
+pipeline/cli.py:61:def _normalize_pipeline_name(raw: str | None, default: str = "default") -> str:
+pipeline/cli.py:78:def _env_pipeline(default: str | None = None) -> str:
+pipeline/cli.py:86:def _normalize_step_name(raw: str | None) -> str | None:
+pipeline/cli.py:95:def parse_cli() -> argparse.Namespace:
+pipeline/cli.py:169:def main() -> None:
+pipeline/cli.py:191:    def tee_print(*pargs, **pkwargs):
 pipeline/components.py:32:def _doc_has_meaningful_text(doc: Dict[str, Any]) -> bool:
 pipeline/components.py:59:def _drop_empty_duplicate_docs(docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 pipeline/components.py:84:class Component:
@@ -560,18 +583,18 @@ pipeline/components.py:231:class TokenisationLayoutComponent(Component):
 pipeline/components.py:232:    def run(self, context: Context) -> Any:
 pipeline/components.py:258:class GrammarComponent(Component):
 pipeline/components.py:259:    def run(self, context: Context) -> Any:
-pipeline/components.py:279:class TableExtractionComponent(Component):
-pipeline/components.py:280:    def run(self, context: Context) -> Any:
-pipeline/components.py:302:class InterDocLinkingComponent(Component):
-pipeline/components.py:303:    def run(self, context: Context) -> Any:
-pipeline/components.py:325:class ElasticsearchComponent(Component):
-pipeline/components.py:326:    def run(self, context: Context) -> Any:
-pipeline/components.py:366:class ClassificationComponent(Component):
-pipeline/components.py:367:    def run(self, context: Context) -> Any:
-pipeline/components.py:413:class RuleExtractionComponent(Component):
-pipeline/components.py:414:    def run(self, context: Context) -> Any:
-pipeline/components.py:463:class FusionResultComponent(Component):
-pipeline/components.py:466:    def run(self, context: Context) -> Any:
+pipeline/components.py:300:class TableExtractionComponent(Component):
+pipeline/components.py:301:    def run(self, context: Context) -> Any:
+pipeline/components.py:323:class InterDocLinkingComponent(Component):
+pipeline/components.py:324:    def run(self, context: Context) -> Any:
+pipeline/components.py:346:class ElasticsearchComponent(Component):
+pipeline/components.py:347:    def run(self, context: Context) -> Any:
+pipeline/components.py:387:class ClassificationComponent(Component):
+pipeline/components.py:388:    def run(self, context: Context) -> Any:
+pipeline/components.py:434:class RuleExtractionComponent(Component):
+pipeline/components.py:435:    def run(self, context: Context) -> Any:
+pipeline/components.py:484:class FusionResultComponent(Component):
+pipeline/components.py:487:    def run(self, context: Context) -> Any:
 pipeline/elasticsearch.py:33:def _iso_now() -> str:
 pipeline/elasticsearch.py:37:def _unique_keep_order(items: Iterable[str]) -> List[str]:
 pipeline/elasticsearch.py:48:def _safe_int(value: Any, default: int = 0) -> int:

@@ -3,7 +3,7 @@
 Ce dépôt regroupe des scripts de traitement documentaire (prétraitement, OCR, tokenisation, grammaire, classification) et un orchestrateur léger qui les enchaîne **sans modifier leur logique métier**.
 
 ## Architecture
-- `pretraitement-de-docs.py` → `si-image-pretraiter-sinonpass-le-doc` → `output-txt.py` → `tokenisation-layout` → `atripusion-gramatical-en-utilisant-les3ficherla.py` → `elasticsearch.py` → `clasification.py` → `extraction-regles.py` → `fusion_resultats.py`
+- `pretraitement-de-docs.py` → `si-image-pretraiter-sinonpass-le-doc` → `output-txt.py` → `clasification.py` → `tokenisation-layout` → `atripusion-gramatical` → `liaison-inter-docs.py` → `elasticsearch.py` → `extraction-regles.py` → `fusion_resultats.py`
 - `pipeline/` : couche d'orchestration open-source friendly  
   - `settings.py` : logging, helpers (argv isolation, cwd, normalisation des entrées)  
   - `components.py` : wrappers `Component` pour chaque script  
@@ -19,10 +19,10 @@ python -m pipeline.cli documents/englais.docx
 ```
 
 ## Exécution avec Elasticsearch
-Le pipeline peut maintenant indexer les documents tokenisés dans Elasticsearch entre les étapes
-`atripusion-gramatical-en-utilisant-les3ficherla` et `clasification`, puis:
-- lire le texte/passages/mots depuis Elasticsearch pour `clasification` et `extraction-regles`
-- écrire les résultats de classification et d'extraction dans le document Elasticsearch
+Le pipeline peut maintenant indexer les documents tokenisés dans Elasticsearch à l'étape
+`elasticsearch`, puis:
+- relire le texte/passages/mots depuis Elasticsearch pour `extraction-regles` (et `clasification` si documents déjà indexés)
+- écrire les résultats de classification, d'extraction et de NLP dans Elasticsearch
 - construire `fusion_output.json` depuis Elasticsearch (mode debug/inspection)
   - `fusion_resultats.py` est optionnel (debug): s'il est absent ou en erreur, le pipeline principal continue.
 
@@ -32,6 +32,77 @@ python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf \
   --es-url http://localhost:9200 \
   --es-index dms_documents
 ```
+
+## Téléchargements automatiques (global)
+Ce dépôt peut télécharger automatiquement des ressources au premier lancement, selon les composants exécutés.
+
+### 1) Pipeline100 grammaire XLM-R
+Composant:
+- `component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py`
+
+Modèle par défaut:
+- `xlm-roberta-base`
+
+Artefacts téléchargés automatiquement (si absents):
+- `config.json`
+- `tokenizer_config.json`
+- `tokenizer.json`
+- `special_tokens_map.json`
+- `sentencepiece.bpe.model`
+- poids du modèle (`model.safetensors` ou `pytorch_model.bin`)
+
+Emplacements:
+1. `ML100_MODEL_LOCAL_DIR` si défini (utilise ce dossier, pas de téléchargement)
+2. sinon cache projet: `/home/mourad/Bureau/DMS/core/component/atrribution-gramatical/.hf_model_cache`
+3. fallback `transformers` direct Hub: `~/.cache/huggingface/hub` (ou `HF_HOME` / `TRANSFORMERS_CACHE`)
+
+Variables:
+- `ML100_MODEL_NAME`
+- `ML100_MODEL_LOCAL_DIR`
+- `ML100_MODEL_CACHE_DIR`
+- offline: `HF_HUB_OFFLINE=1`, `TRANSFORMERS_OFFLINE=1`, `LANG_PIPE_OFFLINE=1`
+
+Audit terminal:
+- `[grammar-100ml-xlmr] ... source=...`
+- `[grammar-100ml-xlmr][model] auto-installed:... | remote-hub:... | local-dir:...`
+
+### 2) Pipeline100 tokenisation embeddings Transformer
+Composant:
+- `component/tokenisation-layout-100ml.py`
+
+Téléchargement automatique possible:
+- modèle `ML100_MODEL_NAME` (par défaut `xlm-roberta-base`) via `transformers` (`AutoTokenizer.from_pretrained`, `AutoModel.from_pretrained`)
+
+Emplacement:
+- cache Hugging Face global (`~/.cache/huggingface/hub`, ou `HF_HOME` / `TRANSFORMERS_CACHE`)
+
+### 3) Grammaire EN/FR (pipeline default et pipeline50ml)
+Composants:
+- `component/atrribution-gramatical/engcode.py`
+- `component/atrribution-gramatical/frcode.py`
+
+Téléchargements automatiques possibles:
+- NLTK (EN): `punkt`, `averaged_perceptron_tagger`, `wordnet`, `omw-1.4`
+- Modèle NER EN: `dslim/bert-base-NER`
+- Modèle NER FR: `Davlan/bert-base-multilingual-cased-ner-hrl`
+
+Emplacements:
+- NLTK data: `~/nltk_data` (ou variable `NLTK_DATA`)
+- modèles HF: `~/.cache/huggingface/hub` (ou `HF_HOME` / `TRANSFORMERS_CACHE`)
+
+### 4) Tokenisation layout classique
+Composant:
+- `component/tokenisation-layout.py`
+
+Téléchargement automatique possible:
+- NLTK: `punkt`, `punkt_tab`
+
+Emplacement:
+- `~/nltk_data` (ou `NLTK_DATA`)
+
+### 5) Dépendances non téléchargées automatiquement
+- `tesseract` (OCR): requis système, non installé automatiquement par le code
+- `camel_tools` + données arabes (`morphology-db-msa-r13`, `ner-arabert`): le code donne les commandes, mais n’installe pas automatiquement
 
 ## Maintenance / Open Source
 - Code orchestrateur typé et découpé par responsabilités (helpers vs composants vs CLI).

@@ -13,9 +13,9 @@ Output: [{'content': 'image_only',
 [Component: si-image-pretraiter-sinonpass-le-doc]
 Type: dict
 Summary: text=0, image=1, docs_prepped=1
-Output: {'DOCS': [{'original': <PIL.WebPImagePlugin.WebPImageFile image mode=RGB size=768x1024 at 0x773B6D5531F0>,
+Output: {'DOCS': [{'original': <PIL.WebPImagePlugin.WebPImageFile image mode=RGB size=768x1024 at 0x7B601954F220>,
            'path': PosixPath('/home/mourad/Bureau/DMS/core/documents/image2tab.webp'),
-           'prepped': <PIL.Image.Image image mode=L size=1152x1536 at 0x773B6E4CEB90>}],
+           'prepped': <PIL.Image.Image image mode=L size=1152x1536 at 0x7B601A536B90>}],
  'IMAGE_ONLY_FILES': ['/home/mourad/Bureau/DMS/core/documents/image2tab.webp'],
  'TEXT_FILES': []}
 
@@ -100,7 +100,7 @@ Output: {'DOCS': [{'original': <PIL.WebPImagePlugin.WebPImageFile image mode=RGB
 Type: list
 Summary: 1 docs | pages=1
 Output: [{'content': 'image_only',
-  'doc_id': '6e648449-bc94-4024-a3f3-95611c1ceff8',
+  'doc_id': '5068f7ef-b69d-4d75-a798-185f0e119167',
   'extraction': 'ocr:tesseract',
   'filename': 'image2tab.webp',
   'page_count_total': 1,
@@ -269,7 +269,7 @@ Output: [{'anti_confusion_targets': ['BON_DE_COMMANDE', 'CONTRAT', 'DEVIS', 'BON
                         "{'ARTICLE': 2, 'BON_DE_COMMANDE': -21, 'CONTRAT': -18, 'FACTURE': 20, "
                         "'FORMULAIRE': 4}",
   'decision_debug': {'diff': 16, 'second_score': 4, 'top_score': 20},
-  'doc_id': '6e648449-bc94-4024-a3f3-95611c1ceff8',
+  'doc_id': '5068f7ef-b69d-4d75-a798-185f0e119167',
   'doc_type': 'FACTURE',
   'filename': 'image2tab.webp',
   'keyword_matches': {'anti_confusion_hits': [],
@@ -380,7 +380,7 @@ Output: [{'anti_confusion_targets': ['BON_DE_COMMANDE', 'CONTRAT', 'DEVIS', 'BON
 
 ========================================================================================================================
 [doc] image2tab.webp
-  doc_id       : 6e648449-bc94-4024-a3f3-95611c1ceff8
+  doc_id       : 5068f7ef-b69d-4d75-a798-185f0e119167
   content      : image_only
   extraction   : ocr:tesseract
   pages_total  : 1
@@ -453,7 +453,7 @@ Type: list
 Summary: 1 docs | sentences=12
 Output: [{'chars_total': 960,
   'content': 'image_only',
-  'doc_id': '6e648449-bc94-4024-a3f3-95611c1ceff8',
+  'doc_id': '5068f7ef-b69d-4d75-a798-185f0e119167',
   'extraction': 'ocr:tesseract',
   'filename': 'image2tab.webp',
   'page_count_total': 1,
@@ -989,7 +989,7 @@ Type: list
 Summary: Langues executees: en, fr | docs=1 | backend=hash-fallback | component=atripusion-gramatical | pos=hybrid-rules+context-v2 | pos_refined=1/82
 Output: [{'chars_total': 960,
   'content': 'image_only',
-  'doc_id': '6e648449-bc94-4024-a3f3-95611c1ceff8',
+  'doc_id': '5068f7ef-b69d-4d75-a798-185f0e119167',
   'extraction': 'ocr:tesseract',
   'filename': 'image2tab.webp',
   'page_count_total': 1,
@@ -1523,7 +1523,7 @@ Output: [{'chars_total': 960,
 Type: list
 Summary: docs=1 | tables=2 | line_items=13
 Output: [{'detected_columns': ['product', 'quantity', 'reference', 'total', 'unit_price'],
-  'doc_id': '6e648449-bc94-4024-a3f3-95611c1ceff8',
+  'doc_id': '5068f7ef-b69d-4d75-a798-185f0e119167',
   'engine': 'table-100ml-unified-v3-anchor-geometry',
   'filename': 'image2tab.webp',
   'line_items': [{'confidence': 0.62,
@@ -1872,15 +1872,18 @@ Output: [{'detected_columns': ['product', 'quantity', 'reference', 'total', 'uni
              'total_ht': [],
              'total_ttc': ['182006.00']}}]
 
-[interdoc-link] docs=1 | pairs=0 | links=0 | sentence_pairs_scored=0
+[interdoc-link] docs=1 | pairs=0 | links=0 | sentence_pairs_scored=0 | chunk_pairs_scored=0
 [Component: liaison-inter-docs]
 Type: dict
-Summary: docs=1 | pairs=0 | links=0 | sentence_pairs=0
-Output: {'documents_analyzed': 1,
+Summary: docs=1 | pairs=0 | links=0 | sentence_pairs=0 | chunk_pairs=0 | vector_profile=pipeline100ml | vector_links=0
+Output: {'chunk_pairs_scored': 0,
+ 'documents_analyzed': 1,
  'links_count': 0,
- 'method': 'topic-sentence-audit-v1',
+ 'method': 'topic-sentence-audit+vector-v2',
  'pairs_evaluated': 0,
- 'sentence_pairs_scored': 0}
+ 'sentence_pairs_scored': 0,
+ 'vector_links_count': 0,
+ 'vector_profile': 'pipeline100ml'}
 
 [elasticsearch] desactive ou indisponible -> fallback flux local.
 [Component: elasticsearch]
@@ -1990,7 +1993,7 @@ Output: [{'bm25': {'avg_top3_score': 1.119015,
                                            '\n'
                                            '   '}]},
   'classification_status': 'OK',
-  'doc_id': '6e648449-bc94-4024-a3f3-95611c1ceff8',
+  'doc_id': '5068f7ef-b69d-4d75-a798-185f0e119167',
   'doc_type': 'FACTURE',
   'fields': {},
   'filename': 'image2tab.webp',

@@ -1,0 +1,244 @@
+EXPLICATION DES 3 PIPELINES
+
+But:
+- ce fichier explique rapidement quelle pipeline se lance, dans quel ordre, et ce que chaque composant produit.
+- pour cette phase de test, le plus simple est de changer seulement `PIPELINE_DEFAULT_CODE` dans `pipeline/cli.py`, puis lancer `python main.py ...`.
+
+Comment choisir la pipeline a lancer
+- fichier a modifier: `pipeline/cli.py`
+- variable actuelle: `PIPELINE_DEFAULT_CODE = "pipeline100ml"`
+- valeurs utiles:
+  - `"default"` ou `"pipelinorchestrator"` -> lance `PipelineOrchestrator`
+  - `"pipeline50ml"` -> lance `Pipeline50MLOrchestrator`
+  - `"pipeline100ml"` -> lance `Pipeline100MLOrchestrator`
+- en phase de test actuelle, il suffit donc de changer cette variable puis relancer le code.
+- une seule pipeline est executee par run.
+
+Selection runtime
+- `pipeline/cli.py` lit `PIPELINE_DEFAULT_CODE`
+- puis choisit:
+  - `PipelineOrchestrator(...)`
+  - ou `Pipeline50MLOrchestrator(...)`
+  - ou `Pipeline100MLOrchestrator(...)`
+- ensuite l'orchestrateur parcourt `self.components` dans l'ordre.
+- chaque composant lit le `context` commun, ajoute ses sorties, puis le composant suivant reutilise ces donnees.
+
+Pipeline 1: PipelineOrchestrator
+`self.components = [`
+- `PretraitementComponent("pretraitement-de-docs", "component/pretraitement-de-docs.py")`
+- `OCRPreprocessComponent("si-image-pretraiter-sinonpass-le-doc", "component/si-image-pretraiter-sinonpass-le-doc.py")`
+- `OutputTxtComponent("output-txt", "component/output-txt.py")`
+- `ClassificationComponent("clasification", "component/clasification.py")`
+- `TokenisationLayoutComponent("tokenisation-layout", "component/tokenisation_layout/tokenisation-layout.py")`
+- `GrammarComponent("atripusion-gramatical", "component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py")`
+- `InterDocLinkingComponent("liaison-inter-docs", "component/liaison-inter-docs.py")`
+- `ElasticsearchComponent("elasticsearch", "component/elasticsearch.py")`
+- `RuleExtractionComponent("extraction-regles", "component/extraction/extraction-regles.py")`
+- `FusionResultComponent("fusion-resultats", "component/fusion_resultats.py")`
+`]`
+
+Pipeline 2: Pipeline50MLOrchestrator
+`self.components = [`
+- `PretraitementComponent("pretraitement-de-docs", "component/pretraitement-de-docs.py")`
+- `OCRPreprocessComponent("si-image-pretraiter-sinonpass-le-doc", "component/si-image-pretraiter-sinonpass-le-doc.py")`
+- `OutputTxtComponent("output-txt", "component/output-txt.py")`
+- `ClassificationComponent("clasification", "component/clasification.py")`
+- `TokenisationLayoutComponent("tokenisation-layout", "component/tokenisation_layout/tokenisation-layout-50ml.py")`
+- `GrammarComponent("atripusion-gramatical", "component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py")`
+- `TableExtractionComponent("table-extraction", "component/table_extraction/table-extraction.py")`
+- `InterDocLinkingComponent("liaison-inter-docs", "component/liaison-inter-docs.py")`
+- `ElasticsearchComponent("elasticsearch", "component/elasticsearch.py")`
+- `RuleExtractionComponent("extraction-regles", "component/extraction/extraction-regles-50ml.py")`
+- `FusionResultComponent("fusion-resultats", "component/fusion_resultats.py")`
+`]`
+
+Pipeline 3: Pipeline100MLOrchestrator
+`self.components = [`
+- `PretraitementComponent("pretraitement-de-docs", "component/pretraitement-de-docs.py")`
+- `OCRPreprocessComponent("si-image-pretraiter-sinonpass-le-doc", "component/si-image-pretraiter-sinonpass-le-doc.py")`
+- `OutputTxtComponent("output-txt", "component/output-txt.py")`
+- `ClassificationComponent("clasification", "component/clasification.py")`
+- `TokenisationLayoutComponent("tokenisation-layout", "component/tokenisation_layout/tokenisation-layout-100ml.py")`
+- `GrammarComponent("atripusion-gramatical", "component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py")`
+- `TableExtractionComponent("table-extraction", "component/table_extraction/table-extraction.py")`
+- `InterDocLinkingComponent("liaison-inter-docs", "component/liaison-inter-docs.py")`
+- `ElasticsearchComponent("elasticsearch", "component/elasticsearch.py")`
+- `RuleExtractionComponent("extraction-regles", "component/extraction/extraction-regles-100ml.py")`
+- `FusionResultComponent("fusion-resultats", "component/fusion_resultats.py")`
+`]`
+
+Comment les composants sont relies
+- entree user -> `INPUT_FILE`
+- `pretraitement-de-docs` detecte le type de fichier et produit `PRETRAITEMENT_RESULT`
+- `si-image-pretraiter-sinonpass-le-doc` separe texte natif / image OCR et produit `TEXT_FILES`, `IMAGE_ONLY_FILES`, `DOCS`, `PREPROCESS_RESULT`
+- `output-txt` reconstruit le texte exploitable et produit `FINAL_DOCS`
+- `clasification` lit `FINAL_DOCS` et produit `RESULTS`
+- `tokenisation-layout` lit surtout `FINAL_DOCS` + `RESULTS` et produit `TOK_DOCS` / `selected`
+- `atripusion-gramatical` lit `TOK_DOCS` / `selected` et produit `NLP_*`
+- `table-extraction` (50ml et 100ml seulement) lit les docs tokenises/pages OCR et produit `TABLE_EXTRACTIONS*`
+- `liaison-inter-docs` lit les topics / tokens / phrases et produit `INTERDOC_*`
+- `elasticsearch` indexe ou synchronise les donnees et produit `ES_*`
+- `extraction-regles` lit surtout classification + texte + parfois ES et produit `EXTRACTIONS`
+- `fusion-resultats` fusionne tout dans `fusion_output.json` et produit `FUSION_*`
+
+Flux logique court
+- fichier -> type de contenu -> texte final -> classification -> phrases/chunks/tokens -> grammaire/NER/lemma/POS -> tables -> liens inter-docs -> sync Elasticsearch -> extraction metier -> JSON final
+
+Ce que chaque composant extrait ou produit
+
+1) `pretraitement-de-docs`
+- detecte le format du fichier
+- detecte si le document est surtout `text` ou `image_only`
+- remonte le chemin, le nom, la taille `size`, des metadonnees de base
+- techno principale: logique Python / lecture metadonnees fichier, pas de BERT, pas de BM25
+- sortie principale: `PRETRAITEMENT_RESULT`
+
+2) `si-image-pretraiter-sinonpass-le-doc`
+- route les fichiers texte natifs et les fichiers image/OCR
+- prepare les documents pour la suite
+- pour l'image, prepare la phase OCR/preprocess
+- techno principale: `pytesseract` + binaire systeme `tesseract`, OSD/orientation OCR
+- sorties principales: `TEXT_FILES`, `IMAGE_ONLY_FILES`, `DOCS`, `PREPROCESS_RESULT`
+
+3) `output-txt`
+- extrait le texte final par document
+- garde la logique page par page
+- remonte `page_count_total`, `pages_text`, `text`, `full_text`, type d'extraction
+- techno principale: extraction native PDF/Doc quand possible, sinon OCR `tesseract` via `pytesseract.image_to_data`
+- sortie principale: `FINAL_DOCS`
+
+4) `clasification`
+- detecte le type documentaire (`CONTRAT`, `FACTURE`, etc.)
+- calcule les scores par classe
+- garde l'audit des mots-cles, des anti-confusions et du statut
+- techno principale: regles + mots-cles charges depuis `classification/*.json` + `classification/common.json`
+- important: pas de BERT, pas de Word2Vec, pas de BM25 dans ce composant
+- sortie principale: `RESULTS`
+
+5) `tokenisation-layout` version default
+- decoupe en phrases / segments / tokens avec infos de layout
+- prepare les pages, chunks, sentences pour la suite
+- techno principale: heuristiques layout/regex/multicolonnes OCR ou natif
+- important: pas de BERT, pas de Word2Vec, pas de BM25 dans cette version
+- sortie principale: `TOK_DOCS` ou `selected`
+
+6) `tokenisation-layout` version 50ml
+- fait la meme base que la version default
+- ajoute une couche ML legere type FastText-like / hashing subword
+- calcule des vecteurs mot, chunk et document
+- extrait des topics de chunk et des topics document
+- techno principale: vecteurs `fasttext-subword-hash-v1` en local
+- important: ce n'est pas du vrai FastText pre-entraine, et ce n'est pas du Word2Vec
+- sorties principales: `TOK_DOCS`, `selected`, structures `ML50_*`
+
+7) `tokenisation-layout` version 100ml
+- fait la meme base que la version default
+- ajoute des embeddings Transformer / XLM-R-BERT avec pooling
+- calcule un embedding par chunk et un embedding document
+- extrait des topics de chunk et des topics document
+- techno principale: `transformers` + `AutoTokenizer` + `AutoModel`
+- modele par defaut: `xlm-roberta-base`
+- methode embedding: `transformer-mean-pooling`
+- fallback: vecteur hash local si le modele n'est pas disponible
+- sorties principales: `TOK_DOCS`, `selected`, structures `ML100_*`
+
+8) `atripusion-gramatical` version legacy
+- utilise les 3 fichiers langue EN / FR / AR
+- assigne POS, lemma, NER, langue
+- produit les phrases NLP, tokens NLP et entites
+- EN: `nltk` + `WordNetLemmatizer` + NER optionnel `dslim/bert-base-NER`
+- FR: `simplemma` + NER optionnel `Davlan/bert-base-multilingual-cased-ner-hrl`
+- AR: `camel_tools` morphologie + `camel_tools.ner`
+- important: ce composant n'utilise pas `xlm-roberta-base`
+- sorties principales: `NLP_ANALYSES`, `NLP_SENTENCES`, `NLP_TOKENS`, `NLP_ENTITIES`
+
+9) `atripusion-gramatical` version 100ml
+- utilise XLM-R multi-langue
+- assigne POS, lemma, NER, langue avec backend plus lourd
+- garde un audit du backend, du modele et du raffinage POS
+- techno principale: `transformers` + `AutoTokenizer` + `AutoModel`
+- modele par defaut: `xlm-roberta-base`
+- methode POS: `hybrid-rules+context+xlmr-prototypes-v2`
+- fallback: mode local hybride si backend Transformer indisponible
+- sorties principales: `NLP_ANALYSES`, `NLP_SENTENCES`, `NLP_TOKENS`, `NLP_ENTITIES`, audit `NLP_*`
+
+10) `table-extraction`
+- detecte les tableaux, y compris OCR si possible
+- reconstruit lignes, colonnes, cellules et line items
+- remonte des tableaux utiles pour produit / quantite / prix / total quand ils existent
+- techno principale: heuristiques de geometrie texte + ancrages de colonnes + score de tabularite
+- OCR fallback tableau: `pytesseract` + `tesseract`
+- important: pas de Camelot, pas de Tabula, pas de modele table Transformer dans le code actuel
+- sorties principales: `TABLE_EXTRACTIONS`, `TABLE_EXTRACTIONS_50ML` ou `TABLE_EXTRACTIONS_100ML`
+
+11) `liaison-inter-docs`
+- compare plusieurs documents entre eux
+- detecte les topics partages et les rapprochements de phrases
+- garde un audit de match phrase vs phrase entre documents
+- techno principale: overlap lexical/topics + audit phrase-vers-phrase
+- important: pas de base vectorielle externe dediee a ce composant dans la version actuelle
+- sorties principales: `INTERDOC_ANALYSIS`, `INTERDOC_LINKS`, `INTERDOC_DOC_LINKS`
+
+12) `elasticsearch`
+- verifie la disponibilite ES
+- indexe les documents dans `dms_documents`
+- peut aussi sync classification, extraction et NLP summary/full
+- remonte les `doc_id` ES et l'etat de sync
+- techno principale: sync Elasticsearch documents + NLP + fusion
+- en mode `--es-nlp-level full`, les tokens vont dans l'index dedie `dms_nlp_tokens`
+- sorties principales: `ES_DOC_IDS`, `ES_AVAILABLE`, `ES_CLASSIFICATION_SYNCED`, `ES_EXTRACTION_SYNCED`, `ES_NLP_SYNC`
+
+13) `extraction-regles` version default
+- applique les regles metier standard
+- extrait des champs utiles selon le document
+- techno principale: extraction regles/regex standard
+- important: pas de BM25 dans cette version
+- sorties principales: `EXTRACTIONS`
+
+14) `extraction-regles` version 50ml
+- applique les regles YAML selon `doc_type`
+- ajoute un scoring BM25 sur chunks / passages
+- nettoie les valeurs extraites pour garder la valeur pure
+- techno principale: `rules/*.yaml` + moteur YAML + BM25 maison
+- parametres BM25: `k1=1.5`, `b=0.75`
+- important: BM25 code maison Python, pas package `rank_bm25`
+- sorties principales: `EXTRACTIONS` avec enrichissements 50ml/BM25
+
+15) `extraction-regles` version 100ml
+- applique les regles YAML selon `doc_type`
+- ajoute un scoring BM25 avec contexte 100ml
+- nettoie les valeurs extraites pour garder la valeur pure
+- techno principale: `rules/*.yaml` + moteur YAML + BM25 maison
+- parametres BM25: `k1=1.5`, `b=0.75`
+- important: BM25 code maison Python, pas package `rank_bm25`
+- sorties principales: `EXTRACTIONS` avec enrichissements 100ml/BM25
+
+16) `fusion-resultats`
+- prend toutes les sorties precedentes
+- les regroupe par document
+- structure la sortie finale pour humain + machine
+- ecrit `fusion_output.json`
+- techno principale: fusion context locale + ajout conditionnel des branches `default`, `ml50`, `ml100`, `bm25`, `elasticsearch`
+- sorties principales: `FUSION_RESULT`, `FUSION_PAYLOAD`, `FUSION_PAYLOADS`
+
+Resume simple
+- `PipelineOrchestrator` = pipeline standard
+- `Pipeline50MLOrchestrator` = pipeline standard + topics/vecteurs legers + tables + extraction YAML/BM25
+- `Pipeline100MLOrchestrator` = pipeline standard + embeddings Transformer + grammaire XLM-R + tables + extraction YAML/BM25
+
+Points importants sur les technos vraiment utilisees
+- `Tesseract` est bien utilise pour l'OCR.
+- `BM25` est bien utilise seulement dans `extraction-regles-50ml.py` et `extraction-regles-100ml.py`.
+- `xlm-roberta-base` est bien utilise dans la pipeline 100ml pour:
+  - `tokenisation-layout-100ml.py`
+  - `attribution-gramatical-100ml-xlmr.py`
+- `Word2Vec` n'est pas utilise actuellement.
+- la pipeline 50ml utilise un mode `fasttext-like` local par hashing subword, pas un modele Word2Vec.
+- la classification actuelle est surtout basee sur des mots-cles et scores de regles JSON.
+
+Fichier code a retenir
+- choix par defaut: `pipeline/cli.py`
+- definition des 3 pipelines: `pipeline/orchestrator.py`
+- wrappers des composants et resumes: `pipeline/components.py`
+- sortie terminal: `outputgeneralterminal.txt`
+- sortie finale: `fusion_output.json`

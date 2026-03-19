@@ -124,7 +124,13 @@ def _interdoc_output(ctx: Dict[str, Any]) -> Dict[str, Any]:
         "documents_analyzed": _safe_int(analysis.get("documents_analyzed"), 0),
         "pairs_evaluated": _safe_int(analysis.get("pairs_evaluated"), 0),
         "sentence_pairs_scored": _safe_int(analysis.get("sentence_pairs_scored"), 0),
+        "chunk_pairs_scored": _safe_int(analysis.get("chunk_pairs_scored"), 0),
         "links_count": _safe_int(analysis.get("links_count"), 0),
+        "vector_profile": analysis.get("vector_profile"),
+        "embedding_method": analysis.get("embedding_method"),
+        "embedding_backend": analysis.get("embedding_backend"),
+        "vector_dim": _safe_int(analysis.get("vector_dim"), 0),
+        "vector_links_count": _safe_int(analysis.get("vector_links_count"), 0),
         "links": _safe_list(analysis.get("links")),
         "generated_at": analysis.get("generated_at"),
     }

@@ -9,11 +9,9 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Tuple
 
-import numpy as np
-
-
 BASE_SCRIPT = Path(__file__).resolve().with_name("tokenisation-layout.py")
 TOKEN_RE = re.compile(r"[A-Za-z0-9_\u00C0-\u024F\u0600-\u06FF]+", re.UNICODE)
+Vector = List[float]
 
 _STOPWORDS = {
     "the", "and", "for", "with", "from", "that", "this", "are", "was", "were", "will", "shall", "must",
@@ -217,33 +215,39 @@ def _hash_index_sign(value: str, dim: int) -> Tuple[int, float]:
     return idx, sign
 
 
-def _fasttext_like_vector(token: str, dim: int) -> np.ndarray:
-    vec = np.zeros(dim, dtype=np.float32)
+def _vector_norm(vec: Vector) -> float:
+    return math.sqrt(sum(float(x) * float(x) for x in vec))
+
+
+def _fasttext_like_vector(token: str, dim: int) -> Vector:
+    vec = [0.0] * dim
     grams = _char_ngrams(token)
     for gram in grams:
         idx, sign = _hash_index_sign(gram, dim)
         vec[idx] += sign
-    norm = float(np.linalg.norm(vec))
+    norm = _vector_norm(vec)
     if norm > 0.0:
-        vec /= norm
+        vec = [float(x) / norm for x in vec]
     return vec
 
 
-def _mean_vectors(vectors: List[np.ndarray], dim: int) -> np.ndarray:
+def _mean_vectors(vectors: List[Vector], dim: int) -> Vector:
     if not vectors:
-        return np.zeros(dim, dtype=np.float32)
-    out = np.zeros(dim, dtype=np.float32)
+        return [0.0] * dim
+    out = [0.0] * dim
     for v in vectors:
-        out += v
-    out /= float(len(vectors))
-    norm = float(np.linalg.norm(out))
+        limit = min(dim, len(v))
+        for i in range(limit):
+            out[i] += float(v[i])
+    out = [x / float(len(vectors)) for x in out]
+    norm = _vector_norm(out)
     if norm > 0.0:
-        out /= norm
+        out = [float(x) / norm for x in out]
     return out
 
 
-def _to_list(vec: np.ndarray, precision: int = 6) -> List[float]:
-    return [round(float(x), precision) for x in vec.tolist()]
+def _to_list(vec: Vector, precision: int = 6) -> List[float]:
+    return [round(float(x), precision) for x in vec]
 
 
 def _iter_doc_chunks(doc: Dict[str, Any]) -> Iterable[Tuple[int, int, str, str]]:
@@ -373,7 +377,7 @@ def _augment_with_ml50(ctx: Dict[str, Any]) -> None:
         key = _doc_key(doc_id, filename)
         doc_boost_terms = _build_topic_boost_terms(ctx, doc_id, filename)
 
-        doc_chunk_vecs: List[np.ndarray] = []
+        doc_chunk_vecs: List[Vector] = []
         doc_chunk_payloads: List[Dict[str, Any]] = []
         token_counter: Counter = Counter()
         tokenized_chunks: List[List[str]] = []

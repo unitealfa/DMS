@@ -55,6 +55,27 @@ MIN_SHARED_TOPICS = 1
 MAX_SHARED_TERMS_PER_MATCH = 8
 MIN_INFORMATIVE_TERM_SCORE = 0.85
 
+VECTOR_PROFILE_CONFIG = {
+    "pipeline50ml": {
+        "prefix": "ML50",
+        "profile": "pipeline50ml",
+        "doc_prefilter": 0.06,
+        "min_doc_similarity": 0.18,
+        "min_chunk_cosine": 0.15,
+        "min_chunk_hybrid": 0.23,
+        "vector_accept": 0.24,
+    },
+    "pipeline100ml": {
+        "prefix": "ML100",
+        "profile": "pipeline100ml",
+        "doc_prefilter": 0.10,
+        "min_doc_similarity": 0.24,
+        "min_chunk_cosine": 0.20,
+        "min_chunk_hybrid": 0.30,
+        "vector_accept": 0.31,
+    },
+}
+
 
 def _iso_now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -67,6 +88,13 @@ def _safe_list(value: Any) -> List[Any]:
 def _safe_int(value: Any, default: int = 0) -> int:
     try:
         return int(value)
+    except Exception:
+        return default
+
+
+def _safe_float(value: Any, default: float = 0.0) -> float:
+    try:
+        return float(value)
     except Exception:
         return default
 
@@ -159,6 +187,58 @@ def _clip_text(text: str, limit: int = 220) -> str:
     if len(txt) <= limit:
         return txt
     return txt[: max(0, limit - 3)].rstrip() + "..."
+
+
+def _coerce_vector(value: Any) -> List[float]:
+    if not isinstance(value, list):
+        return []
+    out: List[float] = []
+    for item in value:
+        try:
+            out.append(float(item))
+        except Exception:
+            return []
+    return out
+
+
+def _vector_norm(vec: List[float]) -> float:
+    return math.sqrt(sum(float(x) * float(x) for x in vec))
+
+
+def _cosine_similarity(vec_a: Any, vec_b: Any) -> float:
+    a = _coerce_vector(vec_a)
+    b = _coerce_vector(vec_b)
+    if not a or not b:
+        return 0.0
+    limit = min(len(a), len(b))
+    if limit <= 0:
+        return 0.0
+    a = a[:limit]
+    b = b[:limit]
+    norm_a = _vector_norm(a)
+    norm_b = _vector_norm(b)
+    if norm_a <= 0.0 or norm_b <= 0.0:
+        return 0.0
+    dot = sum(float(a[i]) * float(b[i]) for i in range(limit))
+    return dot / (norm_a * norm_b)
+
+
+def _mean_vector(rows: List[List[float]]) -> List[float]:
+    valid = [row for row in rows if row]
+    if not valid:
+        return []
+    dim = min(len(row) for row in valid)
+    if dim <= 0:
+        return []
+    out = [0.0] * dim
+    for row in valid:
+        for i in range(dim):
+            out[i] += float(row[i])
+    out = [x / float(len(valid)) for x in out]
+    norm = _vector_norm(out)
+    if norm > 0.0:
+        out = [float(x) / norm for x in out]
+    return out
 
 
 def _doc_key(doc_id: Any, filename: Any, idx: int) -> str:
@@ -352,6 +432,70 @@ def _index_topic_rows(ctx: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
     return out
 
 
+def _vector_profile(ctx: Dict[str, Any]) -> Dict[str, Any]:
+    profile = str(ctx.get("PIPELINE_PROFILE") or "").strip().lower()
+    base = VECTOR_PROFILE_CONFIG.get(profile)
+    if not base:
+        return {"enabled": False, "profile": profile}
+
+    prefix = str(base.get("prefix") or "")
+    return {
+        "enabled": True,
+        "profile": profile,
+        "prefix": prefix,
+        "embedding_method": ctx.get(f"{prefix}_EMBEDDING_METHOD"),
+        "embedding_backend": ctx.get(f"{prefix}_EMBEDDING_BACKEND") or ctx.get(f"{prefix}_EMBEDDING_METHOD"),
+        "vector_dim": _safe_int(ctx.get(f"{prefix}_VECTOR_DIM"), 0),
+        "doc_prefilter": _safe_float(base.get("doc_prefilter"), 0.0),
+        "min_doc_similarity": _safe_float(base.get("min_doc_similarity"), 0.0),
+        "min_chunk_cosine": _safe_float(base.get("min_chunk_cosine"), 0.0),
+        "min_chunk_hybrid": _safe_float(base.get("min_chunk_hybrid"), 0.0),
+        "vector_accept": _safe_float(base.get("vector_accept"), 0.0),
+    }
+
+
+def _build_vector_index(ctx: Dict[str, Any]) -> Dict[str, Any]:
+    cfg = _vector_profile(ctx)
+    if not cfg.get("enabled"):
+        return {
+            **cfg,
+            "doc_rows": {},
+            "chunk_rows": {},
+        }
+
+    prefix = str(cfg.get("prefix") or "")
+    doc_rows: Dict[str, Dict[str, Any]] = {}
+    chunk_rows: Dict[str, List[Dict[str, Any]]] = {}
+
+    for row in _safe_list(ctx.get(f"{prefix}_DOC_VECTORS")):
+        if not isinstance(row, dict):
+            continue
+        vec = _coerce_vector(row.get("vector"))
+        if not vec:
+            continue
+        prepared = dict(row)
+        prepared["vector"] = vec
+        for alias in _doc_aliases(row.get("doc_id"), row.get("filename"), 0):
+            doc_rows[alias] = prepared
+
+    for row in _safe_list(ctx.get(f"{prefix}_CHUNK_VECTORS")):
+        if not isinstance(row, dict):
+            continue
+        vec = _coerce_vector(row.get("vector"))
+        if not vec:
+            continue
+        prepared = dict(row)
+        prepared["vector"] = vec
+        for alias in _doc_aliases(row.get("doc_id"), row.get("filename"), 0):
+            chunk_rows.setdefault(alias, []).append(prepared)
+
+    return {
+        **cfg,
+        "doc_rows": doc_rows,
+        "chunk_rows": chunk_rows,
+    }
+
+
 def _extract_topics(topic_row: Dict[str, Any], fallback_terms: Counter) -> List[Dict[str, Any]]:
     topics = []
     for item in _safe_list(topic_row.get("document_topics")):
@@ -379,6 +523,20 @@ def _extract_topics(topic_row: Dict[str, Any], fallback_terms: Counter) -> List[
     ]
 
 
+def _chunk_topic_terms(row: Dict[str, Any]) -> Set[str]:
+    out: Set[str] = set()
+    primary = _normalize_term(row.get("chunk_primary_topic"))
+    if _is_informative_term(primary):
+        out.add(primary)
+    for item in _safe_list(row.get("chunk_topics")):
+        if not isinstance(item, dict):
+            continue
+        term = _normalize_term(item.get("term"))
+        if _is_informative_term(term):
+            out.add(term)
+    return out
+
+
 def _prepare_docs(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
     raw_docs = _dedupe_docs(ctx.get("TOK_DOCS") or ctx.get("selected"))
     if not raw_docs:
@@ -387,6 +545,7 @@ def _prepare_docs(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
     topic_index = _index_topic_rows(ctx)
     semantic_index = _build_semantic_sentence_index(ctx)
     cls_index = _build_classification_index(ctx)
+    vector_index = _build_vector_index(ctx)
     out: List[Dict[str, Any]] = []
     for i, doc in enumerate(raw_docs):
         doc_id = str(doc.get("doc_id") or "").strip() or None
@@ -396,6 +555,11 @@ def _prepare_docs(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
         sentences = list(_iter_doc_sentences(doc, filename=filename, semantic_index=semantic_index))
         if len(sentences) > MAX_SENTENCES_PER_DOC:
             sentences = sentences[:MAX_SENTENCES_PER_DOC]
+        sentence_lookup = {
+            (_safe_int(sent.get("page_index"), 0), _safe_int(sent.get("sent_index"), 0)): sent
+            for sent in sentences
+            if isinstance(sent, dict)
+        }
 
         term_counter: Counter = Counter()
         sentence_df: Counter = Counter()
@@ -420,6 +584,54 @@ def _prepare_docs(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
         for alias in aliases:
             signal_terms.update(cls_index.get(alias) or set())
 
+        doc_vector_row: Dict[str, Any] = {}
+        if vector_index.get("enabled"):
+            for alias in aliases:
+                row = vector_index.get("doc_rows", {}).get(alias)
+                if isinstance(row, dict):
+                    doc_vector_row = row
+                    break
+
+        chunk_vectors: List[Dict[str, Any]] = []
+        if vector_index.get("enabled"):
+            seen_chunks: Set[Tuple[int, int, str]] = set()
+            for alias in aliases:
+                for row in _safe_list(vector_index.get("chunk_rows", {}).get(alias)):
+                    if not isinstance(row, dict):
+                        continue
+                    page_index = _safe_int(row.get("page_index"), 0)
+                    sent_index = _safe_int(row.get("sent_index"), 0)
+                    preview = str(row.get("text_preview") or "").strip()
+                    row_key = (page_index, sent_index, preview)
+                    if row_key in seen_chunks:
+                        continue
+                    seen_chunks.add(row_key)
+
+                    sent_ref = sentence_lookup.get((page_index, sent_index)) or {}
+                    text = str(sent_ref.get("text") or row.get("text_preview") or "").strip()
+                    terms_set = set(sent_ref.get("terms_set") or set(_tokenize_terms(text)))
+                    chunk_vectors.append(
+                        {
+                            "page_index": page_index,
+                            "sent_index": sent_index,
+                            "text": text,
+                            "text_preview": preview or _clip_text(text, 220),
+                            "token_count": _safe_int(row.get("token_count"), len(terms_set)),
+                            "lang": row.get("lang"),
+                            "vector": _coerce_vector(row.get("vector")),
+                            "chunk_primary_topic": row.get("chunk_primary_topic"),
+                            "chunk_topics": _safe_list(row.get("chunk_topics")),
+                            "topic_terms": _chunk_topic_terms(row),
+                            "terms_set": terms_set,
+                        }
+                    )
+        if len(chunk_vectors) > MAX_SENTENCES_PER_DOC:
+            chunk_vectors = chunk_vectors[:MAX_SENTENCES_PER_DOC]
+
+        doc_vector = _coerce_vector(doc_vector_row.get("vector"))
+        if not doc_vector and chunk_vectors:
+            doc_vector = _mean_vector([_coerce_vector(row.get("vector")) for row in chunk_vectors])
+
         out.append(
             {
                 "doc_key": _doc_key(doc_id, filename, i),
@@ -433,6 +645,12 @@ def _prepare_docs(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
                 "topic_terms": topic_terms,
                 "topic_scores": topic_scores,
                 "signal_terms": signal_terms,
+                "vector_profile": vector_index.get("profile"),
+                "embedding_method": vector_index.get("embedding_method"),
+                "embedding_backend": vector_index.get("embedding_backend"),
+                "vector_dim": _safe_int(vector_index.get("vector_dim"), 0),
+                "doc_vector": doc_vector,
+                "chunk_vectors": chunk_vectors,
             }
         )
     return out
@@ -529,9 +747,127 @@ def _topic_examples_for_doc(doc: Dict[str, Any], term: str, limit: int = 2) -> L
     return out
 
 
-def _build_link(doc_a: Dict[str, Any], doc_b: Dict[str, Any]) -> Tuple[Dict[str, Any], int]:
+def _sorted_shared_terms(shared: Set[str], limit: int = MAX_SHARED_TERMS_PER_MATCH) -> List[str]:
+    terms = [term for term in shared if _is_informative_term(term)]
+    terms.sort(key=lambda x: (-len(x.split()), -len(x), x))
+    return terms[:limit]
+
+
+def _vector_chunk_matches(
+    doc_a: Dict[str, Any],
+    doc_b: Dict[str, Any],
+    cfg: Dict[str, Any],
+    shared_doc_topics: Set[str],
+    shared_signal_terms: Set[str],
+    doc_vector_similarity: float,
+) -> Tuple[List[Dict[str, Any]], int, float, float]:
+    if not cfg.get("enabled"):
+        return [], 0, 0.0, 0.0
+
+    chunks_a = [row for row in _safe_list(doc_a.get("chunk_vectors")) if isinstance(row, dict)]
+    chunks_b = [row for row in _safe_list(doc_b.get("chunk_vectors")) if isinstance(row, dict)]
+    if not chunks_a or not chunks_b:
+        return [], 0, 0.0, 0.0
+
+    if (
+        doc_vector_similarity < _safe_float(cfg.get("doc_prefilter"), 0.0)
+        and not shared_doc_topics
+        and not shared_signal_terms
+    ):
+        return [], 0, 0.0, doc_vector_similarity
+
+    raw: List[Dict[str, Any]] = []
+    pairs_scored = 0
+    min_cosine = _safe_float(cfg.get("min_chunk_cosine"), 0.0)
+    min_hybrid = _safe_float(cfg.get("min_chunk_hybrid"), 0.0)
+
+    for row_a in chunks_a:
+        vec_a = _coerce_vector(row_a.get("vector"))
+        if not vec_a:
+            continue
+        topics_a = set(row_a.get("topic_terms") or set())
+        terms_a = set(row_a.get("terms_set") or set())
+
+        for row_b in chunks_b:
+            vec_b = _coerce_vector(row_b.get("vector"))
+            if not vec_b:
+                continue
+            pairs_scored += 1
+            cosine = _cosine_similarity(vec_a, vec_b)
+            if cosine <= 0.0:
+                continue
+
+            topics_b = set(row_b.get("topic_terms") or set())
+            terms_b = set(row_b.get("terms_set") or set())
+            shared_topics = sorted(topics_a.intersection(topics_b))[:6]
+            shared_terms = _sorted_shared_terms(terms_a.intersection(terms_b))
+
+            min_topics = max(1, min(len(topics_a) or 1, len(topics_b) or 1))
+            min_terms = max(1, min(len(terms_a) or 1, len(terms_b) or 1))
+            topic_overlap = len(shared_topics) / float(min_topics)
+            term_overlap = len(shared_terms) / float(min_terms)
+            doc_topic_bonus = 0.10 * min(1.0, float(len([t for t in shared_topics if t in shared_doc_topics])))
+            signal_bonus = 0.06 * min(1.0, float(len([t for t in shared_terms if t in shared_signal_terms])) / 2.0)
+            hybrid = (0.78 * cosine) + (0.12 * topic_overlap) + (0.10 * min(1.0, term_overlap * 2.0))
+            hybrid += doc_topic_bonus + signal_bonus
+
+            if cosine < min_cosine and hybrid < min_hybrid:
+                continue
+
+            raw.append(
+                {
+                    "score": round(hybrid, 6),
+                    "vector_similarity": round(cosine, 6),
+                    "shared_topics": shared_topics,
+                    "shared_terms": shared_terms,
+                    "chunk_a": {
+                        "document_id": doc_a.get("doc_id"),
+                        "filename": doc_a.get("filename"),
+                        "page_index": _safe_int(row_a.get("page_index"), 0),
+                        "sent_index": _safe_int(row_a.get("sent_index"), 0),
+                        "text_excerpt": _clip_text(str(row_a.get("text") or row_a.get("text_preview") or "")),
+                    },
+                    "chunk_b": {
+                        "document_id": doc_b.get("doc_id"),
+                        "filename": doc_b.get("filename"),
+                        "page_index": _safe_int(row_b.get("page_index"), 0),
+                        "sent_index": _safe_int(row_b.get("sent_index"), 0),
+                        "text_excerpt": _clip_text(str(row_b.get("text") or row_b.get("text_preview") or "")),
+                    },
+                }
+            )
+
+    raw.sort(
+        key=lambda x: (
+            float(x.get("score") or 0.0),
+            float(x.get("vector_similarity") or 0.0),
+            len(_safe_list(x.get("shared_topics"))),
+            len(_safe_list(x.get("shared_terms"))),
+        ),
+        reverse=True,
+    )
+    selected = raw[:MAX_MATCHES_PER_LINK]
+    best_hybrid = float(selected[0].get("score") or 0.0) if selected else 0.0
+    best_cosine = float(selected[0].get("vector_similarity") or 0.0) if selected else 0.0
+    return selected, pairs_scored, best_hybrid, best_cosine
+
+
+def _build_link(doc_a: Dict[str, Any], doc_b: Dict[str, Any]) -> Tuple[Dict[str, Any], int, int]:
     shared_topics = set(doc_a.get("topic_terms") or set()).intersection(doc_b.get("topic_terms") or set())
     shared_signal_terms = set(doc_a.get("signal_terms") or set()).intersection(doc_b.get("signal_terms") or set())
+    profile_a = str(doc_a.get("vector_profile") or "").strip().lower()
+    profile_b = str(doc_b.get("vector_profile") or "").strip().lower()
+    vector_cfg: Dict[str, Any] = {"enabled": False}
+    if profile_a and profile_a == profile_b and profile_a in VECTOR_PROFILE_CONFIG:
+        vector_cfg = {
+            **VECTOR_PROFILE_CONFIG[profile_a],
+            "enabled": True,
+            "embedding_method": doc_a.get("embedding_method") or doc_b.get("embedding_method"),
+            "embedding_backend": doc_a.get("embedding_backend") or doc_b.get("embedding_backend"),
+            "vector_dim": _safe_int(doc_a.get("vector_dim") or doc_b.get("vector_dim"), 0),
+        }
+
+    doc_vector_similarity = _cosine_similarity(doc_a.get("doc_vector"), doc_b.get("doc_vector")) if vector_cfg.get("enabled") else 0.0
 
     pair_sentence_df: Counter = Counter()
     sentences_a = [s for s in _safe_list(doc_a.get("sentences")) if isinstance(s, dict)]
@@ -580,6 +916,15 @@ def _build_link(doc_a: Dict[str, Any], doc_b: Dict[str, Any]) -> Tuple[Dict[str,
     raw_matches.sort(key=lambda x: float(x.get("score") or 0.0), reverse=True)
     selected_matches = raw_matches[:MAX_MATCHES_PER_LINK]
 
+    vector_chunk_matches, chunk_pairs_scored, best_chunk_score, best_chunk_cosine = _vector_chunk_matches(
+        doc_a=doc_a,
+        doc_b=doc_b,
+        cfg=vector_cfg,
+        shared_doc_topics=shared_topics,
+        shared_signal_terms=shared_signal_terms,
+        doc_vector_similarity=doc_vector_similarity,
+    )
+
     best_sentence_score = float(selected_matches[0]["score"]) if selected_matches else 0.0
     shared_topics_count = len(shared_topics)
     shared_signals_count = len(shared_signal_terms)
@@ -587,12 +932,26 @@ def _build_link(doc_a: Dict[str, Any], doc_b: Dict[str, Any]) -> Tuple[Dict[str,
     topic_overlap = shared_topics_count / float(smallest_topics)
     smallest_signals = max(1, min(len(doc_a.get("signal_terms") or set()), len(doc_b.get("signal_terms") or set())))
     signal_overlap = shared_signals_count / float(smallest_signals)
-    link_score = (0.45 * topic_overlap) + (0.35 * best_sentence_score) + (0.20 * signal_overlap)
+
+    if vector_cfg.get("enabled"):
+        doc_vector_component = max(0.0, doc_vector_similarity)
+        chunk_vector_component = max(0.0, best_chunk_score)
+        link_score = (
+            (0.28 * topic_overlap)
+            + (0.24 * best_sentence_score)
+            + (0.16 * signal_overlap)
+            + (0.16 * doc_vector_component)
+            + (0.16 * chunk_vector_component)
+        )
+    else:
+        link_score = (0.45 * topic_overlap) + (0.35 * best_sentence_score) + (0.20 * signal_overlap)
 
     if shared_topics_count < MIN_SHARED_TOPICS and signal_overlap < 0.20 and best_sentence_score < 0.24:
-        return {}, scored_pairs
+        vector_gate = max(doc_vector_similarity, best_chunk_score)
+        if not vector_cfg.get("enabled") or vector_gate < _safe_float(vector_cfg.get("vector_accept"), 0.0):
+            return {}, scored_pairs, chunk_pairs_scored
     if link_score < MIN_LINK_SCORE:
-        return {}, scored_pairs
+        return {}, scored_pairs, chunk_pairs_scored
 
     shared_topics_scored = []
     for term in sorted(shared_topics):
@@ -619,6 +978,14 @@ def _build_link(doc_a: Dict[str, Any], doc_b: Dict[str, Any]) -> Tuple[Dict[str,
             "filename": doc_b.get("filename"),
         },
         "shared_topics": shared_topics_scored[:12],
+        "score_breakdown": {
+            "topic_overlap": round(topic_overlap, 6),
+            "best_sentence_score": round(best_sentence_score, 6),
+            "signal_overlap": round(signal_overlap, 6),
+            "doc_vector_similarity": round(doc_vector_similarity, 6) if vector_cfg.get("enabled") else None,
+            "best_chunk_vector_score": round(best_chunk_score, 6) if vector_cfg.get("enabled") else None,
+            "best_chunk_cosine": round(best_chunk_cosine, 6) if vector_cfg.get("enabled") else None,
+        },
         "audit": {
             "sentence_matches_count": len(selected_matches),
             "matches": [
@@ -633,17 +1000,42 @@ def _build_link(doc_a: Dict[str, Any], doc_b: Dict[str, Any]) -> Tuple[Dict[str,
             ],
         },
     }
-    return link, scored_pairs
+    if vector_cfg.get("enabled"):
+        link["vector_audit"] = {
+            "profile": vector_cfg.get("profile"),
+            "embedding_method": vector_cfg.get("embedding_method"),
+            "embedding_backend": vector_cfg.get("embedding_backend"),
+            "vector_dim": _safe_int(vector_cfg.get("vector_dim"), 0),
+            "doc_similarity": round(doc_vector_similarity, 6),
+            "chunk_pairs_scored": chunk_pairs_scored,
+            "chunk_matches_count": len(vector_chunk_matches),
+            "best_chunk_similarity": round(best_chunk_cosine, 6) if vector_chunk_matches else None,
+            "best_chunk_hybrid_score": round(best_chunk_score, 6) if vector_chunk_matches else None,
+            "chunk_matches": [
+                {
+                    "score": round(float(m.get("score") or 0.0), 6),
+                    "vector_similarity": round(float(m.get("vector_similarity") or 0.0), 6),
+                    "shared_terms": _safe_list(m.get("shared_terms"))[:10],
+                    "shared_topics": _safe_list(m.get("shared_topics"))[:8],
+                    "chunk_a": m.get("chunk_a"),
+                    "chunk_b": m.get("chunk_b"),
+                }
+                for m in vector_chunk_matches
+            ],
+        }
+    return link, scored_pairs, chunk_pairs_scored
 
 
-def _compute_links(prepared_docs: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], int]:
+def _compute_links(prepared_docs: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], int, int]:
     links: List[Dict[str, Any]] = []
     sentence_pairs_scored = 0
+    chunk_pairs_scored = 0
 
     for i in range(len(prepared_docs)):
         for j in range(i + 1, len(prepared_docs)):
-            link, scored = _build_link(prepared_docs[i], prepared_docs[j])
+            link, scored, chunk_scored = _build_link(prepared_docs[i], prepared_docs[j])
             sentence_pairs_scored += scored
+            chunk_pairs_scored += chunk_scored
             if not link:
                 continue
             link["link_id"] = f"link-{len(links) + 1}"
@@ -652,7 +1044,7 @@ def _compute_links(prepared_docs: List[Dict[str, Any]]) -> Tuple[List[Dict[str, 
     links.sort(key=lambda x: float(x.get("score") or 0.0), reverse=True)
     for idx, link in enumerate(links, start=1):
         link["link_id"] = f"link-{idx}"
-    return links, sentence_pairs_scored
+    return links, sentence_pairs_scored, chunk_pairs_scored
 
 
 def _build_doc_links_index(prepared_docs: List[Dict[str, Any]], links: List[Dict[str, Any]]) -> Dict[str, List[str]]:
@@ -679,16 +1071,43 @@ def _build_doc_links_index(prepared_docs: List[Dict[str, Any]], links: List[Dict
 def run(ctx: Dict[str, Any]) -> Dict[str, Any]:
     prepared_docs = _prepare_docs(ctx)
     pairs_evaluated = int((len(prepared_docs) * (len(prepared_docs) - 1)) / 2)
-    links, sentence_pairs_scored = _compute_links(prepared_docs)
+    links, sentence_pairs_scored, chunk_pairs_scored = _compute_links(prepared_docs)
     doc_links = _build_doc_links_index(prepared_docs, links)
+    vector_profile = None
+    embedding_method = None
+    embedding_backend = None
+    vector_dim = 0
+    for doc in prepared_docs:
+        profile = str(doc.get("vector_profile") or "").strip()
+        if not profile:
+            continue
+        vector_profile = profile
+        embedding_method = doc.get("embedding_method")
+        embedding_backend = doc.get("embedding_backend")
+        vector_dim = _safe_int(doc.get("vector_dim"), 0)
+        break
+    vector_links_count = sum(
+        1
+        for link in links
+        if isinstance(link.get("vector_audit"), dict) and (
+            _safe_int(link.get("vector_audit", {}).get("chunk_matches_count"), 0) > 0
+            or _safe_float(link.get("vector_audit", {}).get("doc_similarity"), 0.0) > 0.0
+        )
+    )
 
     analysis = {
-        "method": "topic-sentence-audit-v1",
+        "method": "topic-sentence-audit+vector-v2" if vector_profile else "topic-sentence-audit-v1",
         "generated_at": _iso_now(),
         "documents_analyzed": len(prepared_docs),
         "pairs_evaluated": pairs_evaluated,
         "sentence_pairs_scored": sentence_pairs_scored,
+        "chunk_pairs_scored": chunk_pairs_scored,
         "links_count": len(links),
+        "vector_profile": vector_profile,
+        "embedding_method": embedding_method,
+        "embedding_backend": embedding_backend,
+        "vector_dim": vector_dim,
+        "vector_links_count": vector_links_count,
         "links": links,
     }
 
@@ -699,16 +1118,18 @@ def run(ctx: Dict[str, Any]) -> Dict[str, Any]:
     print(
         "[interdoc-link] "
         f"docs={len(prepared_docs)} | pairs={pairs_evaluated} | links={len(links)} | "
-        f"sentence_pairs_scored={sentence_pairs_scored}"
+        f"sentence_pairs_scored={sentence_pairs_scored} | chunk_pairs_scored={chunk_pairs_scored}"
     )
     for link in links[:8]:
         a = link.get("doc_a") if isinstance(link.get("doc_a"), dict) else {}
         b = link.get("doc_b") if isinstance(link.get("doc_b"), dict) else {}
         shared = [str(x.get("term")) for x in _safe_list(link.get("shared_topics"))[:4] if isinstance(x, dict)]
+        vector_audit = link.get("vector_audit") if isinstance(link.get("vector_audit"), dict) else {}
         print(
             "[interdoc-link] "
             f"{a.get('filename')} <-> {b.get('filename')} | score={link.get('score')} | "
-            f"shared_topics={shared} | sentence_matches={_safe_int((link.get('audit') or {}).get('sentence_matches_count'), 0)}"
+            f"shared_topics={shared} | sentence_matches={_safe_int((link.get('audit') or {}).get('sentence_matches_count'), 0)} | "
+            f"doc_vector={vector_audit.get('doc_similarity')} | chunk_matches={_safe_int(vector_audit.get('chunk_matches_count'), 0)}"
         )
     return analysis
 

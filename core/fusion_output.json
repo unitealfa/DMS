@@ -1,11 +1,11 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-03-19T09:00:32.594259+00:00",
+  "generated_at": "2026-03-19T10:08:53.870927+00:00",
   "source": "local-context",
   "documents_count": 1,
   "documents": [
     {
-      "document_id": "6e648449-bc94-4024-a3f3-95611c1ceff8",
+      "document_id": "5068f7ef-b69d-4d75-a798-185f0e119167",
       "file": {
         "name": "image2tab.webp",
         "paths": [],
@@ -13,7 +13,7 @@
         "page_count": 1
       },
       "classification": {
-        "doc_id": "6e648449-bc94-4024-a3f3-95611c1ceff8",
+        "doc_id": "5068f7ef-b69d-4d75-a798-185f0e119167",
         "filename": "image2tab.webp",
         "doc_type": "FACTURE",
         "status": "OK",
@@ -317,7 +317,7 @@
           "entities_count": 18
         },
         "liaison_inter_docs": {
-          "method": "topic-sentence-audit-v1",
+          "method": "topic-sentence-audit+vector-v2",
           "links_count_total": 0,
           "linked_documents_count": 0
         },
@@ -326,7 +326,7 @@
           "available": false,
           "es_url": "http://localhost:9200",
           "es_index": "dms_documents",
-          "doc_id": "6e648449-bc94-4024-a3f3-95611c1ceff8",
+          "doc_id": "5068f7ef-b69d-4d75-a798-185f0e119167",
           "nlp_level": "full",
           "nlp_tokens_index": "dms_nlp_tokens",
           "nlp_docs_synced": 0,
@@ -1689,7 +1689,7 @@
         ],
         "regex_extractions": [
           {
-            "doc_id": "6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_id": "5068f7ef-b69d-4d75-a798-185f0e119167",
             "filename": "image2tab.webp",
             "doc_type": "FACTURE",
             "classification_status": "OK",
@@ -3535,7 +3535,7 @@
         "timestamp": null
       },
       "meta": {
-        "generated_at": "2026-03-19T09:00:32.594246+00:00",
+        "generated_at": "2026-03-19T10:08:53.870912+00:00",
         "schema_version": "2.0",
         "source": "local-context"
       },
@@ -3931,9 +3931,9 @@
         "chunk_count": 9,
         "chunks_embeddings": [
           {
-            "doc_id": "6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_id": "5068f7ef-b69d-4d75-a798-185f0e119167",
             "filename": "image2tab.webp",
-            "doc_key": "id:6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_key": "id:5068f7ef-b69d-4d75-a798-185f0e119167",
             "page_index": 1,
             "sent_index": 0,
             "lang": "fr",
@@ -4334,9 +4334,9 @@
             ]
           },
           {
-            "doc_id": "6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_id": "5068f7ef-b69d-4d75-a798-185f0e119167",
             "filename": "image2tab.webp",
-            "doc_key": "id:6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_key": "id:5068f7ef-b69d-4d75-a798-185f0e119167",
             "page_index": 1,
             "sent_index": 3,
             "lang": "fr",
@@ -4741,9 +4741,9 @@
             ]
           },
           {
-            "doc_id": "6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_id": "5068f7ef-b69d-4d75-a798-185f0e119167",
             "filename": "image2tab.webp",
-            "doc_key": "id:6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_key": "id:5068f7ef-b69d-4d75-a798-185f0e119167",
             "page_index": 1,
             "sent_index": 4,
             "lang": "fr",
@@ -5144,9 +5144,9 @@
             ]
           },
           {
-            "doc_id": "6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_id": "5068f7ef-b69d-4d75-a798-185f0e119167",
             "filename": "image2tab.webp",
-            "doc_key": "id:6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_key": "id:5068f7ef-b69d-4d75-a798-185f0e119167",
             "page_index": 1,
             "sent_index": 5,
             "lang": "fr",
@@ -5542,9 +5542,9 @@
             ]
           },
           {
-            "doc_id": "6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_id": "5068f7ef-b69d-4d75-a798-185f0e119167",
             "filename": "image2tab.webp",
-            "doc_key": "id:6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_key": "id:5068f7ef-b69d-4d75-a798-185f0e119167",
             "page_index": 1,
             "sent_index": 7,
             "lang": "fr",
@@ -5940,9 +5940,9 @@
             ]
           },
           {
-            "doc_id": "6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_id": "5068f7ef-b69d-4d75-a798-185f0e119167",
             "filename": "image2tab.webp",
-            "doc_key": "id:6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_key": "id:5068f7ef-b69d-4d75-a798-185f0e119167",
             "page_index": 1,
             "sent_index": 8,
             "lang": "fr",
@@ -6351,9 +6351,9 @@
             ]
           },
           {
-            "doc_id": "6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_id": "5068f7ef-b69d-4d75-a798-185f0e119167",
             "filename": "image2tab.webp",
-            "doc_key": "id:6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_key": "id:5068f7ef-b69d-4d75-a798-185f0e119167",
             "page_index": 1,
             "sent_index": 9,
             "lang": "fr",
@@ -6749,9 +6749,9 @@
             ]
           },
           {
-            "doc_id": "6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_id": "5068f7ef-b69d-4d75-a798-185f0e119167",
             "filename": "image2tab.webp",
-            "doc_key": "id:6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_key": "id:5068f7ef-b69d-4d75-a798-185f0e119167",
             "page_index": 1,
             "sent_index": 10,
             "lang": "fr",
@@ -7160,9 +7160,9 @@
             ]
           },
           {
-            "doc_id": "6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_id": "5068f7ef-b69d-4d75-a798-185f0e119167",
             "filename": "image2tab.webp",
-            "doc_key": "id:6e648449-bc94-4024-a3f3-95611c1ceff8",
+            "doc_key": "id:5068f7ef-b69d-4d75-a798-185f0e119167",
             "page_index": 1,
             "sent_index": 11,
             "lang": "fr",
@@ -7618,13 +7618,19 @@
     }
   ],
   "cross_document_analysis": {
-    "method": "topic-sentence-audit-v1",
+    "method": "topic-sentence-audit+vector-v2",
     "documents_analyzed": 1,
     "pairs_evaluated": 0,
     "sentence_pairs_scored": 0,
+    "chunk_pairs_scored": 0,
     "links_count": 0,
+    "vector_profile": "pipeline100ml",
+    "embedding_method": "transformer-mean-pooling",
+    "embedding_backend": "hash-fallback",
+    "vector_dim": 384,
+    "vector_links_count": 0,
     "links": [],
-    "generated_at": "2026-03-19T09:00:32.560468+00:00"
+    "generated_at": "2026-03-19T10:08:53.849352+00:00"
   },
   "pipeline": {
     "es_enabled": true,

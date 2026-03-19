@@ -333,12 +333,21 @@ class InterDocLinkingComponent(Component):
             "documents_analyzed": int(analysis.get("documents_analyzed") or 0),
             "pairs_evaluated": int(analysis.get("pairs_evaluated") or 0),
             "sentence_pairs_scored": int(analysis.get("sentence_pairs_scored") or 0),
+            "chunk_pairs_scored": int(analysis.get("chunk_pairs_scored") or 0),
             "links_count": int(analysis.get("links_count") or len(links)),
+            "vector_profile": analysis.get("vector_profile"),
+            "vector_links_count": int(analysis.get("vector_links_count") or 0),
         }
         summary = (
             f"docs={output['documents_analyzed']} | pairs={output['pairs_evaluated']} | "
-            f"links={output['links_count']} | sentence_pairs={output['sentence_pairs_scored']}"
+            f"links={output['links_count']} | sentence_pairs={output['sentence_pairs_scored']} | "
+            f"chunk_pairs={output['chunk_pairs_scored']}"
         )
+        if output.get("vector_profile"):
+            summary += (
+                f" | vector_profile={output['vector_profile']} | "
+                f"vector_links={output['vector_links_count']}"
+            )
         self._report(output, summary)
         return output
 

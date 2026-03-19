@@ -5,7 +5,7 @@ Date d'audit: 2026-03-19
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
 - Python files analyses: 32
-- Fonctions/classes indexees: 682 (voir `FUNCTION_INDEX.txt`)
+- Fonctions/classes indexees: 693 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 - Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
@@ -16,6 +16,7 @@ Date d'audit: 2026-03-19
 - Orchestrateurs:
   - `pipeline/orchestrator.py` (contient `PipelineOrchestrator` + `Pipeline50MLOrchestrator` + `Pipeline100MLOrchestrator`)
 - Wrappers d'execution des composants: `pipeline/components.py`
+- Document de lecture rapide des 3 pipelines: `EXPLICATION_PIPELINES.txt`
 
 ## 3) Pipeline reel (ordre d'execution)
 - Pipeline `default`:
@@ -47,7 +48,9 @@ Date d'audit: 2026-03-19
      - meilleure detection des tableaux denses/serres OCR,
      - sortie context: `TABLE_EXTRACTIONS_50ML` + `TABLE_EXTRACTIONS`.
   8. `liaison-inter-docs` (`component/liaison-inter-docs.py`):
-     - detection de liens inter-documents par overlap de topics + matching phrase-a-phrase auditable.
+     - detection de liens inter-documents par overlap de topics + matching phrase-a-phrase auditable,
+     - ajoute aussi une liaison vectorielle doc-doc et chunk-chunk en reutilisant `ML50_DOC_VECTORS` et `ML50_CHUNK_VECTORS`,
+     - audit des meilleurs chunks relies avec similarite cosinus et extraits de texte.
   9. `elasticsearch`
   10. `extraction-regles` (`component/extraction/extraction-regles-50ml.py`):
      - extraction YAML (sans regex de champs) pilotee par classification/doc_type + scoring BM25 par chunk.
@@ -77,7 +80,9 @@ Date d'audit: 2026-03-19
      - meilleure detection des tableaux denses/serres OCR,
      - sortie context: `TABLE_EXTRACTIONS_100ML` + `TABLE_EXTRACTIONS`.
   8. `liaison-inter-docs` (`component/liaison-inter-docs.py`):
-     - detection de liens inter-documents par overlap de topics + matching phrase-a-phrase auditable.
+     - detection de liens inter-documents par overlap de topics + matching phrase-a-phrase auditable,
+     - ajoute aussi une liaison vectorielle doc-doc et chunk-chunk en reutilisant `ML100_DOC_VECTORS` et `ML100_CHUNK_VECTORS`,
+     - audit des meilleurs chunks relies avec similarite cosinus et extraits de texte.
   9. `elasticsearch`
   10. `extraction-regles` (`component/extraction/extraction-regles-100ml.py`):
      - extraction YAML (sans regex de champs) pilotee par classification/doc_type + scoring BM25 par chunk.
@@ -425,6 +430,12 @@ Reference implementation:
 
 ## 11) Changelog code
 - 2026-03-19:
+  - `EXPLICATION_PIPELINES.txt`:
+    - nouveau fichier texte de lecture rapide pour les 3 pipelines.
+    - explique la selection runtime via `PIPELINE_DEFAULT_CODE` dans `pipeline/cli.py`.
+    - liste les `self.components` exacts de `PipelineOrchestrator`, `Pipeline50MLOrchestrator` et `Pipeline100MLOrchestrator`.
+    - resume le chainage des composants et les informations extraites par chaque etape.
+    - precise aussi les technos/moteurs utilises par composant: `tesseract`, `simplemma`, `WordNet`, `camel_tools`, BERT NER legacy, `xlm-roberta-base`, BM25 maison, et les non-usages comme `Word2Vec`.
   - `component/si-image-pretraiter-sinonpass-le-doc.py`:
     - l'import `IPython.display` est maintenant optionnel.
     - en execution CLI, le composant n'essaie plus d'afficher les images notebook et ne plante plus si `IPython` est absent.
@@ -444,6 +455,19 @@ Reference implementation:
   - `component/tokenisation_layout/tokenisation-layout-100ml.py`:
     - suppression de la dependance dure a `numpy`.
     - calcul des vecteurs hash/mean et des sorties 100ml en listes Python pures.
+  - `component/tokenisation_layout/tokenisation-layout-50ml.py`:
+    - suppression de la dependance dure a `numpy`.
+    - calcul des vecteurs FastText-like/hash et moyennes en listes Python pures.
+  - `component/liaison-inter-docs.py`:
+    - ajoute une couche de liaison vectorielle active seulement en `pipeline50ml` et `pipeline100ml`.
+    - `pipeline50ml`: reutilise `ML50_DOC_VECTORS` et `ML50_CHUNK_VECTORS` (FastText-like local).
+    - `pipeline100ml`: reutilise `ML100_DOC_VECTORS` et `ML100_CHUNK_VECTORS` (embeddings Transformer/XLM-R).
+    - calcule une similarite doc-doc + des meilleurs couples chunk-chunk avec audit de texte, score hybride et similarite cosinus.
+    - enrichit `INTERDOC_ANALYSIS` avec `vector_profile`, `chunk_pairs_scored`, `vector_links_count` et `vector_audit` par lien.
+  - `pipeline/components.py`:
+    - resume du composant `liaison-inter-docs` enrichi avec `chunk_pairs_scored`, `vector_profile` et `vector_links_count`.
+  - `component/fusion_resultats.py`:
+    - exporte maintenant les metadonnees vectorielles inter-docs dans `cross_document_analysis`.
   - `component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py`:
     - suppression de la dependance dure a `numpy`.
     - encodeur/fallback XLM-R et raffinement POS vectoriel adaptes a des matrices/listes Python pures.

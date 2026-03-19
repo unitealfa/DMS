@@ -44,16 +44,6 @@ source .venv/bin/activate
 
 
 
-python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf \
---use-elasticsearch \
---es-url http://localhost:9200 \
---es-index dms_documents
-
-
-
-
-
-
 
 2. Mode complet tokens: 
 
@@ -62,16 +52,6 @@ lancer une fois EA manuelmetn sinon sa marche pas :
   sudo systemctl start elasticsearch
   sudo systemctl status elasticsearch --no-pager
   curl -s http://localhost:9200
-
-  python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
-
-
-
-
-
-
-
-
 
 
 

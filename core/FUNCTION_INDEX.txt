@@ -1,3 +1,4 @@
+# Regenerated: 2026-03-19
 component/atrribution-gramatical/arabcode.py:11:def _install_help():
 component/atrribution-gramatical/arabcode.py:87:def simple_tokenize(text: str) -> List[str]:
 component/atrribution-gramatical/arabcode.py:90:def is_punct(tok: str) -> bool:
@@ -243,95 +244,105 @@ component/fusion_resultats.py:62:def _safe_int(value: Any, default: int = 0) -> 
 component/fusion_resultats.py:69:def _interdoc_aliases(doc_id: Optional[str], filename: Optional[str]) -> List[str]:
 component/fusion_resultats.py:91:def _interdoc_link_ids_for_doc(ctx: Dict[str, Any], doc_id: Optional[str], filename: Optional[str]) -> List[str]:
 component/fusion_resultats.py:110:def _interdoc_output(ctx: Dict[str, Any]) -> Dict[str, Any]:
-component/fusion_resultats.py:133:def _iso_now() -> str:
-component/fusion_resultats.py:137:def _basename(value: Any) -> str:
-component/fusion_resultats.py:146:def _norm_filename(value: Any) -> str:
-component/fusion_resultats.py:150:def _same_filename(a: Any, b: Any) -> bool:
-component/fusion_resultats.py:156:def _safe_non_negative_int(value: Any) -> Optional[int]:
-component/fusion_resultats.py:166:def _size_from_paths(paths: List[Any]) -> Optional[int]:
-component/fusion_resultats.py:190:def _size_maps_from_pretraitement(ctx: Dict[str, Any]) -> Tuple[Dict[str, int], Dict[str, int]]:
-component/fusion_resultats.py:221:def _resolve_file_size(
-component/fusion_resultats.py:246:def _row_belongs_to_doc(row: Any, doc_id: Optional[str], filename: Optional[str]) -> bool:
-component/fusion_resultats.py:258:def _filter_rows_for_doc(rows: Any, doc_id: Optional[str], filename: Optional[str]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:268:def _doc_key(row: Dict[str, Any], index: int) -> str:
-component/fusion_resultats.py:281:def _doc_text_score(row: Dict[str, Any]) -> int:
-component/fusion_resultats.py:298:def _dedupe_docs(rows: Any) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:338:def _normalize_pages_from_doc(row: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:352:def _filter_and_dedupe_extractions(
-component/fusion_resultats.py:393:def _default_nlp_tokens_index(ctx: Dict[str, Any]) -> str:
-component/fusion_resultats.py:401:def _search_index(
-component/fusion_resultats.py:421:def _fetch_nlp_tokens(
-component/fusion_resultats.py:498:def _structure_nlp_tokens(tokens: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:546:def _nlp_from_es_and_ctx(
-component/fusion_resultats.py:722:def _build_map(rows: Any) -> Dict[str, Dict[str, Dict[str, Any]]]:
-component/fusion_resultats.py:737:def _pick_from_map(
-component/fusion_resultats.py:749:def _same_doc_hint(value: Any, filename: str, first_path: str) -> bool:
-component/fusion_resultats.py:758:def _extract_component_views(
-component/fusion_resultats.py:920:def _to_document_output(
-component/fusion_resultats.py:969:def _final_output(
-component/fusion_resultats.py:998:def extract_text_raw(ctx: Dict[str, Any]) -> str:
-component/fusion_resultats.py:1027:def extract_pages_meta(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:1033:def extract_pages(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:1060:def extract_classification(ctx: Dict[str, Any]) -> Dict[str, Any]:
-component/fusion_resultats.py:1066:def extract_doc_type(cls: Dict[str, Any]) -> str:
-component/fusion_resultats.py:1070:def extract_extractions(ctx: Dict[str, Any]) -> Any:
-component/fusion_resultats.py:1074:def extract_detected_languages(ctx: Dict[str, Any]) -> List[str]:
-component/fusion_resultats.py:1078:def _text_from_tok_pages(pages: List[Dict[str, Any]]) -> str:
-component/fusion_resultats.py:1089:def _pages_from_final_doc(final_doc: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:1103:def _collect_local_tokens_for_doc(ctx: Dict[str, Any], doc_id: Optional[str], filename: Optional[str]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:1173:def _pick_local_final_doc(final_docs: List[Dict[str, Any]], doc_id: Optional[str], filename: Optional[str]) -> Dict[str, Any]:
-component/fusion_resultats.py:1186:def _pick_local_classification(results: List[Dict[str, Any]], doc_id: Optional[str], filename: Optional[str]) -> Dict[str, Any]:
-component/fusion_resultats.py:1199:def _build_local_payload_for_doc(
-component/fusion_resultats.py:1314:def build_payloads_from_context(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:1347:def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
-component/fusion_resultats.py:1519:def _es_text_from_pages(src: Dict[str, Any]) -> str:
-component/fusion_resultats.py:1530:def _es_pages(src: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/fusion_resultats.py:1546:def build_payload_from_es_source(
-component/fusion_resultats.py:1652:def build_payloads_from_es(ctx: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], int]:
-component/fusion_resultats.py:1724:def _profile_norm_term(value: Any) -> str:
-component/fusion_resultats.py:1734:def _profile_doc_key(doc_id: Any, filename: Any) -> str:
-component/fusion_resultats.py:1744:def _profile_doc_aliases(doc_id: Any, filename: Any) -> List[str]:
-component/fusion_resultats.py:1756:def _profile_index_rows(rows: Any) -> Dict[str, Any]:
-component/fusion_resultats.py:1772:def _profile_group_rows(rows: Any) -> Dict[str, List[Dict[str, Any]]]:
-component/fusion_resultats.py:1789:def _profile_pick_bm25(extractions: Dict[str, Any], key: str) -> Dict[str, Any]:
-component/fusion_resultats.py:1797:def _is_grammar_noise(token_row: Dict[str, Any]) -> bool:
-component/fusion_resultats.py:1813:def _build_grammar_block_map(ctx: Dict[str, Any]) -> Dict[str, Set[str]]:
-component/fusion_resultats.py:1832:def _collect_blocked_terms(
-component/fusion_resultats.py:1845:def _is_blocked_topic_term(term: str, blocked_terms: Set[str]) -> bool:
-component/fusion_resultats.py:1861:def _filter_topics(topics: Any, blocked_terms: Set[str]) -> Tuple[List[Dict[str, Any]], int]:
-component/fusion_resultats.py:1887:def _filter_chunk_topics(chunks: Any, blocked_terms: Set[str]) -> Tuple[List[Dict[str, Any]], int]:
-component/fusion_resultats.py:1905:def _augment_payload_for_profile(ctx: Dict[str, Any], payload: Dict[str, Any], profile: str) -> Dict[str, Any]:
-component/fusion_resultats.py:2062:def main() -> None:
-component/liaison-inter-docs.py:59:def _iso_now() -> str:
-component/liaison-inter-docs.py:63:def _safe_list(value: Any) -> List[Any]:
-component/liaison-inter-docs.py:67:def _safe_int(value: Any, default: int = 0) -> int:
-component/liaison-inter-docs.py:74:def _normalize_term(value: Any) -> str:
-component/liaison-inter-docs.py:84:def _filename_aliases(filename: Any) -> List[str]:
-component/liaison-inter-docs.py:100:def _sentence_key(filename: str, page_index: int, sent_index: int) -> str:
-component/liaison-inter-docs.py:104:def _is_semantic_pos(pos_value: Any, ner_value: Any) -> bool:
-component/liaison-inter-docs.py:120:def _is_informative_term(term: str) -> bool:
-component/liaison-inter-docs.py:137:def _tokenize_terms(text: str) -> List[str]:
-component/liaison-inter-docs.py:147:def _split_to_sentences(text: str) -> List[str]:
-component/liaison-inter-docs.py:157:def _clip_text(text: str, limit: int = 220) -> str:
-component/liaison-inter-docs.py:164:def _doc_key(doc_id: Any, filename: Any, idx: int) -> str:
-component/liaison-inter-docs.py:174:def _doc_aliases(doc_id: Any, filename: Any, idx: int) -> List[str]:
-component/liaison-inter-docs.py:188:def _extract_classification_terms(row: Dict[str, Any]) -> Set[str]:
-component/liaison-inter-docs.py:207:def _build_classification_index(ctx: Dict[str, Any]) -> Dict[str, Set[str]]:
-component/liaison-inter-docs.py:221:def _build_semantic_sentence_index(ctx: Dict[str, Any]) -> Dict[str, Set[str]]:
-component/liaison-inter-docs.py:250:def _lookup_semantic_terms(
-component/liaison-inter-docs.py:264:def _iter_doc_sentences(
-component/liaison-inter-docs.py:317:def _doc_text_score(doc: Dict[str, Any]) -> int:
-component/liaison-inter-docs.py:325:def _dedupe_docs(rows: Any) -> List[Dict[str, Any]]:
-component/liaison-inter-docs.py:343:def _index_topic_rows(ctx: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
-component/liaison-inter-docs.py:355:def _extract_topics(topic_row: Dict[str, Any], fallback_terms: Counter) -> List[Dict[str, Any]]:
-component/liaison-inter-docs.py:382:def _prepare_docs(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
-component/liaison-inter-docs.py:441:def _score_informative_term(
-component/liaison-inter-docs.py:456:def _sentence_match_score(
-component/liaison-inter-docs.py:509:def _topic_examples_for_doc(doc: Dict[str, Any], term: str, limit: int = 2) -> List[Dict[str, Any]]:
-component/liaison-inter-docs.py:532:def _build_link(doc_a: Dict[str, Any], doc_b: Dict[str, Any]) -> Tuple[Dict[str, Any], int]:
-component/liaison-inter-docs.py:639:def _compute_links(prepared_docs: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], int]:
-component/liaison-inter-docs.py:658:def _build_doc_links_index(prepared_docs: List[Dict[str, Any]], links: List[Dict[str, Any]]) -> Dict[str, List[str]]:
-component/liaison-inter-docs.py:679:def run(ctx: Dict[str, Any]) -> Dict[str, Any]:
+component/fusion_resultats.py:139:def _iso_now() -> str:
+component/fusion_resultats.py:143:def _basename(value: Any) -> str:
+component/fusion_resultats.py:152:def _norm_filename(value: Any) -> str:
+component/fusion_resultats.py:156:def _same_filename(a: Any, b: Any) -> bool:
+component/fusion_resultats.py:162:def _safe_non_negative_int(value: Any) -> Optional[int]:
+component/fusion_resultats.py:172:def _size_from_paths(paths: List[Any]) -> Optional[int]:
+component/fusion_resultats.py:196:def _size_maps_from_pretraitement(ctx: Dict[str, Any]) -> Tuple[Dict[str, int], Dict[str, int]]:
+component/fusion_resultats.py:227:def _resolve_file_size(
+component/fusion_resultats.py:252:def _row_belongs_to_doc(row: Any, doc_id: Optional[str], filename: Optional[str]) -> bool:
+component/fusion_resultats.py:264:def _filter_rows_for_doc(rows: Any, doc_id: Optional[str], filename: Optional[str]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:274:def _doc_key(row: Dict[str, Any], index: int) -> str:
+component/fusion_resultats.py:287:def _doc_text_score(row: Dict[str, Any]) -> int:
+component/fusion_resultats.py:304:def _dedupe_docs(rows: Any) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:344:def _normalize_pages_from_doc(row: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:358:def _filter_and_dedupe_extractions(
+component/fusion_resultats.py:399:def _default_nlp_tokens_index(ctx: Dict[str, Any]) -> str:
+component/fusion_resultats.py:407:def _search_index(
+component/fusion_resultats.py:427:def _fetch_nlp_tokens(
+component/fusion_resultats.py:504:def _structure_nlp_tokens(tokens: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:552:def _nlp_from_es_and_ctx(
+component/fusion_resultats.py:728:def _build_map(rows: Any) -> Dict[str, Dict[str, Dict[str, Any]]]:
+component/fusion_resultats.py:743:def _pick_from_map(
+component/fusion_resultats.py:755:def _same_doc_hint(value: Any, filename: str, first_path: str) -> bool:
+component/fusion_resultats.py:764:def _extract_component_views(
+component/fusion_resultats.py:926:def _to_document_output(
+component/fusion_resultats.py:975:def _final_output(
+component/fusion_resultats.py:1004:def extract_text_raw(ctx: Dict[str, Any]) -> str:
+component/fusion_resultats.py:1033:def extract_pages_meta(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:1039:def extract_pages(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:1066:def extract_classification(ctx: Dict[str, Any]) -> Dict[str, Any]:
+component/fusion_resultats.py:1072:def extract_doc_type(cls: Dict[str, Any]) -> str:
+component/fusion_resultats.py:1076:def extract_extractions(ctx: Dict[str, Any]) -> Any:
+component/fusion_resultats.py:1080:def extract_detected_languages(ctx: Dict[str, Any]) -> List[str]:
+component/fusion_resultats.py:1084:def _text_from_tok_pages(pages: List[Dict[str, Any]]) -> str:
+component/fusion_resultats.py:1095:def _pages_from_final_doc(final_doc: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:1109:def _collect_local_tokens_for_doc(ctx: Dict[str, Any], doc_id: Optional[str], filename: Optional[str]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:1179:def _pick_local_final_doc(final_docs: List[Dict[str, Any]], doc_id: Optional[str], filename: Optional[str]) -> Dict[str, Any]:
+component/fusion_resultats.py:1192:def _pick_local_classification(results: List[Dict[str, Any]], doc_id: Optional[str], filename: Optional[str]) -> Dict[str, Any]:
+component/fusion_resultats.py:1205:def _build_local_payload_for_doc(
+component/fusion_resultats.py:1320:def build_payloads_from_context(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:1353:def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
+component/fusion_resultats.py:1525:def _es_text_from_pages(src: Dict[str, Any]) -> str:
+component/fusion_resultats.py:1536:def _es_pages(src: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/fusion_resultats.py:1552:def build_payload_from_es_source(
+component/fusion_resultats.py:1658:def build_payloads_from_es(ctx: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], int]:
+component/fusion_resultats.py:1730:def _profile_norm_term(value: Any) -> str:
+component/fusion_resultats.py:1740:def _profile_doc_key(doc_id: Any, filename: Any) -> str:
+component/fusion_resultats.py:1750:def _profile_doc_aliases(doc_id: Any, filename: Any) -> List[str]:
+component/fusion_resultats.py:1762:def _profile_index_rows(rows: Any) -> Dict[str, Any]:
+component/fusion_resultats.py:1778:def _profile_group_rows(rows: Any) -> Dict[str, List[Dict[str, Any]]]:
+component/fusion_resultats.py:1795:def _profile_pick_bm25(extractions: Dict[str, Any], key: str) -> Dict[str, Any]:
+component/fusion_resultats.py:1803:def _is_grammar_noise(token_row: Dict[str, Any]) -> bool:
+component/fusion_resultats.py:1819:def _build_grammar_block_map(ctx: Dict[str, Any]) -> Dict[str, Set[str]]:
+component/fusion_resultats.py:1838:def _collect_blocked_terms(
+component/fusion_resultats.py:1851:def _is_blocked_topic_term(term: str, blocked_terms: Set[str]) -> bool:
+component/fusion_resultats.py:1867:def _filter_topics(topics: Any, blocked_terms: Set[str]) -> Tuple[List[Dict[str, Any]], int]:
+component/fusion_resultats.py:1893:def _filter_chunk_topics(chunks: Any, blocked_terms: Set[str]) -> Tuple[List[Dict[str, Any]], int]:
+component/fusion_resultats.py:1911:def _augment_payload_for_profile(ctx: Dict[str, Any], payload: Dict[str, Any], profile: str) -> Dict[str, Any]:
+component/fusion_resultats.py:2068:def main() -> None:
+component/liaison-inter-docs.py:80:def _iso_now() -> str:
+component/liaison-inter-docs.py:84:def _safe_list(value: Any) -> List[Any]:
+component/liaison-inter-docs.py:88:def _safe_int(value: Any, default: int = 0) -> int:
+component/liaison-inter-docs.py:95:def _safe_float(value: Any, default: float = 0.0) -> float:
+component/liaison-inter-docs.py:102:def _normalize_term(value: Any) -> str:
+component/liaison-inter-docs.py:112:def _filename_aliases(filename: Any) -> List[str]:
+component/liaison-inter-docs.py:128:def _sentence_key(filename: str, page_index: int, sent_index: int) -> str:
+component/liaison-inter-docs.py:132:def _is_semantic_pos(pos_value: Any, ner_value: Any) -> bool:
+component/liaison-inter-docs.py:148:def _is_informative_term(term: str) -> bool:
+component/liaison-inter-docs.py:165:def _tokenize_terms(text: str) -> List[str]:
+component/liaison-inter-docs.py:175:def _split_to_sentences(text: str) -> List[str]:
+component/liaison-inter-docs.py:185:def _clip_text(text: str, limit: int = 220) -> str:
+component/liaison-inter-docs.py:192:def _coerce_vector(value: Any) -> List[float]:
+component/liaison-inter-docs.py:204:def _vector_norm(vec: List[float]) -> float:
+component/liaison-inter-docs.py:208:def _cosine_similarity(vec_a: Any, vec_b: Any) -> float:
+component/liaison-inter-docs.py:226:def _mean_vector(rows: List[List[float]]) -> List[float]:
+component/liaison-inter-docs.py:244:def _doc_key(doc_id: Any, filename: Any, idx: int) -> str:
+component/liaison-inter-docs.py:254:def _doc_aliases(doc_id: Any, filename: Any, idx: int) -> List[str]:
+component/liaison-inter-docs.py:268:def _extract_classification_terms(row: Dict[str, Any]) -> Set[str]:
+component/liaison-inter-docs.py:287:def _build_classification_index(ctx: Dict[str, Any]) -> Dict[str, Set[str]]:
+component/liaison-inter-docs.py:301:def _build_semantic_sentence_index(ctx: Dict[str, Any]) -> Dict[str, Set[str]]:
+component/liaison-inter-docs.py:330:def _lookup_semantic_terms(
+component/liaison-inter-docs.py:344:def _iter_doc_sentences(
+component/liaison-inter-docs.py:397:def _doc_text_score(doc: Dict[str, Any]) -> int:
+component/liaison-inter-docs.py:405:def _dedupe_docs(rows: Any) -> List[Dict[str, Any]]:
+component/liaison-inter-docs.py:423:def _index_topic_rows(ctx: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+component/liaison-inter-docs.py:435:def _vector_profile(ctx: Dict[str, Any]) -> Dict[str, Any]:
+component/liaison-inter-docs.py:457:def _build_vector_index(ctx: Dict[str, Any]) -> Dict[str, Any]:
+component/liaison-inter-docs.py:499:def _extract_topics(topic_row: Dict[str, Any], fallback_terms: Counter) -> List[Dict[str, Any]]:
+component/liaison-inter-docs.py:526:def _chunk_topic_terms(row: Dict[str, Any]) -> Set[str]:
+component/liaison-inter-docs.py:540:def _prepare_docs(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
+component/liaison-inter-docs.py:659:def _score_informative_term(
+component/liaison-inter-docs.py:674:def _sentence_match_score(
+component/liaison-inter-docs.py:727:def _topic_examples_for_doc(doc: Dict[str, Any], term: str, limit: int = 2) -> List[Dict[str, Any]]:
+component/liaison-inter-docs.py:750:def _sorted_shared_terms(shared: Set[str], limit: int = MAX_SHARED_TERMS_PER_MATCH) -> List[str]:
+component/liaison-inter-docs.py:756:def _vector_chunk_matches(
+component/liaison-inter-docs.py:855:def _build_link(doc_a: Dict[str, Any], doc_b: Dict[str, Any]) -> Tuple[Dict[str, Any], int, int]:
+component/liaison-inter-docs.py:1029:def _compute_links(prepared_docs: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], int, int]:
+component/liaison-inter-docs.py:1050:def _build_doc_links_index(prepared_docs: List[Dict[str, Any]], links: List[Dict[str, Any]]) -> Dict[str, List[str]]:
+component/liaison-inter-docs.py:1071:def run(ctx: Dict[str, Any]) -> Dict[str, Any]:
 component/output-txt.py:51:    def build_config(oem, psm, base_flags, dpi, tessdata_dir, user_words, user_patterns):
 component/output-txt.py:56:    class _DummyFT:
 component/output-txt.py:57:        def __init__(self, ext: str):
@@ -469,28 +480,29 @@ component/tokenisation_layout/tokenisation-layout-100ml.py:328:    def __init__(
 component/tokenisation_layout/tokenisation-layout-100ml.py:361:    def embed_texts(self, texts: List[str]) -> List[Vector]:
 component/tokenisation_layout/tokenisation-layout-100ml.py:413:def _run_base_tokenisation(ctx: Dict[str, Any]) -> None:
 component/tokenisation_layout/tokenisation-layout-100ml.py:419:def _augment_with_ml100(ctx: Dict[str, Any]) -> None:
-component/tokenisation_layout/tokenisation-layout-50ml.py:37:def _safe_int(value: Any, default: int) -> int:
-component/tokenisation_layout/tokenisation-layout-50ml.py:44:def _norm_token(token: str) -> str:
-component/tokenisation_layout/tokenisation-layout-50ml.py:48:def _tokenize(text: str) -> List[str]:
-component/tokenisation_layout/tokenisation-layout-50ml.py:52:def _norm_topic_term(term: str) -> str:
-component/tokenisation_layout/tokenisation-layout-50ml.py:63:def _is_topic_candidate(term: str) -> bool:
-component/tokenisation_layout/tokenisation-layout-50ml.py:84:def _tokens_to_topic_terms(tokens: List[str], max_ngram: int = 2) -> List[str]:
-component/tokenisation_layout/tokenisation-layout-50ml.py:102:def _score_term_quality(term: str) -> float:
-component/tokenisation_layout/tokenisation-layout-50ml.py:114:def _prune_topic_redundancy(scored_terms: List[Tuple[str, float]], max_topics: int) -> List[Tuple[str, float]]:
-component/tokenisation_layout/tokenisation-layout-50ml.py:136:def _extract_terms_from_keyword_item(item: Any) -> List[str]:
-component/tokenisation_layout/tokenisation-layout-50ml.py:149:def _build_topic_boost_terms(ctx: Dict[str, Any], doc_id: Any, filename: str) -> Dict[str, float]:
-component/tokenisation_layout/tokenisation-layout-50ml.py:172:    def _apply(items: Any, factor: float) -> None:
-component/tokenisation_layout/tokenisation-layout-50ml.py:197:def _char_ngrams(token: str, min_n: int = 3, max_n: int = 5) -> Iterable[str]:
-component/tokenisation_layout/tokenisation-layout-50ml.py:213:def _hash_index_sign(value: str, dim: int) -> Tuple[int, float]:
-component/tokenisation_layout/tokenisation-layout-50ml.py:220:def _fasttext_like_vector(token: str, dim: int) -> np.ndarray:
-component/tokenisation_layout/tokenisation-layout-50ml.py:232:def _mean_vectors(vectors: List[np.ndarray], dim: int) -> np.ndarray:
-component/tokenisation_layout/tokenisation-layout-50ml.py:245:def _to_list(vec: np.ndarray, precision: int = 6) -> List[float]:
-component/tokenisation_layout/tokenisation-layout-50ml.py:249:def _iter_doc_chunks(doc: Dict[str, Any]) -> Iterable[Tuple[int, int, str, str]]:
-component/tokenisation_layout/tokenisation-layout-50ml.py:270:def _extract_topics_from_chunks(
-component/tokenisation_layout/tokenisation-layout-50ml.py:305:def _extract_chunk_topics(
-component/tokenisation_layout/tokenisation-layout-50ml.py:334:def _doc_key(doc_id: Any, filename: Any) -> str:
-component/tokenisation_layout/tokenisation-layout-50ml.py:342:def _run_base_tokenisation(ctx: Dict[str, Any]) -> None:
-component/tokenisation_layout/tokenisation-layout-50ml.py:348:def _augment_with_ml50(ctx: Dict[str, Any]) -> None:
+component/tokenisation_layout/tokenisation-layout-50ml.py:35:def _safe_int(value: Any, default: int) -> int:
+component/tokenisation_layout/tokenisation-layout-50ml.py:42:def _norm_token(token: str) -> str:
+component/tokenisation_layout/tokenisation-layout-50ml.py:46:def _tokenize(text: str) -> List[str]:
+component/tokenisation_layout/tokenisation-layout-50ml.py:50:def _norm_topic_term(term: str) -> str:
+component/tokenisation_layout/tokenisation-layout-50ml.py:61:def _is_topic_candidate(term: str) -> bool:
+component/tokenisation_layout/tokenisation-layout-50ml.py:82:def _tokens_to_topic_terms(tokens: List[str], max_ngram: int = 2) -> List[str]:
+component/tokenisation_layout/tokenisation-layout-50ml.py:100:def _score_term_quality(term: str) -> float:
+component/tokenisation_layout/tokenisation-layout-50ml.py:112:def _prune_topic_redundancy(scored_terms: List[Tuple[str, float]], max_topics: int) -> List[Tuple[str, float]]:
+component/tokenisation_layout/tokenisation-layout-50ml.py:134:def _extract_terms_from_keyword_item(item: Any) -> List[str]:
+component/tokenisation_layout/tokenisation-layout-50ml.py:147:def _build_topic_boost_terms(ctx: Dict[str, Any], doc_id: Any, filename: str) -> Dict[str, float]:
+component/tokenisation_layout/tokenisation-layout-50ml.py:170:    def _apply(items: Any, factor: float) -> None:
+component/tokenisation_layout/tokenisation-layout-50ml.py:195:def _char_ngrams(token: str, min_n: int = 3, max_n: int = 5) -> Iterable[str]:
+component/tokenisation_layout/tokenisation-layout-50ml.py:211:def _hash_index_sign(value: str, dim: int) -> Tuple[int, float]:
+component/tokenisation_layout/tokenisation-layout-50ml.py:218:def _vector_norm(vec: Vector) -> float:
+component/tokenisation_layout/tokenisation-layout-50ml.py:222:def _fasttext_like_vector(token: str, dim: int) -> Vector:
+component/tokenisation_layout/tokenisation-layout-50ml.py:234:def _mean_vectors(vectors: List[Vector], dim: int) -> Vector:
+component/tokenisation_layout/tokenisation-layout-50ml.py:249:def _to_list(vec: Vector, precision: int = 6) -> List[float]:
+component/tokenisation_layout/tokenisation-layout-50ml.py:253:def _iter_doc_chunks(doc: Dict[str, Any]) -> Iterable[Tuple[int, int, str, str]]:
+component/tokenisation_layout/tokenisation-layout-50ml.py:274:def _extract_topics_from_chunks(
+component/tokenisation_layout/tokenisation-layout-50ml.py:309:def _extract_chunk_topics(
+component/tokenisation_layout/tokenisation-layout-50ml.py:338:def _doc_key(doc_id: Any, filename: Any) -> str:
+component/tokenisation_layout/tokenisation-layout-50ml.py:346:def _run_base_tokenisation(ctx: Dict[str, Any]) -> None:
+component/tokenisation_layout/tokenisation-layout-50ml.py:352:def _augment_with_ml50(ctx: Dict[str, Any]) -> None:
 component/tokenisation_layout/tokenisation-layout.py:15:    def _get_pdf_reader():
 component/tokenisation_layout/tokenisation-layout.py:42:def _ensure_nltk():
 component/tokenisation_layout/tokenisation-layout.py:64:def detect_lang(text: str) -> str:
@@ -581,14 +593,14 @@ pipeline/components.py:300:class TableExtractionComponent(Component):
 pipeline/components.py:301:    def run(self, context: Context) -> Any:
 pipeline/components.py:323:class InterDocLinkingComponent(Component):
 pipeline/components.py:324:    def run(self, context: Context) -> Any:
-pipeline/components.py:346:class ElasticsearchComponent(Component):
-pipeline/components.py:347:    def run(self, context: Context) -> Any:
-pipeline/components.py:387:class ClassificationComponent(Component):
-pipeline/components.py:388:    def run(self, context: Context) -> Any:
-pipeline/components.py:434:class RuleExtractionComponent(Component):
-pipeline/components.py:435:    def run(self, context: Context) -> Any:
-pipeline/components.py:484:class FusionResultComponent(Component):
-pipeline/components.py:487:    def run(self, context: Context) -> Any:
+pipeline/components.py:355:class ElasticsearchComponent(Component):
+pipeline/components.py:356:    def run(self, context: Context) -> Any:
+pipeline/components.py:396:class ClassificationComponent(Component):
+pipeline/components.py:397:    def run(self, context: Context) -> Any:
+pipeline/components.py:443:class RuleExtractionComponent(Component):
+pipeline/components.py:444:    def run(self, context: Context) -> Any:
+pipeline/components.py:493:class FusionResultComponent(Component):
+pipeline/components.py:496:    def run(self, context: Context) -> Any:
 pipeline/elasticsearch.py:33:def _iso_now() -> str:
 pipeline/elasticsearch.py:37:def _unique_keep_order(items: Iterable[str]) -> List[str]:
 pipeline/elasticsearch.py:48:def _safe_int(value: Any, default: int = 0) -> int:

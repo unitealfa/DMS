@@ -1,8 +1,8 @@
 """
-Fusionne les sorties du pipeline en un JSON unique selon les directives de
-"prompte .txt". Le script lit les variables globales (injectées par les
-composants exécutés via runpy.run_path) et construit une structure complète
-avec des valeurs par défaut prudentes.
+Fusionne les sorties du pipeline en un JSON unique selon le schema du projet.
+Le script lit les variables globales (injectees par les composants executes via
+runpy.run_path) et construit une structure complete avec des valeurs par
+defaut prudentes.
 
 Usage :
     python -m component.fusion_resultats
@@ -11,11 +11,13 @@ ou  runpy.run_path("component/fusion_resultats.py", init_globals=ctx)
 
 from __future__ import annotations
 
+from collections import defaultdict
 import json
 import sys
+import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 from urllib.parse import quote
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -1674,6 +1676,389 @@ def build_payloads_from_es(ctx: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], i
         return [], 0
 
 
+# ---------- Branches de fusion profilees (default / pipeline50ml / pipeline100ml) ----------
+_PROFILE_AUGMENT_CONFIG: Dict[str, Dict[str, str]] = {
+    "pipeline50ml": {
+        "tag": "50ml",
+        "ctx_prefix": "ML50",
+        "doc_section": "ml50",
+        "table_ctx_key": "TABLE_EXTRACTIONS_50ML",
+        "topic_print_tag": "[ml50-topic]",
+        "table_print_tag": "[table-50ml]",
+        "summary_print_tag": "[fusion-resultats-50ml]",
+    },
+    "pipeline100ml": {
+        "tag": "100ml",
+        "ctx_prefix": "ML100",
+        "doc_section": "ml100",
+        "table_ctx_key": "TABLE_EXTRACTIONS_100ML",
+        "topic_print_tag": "[ml100-topic]",
+        "table_print_tag": "[table-100ml]",
+        "summary_print_tag": "[fusion-resultats-100ml]",
+    },
+}
+
+_GRAMMAR_BLOCK_POS = {
+    "PRON", "DET", "ADP", "CCONJ", "SCONJ", "CONJ", "PART", "AUX", "INTJ", "PUNCT", "SYM",
+    "ADV", "RB", "RBR", "RBS",
+    "PRP", "PRP$", "WP", "WP$", "WDT", "DT", "IN", "TO", "CC", "MD", "UH", "EX", "PDT", "POS", "RP",
+}
+
+_GRAMMAR_BLOCK_TERMS = {
+    "_", "∅",
+    "je", "tu", "il", "elle", "on", "nous", "vous", "ils", "elles",
+    "me", "moi", "te", "toi", "se", "lui", "leur", "leurs",
+    "ce", "cet", "cette", "ces", "cela", "ca", "ça", "qui", "que", "quoi", "dont", "ou", "où",
+    "de", "du", "des", "la", "le", "les", "un", "une", "et", "mais", "ou", "donc", "or", "ni", "car",
+    "plus", "moins", "tres", "très", "avec", "pour", "par", "dans", "sur", "aux", "au",
+    "i", "you", "he", "she", "it", "we", "they", "me", "him", "her", "us", "them",
+    "my", "your", "his", "its", "our", "their", "mine", "yours", "hers", "ours", "theirs",
+    "this", "that", "these", "those", "who", "which", "whom", "whose", "what", "where", "when", "why", "how",
+    "a", "an", "the", "and", "or", "but", "to", "of", "in", "on", "at", "for", "with", "from", "as",
+    "is", "are", "was", "were", "be", "been", "being", "do", "does", "did", "have", "has", "had",
+    "هو", "هي", "هم", "هن", "انا", "أنت", "انت", "أنتم", "نحن", "ذلك", "هذه", "هذا", "الذي", "التي",
+    "من", "في", "على", "الى", "إلى", "عن", "و", "او", "أو",
+}
+
+
+def _profile_norm_term(value: Any) -> str:
+    txt = str(value or "").strip().lower()
+    if not txt:
+        return ""
+    txt = unicodedata.normalize("NFKD", txt)
+    txt = "".join(ch for ch in txt if not unicodedata.combining(ch))
+    txt = txt.replace("’", "'").replace("`", "'")
+    return txt
+
+
+def _profile_doc_key(doc_id: Any, filename: Any) -> str:
+    sid = str(doc_id or "").strip()
+    if sid.lower() in {"non_specified", "none", "null", "na", "n/a"}:
+        sid = ""
+    if sid:
+        return f"id:{sid}"
+    sfn = str(filename or "").strip().lower()
+    return f"fn:{sfn}"
+
+
+def _profile_doc_aliases(doc_id: Any, filename: Any) -> List[str]:
+    aliases = {_profile_doc_key(doc_id, filename)}
+    sid = str(doc_id or "").strip()
+    if sid:
+        aliases.add(f"id:{sid}")
+    sfn = str(filename or "").strip().lower()
+    if sfn:
+        aliases.add(f"fn:{sfn}")
+        aliases.add(f"fn:{Path(sfn).name}")
+    return [a for a in aliases if a]
+
+
+def _profile_index_rows(rows: Any) -> Dict[str, Any]:
+    out: Dict[str, Any] = {}
+    for row in _safe_list(rows):
+        if not isinstance(row, dict):
+            continue
+        key = _profile_doc_key(row.get("doc_id"), row.get("filename"))
+        out[key] = row
+        if row.get("filename"):
+            raw_fn = str(row.get("filename")).strip().lower()
+            out[f"fn:{raw_fn}"] = row
+            out[f"fn:{Path(raw_fn).name}"] = row
+        if row.get("doc_id"):
+            out[f"id:{str(row.get('doc_id')).strip()}"] = row
+    return out
+
+
+def _profile_group_rows(rows: Any) -> Dict[str, List[Dict[str, Any]]]:
+    out: Dict[str, List[Dict[str, Any]]] = {}
+    for row in _safe_list(rows):
+        if not isinstance(row, dict):
+            continue
+        keys = {_profile_doc_key(row.get("doc_id"), row.get("filename"))}
+        if row.get("filename"):
+            raw_fn = str(row.get("filename")).strip().lower()
+            keys.add(f"fn:{raw_fn}")
+            keys.add(f"fn:{Path(raw_fn).name}")
+        if row.get("doc_id"):
+            keys.add(f"id:{str(row.get('doc_id')).strip()}")
+        for key in keys:
+            out.setdefault(key, []).append(row)
+    return out
+
+
+def _profile_pick_bm25(extractions: Dict[str, Any], key: str) -> Dict[str, Any]:
+    row = extractions.get(key)
+    if not isinstance(row, dict):
+        return {}
+    bm25 = row.get("bm25")
+    return bm25 if isinstance(bm25, dict) else {}
+
+
+def _is_grammar_noise(token_row: Dict[str, Any]) -> bool:
+    pos = str(token_row.get("pos") or "").strip().upper()
+    if pos in _GRAMMAR_BLOCK_POS:
+        return True
+    if any(pos.startswith(prefix) for prefix in ("PRON", "DET", "ADV", "CONJ", "AUX", "ADP")):
+        return True
+
+    token = _profile_norm_term(token_row.get("token"))
+    lemma = _profile_norm_term(token_row.get("lemma"))
+    if token in _GRAMMAR_BLOCK_TERMS or lemma in _GRAMMAR_BLOCK_TERMS:
+        return True
+    if token in {"_", "∅"} or lemma in {"_", "∅"}:
+        return True
+    return False
+
+
+def _build_grammar_block_map(ctx: Dict[str, Any]) -> Dict[str, Set[str]]:
+    out: Dict[str, Set[str]] = {}
+    for row in _safe_list(ctx.get("NLP_TOKENS")):
+        if not isinstance(row, dict):
+            continue
+        if not _is_grammar_noise(row):
+            continue
+        token = _profile_norm_term(row.get("token"))
+        lemma = _profile_norm_term(row.get("lemma"))
+        aliases = _profile_doc_aliases(row.get("doc_id"), row.get("filename") or row.get("doc"))
+        for key in aliases:
+            bucket = out.setdefault(key, set())
+            if token:
+                bucket.add(token)
+            if lemma:
+                bucket.add(lemma)
+    return out
+
+
+def _collect_blocked_terms(
+    blocked_map: Dict[str, Set[str]],
+    doc_id: Any,
+    filename: Any,
+) -> Set[str]:
+    out: Set[str] = set()
+    for key in _profile_doc_aliases(doc_id, filename):
+        values = blocked_map.get(key)
+        if values:
+            out.update(values)
+    return out
+
+
+def _is_blocked_topic_term(term: str, blocked_terms: Set[str]) -> bool:
+    if not blocked_terms:
+        return False
+    norm = _profile_norm_term(term)
+    if not norm:
+        return True
+    if norm in blocked_terms:
+        return True
+    parts = [p for p in norm.split() if p]
+    if not parts:
+        return True
+    if len(parts) == 1:
+        return parts[0] in blocked_terms
+    return any(p in blocked_terms for p in parts)
+
+
+def _filter_topics(topics: Any, blocked_terms: Set[str]) -> Tuple[List[Dict[str, Any]], int]:
+    out: List[Dict[str, Any]] = []
+    seen = set()
+    removed = 0
+
+    for item in _safe_list(topics):
+        if not isinstance(item, dict):
+            continue
+        term = str(item.get("term") or "").strip()
+        if not term:
+            continue
+        norm = _profile_norm_term(term)
+        if not norm:
+            removed += 1
+            continue
+        if norm in seen:
+            continue
+        if _is_blocked_topic_term(term, blocked_terms):
+            removed += 1
+            continue
+        seen.add(norm)
+        out.append(item)
+
+    return out, removed
+
+
+def _filter_chunk_topics(chunks: Any, blocked_terms: Set[str]) -> Tuple[List[Dict[str, Any]], int]:
+    out: List[Dict[str, Any]] = []
+    removed = 0
+
+    for chunk in _safe_list(chunks):
+        if not isinstance(chunk, dict):
+            continue
+        row = dict(chunk)
+        src_topics = _safe_list(row.get("chunk_topics")) or _safe_list(row.get("topics"))
+        clean_topics, removed_here = _filter_topics(src_topics, blocked_terms)
+        removed += removed_here
+        row["chunk_topics"] = clean_topics
+        row["chunk_primary_topic"] = clean_topics[0]["term"] if clean_topics else None
+        out.append(row)
+
+    return out, removed
+
+
+def _augment_payload_for_profile(ctx: Dict[str, Any], payload: Dict[str, Any], profile: str) -> Dict[str, Any]:
+    cfg = _PROFILE_AUGMENT_CONFIG.get(str(profile or "").strip().lower())
+    if not cfg:
+        return payload
+
+    docs = _safe_list(payload.get("documents"))
+    prefix = cfg["ctx_prefix"]
+    doc_vec_map = _profile_index_rows(ctx.get(f"{prefix}_DOC_VECTORS"))
+    topic_map = _profile_index_rows(ctx.get(f"{prefix}_TOPICS"))
+    chunk_map = _profile_group_rows(ctx.get(f"{prefix}_CHUNK_VECTORS"))
+    word_map = _profile_group_rows(ctx.get(f"{prefix}_WORD_VECTORS"))
+    ext_map = _profile_index_rows(ctx.get("EXTRACTIONS"))
+    table_map = _profile_index_rows(ctx.get(cfg["table_ctx_key"]) or ctx.get("TABLE_EXTRACTIONS"))
+    blocked_map = _build_grammar_block_map(ctx)
+
+    for doc in docs:
+        if not isinstance(doc, dict):
+            continue
+        doc_id = doc.get("document_id")
+        filename = (doc.get("file") or {}).get("name") if isinstance(doc.get("file"), dict) else None
+        key = _profile_doc_key(doc_id, filename)
+        blocked_terms = _collect_blocked_terms(blocked_map, doc_id, filename)
+
+        vec_row = doc_vec_map.get(key) or {}
+        topic_row = topic_map.get(key) or {}
+        raw_doc_chunks = chunk_map.get(key) or []
+        doc_chunks, removed_chunk_topics = _filter_chunk_topics(raw_doc_chunks, blocked_terms)
+        doc_words = word_map.get(key) or []
+        bm25 = _profile_pick_bm25(ext_map, key)
+        table_row = table_map.get(key) or {}
+        doc_topics = _safe_list(topic_row.get("document_topics")) or _safe_list(topic_row.get("topics"))
+        if not doc_topics:
+            topic_scores: Dict[str, float] = defaultdict(float)
+            for chunk in doc_chunks:
+                if not isinstance(chunk, dict):
+                    continue
+                for item in _safe_list(chunk.get("chunk_topics")) or _safe_list(chunk.get("topics")):
+                    if not isinstance(item, dict):
+                        continue
+                    term = str(item.get("term") or "").strip()
+                    if not term:
+                        continue
+                    try:
+                        score = float(item.get("score") or 0.0)
+                    except Exception:
+                        score = 0.0
+                    topic_scores[term] += score
+            doc_topics = [
+                {"term": term, "score": round(score, 6)}
+                for term, score in sorted(topic_scores.items(), key=lambda x: x[1], reverse=True)[:12]
+            ]
+        doc_topics, removed_doc_topics = _filter_topics(doc_topics, blocked_terms)
+        document_primary_topics = (
+            _safe_list(topic_row.get("document_primary_topics"))[:2]
+            or _safe_list(topic_row.get("main_topics"))[:2]
+        )
+        document_primary_topics = [
+            str(topic).strip()
+            for topic in _safe_list(document_primary_topics)
+            if str(topic).strip() and not _is_blocked_topic_term(str(topic), blocked_terms)
+        ][:2]
+        if not document_primary_topics:
+            document_primary_topics = [
+                str(item.get("term"))
+                for item in doc_topics[:2]
+                if isinstance(item, dict) and item.get("term")
+            ]
+
+        doc[cfg["doc_section"]] = {
+            "embedding_method": ctx.get(f"{prefix}_EMBEDDING_METHOD"),
+            "vector_dim": ctx.get(f"{prefix}_VECTOR_DIM"),
+            "document_vector": vec_row.get("vector"),
+            "chunk_count": int(vec_row.get("chunk_count") or len(doc_chunks)),
+            "chunks_embeddings": doc_chunks,
+            "word_embeddings": doc_words,
+            "document_primary_topics": document_primary_topics,
+            "document_topics": doc_topics,
+        }
+
+        extraction = doc.get("extraction")
+        if not isinstance(extraction, dict):
+            extraction = {}
+        if bm25:
+            extraction["bm25"] = bm25
+        if isinstance(table_row, dict):
+            extraction["table_extraction"] = {
+                "engine": table_row.get("engine"),
+                "tables_count": int(table_row.get("tables_count") or 0),
+                "rows_total": int(table_row.get("rows_total") or 0),
+                "detected_columns": _safe_list(table_row.get("detected_columns")),
+                "totals": table_row.get("totals") if isinstance(table_row.get("totals"), dict) else {},
+                "line_items": _safe_list(table_row.get("line_items")),
+                "tables": _safe_list(table_row.get("tables")),
+            }
+        doc["extraction"] = extraction
+
+        components = doc.get("components")
+        if not isinstance(components, dict):
+            components = {}
+        components[f"tokenisation_layout_{cfg['tag']}"] = {
+            "embedding_method": ctx.get(f"{prefix}_EMBEDDING_METHOD"),
+            "vector_dim": ctx.get(f"{prefix}_VECTOR_DIM"),
+            "document_primary_topics": document_primary_topics,
+            "document_topics_count": len(doc_topics),
+            "chunk_vectors_count": len(doc_chunks),
+            "word_vectors_count": len(doc_words),
+            "topics_removed_by_grammar": int(removed_doc_topics + removed_chunk_topics),
+        }
+        components[f"extraction_regles_{cfg['tag']}"] = {
+            "bm25_best_score": bm25.get("best_score") if isinstance(bm25, dict) else None,
+            "bm25_chunks_total": bm25.get("chunks_total") if isinstance(bm25, dict) else None,
+            "bm25_query_terms_count": len(_safe_list(bm25.get("query_terms"))) if isinstance(bm25, dict) else 0,
+        }
+        components[f"table_extraction_{cfg['tag']}"] = {
+            "engine": table_row.get("engine") if isinstance(table_row, dict) else None,
+            "tables_count": int((table_row.get("tables_count") if isinstance(table_row, dict) else 0) or 0),
+            "rows_total": int((table_row.get("rows_total") if isinstance(table_row, dict) else 0) or 0),
+            "detected_columns": _safe_list(table_row.get("detected_columns")) if isinstance(table_row, dict) else [],
+        }
+        doc["components"] = components
+
+        filename_label = str(filename or doc_id or "unknown")
+        top_topics = [
+            str(item.get("term"))
+            for item in doc_topics[:5]
+            if isinstance(item, dict) and item.get("term")
+        ]
+        print(
+            f"{cfg['topic_print_tag']} {filename_label} | document_primary_topics={document_primary_topics} | "
+            f"document_top_topics={top_topics} | blocked_terms={len(blocked_terms)} | "
+            f"topics_removed={removed_doc_topics + removed_chunk_topics}"
+        )
+        if isinstance(table_row, dict):
+            print(
+                f"{cfg['table_print_tag']} {filename_label} | tables={int(table_row.get('tables_count') or 0)} | "
+                f"rows={int(table_row.get('rows_total') or 0)} | cols={_safe_list(table_row.get('detected_columns'))}"
+            )
+
+    pipeline = payload.get("pipeline")
+    if not isinstance(pipeline, dict):
+        pipeline = {}
+    pipeline["profile"] = profile
+    pipeline[cfg["doc_section"]] = {
+        "embedding_method": ctx.get(f"{prefix}_EMBEDDING_METHOD"),
+        "vector_dim": ctx.get(f"{prefix}_VECTOR_DIM"),
+        "doc_vectors_count": len(_safe_list(ctx.get(f"{prefix}_DOC_VECTORS"))),
+        "chunk_vectors_count": len(_safe_list(ctx.get(f"{prefix}_CHUNK_VECTORS"))),
+        "word_vectors_count": len(_safe_list(ctx.get(f"{prefix}_WORD_VECTORS"))),
+        "topics_docs_count": len(_safe_list(ctx.get(f"{prefix}_TOPICS"))),
+        "tables_docs_count": len(_safe_list(ctx.get(cfg["table_ctx_key"]) or ctx.get("TABLE_EXTRACTIONS"))),
+    }
+    payload["pipeline"] = pipeline
+    payload["documents"] = docs
+    payload["documents_count"] = len(docs)
+    return payload
+
+
 def main() -> None:
     ctx = globals()
     payloads, es_synced = build_payloads_from_es(ctx)
@@ -1692,7 +2077,9 @@ def main() -> None:
             payload = build_payload_from_context(ctx)
             payloads = [payload]
 
+    profile = str(ctx.get("PIPELINE_PROFILE") or "default").strip().lower()
     final_payload = _final_output(ctx, payloads, source)
+    final_payload = _augment_payload_for_profile(ctx, final_payload, profile)
     OUTPUT_PATH.write_text(json.dumps(final_payload, ensure_ascii=False, indent=2), encoding="utf-8")
     ctx["FUSION_RESULT"] = str(OUTPUT_PATH)
     ctx["FUSION_PAYLOAD"] = final_payload
@@ -1704,6 +2091,15 @@ def main() -> None:
     print("[Component: fusion-resultats]")
     print(f"[fusion-result] source={source} | docs={len(payloads)} | es_synced={es_synced}")
     print(f"[fusion-result] JSON fusionne ecrit dans {OUTPUT_PATH}")
+    cfg = _PROFILE_AUGMENT_CONFIG.get(profile)
+    if cfg:
+        prefix = cfg["ctx_prefix"]
+        print(
+            f"{cfg['summary_print_tag']} "
+            f"docs={len(_safe_list(final_payload.get('documents')))} | "
+            f"doc_vectors={len(_safe_list(ctx.get(f'{prefix}_DOC_VECTORS')))} | "
+            f"bm25_docs={len(_safe_list(ctx.get('BM25_RESULTS')))}"
+        )
 
 
 if __name__ == "__main__":

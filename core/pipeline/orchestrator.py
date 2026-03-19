@@ -27,11 +27,11 @@ class PipelineOrchestrator:
             OCRPreprocessComponent("si-image-pretraiter-sinonpass-le-doc", COMPONENT_DIR / "si-image-pretraiter-sinonpass-le-doc.py"),
             OutputTxtComponent("output-txt", COMPONENT_DIR / "output-txt.py"),
             ClassificationComponent("clasification", COMPONENT_DIR / "clasification.py"),
-            TokenisationLayoutComponent("tokenisation-layout", COMPONENT_DIR / "tokenisation-layout.py"),
+            TokenisationLayoutComponent("tokenisation-layout", COMPONENT_DIR / "tokenisation_layout" / "tokenisation-layout.py"),
             GrammarComponent("atripusion-gramatical", COMPONENT_DIR / "atrribution-gramatical" / "atripusion-gramatical-en-utilisant-les3ficherla.py"),
             InterDocLinkingComponent("liaison-inter-docs", COMPONENT_DIR / "liaison-inter-docs.py"),
             ElasticsearchComponent("elasticsearch", COMPONENT_DIR / "elasticsearch.py"),
-            RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction-regles.py"),
+            RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction" / "extraction-regles.py"),
             FusionResultComponent("fusion-resultats", COMPONENT_DIR / "fusion_resultats.py"),
         ]
 
@@ -91,13 +91,13 @@ class Pipeline50MLOrchestrator:
             OCRPreprocessComponent("si-image-pretraiter-sinonpass-le-doc", COMPONENT_DIR / "si-image-pretraiter-sinonpass-le-doc.py"),
             OutputTxtComponent("output-txt", COMPONENT_DIR / "output-txt.py"),
             ClassificationComponent("clasification", COMPONENT_DIR / "clasification.py"),
-            TokenisationLayoutComponent("tokenisation-layout", COMPONENT_DIR / "tokenisation-layout-50ml.py"),
+            TokenisationLayoutComponent("tokenisation-layout", COMPONENT_DIR / "tokenisation_layout" / "tokenisation-layout-50ml.py"),
             GrammarComponent("atripusion-gramatical", COMPONENT_DIR / "atrribution-gramatical" / "atripusion-gramatical-en-utilisant-les3ficherla.py"),
             TableExtractionComponent("table-extraction", COMPONENT_DIR / "table_extraction" / "table-extraction.py"),
             InterDocLinkingComponent("liaison-inter-docs", COMPONENT_DIR / "liaison-inter-docs.py"),
             ElasticsearchComponent("elasticsearch", COMPONENT_DIR / "elasticsearch.py"),
-            RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction-regles-50ml.py"),
-            FusionResultComponent("fusion-resultats", COMPONENT_DIR / "fusion_resultats-50ml.py"),
+            RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction" / "extraction-regles-50ml.py"),
+            FusionResultComponent("fusion-resultats", COMPONENT_DIR / "fusion_resultats.py"),
         ]
 
     def list_steps(self) -> List[str]:
@@ -156,13 +156,13 @@ class Pipeline100MLOrchestrator:
             OCRPreprocessComponent("si-image-pretraiter-sinonpass-le-doc", COMPONENT_DIR / "si-image-pretraiter-sinonpass-le-doc.py"),
             OutputTxtComponent("output-txt", COMPONENT_DIR / "output-txt.py"),
             ClassificationComponent("clasification", COMPONENT_DIR / "clasification.py"),
-            TokenisationLayoutComponent("tokenisation-layout", COMPONENT_DIR / "tokenisation-layout-100ml.py"),
+            TokenisationLayoutComponent("tokenisation-layout", COMPONENT_DIR / "tokenisation_layout" / "tokenisation-layout-100ml.py"),
             GrammarComponent("atripusion-gramatical", COMPONENT_DIR / "atrribution-gramatical" / "attribution-gramatical-100ml-xlmr.py"),
             TableExtractionComponent("table-extraction", COMPONENT_DIR / "table_extraction" / "table-extraction.py"),
             InterDocLinkingComponent("liaison-inter-docs", COMPONENT_DIR / "liaison-inter-docs.py"),
             ElasticsearchComponent("elasticsearch", COMPONENT_DIR / "elasticsearch.py"),
-            RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction-regles-100ml.py"),
-            FusionResultComponent("fusion-resultats", COMPONENT_DIR / "fusion_resultats-100ml.py"),
+            RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction" / "extraction-regles-100ml.py"),
+            FusionResultComponent("fusion-resultats", COMPONENT_DIR / "fusion_resultats.py"),
         ]
 
     def list_steps(self) -> List[str]:

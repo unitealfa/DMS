@@ -683,21 +683,24 @@ for item in input_items:
                 "page_count": total
             })
 
-from IPython.display import display
+try:
+    from IPython.display import display as _ipython_display
+except Exception:
+    _ipython_display = None
 
-for doc in DOCS:
-    original = doc["original"]
-    prepped = doc["prepped"]
-    path = doc["path"]
+if _ipython_display is not None:
+    for doc in DOCS:
+        original = doc["original"]
+        prepped = doc["prepped"]
+        path = doc["path"]
 
-    display(original.convert("RGB") if original.mode not in ("RGB","L") else original)
+        _ipython_display(original.convert("RGB") if original.mode not in ("RGB", "L") else original)
 
-    if "SHOW_PREPROCESSED" not in globals() or SHOW_PREPROCESSED:
-        display(prepped.convert("RGB") if prepped.mode not in ("RGB","L") else prepped)
+        if "SHOW_PREPROCESSED" not in globals() or SHOW_PREPROCESSED:
+            _ipython_display(prepped.convert("RGB") if prepped.mode not in ("RGB", "L") else prepped)
 
 # Keep globals aligned with the last document for backwards compatibility.
 if DOCS:
     path = DOCS[-1]["path"]
     original = DOCS[-1]["original"]
     prepped = DOCS[-1]["prepped"]
-

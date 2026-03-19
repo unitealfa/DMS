@@ -1,12 +1,13 @@
 # Project Code Map (DMS Core)
 
-Date d'audit: 2026-03-18
+Date d'audit: 2026-03-19
 
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
-- Python files analyses: 30
-- Fonctions/classes indexees: 685 (voir `FUNCTION_INDEX.txt`)
+- Python files analyses: 32
+- Fonctions/classes indexees: 682 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
+- Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
 ## 2) Points d'entree
 - CLI principal: `main.py` -> `pipeline.cli:main`
@@ -34,7 +35,7 @@ Date d'audit: 2026-03-18
   2. `si-image-pretraiter-sinonpass-le-doc`
   3. `output-txt`
   4. `clasification`
-  5. `tokenisation-layout` (`component/tokenisation-layout-50ml.py`):
+  5. `tokenisation-layout` (`component/tokenisation_layout/tokenisation-layout-50ml.py`):
      - tokenisation/layout standard + enrichissement FastText-like (subword hashing),
      - vecteurs mot/chunk/document,
      - topic extraction par chunk (`chunk_primary_topic`, `chunk_topics`) + topics document,
@@ -48,17 +49,18 @@ Date d'audit: 2026-03-18
   8. `liaison-inter-docs` (`component/liaison-inter-docs.py`):
      - detection de liens inter-documents par overlap de topics + matching phrase-a-phrase auditable.
   9. `elasticsearch`
-  10. `extraction-regles` (`component/extraction-regles-50ml.py`):
+  10. `extraction-regles` (`component/extraction/extraction-regles-50ml.py`):
      - extraction YAML (sans regex de champs) pilotee par classification/doc_type + scoring BM25 par chunk.
-  11. `fusion-resultats` (`component/fusion_resultats-50ml.py`):
-     - fusion standard + ajout `ml50` + BM25 dans `fusion_output.json`,
+  11. `fusion-resultats` (`component/fusion_resultats.py`):
+     - fichier unique de fusion, branche `pipeline50ml` incluse dans le meme script,
+     - ajout `ml50` + BM25 dans `fusion_output.json`,
      - filtrage des topics grammaticaux (pronoms/determinants/conjonctions/adverbes) via `NLP_TOKENS` du composant grammaire.
 - Pipeline `pipeline100ml`:
   1. `pretraitement-de-docs`
   2. `si-image-pretraiter-sinonpass-le-doc`
   3. `output-txt`
   4. `clasification`
-  5. `tokenisation-layout` (`component/tokenisation-layout-100ml.py`):
+  5. `tokenisation-layout` (`component/tokenisation_layout/tokenisation-layout-100ml.py`):
      - tokenisation/layout standard + embeddings Transformer (BERT/XLM-R) avec mean pooling,
      - 1 embedding par chunk + 1 embedding document,
      - topic extraction par chunk (`chunk_primary_topic`, `chunk_topics`) + topics document,
@@ -77,10 +79,11 @@ Date d'audit: 2026-03-18
   8. `liaison-inter-docs` (`component/liaison-inter-docs.py`):
      - detection de liens inter-documents par overlap de topics + matching phrase-a-phrase auditable.
   9. `elasticsearch`
-  10. `extraction-regles` (`component/extraction-regles-100ml.py`):
+  10. `extraction-regles` (`component/extraction/extraction-regles-100ml.py`):
      - extraction YAML (sans regex de champs) pilotee par classification/doc_type + scoring BM25 par chunk.
-  11. `fusion-resultats` (`component/fusion_resultats-100ml.py`):
-     - fusion standard + ajout `ml100` + BM25 dans `fusion_output.json`,
+  11. `fusion-resultats` (`component/fusion_resultats.py`):
+     - fichier unique de fusion, branche `pipeline100ml` incluse dans le meme script,
+     - ajout `ml100` + BM25 dans `fusion_output.json`,
      - filtrage des topics grammaticaux (pronoms/determinants/conjonctions/adverbes) via `NLP_TOKENS` du composant grammaire.
 
 Selection runtime:
@@ -224,16 +227,16 @@ Reference implementation:
   - propagation `size` dans `TEXT_DOCS` et `FINAL_DOCS`
 
 ### 5.5 Changer segmentation layout / tables / multi-colonnes / bruit
-- `component/tokenisation-layout.py`
+- `component/tokenisation_layout/tokenisation-layout.py`
   - `layout_items`
   - `_transpose_or_group_multicol`
   - `_collect_table_block`
   - `chunk_layout_universal`
   - `chunk_is_noise`
 - variante ML50 (embedding/topic/doc-vector):
-  - `component/tokenisation-layout-50ml.py`
+  - `component/tokenisation_layout/tokenisation-layout-50ml.py`
 - variante ML100 (Transformer BERT/XLM-R + pooling):
-  - `component/tokenisation-layout-100ml.py`
+  - `component/tokenisation_layout/tokenisation-layout-100ml.py`
 - extraction de tableaux (pipelines 50ml/100ml):
   - `component/table_extraction/table-extraction.py` (script runtime unique),
   - `component/table_extraction/table_extraction_lib.py` (moteur commun et heuristiques).
@@ -249,16 +252,16 @@ Reference implementation:
 - config: `classification/common.json`, `classification/*.json`
 
 ### 5.8 Changer extraction metier
-- moteur regex (pipeline default): `component/extraction-regles.py`
-- moteur YAML (pipelines 50ml/100ml): `component/extraction-regles-yaml.py`
+- moteur regex (pipeline default): `component/extraction/extraction-regles.py`
+- moteur YAML (pipelines 50ml/100ml): `component/extraction/extraction-regles-yaml.py`
 - routage rulesets regex: `config/ruleset_routes.json`
 - routage rulesets YAML: `config/ruleset_routes.yaml`
 - patterns metier regex: `rules/*.json`
 - patterns metier YAML: `rules/*.yaml`
 - variante ML50 avec BM25:
-  - `component/extraction-regles-50ml.py`
+  - `component/extraction/extraction-regles-50ml.py`
 - variante ML100 avec BM25:
-  - `component/extraction-regles-100ml.py`
+  - `component/extraction/extraction-regles-100ml.py`
 
 ### 5.9 Changer logique Elasticsearch
 - composant pont: `component/elasticsearch.py`
@@ -275,17 +278,16 @@ Reference implementation:
 
 ### 5.10 Changer fusion JSON finale
 - `component/fusion_resultats.py`
+- fichier unique de fusion pour `default`, `pipeline50ml`, `pipeline100ml` (pilotage par `PIPELINE_PROFILE`)
 - en mode `NLP full`, la fusion charge aussi les tokens NLP depuis ES (`dms_nlp_tokens`) pour le document courant et les structure par page/sentence.
 - schema fusion lisible humain + exploitable code:
   - top-level: `schema_version`, `generated_at`, `source`, `documents_count`, `documents`
   - par document: `components` detaille tous les composants du pipeline
 - classification detaillee exposee (`scores`, `classification_log`, `keyword_matches`, `anti_confusion_targets`) + `file.size`
 - deduplication active: `components` reste volontairement compact (resume) et les details complets restent au niveau document (`classification`, `extraction`, `nlp`, `file`)
-- variante ML50:
-  - `component/fusion_resultats-50ml.py`
+- branche `pipeline50ml`:
   - enrichit la fusion avec `ml50` (vectors/topics) + BM25
-- variante ML100:
-  - `component/fusion_resultats-100ml.py`
+- branche `pipeline100ml`:
   - enrichit la fusion avec `ml100` (vectors/topics) + BM25
 
 ### 5.11 Changer logique linguistique EN/FR/AR
@@ -323,7 +325,7 @@ Reference implementation:
 
 - 5.12.2 Embeddings pipeline100 (tokenisation)
   - composant:
-    - `component/tokenisation-layout-100ml.py`
+    - `component/tokenisation_layout/tokenisation-layout-100ml.py`
   - telechargement possible:
     - modele `ML100_MODEL_NAME` via `AutoTokenizer.from_pretrained` + `AutoModel.from_pretrained`
   - ou les trouver:
@@ -343,7 +345,7 @@ Reference implementation:
 
 - 5.12.4 Tokenisation layout classique
   - composant:
-    - `component/tokenisation-layout.py`
+    - `component/tokenisation_layout/tokenisation-layout.py`
   - telechargements automatiques:
     - NLTK: `punkt`, `punkt_tab`
   - ou les trouver:
@@ -361,39 +363,36 @@ Reference implementation:
 - `pipeline/orchestrator.py`: contient les 3 orchestrateurs (`PipelineOrchestrator`, `Pipeline50MLOrchestrator`, `Pipeline100MLOrchestrator`) + selection `only/upto/start`.
 - `pipeline/cli.py`: CLI + chargement `.env` + tee print vers `outputgeneralterminal.txt`.
 - `pipeline/elasticsearch.py`: store HTTP ES + auth + flatten/index + auto-start local ES (POSIX/Windows) + fallback docs + sync classification/extraction + sync NLP (summary/full).
+- `pytesseract.py`: shim local compatible `pytesseract` base sur le binaire `tesseract` (OCR CLI, OSD, TSV, langues, version) quand le package Python n'est pas installe.
 
 ### 6.2 Composants metier (`component/`)
 - `pretraitement-de-docs.py`: detect format, determine `text` vs `image_only`, extrait `size`.
 - `si-image-pretraiter-sinonpass-le-doc.py`: split OCR/native + preprocess image.
 - `output-txt.py`: OCR tesseract + extraction native multi-format + `FINAL_DOCS` (+ `size`).
-- `tokenisation-layout.py`: language detect + sentence/layout chunking + table/multicol + `TOK_DOCS` (+ `size`).
-- `tokenisation-layout-50ml.py`: tokenisation/layout + embeddings FastText-like + topics + vectors doc/chunk/word + `NLP_*` minimal (provisoire avant grammaire).
+- `tokenisation_layout/tokenisation-layout.py`: language detect + sentence/layout chunking + table/multicol + `TOK_DOCS` (+ `size`).
+- `tokenisation_layout/tokenisation-layout-50ml.py`: tokenisation/layout + embeddings FastText-like + topics + vectors doc/chunk/word + `NLP_*` minimal (provisoire avant grammaire).
   - topics chunk-level (`chunk_primary_topic`, `chunk_topics`) + top-2 document (`document_primary_topics`).
   - scoring topics ameliore (n-grams, dedupe semantique, boost keywords classification, anti-bruit OCR).
-- `tokenisation-layout-100ml.py`: tokenisation/layout + embeddings Transformer (BERT/XLM-R) + pooling mean + vectors chunk/doc + topics + `NLP_*` minimal (provisoire avant grammaire).
+- `tokenisation_layout/tokenisation-layout-100ml.py`: tokenisation/layout + embeddings Transformer (BERT/XLM-R) + pooling mean + vectors chunk/doc + topics + `NLP_*` minimal (provisoire avant grammaire).
   - fallback hash si modele non disponible localement.
   - scoring topics ameliore (n-grams, dedupe semantique, boost keywords classification, anti-bruit OCR).
 - `atrribution-gramatical/*.py`: POS/lemma/NER per language + notebook style runners.
-- `attribution-gramatical-100ml-xlmr.py`: composant grammaire dedie `pipeline100ml`, base XLM-R (`xlm-roberta-base`) FR/EN/AR, sortie compatible `NLP_*` + fallback local.
+- `atrribution-gramatical/attribution-gramatical-100ml-xlmr.py`: composant grammaire dedie `pipeline100ml`, base XLM-R (`xlm-roberta-base`) FR/EN/AR, sortie compatible `NLP_*` + fallback local.
 - `liaison-inter-docs.py`: lie les documents entre eux via topics + recouvrement lexical phrase-a-phrase, puis publie un audit des matches.
   - filtre qualite `shared_terms`: supprime mots non-significatifs (`son`, `tout`, etc.) et favorise termes metier/juridiques.
 - `elasticsearch.py`: step script pour index/fetch docs ES.
 - `clasification.py`: keyword scoring classification + details matches (`classification_log`, `keyword_matches`).
-- `extraction-regles.py`: regex extractors selon doc_type.
-- `extraction-regles-yaml.py`: extraction sans regex de champs (labels/detecteurs) selon doc_type via YAML.
-- `extraction-regles-50ml.py`: extraction-regles-yaml + scoring BM25 sur chunks.
-- `extraction-regles-100ml.py`: extraction-regles-yaml + scoring BM25 sur chunks.
+- `extraction/extraction-regles.py`: regex extractors selon doc_type.
+- `extraction/extraction-regles-yaml.py`: extraction sans regex de champs (labels/detecteurs) selon doc_type via YAML.
+- `extraction/extraction-regles-50ml.py`: extraction-regles-yaml + scoring BM25 sur chunks.
+- `extraction/extraction-regles-100ml.py`: extraction-regles-yaml + scoring BM25 sur chunks.
 - `table_extraction/table-extraction.py`: composant unique d'extraction tableaux pour pipeline50ml + pipeline100ml.
 - `table_extraction/table_extraction_lib.py`: logique commune (split lignes OCR denses, detection header, mapping colonnes, extraction line-items, fallback OCR multi-variants, dedup/pruning de tableaux redondants).
 - `fusion_resultats.py`: build JSON fusion structure par document (`documents[]`) depuis context + ES.
   - ajoute `cross_document_analysis` (liens + audit) et `document.cross_document` (references link_ids).
-- `fusion_resultats-50ml.py`: fusion_resultats + enrichissement ML50/BM25.
-  - force la visibilite `ml50.document_topics`/`ml50.document_primary_topics` dans `fusion_output.json` (fallback depuis les topics de chunks si `ML50_TOPICS` absent/mal aligne).
-  - applique un filtrage grammatical des topics via `NLP_TOKENS` (POS/lemma) pour retirer pronoms/mots-outils.
-  - affiche un resume terminal par document: `[ml50-topic] <filename> | document_primary_topics=[...] | document_top_topics=[...]`.
-- `fusion_resultats-100ml.py`: fusion_resultats + enrichissement ML100/BM25.
-  - produit `document.ml100` + `components.tokenisation_layout_100ml` + `components.extraction_regles_100ml`.
-  - applique un filtrage grammatical des topics via `NLP_TOKENS` (POS/lemma) pour retirer pronoms/mots-outils.
+- `fusion_resultats.py` contient aussi les branches profilees:
+  - `pipeline50ml`: enrichissement `document.ml50`, `components.tokenisation_layout_50ml`, `components.extraction_regles_50ml`, `components.table_extraction_50ml`, BM25, filtrage grammatical des topics, print `[ml50-topic]`.
+  - `pipeline100ml`: enrichissement `document.ml100`, `components.tokenisation_layout_100ml`, `components.extraction_regles_100ml`, `components.table_extraction_100ml`, BM25, filtrage grammatical des topics, print `[ml100-topic]`.
 
 ## 7) Fichiers metier JSON/YAML
 - `classification/common.json`: poids/penalites/seuil/marge globaux.
@@ -416,7 +415,7 @@ Reference implementation:
 
 ## 9) Notes de qualite observees pendant audit
 - `component/si-image-pretraiter-sinonpass-le-doc.py` contient du code duplique sur la construction de `DOCS` (deux boucles consecutives).
-- `component/extraction-regles.py` compile les regex sans garde plus fine que `re.error`; en cas de pattern invalide, le champ est skippe (comportement tolerant).
+- `component/extraction/extraction-regles.py` compile les regex sans garde plus fine que `re.error`; en cas de pattern invalide, le champ est skippe (comportement tolerant).
 - `component/fusion_resultats.py` est clairement oriente "debug/fusion", pas schema strict valide via validation formelle.
 - La couche `pipeline/` est proprement separee et sert de facade stable autour des scripts notebooks.
 
@@ -425,6 +424,62 @@ Reference implementation:
 - Ce fichier est la reference la plus rapide pour localiser une modification precise.
 
 ## 11) Changelog code
+- 2026-03-19:
+  - `component/si-image-pretraiter-sinonpass-le-doc.py`:
+    - l'import `IPython.display` est maintenant optionnel.
+    - en execution CLI, le composant n'essaie plus d'afficher les images notebook et ne plante plus si `IPython` est absent.
+  - `pytesseract.py`:
+    - ajout d'un shim local compatible avec les usages du projet:
+      - `get_tesseract_version`
+      - `get_languages`
+      - `image_to_osd`
+      - `image_to_string`
+      - `image_to_data`
+      - `Output.DICT`
+    - le shim s'appuie sur le binaire systeme `tesseract` deja present sur la machine et evite la dependance obligatoire au package Python `pytesseract`.
+    - effet: suppression du crash `ModuleNotFoundError: No module named 'pytesseract'` sur les etapes OCR et extraction tableaux, tant que le binaire `tesseract` est disponible.
+  - `component/tokenisation_layout/tokenisation-layout.py`:
+    - `nltk` est maintenant optionnel.
+    - fallback local de segmentation phrase/layout si `nltk` ou les donnees `punkt` sont absents.
+  - `component/tokenisation_layout/tokenisation-layout-100ml.py`:
+    - suppression de la dependance dure a `numpy`.
+    - calcul des vecteurs hash/mean et des sorties 100ml en listes Python pures.
+  - `component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py`:
+    - suppression de la dependance dure a `numpy`.
+    - encodeur/fallback XLM-R et raffinement POS vectoriel adaptes a des matrices/listes Python pures.
+  - architecture `component/`:
+    - creation du sous-dossier `component/extraction/` pour centraliser:
+      - `extraction-regles.py`
+      - `extraction-regles-yaml.py`
+      - `extraction-regles-50ml.py`
+      - `extraction-regles-100ml.py`
+    - creation du sous-dossier `component/tokenisation_layout/` pour centraliser:
+      - `tokenisation-layout.py`
+      - `tokenisation-layout-50ml.py`
+      - `tokenisation-layout-100ml.py`
+    - ajout des marqueurs package:
+      - `component/extraction/__init__.py`
+      - `component/tokenisation_layout/__init__.py`
+  - `pipeline/orchestrator.py`:
+    - mise a jour de tous les chemins scripts vers la nouvelle arborescence `component/extraction/` et `component/tokenisation_layout/`.
+    - `fusion-resultats` unifie pour `default`, `pipeline50ml` et `pipeline100ml` via le meme script `component/fusion_resultats.py`.
+  - `component/fusion_resultats.py`:
+    - suppression du besoin des wrappers `fusion_resultats-50ml.py` et `fusion_resultats-100ml.py`.
+    - consolidation des branches profilees dans le meme fichier via `PIPELINE_PROFILE`.
+    - separation explicite entre base commune et enrichissements profiles pour faciliter la maintenance.
+  - `component/extraction/extraction-regles.py` + `component/extraction/extraction-regles-yaml.py`:
+    - correction du calcul `REPO_ROOT` apres deplacement en sous-dossier (`parents[2]`).
+  - `graphecode.html`:
+    - remise a jour du graphe runtime avec le bon ordre d'execution actuel:
+      - `clasification` avant `tokenisation-layout`,
+      - ajout de `liaison-inter-docs`,
+      - chemins scripts corriges vers les nouveaux sous-dossiers.
+  - validation technique:
+    - compilation `py_compile` OK sur `pipeline/orchestrator.py`, `component/fusion_resultats.py`, les scripts de `component/extraction/` et `component/tokenisation_layout/`.
+    - validation fonctionnelle locale du moteur d'extraction et de la fusion unifiee via contexte synthetique.
+    - validation runtime reelle:
+      - `python main.py documents/image2tab.webp --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens`
+      - resultat: execution complete jusqu'a `fusion-resultats` avec `EXIT:0`.
 - 2026-03-18:
   - `.gitignore`:
     - ajout des ignores pour caches de telechargement modeles/transformers afin d'eviter les commits de poids inutiles:
@@ -756,7 +811,7 @@ Reference implementation:
 - Role: graphe runtime interactif du pipeline `core` pour la commande:
   - `python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens`
 - Contenu de la vue:
-  - noeuds execution (CLI -> orchestrateur -> 9 composants)
+  - noeuds execution (CLI -> orchestrateur -> 10 composants)
   - noeuds scripts (`component/*.py` et wrappers `pipeline/components.py`)
   - noeuds de contexte (`INPUT_FILE`, `FINAL_DOCS`, `TOK_DOCS`, `NLP_*`, `RESULTS`, `EXTRACTIONS`, `FUSION_*`, `ES_*`)
   - branches conditionnelles:

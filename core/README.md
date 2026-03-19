@@ -4,6 +4,9 @@ Ce dépôt regroupe des scripts de traitement documentaire (prétraitement, OCR,
 
 ## Architecture
 - `pretraitement-de-docs.py` → `si-image-pretraiter-sinonpass-le-doc` → `output-txt.py` → `clasification.py` → `tokenisation-layout` → `atripusion-gramatical` → `liaison-inter-docs.py` → `elasticsearch.py` → `extraction-regles.py` → `fusion_resultats.py`
+- `component/tokenisation_layout/` : scripts de tokenisation/layout (`default`, `50ml`, `100ml`)
+- `component/extraction/` : scripts d'extraction (`regex`, `yaml`, `50ml`, `100ml`)
+- `component/fusion_resultats.py` : fichier unique de fusion pour `default`, `pipeline50ml`, `pipeline100ml`
 - `pipeline/` : couche d'orchestration open-source friendly  
   - `settings.py` : logging, helpers (argv isolation, cwd, normalisation des entrées)  
   - `components.py` : wrappers `Component` pour chaque script  
@@ -68,7 +71,7 @@ Audit terminal:
 
 ### 2) Pipeline100 tokenisation embeddings Transformer
 Composant:
-- `component/tokenisation-layout-100ml.py`
+- `component/tokenisation_layout/tokenisation-layout-100ml.py`
 
 Téléchargement automatique possible:
 - modèle `ML100_MODEL_NAME` (par défaut `xlm-roberta-base`) via `transformers` (`AutoTokenizer.from_pretrained`, `AutoModel.from_pretrained`)
@@ -92,7 +95,7 @@ Emplacements:
 
 ### 4) Tokenisation layout classique
 Composant:
-- `component/tokenisation-layout.py`
+- `component/tokenisation_layout/tokenisation-layout.py`
 
 Téléchargement automatique possible:
 - NLTK: `punkt`, `punkt_tab`

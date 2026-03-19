@@ -8,8 +8,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
-import numpy as np
-
+Vector = List[float]
+Matrix = List[Vector]
 
 AR_RE = re.compile(r"[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]")
 WORD_RE = re.compile(r"[A-Za-zÀ-ÖØ-öø-ÿ]+", flags=re.UNICODE)
@@ -81,6 +81,37 @@ POS_PROTOTYPE_SEEDS: Dict[str, List[str]] = {
         "أودي", "باريس",
     ],
 }
+
+
+def _zeros_vec(dim: int) -> Vector:
+    return [0.0] * max(0, int(dim))
+
+
+def _zeros_matrix(rows: int, dim: int) -> Matrix:
+    return [_zeros_vec(dim) for _ in range(max(0, int(rows)))]
+
+
+def _vector_norm(vec: Vector) -> float:
+    return sum(float(x) * float(x) for x in vec) ** 0.5
+
+
+def _normalize_vector(vec: Vector) -> Vector:
+    norm = _vector_norm(vec)
+    if norm <= 0.0:
+        return [float(x) for x in vec]
+    return [float(x) / norm for x in vec]
+
+
+def _average_vectors(rows: List[Vector]) -> Vector:
+    if not rows:
+        return []
+    dim = max(len(row) for row in rows)
+    out = [0.0] * dim
+    for row in rows:
+        for i, value in enumerate(row):
+            out[i] += float(value)
+    count = float(len(rows))
+    return [value / count for value in out]
 
 
 def _env_true(name: str) -> bool:
@@ -352,19 +383,20 @@ def _guess_pos(token: str, lang: str, prev_token: str = "", next_token: str = ""
     return "NOUN"
 
 
-def _cosine(a: np.ndarray, b: np.ndarray) -> float:
-    if not isinstance(a, np.ndarray) or not isinstance(b, np.ndarray):
+def _cosine(a: Vector, b: Vector) -> float:
+    if not isinstance(a, list) or not isinstance(b, list):
         return 0.0
-    if a.size == 0 or b.size == 0:
+    if not a or not b:
         return 0.0
-    num = float(np.dot(a, b))
-    den = float(np.linalg.norm(a) * np.linalg.norm(b))
+    limit = min(len(a), len(b))
+    num = sum(float(a[i]) * float(b[i]) for i in range(limit))
+    den = _vector_norm(a) * _vector_norm(b)
     if den <= 0:
         return 0.0
     return num / den
 
 
-def _build_pos_prototypes(encoder: "_XLMRContextEncoder") -> Dict[str, np.ndarray]:
+def _build_pos_prototypes(encoder: "_XLMRContextEncoder") -> Dict[str, Vector]:
     items: List[tuple[str, str]] = []
     for tag, seeds in POS_PROTOTYPE_SEEDS.items():
         for seed in seeds:
@@ -375,29 +407,24 @@ def _build_pos_prototypes(encoder: "_XLMRContextEncoder") -> Dict[str, np.ndarra
 
     token_lists = [[token] for _, token in items]
     vectors = encoder.encode_token_lists(token_lists)
-    grouped: Dict[str, List[np.ndarray]] = {}
+    grouped: Dict[str, List[Vector]] = {}
     for idx, (tag, _) in enumerate(items):
         if idx >= len(vectors):
             continue
         mat = vectors[idx]
-        if not isinstance(mat, np.ndarray) or mat.size == 0:
+        if not isinstance(mat, list) or not mat:
             continue
-        vec = np.asarray(mat[0], dtype=np.float32)
-        if vec.size == 0:
+        vec = [float(x) for x in mat[0]]
+        if not vec:
             continue
-        norm = float(np.linalg.norm(vec))
-        if norm > 0:
-            vec = vec / norm
+        vec = _normalize_vector(vec)
         grouped.setdefault(tag, []).append(vec)
 
-    out: Dict[str, np.ndarray] = {}
+    out: Dict[str, Vector] = {}
     for tag, rows in grouped.items():
         if not rows:
             continue
-        avg = np.mean(np.stack(rows, axis=0), axis=0).astype(np.float32)
-        norm = float(np.linalg.norm(avg))
-        if norm > 0:
-            avg = avg / norm
+        avg = _normalize_vector(_average_vectors(rows))
         out[tag] = avg
     return out
 
@@ -407,8 +434,8 @@ def _refine_pos_tags(
     lemmas: List[str],
     pos_tags: List[str],
     lang: str,
-    token_vectors: Optional[np.ndarray],
-    pos_prototypes: Dict[str, np.ndarray],
+    token_vectors: Optional[Matrix],
+    pos_prototypes: Dict[str, Vector],
     use_vector_refine: bool,
 ) -> tuple[List[str], Dict[str, int]]:
     refined = list(pos_tags or [])
@@ -466,14 +493,12 @@ def _refine_pos_tags(
             if low_no_acc in DETERMINERS.get(lang, set()) or low_no_acc in PRONOUNS.get(lang, set()):
                 cand = "DET" if low_no_acc in DETERMINERS.get(lang, set()) else "PRON"
 
-        if use_vector_refine and isinstance(token_vectors, np.ndarray) and idx < token_vectors.shape[0] and pos_prototypes:
-            vec = np.asarray(token_vectors[idx], dtype=np.float32)
-            norm = float(np.linalg.norm(vec))
-            if norm > 0:
-                vec = vec / norm
+        if use_vector_refine and isinstance(token_vectors, list) and idx < len(token_vectors) and pos_prototypes:
+            vec = _normalize_vector([float(x) for x in token_vectors[idx]])
+            if vec:
                 best_tag = ""
                 best_score = -1.0
-                cand_score = _cosine(vec, pos_prototypes.get(cand, np.zeros(0, dtype=np.float32))) if cand else -1.0
+                cand_score = _cosine(vec, pos_prototypes.get(cand, [])) if cand else -1.0
                 for tag, proto in pos_prototypes.items():
                     score = _cosine(vec, proto)
                     if score > best_score:
@@ -491,8 +516,8 @@ def _refine_pos_tags(
     return refined, {"changed": changed, "total": len(tokens)}
 
 
-def _hash_vec(text: str, dim: int) -> np.ndarray:
-    out = np.zeros(dim, dtype=np.float32)
+def _hash_vec(text: str, dim: int) -> Vector:
+    out = _zeros_vec(dim)
     token = str(text or "").strip().lower() or "_"
     digest = hashlib.blake2b(token.encode("utf-8"), digest_size=16).digest()
     idx = int.from_bytes(digest[:8], "big") % dim
@@ -549,15 +574,15 @@ class _XLMRContextEncoder:
             self._tokenizer = None
             self._model = None
 
-    def encode_token_lists(self, token_lists: List[List[str]]) -> List[np.ndarray]:
+    def encode_token_lists(self, token_lists: List[List[str]]) -> List[Matrix]:
         if not token_lists:
             return []
 
         if self._torch is None or self._tokenizer is None or self._model is None:
-            return [np.stack([_hash_vec(tok, self.dim) for tok in toks], axis=0) if toks else np.zeros((0, self.dim), dtype=np.float32) for toks in token_lists]
+            return [[_hash_vec(tok, self.dim) for tok in toks] if toks else [] for toks in token_lists]
 
         torch = self._torch
-        out: List[np.ndarray] = []
+        out: List[Matrix] = []
         try:
             with torch.inference_mode():
                 for i in range(0, len(token_lists), self.batch_size):
@@ -577,39 +602,36 @@ class _XLMRContextEncoder:
                         hidden = outputs[0]
                     if hidden is None:
                         for toks in batch:
-                            rows = np.stack([_hash_vec(tok, self.dim) for tok in toks], axis=0) if toks else np.zeros((0, self.dim), dtype=np.float32)
+                            rows = [_hash_vec(tok, self.dim) for tok in toks] if toks else []
                             out.append(rows)
                         continue
 
-                    hidden_np = hidden.detach().cpu().numpy().astype(np.float32)
+                    hidden_rows = hidden.detach().cpu().tolist()
                     for b_idx, toks in enumerate(batch):
                         word_ids = enc.word_ids(batch_index=b_idx)
-                        groups: Dict[int, List[np.ndarray]] = {}
+                        groups: Dict[int, List[Vector]] = {}
                         for tok_idx, wid in enumerate(word_ids):
                             if wid is None or wid < 0 or wid >= len(toks):
                                 continue
-                            groups.setdefault(wid, []).append(hidden_np[b_idx, tok_idx])
+                            groups.setdefault(wid, []).append([float(x) for x in hidden_rows[b_idx][tok_idx]])
 
-                        rows: List[np.ndarray] = []
+                        rows: List[Vector] = []
                         for wid in range(len(toks)):
                             vectors = groups.get(wid)
                             if not vectors:
                                 rows.append(_hash_vec(toks[wid], self.dim))
                                 continue
-                            vec = np.mean(np.stack(vectors, axis=0), axis=0).astype(np.float32)
-                            norm = float(np.linalg.norm(vec))
-                            if norm > 0:
-                                vec = vec / norm
+                            vec = _normalize_vector(_average_vectors(vectors))
                             rows.append(vec)
-                        out.append(np.stack(rows, axis=0) if rows else np.zeros((0, self.dim), dtype=np.float32))
+                        out.append(rows)
         except Exception as exc:
             self.error = str(exc)
             self.backend = "hash-fallback"
-            return [np.stack([_hash_vec(tok, self.dim) for tok in toks], axis=0) if toks else np.zeros((0, self.dim), dtype=np.float32) for toks in token_lists]
+            return [[_hash_vec(tok, self.dim) for tok in toks] if toks else [] for toks in token_lists]
 
         if len(out) < len(token_lists):
             for toks in token_lists[len(out):]:
-                rows = np.stack([_hash_vec(tok, self.dim) for tok in toks], axis=0) if toks else np.zeros((0, self.dim), dtype=np.float32)
+                rows = [_hash_vec(tok, self.dim) for tok in toks] if toks else []
                 out.append(rows)
         return out
 
@@ -671,7 +693,7 @@ def _run() -> None:
         text = row["text"]
         lang = str(row.get("lang") or detect_lang(text))
         tokens = token_lists[idx] if idx < len(token_lists) else _basic_tokenize(text)
-        vecs = embeddings[idx] if idx < len(embeddings) else np.zeros((len(tokens), encoder.dim), dtype=np.float32)
+        vecs = embeddings[idx] if idx < len(embeddings) else _zeros_matrix(len(tokens), encoder.dim)
 
         norm_tokens: List[str] = []
         lemmas: List[str] = []
@@ -694,7 +716,7 @@ def _run() -> None:
             lemmas=lemmas,
             pos_tags=base_pos_tags,
             lang=lang,
-            token_vectors=vecs if isinstance(vecs, np.ndarray) else None,
+            token_vectors=vecs if isinstance(vecs, list) else None,
             pos_prototypes=pos_prototypes,
             use_vector_refine=use_vector_refine,
         )
@@ -755,7 +777,7 @@ def _run() -> None:
                 "entities": {"flat": sentence_entities_flat},
                 "xlmr_backend": encoder.backend,
                 "xlmr_vector_dim": int(encoder.dim),
-                "xlmr_token_vectors_count": int(vecs.shape[0]) if isinstance(vecs, np.ndarray) else len(tokens),
+                "xlmr_token_vectors_count": len(vecs) if isinstance(vecs, list) else len(tokens),
             }
         )
         nlp_sentences.append(

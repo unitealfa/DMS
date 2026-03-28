@@ -320,6 +320,26 @@ class TableExtractionComponent(Component):
         return rows
 
 
+class TotalsVerificationComponent(Component):
+    def run(self, context: Context) -> Any:
+        ctx = self._execute_script(context)
+        rows = ctx.get("TOTALS_VERIFICATION") or []
+        if not isinstance(rows, list):
+            rows = []
+
+        docs = len(rows)
+        ok = sum(1 for row in rows if isinstance(row, dict) and str(row.get("verification_status")) == "ok")
+        partial_ok = sum(1 for row in rows if isinstance(row, dict) and str(row.get("verification_status")) == "partial_ok")
+        mismatch = sum(1 for row in rows if isinstance(row, dict) and str(row.get("verification_status")) == "mismatch")
+        missing = sum(1 for row in rows if isinstance(row, dict) and str(row.get("verification_status")) == "not_enough_data")
+        summary = (
+            f"docs={docs} | ok={ok} | partial_ok={partial_ok} | "
+            f"mismatch={mismatch} | missing={missing}"
+        )
+        self._report(rows, summary)
+        return rows
+
+
 class VisualMarksDetectionComponent(Component):
     def run(self, context: Context) -> Any:
         ctx = self._execute_script(context)

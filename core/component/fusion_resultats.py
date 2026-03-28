@@ -824,6 +824,18 @@ def _extract_component_views(
             visual_row = row
             break
 
+    totals_rows = _safe_list(ctx.get("TOTALS_VERIFICATION"))
+    totals_row = {}
+    for row in totals_rows:
+        if not isinstance(row, dict):
+            continue
+        if document_id and str(row.get("doc_id") or "") == document_id:
+            totals_row = row
+            break
+        if _same_doc_hint(row.get("filename"), filename, first_path):
+            totals_row = row
+            break
+
     tok_pages = _safe_list(tok_doc.get("pages"))
     tok_sentences = 0
     for page in tok_pages:
@@ -931,6 +943,18 @@ def _extract_component_views(
             "has_stamp": bool((visual_row.get("has_stamp") if isinstance(visual_row, dict) else False)),
             "has_barcode": bool((visual_row.get("has_barcode") if isinstance(visual_row, dict) else False)),
             "has_qrcode": bool((visual_row.get("has_qrcode") if isinstance(visual_row, dict) else False)),
+        },
+        "verification_totaux": {
+            "engine": totals_row.get("engine") if isinstance(totals_row, dict) else None,
+            "verification_status": totals_row.get("verification_status") if isinstance(totals_row, dict) else None,
+            "passed": bool((totals_row.get("passed") if isinstance(totals_row, dict) else False)),
+            "complete": bool((totals_row.get("complete") if isinstance(totals_row, dict) else False)),
+            "row_mismatch_count": _safe_int((totals_row.get("row_mismatch_count") if isinstance(totals_row, dict) else None), 0),
+            "computed_subtotal": totals_row.get("computed_subtotal") if isinstance(totals_row, dict) else None,
+            "declared_subtotal": totals_row.get("declared_subtotal") if isinstance(totals_row, dict) else None,
+            "declared_tax": totals_row.get("declared_tax") if isinstance(totals_row, dict) else None,
+            "declared_total": totals_row.get("declared_total") if isinstance(totals_row, dict) else None,
+            "issue_locations_count": len(_safe_list((totals_row.get("issue_locations") if isinstance(totals_row, dict) else []))),
         },
         "extraction_regles": {
             "documents_count": regex_doc_count,
@@ -2169,6 +2193,164 @@ def _augment_payload_with_default_tables(ctx: Dict[str, Any], payload: Dict[str,
     return payload
 
 
+def _append_totals_quality_check(doc: Dict[str, Any], verify_row: Dict[str, Any]) -> None:
+    quality_checks = doc.get("quality_checks")
+    if not isinstance(quality_checks, list):
+        quality_checks = []
+    quality_checks = [
+        item
+        for item in quality_checks
+        if not (isinstance(item, dict) and str(item.get("check") or "") == "totals_verification")
+    ]
+    quality_checks.append(
+        {
+            "check": "totals_verification",
+            "engine": verify_row.get("engine"),
+            "status": verify_row.get("verification_status"),
+            "passed": bool(verify_row.get("passed")),
+            "complete": bool(verify_row.get("complete")),
+            "row_mismatch_count": _safe_int(verify_row.get("row_mismatch_count"), 0),
+            "rows_verified": _safe_int(verify_row.get("rows_verified"), 0),
+            "computed_subtotal": verify_row.get("computed_subtotal"),
+            "declared_subtotal": verify_row.get("declared_subtotal"),
+            "declared_tax": verify_row.get("declared_tax"),
+            "declared_total": verify_row.get("declared_total"),
+            "issue_locations": _safe_list(verify_row.get("issue_locations")),
+        }
+    )
+    doc["quality_checks"] = quality_checks
+
+
+def _augment_payload_with_totals_verification(ctx: Dict[str, Any], payload: Dict[str, Any], profile: str) -> Dict[str, Any]:
+    docs = _safe_list(payload.get("documents"))
+    if not docs:
+        return payload
+
+    totals_rows = ctx.get("TOTALS_VERIFICATION")
+    totals_map = _profile_index_rows(totals_rows)
+    if not totals_map:
+        return payload
+
+    ok = 0
+    partial_ok = 0
+    mismatch = 0
+    missing = 0
+
+    for doc in docs:
+        if not isinstance(doc, dict):
+            continue
+        doc_id = doc.get("document_id")
+        filename = (doc.get("file") or {}).get("name") if isinstance(doc.get("file"), dict) else None
+        verify_row = totals_map.get(_profile_doc_key(doc_id, filename)) or {}
+        if not isinstance(verify_row, dict) or not verify_row:
+            continue
+
+        status = str(verify_row.get("verification_status") or "")
+        if status == "ok":
+            ok += 1
+        elif status == "partial_ok":
+            partial_ok += 1
+        elif status == "mismatch":
+            mismatch += 1
+        else:
+            missing += 1
+
+        extraction = doc.get("extraction")
+        if not isinstance(extraction, dict):
+            extraction = {}
+        extraction["totals_verification"] = {
+            "engine": verify_row.get("engine"),
+            "verification_status": status,
+            "passed": bool(verify_row.get("passed")),
+            "complete": bool(verify_row.get("complete")),
+            "tables_count": _safe_int(verify_row.get("tables_count"), 0),
+            "rows_total": _safe_int(verify_row.get("rows_total"), 0),
+            "rows_verified": _safe_int(verify_row.get("rows_verified"), 0),
+            "row_ok_count": _safe_int(verify_row.get("row_ok_count"), 0),
+            "row_partial_count": _safe_int(verify_row.get("row_partial_count"), 0),
+            "row_mismatch_count": _safe_int(verify_row.get("row_mismatch_count"), 0),
+            "computed_subtotal": verify_row.get("computed_subtotal"),
+            "declared_subtotal": verify_row.get("declared_subtotal"),
+            "declared_tax": verify_row.get("declared_tax"),
+            "computed_tax": verify_row.get("computed_tax"),
+            "declared_total": verify_row.get("declared_total"),
+            "expected_total": verify_row.get("expected_total"),
+            "subtotal_status": verify_row.get("subtotal_status"),
+            "tax_status": verify_row.get("tax_status"),
+            "total_status": verify_row.get("total_status"),
+            "checks": _safe_list(verify_row.get("checks")),
+            "table_anchor": verify_row.get("table_anchor") if isinstance(verify_row.get("table_anchor"), dict) else {},
+            "subtotal_location": verify_row.get("subtotal_location") if isinstance(verify_row.get("subtotal_location"), dict) else {},
+            "tax_location": verify_row.get("tax_location") if isinstance(verify_row.get("tax_location"), dict) else {},
+            "total_location": verify_row.get("total_location") if isinstance(verify_row.get("total_location"), dict) else {},
+            "issue_locations": _safe_list(verify_row.get("issue_locations")),
+            "row_audit": _safe_list(verify_row.get("row_audit")),
+            "declared_totals_raw": verify_row.get("declared_totals_raw") if isinstance(verify_row.get("declared_totals_raw"), dict) else {},
+            "tolerance": verify_row.get("tolerance"),
+        }
+        doc["extraction"] = extraction
+
+        components = doc.get("components")
+        if not isinstance(components, dict):
+            components = {}
+        components["verification_totaux"] = {
+            "engine": verify_row.get("engine"),
+            "verification_status": status,
+            "passed": bool(verify_row.get("passed")),
+            "complete": bool(verify_row.get("complete")),
+            "row_mismatch_count": _safe_int(verify_row.get("row_mismatch_count"), 0),
+            "issue_locations_count": len(_safe_list(verify_row.get("issue_locations"))),
+            "computed_subtotal": verify_row.get("computed_subtotal"),
+            "declared_subtotal": verify_row.get("declared_subtotal"),
+            "declared_tax": verify_row.get("declared_tax"),
+            "declared_total": verify_row.get("declared_total"),
+        }
+        doc["components"] = components
+
+        _append_totals_quality_check(doc, verify_row)
+
+        filename_label = str(filename or doc_id or "unknown")
+        print(
+            "[totaux-check] "
+            f"{filename_label} | status={status} | passed={1 if verify_row.get('passed') else 0} | "
+            f"rows={_safe_int(verify_row.get('rows_verified'), 0)}/{_safe_int(verify_row.get('rows_total'), 0)} | "
+            f"subtotal={verify_row.get('computed_subtotal')}~{verify_row.get('declared_subtotal')} | "
+            f"tax={verify_row.get('declared_tax')} | total={verify_row.get('declared_total')}"
+        )
+
+    pipeline = payload.get("pipeline")
+    if not isinstance(pipeline, dict):
+        pipeline = {}
+
+    target = None
+    if str(profile or "").strip().lower() == "pipeline50ml":
+        target = pipeline.get("ml50")
+        if not isinstance(target, dict):
+            target = {}
+        pipeline["ml50"] = target
+    elif str(profile or "").strip().lower() == "pipeline100ml":
+        target = pipeline.get("ml100")
+        if not isinstance(target, dict):
+            target = {}
+        pipeline["ml100"] = target
+    else:
+        target = pipeline.get("0ml")
+        if not isinstance(target, dict):
+            target = {}
+        pipeline["0ml"] = target
+
+    target["totals_verification_docs_count"] = len(_safe_list(totals_rows))
+    target["totals_verification_ok_docs_count"] = ok
+    target["totals_verification_partial_ok_docs_count"] = partial_ok
+    target["totals_verification_mismatch_docs_count"] = mismatch
+    target["totals_verification_missing_docs_count"] = missing
+
+    payload["pipeline"] = pipeline
+    payload["documents"] = docs
+    payload["documents_count"] = len(docs)
+    return payload
+
+
 def _augment_payload_with_visual_marks_100ml(ctx: Dict[str, Any], payload: Dict[str, Any], profile: str) -> Dict[str, Any]:
     if str(profile or "").strip().lower() != "pipeline100ml":
         return payload
@@ -2302,6 +2484,7 @@ def main() -> None:
     final_payload = _final_output(ctx, payloads, source)
     final_payload = _augment_payload_with_default_tables(ctx, final_payload)
     final_payload = _augment_payload_for_profile(ctx, final_payload, profile)
+    final_payload = _augment_payload_with_totals_verification(ctx, final_payload, profile)
     final_payload = _augment_payload_with_visual_marks_100ml(ctx, final_payload, profile)
     OUTPUT_PATH.write_text(json.dumps(final_payload, ensure_ascii=False, indent=2), encoding="utf-8")
     ctx["FUSION_RESULT"] = str(OUTPUT_PATH)

@@ -4,8 +4,8 @@ Date d'audit: 2026-03-19
 
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
-- Python files analyses: 31
-- Fonctions/classes indexees: 673 (voir `FUNCTION_INDEX.txt`)
+- Python files analyses: 32
+- Fonctions/classes indexees: 737 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 - Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
@@ -31,10 +31,14 @@ Date d'audit: 2026-03-19
      - extraction de tableaux non-ML pour la pipeline standard,
      - detection par heuristiques de geometrie + synonymes/metiers de colonnes (`product`, `quantity`, `unit_price`, `total`, etc.),
      - sortie context: `TABLE_EXTRACTIONS_DEFAULT` + `TABLE_EXTRACTIONS`.
-  8. `liaison-inter-docs`
-  9. `elasticsearch`
-  10. `extraction-regles`
-  11. `fusion-resultats` (debug/fusion finale, non bloquant en erreur)
+  8. `verification-totaux` (`component/verification-totaux.py`):
+     - verification non-ML des sous-totaux, taxes et totaux a partir des lignes/tableaux extraits,
+     - audit ligne par ligne (`quantity * unit_price`) + comparaison aux totaux declares les plus plausibles,
+     - sortie context: `TOTALS_VERIFICATION`.
+  9. `liaison-inter-docs`
+  10. `elasticsearch`
+  11. `extraction-regles`
+  12. `fusion-resultats` (debug/fusion finale, non bloquant en erreur)
 - Pipeline `pipeline50ml`:
   1. `pretraitement-de-docs`
   2. `si-image-pretraiter-sinonpass-le-doc`
@@ -51,14 +55,18 @@ Date d'audit: 2026-03-19
      - detection agnostique renforcee par geometrie texte (ancrages X stables + score de tabularite par ligne),
      - meilleure detection des tableaux denses/serres OCR,
      - sortie context: `TABLE_EXTRACTIONS_50ML` + `TABLE_EXTRACTIONS`.
-  8. `liaison-inter-docs` (`component/liaison-inter-docs.py`):
+  8. `verification-totaux` (`component/verification-totaux.py`):
+     - verification non-ML partagee avec les autres pipelines,
+     - consomme `TABLE_EXTRACTIONS_50ML` / `TABLE_EXTRACTIONS`,
+     - produit un audit totals/rows reutilise dans la fusion.
+  9. `liaison-inter-docs` (`component/liaison-inter-docs.py`):
      - detection de liens inter-documents par overlap de topics + matching phrase-a-phrase auditable,
      - ajoute aussi une liaison vectorielle doc-doc et chunk-chunk en reutilisant `ML50_DOC_VECTORS` et `ML50_CHUNK_VECTORS`,
      - audit des meilleurs chunks relies avec similarite cosinus et extraits de texte.
-  9. `elasticsearch`
-  10. `extraction-regles` (`component/extraction/extraction-regles-50ml.py`):
+  10. `elasticsearch`
+  11. `extraction-regles` (`component/extraction/extraction-regles-50ml.py`):
      - extraction YAML (sans regex de champs) pilotee par classification/doc_type + scoring BM25 par chunk.
-  11. `fusion-resultats` (`component/fusion_resultats.py`):
+  12. `fusion-resultats` (`component/fusion_resultats.py`):
      - fichier unique de fusion, branche `pipeline50ml` incluse dans le meme script,
      - ajout `ml50` + BM25 dans `fusion_output.json`,
      - filtrage des topics grammaticaux (pronoms/determinants/conjonctions/adverbes) via `NLP_TOKENS` du composant grammaire.
@@ -83,19 +91,22 @@ Date d'audit: 2026-03-19
      - detection agnostique renforcee par geometrie texte (ancrages X stables + score de tabularite par ligne),
      - meilleure detection des tableaux denses/serres OCR,
      - sortie context: `TABLE_EXTRACTIONS_100ML` + `TABLE_EXTRACTIONS`.
-  8. `detection-signature-chachet-codebarr` (`component/detection-signature-chachet-codebarr.py`):
+  8. `verification-totaux` (`component/verification-totaux.py`):
+     - verification non-ML partagee avec `default` et `pipeline50ml`,
+     - produit un audit totals/rows reutilise dans `fusion_output.json`.
+  9. `detection-signature-chachet-codebarr` (`component/detection-signature-chachet-codebarr.py`):
      - detection visuelle des signatures, cachets, codes-barres et QR codes,
      - moteur hybride: heuristiques visuelles + decodeurs locaux optionnels (`pyzbar`, `OpenCV QRCodeDetector`) si disponibles,
      - sortie context: `VISUAL_MARKS_DETECTIONS_100ML` + `VISUAL_MARKS_DETECTIONS`,
-     - localisation normalisee par page (`page_index`, `bbox_px`, `bbox_norm`) et drapeaux document (`has_signature`, `has_stamp`, `has_barcode`, `has_qrcode`).
-  9. `liaison-inter-docs` (`component/liaison-inter-docs.py`):
+      - localisation normalisee par page (`page_index`, `bbox_px`, `bbox_norm`) et drapeaux document (`has_signature`, `has_stamp`, `has_barcode`, `has_qrcode`).
+  10. `liaison-inter-docs` (`component/liaison-inter-docs.py`):
      - detection de liens inter-documents par overlap de topics + matching phrase-a-phrase auditable,
      - ajoute aussi une liaison vectorielle doc-doc et chunk-chunk en reutilisant `ML100_DOC_VECTORS` et `ML100_CHUNK_VECTORS`,
      - audit des meilleurs chunks relies avec similarite cosinus et extraits de texte.
-  10. `elasticsearch`
-  11. `extraction-regles` (`component/extraction/extraction-regles-100ml.py`):
+  11. `elasticsearch`
+  12. `extraction-regles` (`component/extraction/extraction-regles-100ml.py`):
      - extraction YAML (sans regex de champs) pilotee par classification/doc_type + scoring BM25 par chunk.
-  12. `fusion-resultats` (`component/fusion_resultats.py`):
+  13. `fusion-resultats` (`component/fusion_resultats.py`):
      - fichier unique de fusion, branche `pipeline100ml` incluse dans le meme script,
      - ajout `ml100` + BM25 dans `fusion_output.json`,
      - filtrage des topics grammaticaux (pronoms/determinants/conjonctions/adverbes) via `NLP_TOKENS` du composant grammaire,
@@ -174,6 +185,25 @@ Reference implementation:
   - structurer chaque tableau avec `table_type` + `shape` (`columns_estimated`, `rows_estimated`),
   - supprimer automatiquement les tableaux redondants/partiels quand un tableau riche est detecte.
 
+### 4.6 bis Verification des totaux (3 pipelines)
+- composant runtime: `component/verification-totaux.py`
+- sortie contexte:
+  - `TOTALS_VERIFICATION`
+- verification effectuee:
+  - coherence ligne par ligne (`quantity * unit_price ~= total`)
+  - sous-total recompose depuis les lignes
+  - comparaison aux montants declares extraits du tableau (`total_ht`, `tax`, `total`, `total_ttc`, `amount_due`)
+- sortie par document:
+  - `verification_status` (`ok`, `partial_ok`, `mismatch`, `not_enough_data`)
+  - `passed`, `complete`
+  - `computed_subtotal`, `declared_subtotal`, `declared_tax`, `declared_total`, `expected_total`
+  - `row_audit[]` avec detail des lignes verifiees
+  - audit de localisation:
+    - `table_anchor`
+    - `subtotal_location`, `tax_location`, `total_location`
+    - `issue_locations[]`
+    - chaque localisation peut exposer `table_index`, `page_index`, `sent_index`, `line`, `chunk_start`, `chunk_end`
+
 ### 4.7 Detection visuelle signature/cachet/code-barres/QR (pipeline100ml)
 - composant runtime: `component/detection-signature-chachet-codebarr.py`
 - sorties contexte:
@@ -232,6 +262,11 @@ Reference implementation:
   - `content.visual_flags`: drapeaux visuels documentaires
   - `document_structure.visual_marks`: localisations detectees
   - `document_structure.visual_marks_summary`: resume detection visuelle
+  - tous profils:
+  - `extraction.totals_verification`
+  - `components.verification_totaux`
+  - `quality_checks[]` inclut un check `totals_verification`
+  - les audits de verification des totaux exposent aussi l'emplacement precis de l'erreur/manque dans le tableau et le chunk source
 
 ## 5) Ou modifier selon le besoin
 
@@ -279,7 +314,14 @@ Reference implementation:
   - regles de score/threshold,
   - structure de l'audit `phrase_a` / `phrase_b` et champs exposes dans la fusion.
 
-### 5.6 bis Changer la detection visuelle signature/cachet/code-barres/QR
+### 5.6 bis Changer la verification des totaux
+- `component/verification-totaux.py`
+  - parsing des montants/quantites,
+  - choix des candidats de totaux les plus plausibles,
+  - audit ligne par ligne,
+  - regles de statut `ok` / `partial_ok` / `mismatch` / `not_enough_data`.
+
+### 5.6 ter Changer la detection visuelle signature/cachet/code-barres/QR
 - `component/detection-signature-chachet-codebarr.py`
   - chargement des pages source (images/PDF),
   - heuristiques visuelles signature/cachet,
@@ -463,6 +505,29 @@ Reference implementation:
 - Ce fichier est la reference la plus rapide pour localiser une modification precise.
 
 ## 11) Changelog code
+- 2026-03-28:
+  - `component/verification-totaux.py`:
+    - nouveau composant non-ML partage par `default`, `pipeline50ml` et `pipeline100ml`.
+    - verifie les lignes (`quantity * unit_price`), reconstruit un sous-total, choisit les totaux declares les plus plausibles et calcule un statut `ok` / `partial_ok` / `mismatch`.
+    - ajoute maintenant une auditabilite fine des erreurs/manques:
+      - `table_index`
+      - `page_index`
+      - `sent_index` / chunk source
+      - offsets `chunk_start` / `chunk_end`
+      - `issue_locations[]`, `table_anchor`, `subtotal_location`, `tax_location`, `total_location`.
+  - `pipeline/orchestrator.py`:
+    - ajoute `verification-totaux` juste apres `table-extraction` dans les 3 pipelines.
+  - `pipeline/components.py`:
+    - ajoute `TotalsVerificationComponent` avec resume terminal standardise.
+  - `pipeline/cli.py`:
+    - ajoute `verification-totaux` aux etapes supportees par `--only`, `--upto`, `--start`.
+  - `component/fusion_resultats.py`:
+    - injecte l'audit de verification dans:
+      - `extraction.totals_verification`
+      - `components.verification_totaux`
+      - `quality_checks[]`
+      - compteurs `pipeline.0ml`, `pipeline.ml50`, `pipeline.ml100`.
+    - propage aussi les localisations precises d'erreur/manque pour faciliter l'audit humain.
 - 2026-03-28:
   - `component/detection-signature-chachet-codebarr.py`:
     - nouveau composant pipeline100ml place entre `table-extraction` et `liaison-inter-docs`.

@@ -26,6 +26,7 @@ _STEP_CHOICES = [
     "atripusion-gramatical",
     "atripusion-gramatical-en-utilisant-les3ficherla",
     "table-extraction",
+    "verification-totaux",
     "detection-signature-chachet-codebarr",
     "liaison-inter-docs",
     "elasticsearch",

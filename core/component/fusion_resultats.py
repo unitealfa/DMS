@@ -812,6 +812,18 @@ def _extract_component_views(
             tok_doc = row
             break
 
+    visual_rows = _safe_list(ctx.get("VISUAL_MARKS_DETECTIONS_100ML")) or _safe_list(ctx.get("VISUAL_MARKS_DETECTIONS"))
+    visual_row = {}
+    for row in visual_rows:
+        if not isinstance(row, dict):
+            continue
+        if document_id and str(row.get("doc_id") or "") == document_id:
+            visual_row = row
+            break
+        if _same_doc_hint(row.get("filename"), filename, first_path):
+            visual_row = row
+            break
+
     tok_pages = _safe_list(tok_doc.get("pages"))
     tok_sentences = 0
     for page in tok_pages:
@@ -910,6 +922,15 @@ def _extract_component_views(
             "doc_type": cls_obj.get("doc_type") if isinstance(cls_obj, dict) else None,
             "status": cls_obj.get("status") if isinstance(cls_obj, dict) else None,
             "winning_score": cls_obj.get("winning_score") if isinstance(cls_obj, dict) else None,
+        },
+        "detection_signature_chachet_codebarr": {
+            "engine": visual_row.get("engine") if isinstance(visual_row, dict) else None,
+            "pages_scanned": _safe_int((visual_row.get("pages_scanned") if isinstance(visual_row, dict) else None), 0),
+            "detections_count": _safe_int((visual_row.get("detections_count") if isinstance(visual_row, dict) else None), 0),
+            "has_signature": bool((visual_row.get("has_signature") if isinstance(visual_row, dict) else False)),
+            "has_stamp": bool((visual_row.get("has_stamp") if isinstance(visual_row, dict) else False)),
+            "has_barcode": bool((visual_row.get("has_barcode") if isinstance(visual_row, dict) else False)),
+            "has_qrcode": bool((visual_row.get("has_qrcode") if isinstance(visual_row, dict) else False)),
         },
         "extraction_regles": {
             "documents_count": regex_doc_count,
@@ -2148,6 +2169,117 @@ def _augment_payload_with_default_tables(ctx: Dict[str, Any], payload: Dict[str,
     return payload
 
 
+def _augment_payload_with_visual_marks_100ml(ctx: Dict[str, Any], payload: Dict[str, Any], profile: str) -> Dict[str, Any]:
+    if str(profile or "").strip().lower() != "pipeline100ml":
+        return payload
+
+    docs = _safe_list(payload.get("documents"))
+    if not docs:
+        return payload
+
+    visual_rows = ctx.get("VISUAL_MARKS_DETECTIONS_100ML") or ctx.get("VISUAL_MARKS_DETECTIONS")
+    visual_map = _profile_index_rows(visual_rows)
+    if not visual_map:
+        return payload
+
+    totals = {"signature": 0, "stamp": 0, "barcode": 0, "qrcode": 0}
+    for doc in docs:
+        if not isinstance(doc, dict):
+            continue
+        doc_id = doc.get("document_id")
+        filename = (doc.get("file") or {}).get("name") if isinstance(doc.get("file"), dict) else None
+        key = _profile_doc_key(doc_id, filename)
+        visual_row = visual_map.get(key) or {}
+        if not isinstance(visual_row, dict):
+            continue
+
+        totals["signature"] += 1 if visual_row.get("has_signature") else 0
+        totals["stamp"] += 1 if visual_row.get("has_stamp") else 0
+        totals["barcode"] += 1 if visual_row.get("has_barcode") else 0
+        totals["qrcode"] += 1 if visual_row.get("has_qrcode") else 0
+
+        content = doc.get("content")
+        if not isinstance(content, dict):
+            content = {}
+        content["visual_flags"] = {
+            "has_signature": bool(visual_row.get("has_signature")),
+            "has_stamp": bool(visual_row.get("has_stamp")),
+            "has_barcode": bool(visual_row.get("has_barcode")),
+            "has_qrcode": bool(visual_row.get("has_qrcode")),
+        }
+        doc["content"] = content
+
+        structure = doc.get("document_structure")
+        if not isinstance(structure, dict):
+            structure = {}
+        structure["visual_marks"] = _safe_list(visual_row.get("detections"))
+        structure["visual_marks_summary"] = {
+            "engine": visual_row.get("engine"),
+            "pages_scanned": _safe_int(visual_row.get("pages_scanned"), 0),
+            "detections_count": _safe_int(visual_row.get("detections_count"), 0),
+            "has_signature": bool(visual_row.get("has_signature")),
+            "has_stamp": bool(visual_row.get("has_stamp")),
+            "has_barcode": bool(visual_row.get("has_barcode")),
+            "has_qrcode": bool(visual_row.get("has_qrcode")),
+        }
+        doc["document_structure"] = structure
+
+        extraction = doc.get("extraction")
+        if not isinstance(extraction, dict):
+            extraction = {}
+        extraction["visual_detection"] = {
+            "engine": visual_row.get("engine"),
+            "pages_scanned": _safe_int(visual_row.get("pages_scanned"), 0),
+            "detections_count": _safe_int(visual_row.get("detections_count"), 0),
+            "has_signature": bool(visual_row.get("has_signature")),
+            "has_stamp": bool(visual_row.get("has_stamp")),
+            "has_barcode": bool(visual_row.get("has_barcode")),
+            "has_qrcode": bool(visual_row.get("has_qrcode")),
+        }
+        doc["extraction"] = extraction
+
+        components = doc.get("components")
+        if not isinstance(components, dict):
+            components = {}
+        components["detection_signature_chachet_codebarr_100ml"] = {
+            "engine": visual_row.get("engine"),
+            "pages_scanned": _safe_int(visual_row.get("pages_scanned"), 0),
+            "detections_count": _safe_int(visual_row.get("detections_count"), 0),
+            "has_signature": bool(visual_row.get("has_signature")),
+            "has_stamp": bool(visual_row.get("has_stamp")),
+            "has_barcode": bool(visual_row.get("has_barcode")),
+            "has_qrcode": bool(visual_row.get("has_qrcode")),
+        }
+        doc["components"] = components
+
+        filename_label = str(filename or doc_id or "unknown")
+        print(
+            "[visual-100ml] "
+            f"{filename_label} | signature={1 if visual_row.get('has_signature') else 0} | "
+            f"stamp={1 if visual_row.get('has_stamp') else 0} | "
+            f"barcode={1 if visual_row.get('has_barcode') else 0} | "
+            f"qrcode={1 if visual_row.get('has_qrcode') else 0} | "
+            f"detections={_safe_int(visual_row.get('detections_count'), 0)}"
+        )
+
+    pipeline = payload.get("pipeline")
+    if not isinstance(pipeline, dict):
+        pipeline = {}
+    ml100 = pipeline.get("ml100")
+    if not isinstance(ml100, dict):
+        ml100 = {}
+    ml100["visual_detection_docs_count"] = len(_safe_list(visual_rows))
+    ml100["visual_signature_docs_count"] = totals["signature"]
+    ml100["visual_stamp_docs_count"] = totals["stamp"]
+    ml100["visual_barcode_docs_count"] = totals["barcode"]
+    ml100["visual_qrcode_docs_count"] = totals["qrcode"]
+    pipeline["ml100"] = ml100
+    payload["pipeline"] = pipeline
+    payload["documents"] = docs
+    payload["documents_count"] = len(docs)
+    return payload
+
+
 def main() -> None:
     ctx = globals()
     payloads, es_synced = build_payloads_from_es(ctx)
@@ -2170,6 +2302,7 @@ def main() -> None:
     final_payload = _final_output(ctx, payloads, source)
     final_payload = _augment_payload_with_default_tables(ctx, final_payload)
     final_payload = _augment_payload_for_profile(ctx, final_payload, profile)
+    final_payload = _augment_payload_with_visual_marks_100ml(ctx, final_payload, profile)
     OUTPUT_PATH.write_text(json.dumps(final_payload, ensure_ascii=False, indent=2), encoding="utf-8")
     ctx["FUSION_RESULT"] = str(OUTPUT_PATH)
     ctx["FUSION_PAYLOAD"] = final_payload

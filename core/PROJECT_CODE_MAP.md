@@ -4,8 +4,8 @@ Date d'audit: 2026-03-19
 
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
-- Python files analyses: 32
-- Fonctions/classes indexees: 694 (voir `FUNCTION_INDEX.txt`)
+- Python files analyses: 31
+- Fonctions/classes indexees: 673 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 - Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
@@ -83,17 +83,23 @@ Date d'audit: 2026-03-19
      - detection agnostique renforcee par geometrie texte (ancrages X stables + score de tabularite par ligne),
      - meilleure detection des tableaux denses/serres OCR,
      - sortie context: `TABLE_EXTRACTIONS_100ML` + `TABLE_EXTRACTIONS`.
-  8. `liaison-inter-docs` (`component/liaison-inter-docs.py`):
+  8. `detection-signature-chachet-codebarr` (`component/detection-signature-chachet-codebarr.py`):
+     - detection visuelle des signatures, cachets, codes-barres et QR codes,
+     - moteur hybride: heuristiques visuelles + decodeurs locaux optionnels (`pyzbar`, `OpenCV QRCodeDetector`) si disponibles,
+     - sortie context: `VISUAL_MARKS_DETECTIONS_100ML` + `VISUAL_MARKS_DETECTIONS`,
+     - localisation normalisee par page (`page_index`, `bbox_px`, `bbox_norm`) et drapeaux document (`has_signature`, `has_stamp`, `has_barcode`, `has_qrcode`).
+  9. `liaison-inter-docs` (`component/liaison-inter-docs.py`):
      - detection de liens inter-documents par overlap de topics + matching phrase-a-phrase auditable,
      - ajoute aussi une liaison vectorielle doc-doc et chunk-chunk en reutilisant `ML100_DOC_VECTORS` et `ML100_CHUNK_VECTORS`,
      - audit des meilleurs chunks relies avec similarite cosinus et extraits de texte.
-  9. `elasticsearch`
-  10. `extraction-regles` (`component/extraction/extraction-regles-100ml.py`):
+  10. `elasticsearch`
+  11. `extraction-regles` (`component/extraction/extraction-regles-100ml.py`):
      - extraction YAML (sans regex de champs) pilotee par classification/doc_type + scoring BM25 par chunk.
-  11. `fusion-resultats` (`component/fusion_resultats.py`):
+  12. `fusion-resultats` (`component/fusion_resultats.py`):
      - fichier unique de fusion, branche `pipeline100ml` incluse dans le meme script,
      - ajout `ml100` + BM25 dans `fusion_output.json`,
-     - filtrage des topics grammaticaux (pronoms/determinants/conjonctions/adverbes) via `NLP_TOKENS` du composant grammaire.
+     - filtrage des topics grammaticaux (pronoms/determinants/conjonctions/adverbes) via `NLP_TOKENS` du composant grammaire,
+     - ajout des sorties visuelles dans `content.visual_flags`, `document_structure.visual_marks`, `document_structure.visual_marks_summary`, `extraction.visual_detection`, `components.detection_signature_chachet_codebarr_100ml` et `pipeline.ml100`.
 
 Selection runtime:
 - CLI: `--pipeline default|pipelinorchestrator|pipeline50ml|pipeline100ml`
@@ -168,7 +174,21 @@ Reference implementation:
   - structurer chaque tableau avec `table_type` + `shape` (`columns_estimated`, `rows_estimated`),
   - supprimer automatiquement les tableaux redondants/partiels quand un tableau riche est detecte.
 
-### 4.7 Liaison inter-documents
+### 4.7 Detection visuelle signature/cachet/code-barres/QR (pipeline100ml)
+- composant runtime: `component/detection-signature-chachet-codebarr.py`
+- sorties contexte:
+  - `VISUAL_MARKS_DETECTIONS_100ML`
+  - `VISUAL_MARKS_DETECTIONS` (alias commun)
+- contenu par document:
+  - `engine`, `source_path`, `pages_scanned`, `detections_count`
+  - `has_signature`, `has_stamp`, `has_barcode`, `has_qrcode`
+  - `detections[]` avec `page_index`, `bbox_px`, `bbox_norm`, `score`, `source`
+- objectif:
+  - marquer rapidement la presence d'une signature, d'un cachet, d'un code-barres ou d'un QR code,
+  - exposer leur emplacement dans le document pour audit/fusion,
+  - utiliser les decodeurs locaux quand disponibles, sinon fallback heuristique.
+
+### 4.8 Liaison inter-documents
 - composant: `component/liaison-inter-docs.py`
 - sortie contexte:
   - `INTERDOC_ANALYSIS` (methode, statistiques, liens)
@@ -178,7 +198,7 @@ Reference implementation:
   - chaque lien contient `audit.matches[]` avec `phrase_a` / `phrase_b` (page/sentence/text_excerpt), `shared_terms`, `shared_topics`, `score`.
   - `shared_terms` est nettoye pour garder des termes informatifs (stopwords/pronoms/mots vides exclus; priorite aux termes semantiques POS/lemma + topics + signaux classification).
 
-### 4.8 Elasticsearch (optionnel)
+### 4.9 Elasticsearch (optionnel)
 - activation: `USE_ELASTICSEARCH`
 - conf: `ES_URL`, `ES_INDEX`
 - auth HTTP: `ES_USER`, `ES_PASSWORD`, `ES_API_KEY`
@@ -188,17 +208,17 @@ Reference implementation:
 - sorties: `ES_AVAILABLE`, `ES_DOC_IDS`, `ES_CLASSIFICATION_DOCS`, `ES_EXTRACTION_DOCS`, `ES_AUTO_STARTED`, `ES_AUTO_START_CMD`
 - sorties NLP ES: `ES_NLP_SYNC`, `ES_NLP_DOCS_SYNCED`, `ES_NLP_TOKENS_SYNCED`, `ES_NLP_TOKEN_ERRORS`, `ES_NLP_LEVEL_EFFECTIVE`, `ES_NLP_INDEX_EFFECTIVE`
 
-### 4.9 Classification
+### 4.10 Classification
 - sortie: `RESULTS` (doc_type, status, scores, `classification_log`, `keyword_matches`, `anti_confusion_targets`)
 - sync ES: `ES_CLASSIFICATION_SYNCED`
 
-### 4.10 Extraction metier
+### 4.11 Extraction metier
 - sortie: `EXTRACTIONS`
 - sync ES: `ES_EXTRACTION_SYNCED`
 - en `pipeline50ml`: extraction basee YAML (`rules/*.yaml`, `config/ruleset_routes.yaml`) + `EXTRACTIONS[].bm25` + `BM25_RESULTS`
 - en `pipeline100ml`: extraction basee YAML (`rules/*.yaml`, `config/ruleset_routes.yaml`) + `EXTRACTIONS[].bm25` + `BM25_RESULTS`
 
-### 4.11 Fusion finale
+### 4.12 Fusion finale
 - sortie fichier: `fusion_output.json`
 - flags contexte: `FUSION_RESULT`, `FUSION_PAYLOAD`, `FUSION_PAYLOADS`, `FUSION_SOURCE`, `ES_FUSION_SYNCED`
 - structure finale: `documents[]` (un bloc complet par document, avec `components`, `text`, `document_structure`, `extraction`, `nlp`, `quality_checks`)
@@ -209,6 +229,9 @@ Reference implementation:
   - `document.ml50.document_primary_topics`: 2 topics principaux du document
 - en `pipeline100ml`: bloc supplementaire `document.ml100`, `pipeline.profile="pipeline100ml"` et `pipeline.ml100`
   - `document.ml100.document_primary_topics`: 2 topics principaux du document
+  - `content.visual_flags`: drapeaux visuels documentaires
+  - `document_structure.visual_marks`: localisations detectees
+  - `document_structure.visual_marks_summary`: resume detection visuelle
 
 ## 5) Ou modifier selon le besoin
 
@@ -255,6 +278,13 @@ Reference implementation:
   - calcul des liens entre documents,
   - regles de score/threshold,
   - structure de l'audit `phrase_a` / `phrase_b` et champs exposes dans la fusion.
+
+### 5.6 bis Changer la detection visuelle signature/cachet/code-barres/QR
+- `component/detection-signature-chachet-codebarr.py`
+  - chargement des pages source (images/PDF),
+  - heuristiques visuelles signature/cachet,
+  - decodeurs QR/code-barres optionnels,
+  - seuils de score et structure de sortie.
 
 ### 5.7 Changer classification documentaire (scores, threshold, priorites)
 - code: `component/clasification.py`
@@ -433,6 +463,26 @@ Reference implementation:
 - Ce fichier est la reference la plus rapide pour localiser une modification precise.
 
 ## 11) Changelog code
+- 2026-03-28:
+  - `component/detection-signature-chachet-codebarr.py`:
+    - nouveau composant pipeline100ml place entre `table-extraction` et `liaison-inter-docs`.
+    - detecte signatures, cachets, codes-barres et QR codes avec localisation par page.
+    - corrige la resolution des chemins source en supportant les chemins relatifs issus de `PRETRAITEMENT_RESULT`.
+    - ajoute des decodeurs locaux optionnels (`pyzbar`, `OpenCV QRCodeDetector`) pour ameliorer la precision QR/code-barres quand disponibles.
+  - `pipeline/orchestrator.py`:
+    - ajoute l'etape `detection-signature-chachet-codebarr` dans `Pipeline100MLOrchestrator`.
+  - `pipeline/components.py`:
+    - ajoute le wrapper `VisualMarksDetectionComponent` avec resume terminal standardise.
+  - `pipeline/cli.py`:
+    - ajoute `detection-signature-chachet-codebarr` dans les etapes supportees par `--only`, `--upto`, `--start`.
+  - `component/fusion_resultats.py`:
+    - integre les detections visuelles 100ml dans `fusion_output.json`:
+      - `content.visual_flags`
+      - `document_structure.visual_marks`
+      - `document_structure.visual_marks_summary`
+      - `extraction.visual_detection`
+      - `components.detection_signature_chachet_codebarr_100ml`
+      - compteurs `pipeline.ml100.visual_*`.
 - 2026-03-19:
   - `EXPLICATION_PIPELINES.txt`:
     - nouveau fichier texte de lecture rapide pour les 3 pipelines.

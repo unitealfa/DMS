@@ -320,6 +320,38 @@ class TableExtractionComponent(Component):
         return rows
 
 
+class VisualMarksDetectionComponent(Component):
+    def run(self, context: Context) -> Any:
+        ctx = self._execute_script(context)
+        rows = ctx.get("VISUAL_MARKS_DETECTIONS_100ML")
+        if not isinstance(rows, list):
+            rows = ctx.get("VISUAL_MARKS_DETECTIONS") or []
+        if not isinstance(rows, list):
+            rows = []
+
+        docs = len(rows)
+        detections = 0
+        signature = 0
+        stamp = 0
+        barcode = 0
+        qrcode = 0
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            detections += int(row.get("detections_count") or len(row.get("detections") or []))
+            signature += int(row.get("counts", {}).get("signature") or 0) if isinstance(row.get("counts"), dict) else 0
+            stamp += int(row.get("counts", {}).get("stamp") or 0) if isinstance(row.get("counts"), dict) else 0
+            barcode += int(row.get("counts", {}).get("barcode") or 0) if isinstance(row.get("counts"), dict) else 0
+            qrcode += int(row.get("counts", {}).get("qrcode") or 0) if isinstance(row.get("counts"), dict) else 0
+
+        summary = (
+            f"docs={docs} | detections={detections} | "
+            f"signature={signature} | stamp={stamp} | barcode={barcode} | qrcode={qrcode}"
+        )
+        self._report(rows, summary)
+        return rows
+
+
 class InterDocLinkingComponent(Component):
     def run(self, context: Context) -> Any:
         ctx = self._execute_script(context)

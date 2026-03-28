@@ -14,6 +14,7 @@ from .components import (
     PretraitementComponent,
     TableExtractionComponent,
     TokenisationLayoutComponent,
+    VisualMarksDetectionComponent,
     FusionResultComponent,
 )
 from .settings import COMPONENT_DIR, Context, InputLike, normalize_input
@@ -160,6 +161,7 @@ class Pipeline100MLOrchestrator:
             TokenisationLayoutComponent("tokenisation-layout", COMPONENT_DIR / "tokenisation_layout" / "tokenisation-layout-100ml.py"),
             GrammarComponent("atripusion-gramatical", COMPONENT_DIR / "atrribution-gramatical" / "attribution-gramatical-100ml-xlmr.py"),
             TableExtractionComponent("table-extraction", COMPONENT_DIR / "table_extraction" / "table-extraction.py"),
+            VisualMarksDetectionComponent("detection-signature-chachet-codebarr", COMPONENT_DIR / "detection-signature-chachet-codebarr.py"),
             InterDocLinkingComponent("liaison-inter-docs", COMPONENT_DIR / "liaison-inter-docs.py"),
             ElasticsearchComponent("elasticsearch", COMPONENT_DIR / "elasticsearch.py"),
             RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction" / "extraction-regles-100ml.py"),

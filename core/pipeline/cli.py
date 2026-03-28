@@ -11,7 +11,7 @@ from .settings import configure_logging, load_dotenv, normalize_input
 
 # Pipeline par defaut configurable directement dans le code.
 # Valeurs supportees: "pipelinorchestrator" | "pipeline50ml" | "pipeline100ml"
-PIPELINE_DEFAULT_CODE = "pipelinorchestrator"
+PIPELINE_DEFAULT_CODE = "pipeline100ml"
 
 _STEP_ALIASES = {
     "atripusion-gramatical-en-utilisant-les3ficherla": "atripusion-gramatical",
@@ -26,6 +26,7 @@ _STEP_CHOICES = [
     "atripusion-gramatical",
     "atripusion-gramatical-en-utilisant-les3ficherla",
     "table-extraction",
+    "detection-signature-chachet-codebarr",
     "liaison-inter-docs",
     "elasticsearch",
     "extraction-regles",

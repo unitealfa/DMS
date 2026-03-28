@@ -2065,6 +2065,89 @@ def _augment_payload_for_profile(ctx: Dict[str, Any], payload: Dict[str, Any], p
     return payload
 
 
+def _augment_payload_with_default_tables(ctx: Dict[str, Any], payload: Dict[str, Any]) -> Dict[str, Any]:
+    profile = str(ctx.get("PIPELINE_PROFILE") or "default").strip().lower()
+    if profile not in {"default", "pipelinorchestrator", "pipelineorchestrator", "0ml"}:
+        return payload
+
+    docs = _safe_list(payload.get("documents"))
+    if not docs:
+        return payload
+
+    table_rows = ctx.get("TABLE_EXTRACTIONS_DEFAULT") or ctx.get("TABLE_EXTRACTIONS")
+    table_map = _profile_index_rows(table_rows)
+    if not table_map:
+        return payload
+
+    for doc in docs:
+        if not isinstance(doc, dict):
+            continue
+
+        doc_id = doc.get("document_id")
+        filename = (doc.get("file") or {}).get("name") if isinstance(doc.get("file"), dict) else None
+        key = _profile_doc_key(doc_id, filename)
+        table_row = table_map.get(key) or {}
+        if not isinstance(table_row, dict):
+            continue
+
+        structure = doc.get("document_structure")
+        if not isinstance(structure, dict):
+            structure = {}
+        if _safe_list(table_row.get("tables")):
+            structure["tables"] = _safe_list(table_row.get("tables"))
+        if not _safe_list(structure.get("detected_columns")):
+            structure["detected_columns"] = _safe_list(table_row.get("detected_columns"))
+        doc["document_structure"] = structure
+
+        extraction = doc.get("extraction")
+        if not isinstance(extraction, dict):
+            extraction = {}
+        extraction["table_extraction"] = {
+            "engine": table_row.get("engine"),
+            "tables_count": int(table_row.get("tables_count") or 0),
+            "rows_total": int(table_row.get("rows_total") or 0),
+            "detected_columns": _safe_list(table_row.get("detected_columns")),
+            "totals": table_row.get("totals") if isinstance(table_row.get("totals"), dict) else {},
+            "line_items": _safe_list(table_row.get("line_items")),
+            "tables": _safe_list(table_row.get("tables")),
+        }
+        doc["extraction"] = extraction
+
+        components = doc.get("components")
+        if not isinstance(components, dict):
+            components = {}
+        components["table_extraction_0ml"] = {
+            "engine": table_row.get("engine"),
+            "tables_count": int(table_row.get("tables_count") or 0),
+            "rows_total": int(table_row.get("rows_total") or 0),
+            "detected_columns": _safe_list(table_row.get("detected_columns")),
+        }
+        doc["components"] = components
+
+        filename_label = str(filename or doc_id or "unknown")
+        print(
+            f"[table-0ml] {filename_label} | tables={int(table_row.get('tables_count') or 0)} | "
+            f"rows={int(table_row.get('rows_total') or 0)} | cols={_safe_list(table_row.get('detected_columns'))}"
+        )
+
+    pipeline = payload.get("pipeline")
+    if not isinstance(pipeline, dict):
+        pipeline = {}
+    pipeline["profile"] = "default"
+    pipeline["0ml"] = {
+        "tables_docs_count": len(_safe_list(table_rows)),
+    }
+    payload["pipeline"] = pipeline
+    payload["documents"] = docs
+    payload["documents_count"] = len(docs)
+
+    print(
+        f"[fusion-resultats-0ml] docs={len(docs)} | "
+        f"table_docs={len(_safe_list(table_rows))}"
+    )
+    return payload
+
+
 def main() -> None:
     ctx = globals()
     payloads, es_synced = build_payloads_from_es(ctx)
@@ -2085,6 +2168,7 @@ def main() -> None:
 
     profile = str(ctx.get("PIPELINE_PROFILE") or "default").strip().lower()
     final_payload = _final_output(ctx, payloads, source)
+    final_payload = _augment_payload_with_default_tables(ctx, final_payload)
     final_payload = _augment_payload_for_profile(ctx, final_payload, profile)
     OUTPUT_PATH.write_text(json.dumps(final_payload, ensure_ascii=False, indent=2), encoding="utf-8")
     ctx["FUSION_RESULT"] = str(OUTPUT_PATH)

@@ -17,7 +17,7 @@ def _resolve_profile(ctx: Dict[str, Any]) -> str:
         return "100ml"
     if "50" in raw:
         return "50ml"
-    return "100ml"
+    return "0ml"
 
 
 _CTX = globals()
@@ -28,3 +28,5 @@ if _PROFILE == "50ml":
     TABLE_EXTRACTIONS_50ML = TABLE_EXTRACTIONS
 elif _PROFILE == "100ml":
     TABLE_EXTRACTIONS_100ML = TABLE_EXTRACTIONS
+else:
+    TABLE_EXTRACTIONS_DEFAULT = TABLE_EXTRACTIONS

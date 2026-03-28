@@ -29,6 +29,7 @@ class PipelineOrchestrator:
             ClassificationComponent("clasification", COMPONENT_DIR / "clasification.py"),
             TokenisationLayoutComponent("tokenisation-layout", COMPONENT_DIR / "tokenisation_layout" / "tokenisation-layout.py"),
             GrammarComponent("atripusion-gramatical", COMPONENT_DIR / "atrribution-gramatical" / "atripusion-gramatical-en-utilisant-les3ficherla.py"),
+            TableExtractionComponent("table-extraction", COMPONENT_DIR / "table_extraction" / "table-extraction.py"),
             InterDocLinkingComponent("liaison-inter-docs", COMPONENT_DIR / "liaison-inter-docs.py"),
             ElasticsearchComponent("elasticsearch", COMPONENT_DIR / "elasticsearch.py"),
             RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction" / "extraction-regles.py"),

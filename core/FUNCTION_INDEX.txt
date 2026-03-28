@@ -1,4 +1,4 @@
-# Regenerated: 2026-03-19
+# Regenerated: 2026-03-28
 component/atrribution-gramatical/arabcode.py:11:def _install_help():
 component/atrribution-gramatical/arabcode.py:87:def simple_tokenize(text: str) -> List[str]:
 component/atrribution-gramatical/arabcode.py:90:def is_punct(tok: str) -> bool:
@@ -302,7 +302,8 @@ component/fusion_resultats.py:1851:def _is_blocked_topic_term(term: str, blocked
 component/fusion_resultats.py:1867:def _filter_topics(topics: Any, blocked_terms: Set[str]) -> Tuple[List[Dict[str, Any]], int]:
 component/fusion_resultats.py:1893:def _filter_chunk_topics(chunks: Any, blocked_terms: Set[str]) -> Tuple[List[Dict[str, Any]], int]:
 component/fusion_resultats.py:1911:def _augment_payload_for_profile(ctx: Dict[str, Any], payload: Dict[str, Any], profile: str) -> Dict[str, Any]:
-component/fusion_resultats.py:2068:def main() -> None:
+component/fusion_resultats.py:2068:def _augment_payload_with_default_tables(ctx: Dict[str, Any], payload: Dict[str, Any]) -> Dict[str, Any]:
+component/fusion_resultats.py:2151:def main() -> None:
 component/liaison-inter-docs.py:80:def _iso_now() -> str:
 component/liaison-inter-docs.py:84:def _safe_list(value: Any) -> List[Any]:
 component/liaison-inter-docs.py:88:def _safe_int(value: Any, default: int = 0) -> int:
@@ -658,19 +659,19 @@ pipeline/elasticsearch.py:1079:def sync_nlp_results(store: ElasticsearchStore, c
 pipeline/elasticsearch.py:1254:def maybe_build_store(context: Dict[str, Any]) -> Optional[ElasticsearchStore]:
 pipeline/orchestrator.py:22:class PipelineOrchestrator:
 pipeline/orchestrator.py:23:    def __init__(self, base_dir: Path):
-pipeline/orchestrator.py:38:    def list_steps(self) -> List[str]:
-pipeline/orchestrator.py:41:    def _select_components(self, only: Optional[str], upto: Optional[str], start: Optional[str]) -> List[Any]:
-pipeline/orchestrator.py:59:    def run(
-pipeline/orchestrator.py:80:class Pipeline50MLOrchestrator:
-pipeline/orchestrator.py:87:    def __init__(self, base_dir: Path):
-pipeline/orchestrator.py:103:    def list_steps(self) -> List[str]:
-pipeline/orchestrator.py:106:    def _select_components(self, only: Optional[str], upto: Optional[str], start: Optional[str]) -> List[Any]:
-pipeline/orchestrator.py:124:    def run(
-pipeline/orchestrator.py:145:class Pipeline100MLOrchestrator:
-pipeline/orchestrator.py:152:    def __init__(self, base_dir: Path):
-pipeline/orchestrator.py:168:    def list_steps(self) -> List[str]:
-pipeline/orchestrator.py:171:    def _select_components(self, only: Optional[str], upto: Optional[str], start: Optional[str]) -> List[Any]:
-pipeline/orchestrator.py:189:    def run(
+pipeline/orchestrator.py:39:    def list_steps(self) -> List[str]:
+pipeline/orchestrator.py:42:    def _select_components(self, only: Optional[str], upto: Optional[str], start: Optional[str]) -> List[Any]:
+pipeline/orchestrator.py:60:    def run(
+pipeline/orchestrator.py:81:class Pipeline50MLOrchestrator:
+pipeline/orchestrator.py:88:    def __init__(self, base_dir: Path):
+pipeline/orchestrator.py:104:    def list_steps(self) -> List[str]:
+pipeline/orchestrator.py:107:    def _select_components(self, only: Optional[str], upto: Optional[str], start: Optional[str]) -> List[Any]:
+pipeline/orchestrator.py:125:    def run(
+pipeline/orchestrator.py:146:class Pipeline100MLOrchestrator:
+pipeline/orchestrator.py:153:    def __init__(self, base_dir: Path):
+pipeline/orchestrator.py:169:    def list_steps(self) -> List[str]:
+pipeline/orchestrator.py:172:    def _select_components(self, only: Optional[str], upto: Optional[str], start: Optional[str]) -> List[Any]:
+pipeline/orchestrator.py:190:    def run(
 pipeline/settings.py:20:def load_dotenv(path: Union[str, Path, None] = None, override: bool = False) -> Dict[str, str]:
 pipeline/settings.py:55:def configure_logging(level: str = "INFO") -> None:
 pipeline/settings.py:66:def normalize_input(input_data: InputLike) -> List[str]:

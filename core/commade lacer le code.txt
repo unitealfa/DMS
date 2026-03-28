@@ -58,6 +58,7 @@ lancer une fois EA manuelmetn sinon sa marche pas :
 
 • Pour stocker la grammaire dans ES:
 
+  python main.py documents/image2tab.webp --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
   python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
 
   Pour ne pas stocker la grammaire token par token (juste résumé):

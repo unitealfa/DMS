@@ -5,7 +5,7 @@ Date d'audit: 2026-03-19
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
 - Python files analyses: 32
-- Fonctions/classes indexees: 693 (voir `FUNCTION_INDEX.txt`)
+- Fonctions/classes indexees: 694 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 - Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
@@ -27,10 +27,14 @@ Date d'audit: 2026-03-19
   5. `tokenisation-layout`
   6. `atripusion-gramatical` (`component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py`):
      - attribution grammaticale legacy basee sur les 3 modules EN/FR/AR (`engcode.py`, `frcode.py`, `arabcode.py`).
-  7. `liaison-inter-docs`
-  8. `elasticsearch`
-  9. `extraction-regles`
-  10. `fusion-resultats` (debug/fusion finale, non bloquant en erreur)
+  7. `table-extraction` (`component/table_extraction/table-extraction.py`):
+     - extraction de tableaux non-ML pour la pipeline standard,
+     - detection par heuristiques de geometrie + synonymes/metiers de colonnes (`product`, `quantity`, `unit_price`, `total`, etc.),
+     - sortie context: `TABLE_EXTRACTIONS_DEFAULT` + `TABLE_EXTRACTIONS`.
+  8. `liaison-inter-docs`
+  9. `elasticsearch`
+  10. `extraction-regles`
+  11. `fusion-resultats` (debug/fusion finale, non bloquant en erreur)
 - Pipeline `pipeline50ml`:
   1. `pretraitement-de-docs`
   2. `si-image-pretraiter-sinonpass-le-doc`
@@ -458,6 +462,18 @@ Reference implementation:
   - `component/tokenisation_layout/tokenisation-layout-50ml.py`:
     - suppression de la dependance dure a `numpy`.
     - calcul des vecteurs FastText-like/hash et moyennes en listes Python pures.
+  - `pipeline/orchestrator.py`:
+    - reintegre `table-extraction` dans la pipeline `default` apres `atripusion-gramatical`.
+  - `component/table_extraction/table-extraction.py`:
+    - distingue maintenant le profil `0ml`/`default` au lieu de se faire passer pour `100ml`.
+    - expose `TABLE_EXTRACTIONS_DEFAULT` pour la branche standard.
+  - `component/table_extraction/table_extraction_lib.py`:
+    - en profil non-ML, renseigne `TABLE_EXTRACTIONS_DEFAULT` + `TABLE_EXTRACTIONS`.
+    - engine runtime maintenant tagge `table-0ml-unified-v3-anchor-geometry`.
+  - `component/fusion_resultats.py`:
+    - ajoute une integration specifique `0ml` pour les tableaux detectes dans la pipeline standard.
+    - injecte `extraction.table_extraction`, `components.table_extraction_0ml`, `pipeline.0ml` et alimente `document_structure.tables`.
+    - ajoute les prints terminal `[table-0ml]` et `[fusion-resultats-0ml]`.
   - `component/liaison-inter-docs.py`:
     - ajoute une couche de liaison vectorielle active seulement en `pipeline50ml` et `pipeline100ml`.
     - `pipeline50ml`: reutilise `ML50_DOC_VECTORS` et `ML50_CHUNK_VECTORS` (FastText-like local).

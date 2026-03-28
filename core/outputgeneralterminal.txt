@@ -10,12 +10,14 @@ Output: [{'content': 'image_only',
 
 [info] Using INPUT_FILE=/home/mourad/Bureau/DMS/core/documents/image2tab.webp
 [info] Using INPUT_FILE=/home/mourad/Bureau/DMS/core/documents/image2tab.webp
+<PIL.WebPImagePlugin.WebPImageFile image mode=RGB size=768x1024 at 0x70E32BD286A0>
+<PIL.Image.Image image mode=L size=1152x1536 at 0x70E3354594E0>
 [Component: si-image-pretraiter-sinonpass-le-doc]
 Type: dict
 Summary: text=0, image=1, docs_prepped=1
-Output: {'DOCS': [{'original': <PIL.WebPImagePlugin.WebPImageFile image mode=RGB size=768x1024 at 0x7B601954F220>,
+Output: {'DOCS': [{'original': <PIL.WebPImagePlugin.WebPImageFile image mode=RGB size=768x1024 at 0x70E32BD286A0>,
            'path': PosixPath('/home/mourad/Bureau/DMS/core/documents/image2tab.webp'),
-           'prepped': <PIL.Image.Image image mode=L size=1152x1536 at 0x7B601A536B90>}],
+           'prepped': <PIL.Image.Image image mode=L size=1152x1536 at 0x70E3354594E0>}],
  'IMAGE_ONLY_FILES': ['/home/mourad/Bureau/DMS/core/documents/image2tab.webp'],
  'TEXT_FILES': []}
 
@@ -100,7 +102,7 @@ Output: {'DOCS': [{'original': <PIL.WebPImagePlugin.WebPImageFile image mode=RGB
 Type: list
 Summary: 1 docs | pages=1
 Output: [{'content': 'image_only',
-  'doc_id': '5068f7ef-b69d-4d75-a798-185f0e119167',
+  'doc_id': '196cc32c-7799-470b-87ed-d1e300637f77',
   'extraction': 'ocr:tesseract',
   'filename': 'image2tab.webp',
   'page_count_total': 1,
@@ -269,7 +271,7 @@ Output: [{'anti_confusion_targets': ['BON_DE_COMMANDE', 'CONTRAT', 'DEVIS', 'BON
                         "{'ARTICLE': 2, 'BON_DE_COMMANDE': -21, 'CONTRAT': -18, 'FACTURE': 20, "
                         "'FORMULAIRE': 4}",
   'decision_debug': {'diff': 16, 'second_score': 4, 'top_score': 20},
-  'doc_id': '5068f7ef-b69d-4d75-a798-185f0e119167',
+  'doc_id': '196cc32c-7799-470b-87ed-d1e300637f77',
   'doc_type': 'FACTURE',
   'filename': 'image2tab.webp',
   'keyword_matches': {'anti_confusion_hits': [],
@@ -380,7 +382,7 @@ Output: [{'anti_confusion_targets': ['BON_DE_COMMANDE', 'CONTRAT', 'DEVIS', 'BON
 
 ========================================================================================================================
 [doc] image2tab.webp
-  doc_id       : 5068f7ef-b69d-4d75-a798-185f0e119167
+  doc_id       : 196cc32c-7799-470b-87ed-d1e300637f77
   content      : image_only
   extraction   : ocr:tesseract
   pages_total  : 1
@@ -445,15 +447,12 @@ Monatnt  Facture en Lettre   Cinq mille huit cent quatre vingt huit Dinars Algé
 Cachet & Signature
 --------------------------------------------------------------------------------
 
-[tokenisation-100ml] transformer indisponible, fallback hash | reason=No module named 'torch'
-[topic-doc-100] image2tab.webp | document_primary_topics=['facture', 'huit'] | document_top_topics=['facture', 'huit', 'client', 'mode', 'paiement']
-[tokenisation-100ml] docs=1 | chunks=9 | words=0 | topics=12 | nlp_rows=9 | vector_dim=384 | backend=hash-fallback
 [Component: tokenisation-layout]
 Type: list
 Summary: 1 docs | sentences=12
 Output: [{'chars_total': 960,
   'content': 'image_only',
-  'doc_id': '5068f7ef-b69d-4d75-a798-185f0e119167',
+  'doc_id': '196cc32c-7799-470b-87ed-d1e300637f77',
   'extraction': 'ocr:tesseract',
   'filename': 'image2tab.webp',
   'page_count_total': 1,
@@ -981,15 +980,185 @@ Output: [{'chars_total': 960,
   'recompose_ok': False,
   'size': None}]
 
-[grammar-100ml-xlmr] sentences=6 | tokens=82 | langs=['fr'] | backend=hash-fallback | model=xlm-roberta-base | source=xlm-roberta-base
-[grammar-100ml-xlmr][warn] fallback actif: No module named 'torch'
-[grammar-100ml-xlmr][pos] method=hybrid-rules+context-v2 | refined=1/82 | top=NOUN:21, PUNCT:15, PROPN:15, NUM:14, VERB:10, ADP:4, PART:1, ADV:1, DET:1
+[warn] arabcode.py non chargé (dépendances manquantes ?). Détail: CAMeL morphology DB not found. Run:
+  "/home/mourad/Bureau/DMS/.venv/bin/python" -m camel_tools.cli.camel_data -i morphology-db-msa-r13
+
+
+========================================================================================================================
+RUN EN (engcode.py)
+========================================================================================================================
+
+========================================================================================================================
+RUN FR (frcode.py)
+========================================================================================================================
+
+##########################################################################################
+DOC=image2tab.webp | page=1 | sent=3 | lang=fr
+##########################################################################################
+==========================================================================================
+INPUT: Ma   petite entreprise                                         CLIENT
+
+   19, rue de place 1° mai                        EL HANA
+
+   16000  Alger  Centre                            DE  BEJAIA  SETIF
+
+
+   Tel : 00-00-52-12-
+
+   Ident Fiscal : 16010000000000
+
+   N°art :      16010000000
+
+
+
+
+   Mode  de paiement  :        Espèce
+
+   Date Échéance :            5/20/2016
+            Ma  DT      lemma=son
+        petite  NN      lemma=petit
+    entreprise  NN      lemma=entreprise
+        CLIENT  NNP     lemma=client
+            19  CD      lemma=19
+             ,  PUNCT   lemma=∅
+           rue  NN      lemma=rue
+            de  IN      lemma=de
+         place  NN      lemma=place
+             1  CD      lemma=1
+             °  NN      lemma=°
+           mai  NN      lemma=mai
+            EL  NNP     lemma=EL
+          HANA  NNP     lemma=HANA
+         16000  CD      lemma=16000
+         Alger  NNP     lemma=Alger
+        Centre  NNP     lemma=centre
+            DE  IN      lemma=de
+        BEJAIA  NNP     lemma=BEJAIA
+         SETIF  NNP     lemma=SETIF
+           Tel  NNP     lemma=tel
+             :  PUNCT   lemma=∅
+      00-00-52  CD      lemma=00-00-52
+             -  PUNCT   lemma=∅
+            12  CD      lemma=12
+             -  PUNCT   lemma=∅
+         Ident  NNP     lemma=Ident
+        Fiscal  NNP     lemma=fiscal
+             :  PUNCT   lemma=∅
+16010000000000  CD      lemma=16010000000000
+             N  NN      lemma=ne
+             °  NN      lemma=°
+           art  NN      lemma=art
+             :  PUNCT   lemma=∅
+   16010000000  CD      lemma=16010000000
+          Mode  NNP     lemma=mode
+            de  IN      lemma=de
+      paiement  RB      lemma=paiement
+             :  PUNCT   lemma=∅
+        Espèce  NNP     lemma=espèce
+          Date  NNP     lemma=date
+      Échéance  NNP     lemma=échéance
+             :  PUNCT   lemma=∅
+     5/20/2016  CD      lemma=5/20/2016
+
+NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
+[('Ma', 'O'), ('petite', 'O'), ('entreprise', 'O'), ('CLIENT', 'O'), ('19', 'O'), (',', 'O'), ('rue', 'B-LOC'), ('de', 'I-LOC'), ('place', 'I-LOC'), ('1', 'O'), ('°', 'O'), ('mai', 'O'), ('EL', 'O'), ('HANA', 'O'), ('16000', 'O'), ('Alger', 'B-LOC'), ('Centre', 'O'), ('DE', 'O'), ('BEJAIA', 'O'), ('SETIF', 'O'), ('Tel', 'O'), (':', 'O'), ('00-00-52', 'B-DATE'), ('-', 'O'), ('12', 'O'), ('-', 'O'), ('Ident', 'O'), ('Fiscal', 'O'), (':', 'O'), ('16010000000000', 'O'), ('N', 'O'), ('°', 'O'), ('art', 'O'), (':', 'O'), ('16010000000', 'O'), ('Mode', 'O'), ('de', 'O'), ('paiement', 'O'), (':', 'O'), ('Espèce', 'B-LOC'), ('Date', 'O'), ('Échéance', 'O'), (':', 'O'), ('5/20/2016', 'B-DATE')]
+Entities:
+  DATE: 00-00-52
+  DATE: 5/20/2016
+  LOC: rue de place
+  LOC: Alger
+  LOC: Espèce
+
+##########################################################################################
+DOC=image2tab.webp | page=1 | sent=4 | lang=fr
+##########################################################################################
+==========================================================================================
+INPUT: Référence                     Produit                           P.Unitaire
+ Référence  NNP     lemma=référence
+   Produit  NNP     lemma=produit
+         P  NN      lemma=P
+         .  PUNCT   lemma=∅
+  Unitaire  NNP     lemma=unitaire
+
+NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
+[('Référence', 'O'), ('Produit', 'O'), ('P', 'B-ORG'), ('.', 'I-ORG'), ('Unitaire', 'I-ORG')]
+Entities:
+  ORG: P. Unitaire
+
+##########################################################################################
+DOC=image2tab.webp | page=1 | sent=5 | lang=fr
+##########################################################################################
+==========================================================================================
+INPUT: c1001                                                            1.00
+         c  NN      lemma=c
+         1  CD      lemma=1
+         0  CD      lemma=0
+         0  CD      lemma=0
+         1  CD      lemma=1
+      1.00  CD      lemma=1.00
+
+NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
+[('c', 'O'), ('1', 'O'), ('0', 'O'), ('0', 'O'), ('1', 'O'), ('1.00', 'O')]
+Entities:
+
+##########################################################################################
+DOC=image2tab.webp | page=1 | sent=8 | lang=fr
+##########################################################################################
+==========================================================================================
+INPUT: Non assujetti à la tva
+       Non  RP      lemma=Non
+ assujetti  NN      lemma=assujetti
+         à  IN      lemma=à
+        la  DT      lemma=le
+       tva  NN      lemma=tva
+
+NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
+[('Non', 'O'), ('assujetti', 'O'), ('à', 'O'), ('la', 'O'), ('tva', 'O')]
+Entities:
+
+##########################################################################################
+DOC=image2tab.webp | page=1 | sent=10 | lang=fr
+##########################################################################################
+==========================================================================================
+INPUT: Monatnt  Facture en Lettre   Cinq mille huit cent quatre vingt huit Dinars Algériens
+   Monatnt  NNP     lemma=Monatnt
+   Facture  NNP     lemma=facture
+        en  IN      lemma=en
+    Lettre  NNP     lemma=lettre
+      Cinq  NNP     lemma=cinq
+     mille  NN      lemma=mille
+      huit  NN      lemma=huit
+      cent  NN      lemma=cent
+    quatre  VB      lemma=quatre
+     vingt  NN      lemma=vingt
+      huit  NN      lemma=huit
+    Dinars  NNP     lemma=dinar
+ Algériens  NNP     lemma=algérien
+
+NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
+[('Monatnt', 'O'), ('Facture', 'O'), ('en', 'O'), ('Lettre', 'O'), ('Cinq', 'O'), ('mille', 'O'), ('huit', 'O'), ('cent', 'O'), ('quatre', 'O'), ('vingt', 'O'), ('huit', 'O'), ('Dinars', 'B-ORG'), ('Algériens', 'O')]
+Entities:
+  ORG: Dinars
+
+##########################################################################################
+DOC=image2tab.webp | page=1 | sent=11 | lang=fr
+##########################################################################################
+==========================================================================================
+INPUT: Cachet & Signature
+    Cachet  NNP     lemma=cachet
+         &  PUNCT   lemma=∅
+ Signature  NNP     lemma=signature
+
+NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
+[('Cachet', 'B-ORG'), ('&', 'I-ORG'), ('Signature', 'I-ORG')]
+Entities:
+  ORG: Cachet & Signature
 [Component: atripusion-gramatical]
 Type: list
-Summary: Langues executees: en, fr | docs=1 | backend=hash-fallback | component=atripusion-gramatical | pos=hybrid-rules+context-v2 | pos_refined=1/82
+Summary: Langues executees: en, fr | docs=1 | backend=legacy-3files | component=atripusion-gramatical
 Output: [{'chars_total': 960,
   'content': 'image_only',
-  'doc_id': '5068f7ef-b69d-4d75-a798-185f0e119167',
+  'doc_id': '196cc32c-7799-470b-87ed-d1e300637f77',
   'extraction': 'ocr:tesseract',
   'filename': 'image2tab.webp',
   'page_count_total': 1,
@@ -1517,14 +1686,14 @@ Output: [{'chars_total': 960,
   'recompose_ok': False,
   'size': None}]
 
-[table-extraction-100ml] docs=1 | tables=2 | rows=13
+[table-extraction-0ml] docs=1 | tables=2 | rows=13
   - image2tab.webp | tables=2 | rows=13 | cols=['product', 'quantity', 'reference', 'total', 'unit_price']
 [Component: table-extraction]
 Type: list
 Summary: docs=1 | tables=2 | line_items=13
 Output: [{'detected_columns': ['product', 'quantity', 'reference', 'total', 'unit_price'],
-  'doc_id': '5068f7ef-b69d-4d75-a798-185f0e119167',
-  'engine': 'table-100ml-unified-v3-anchor-geometry',
+  'doc_id': '196cc32c-7799-470b-87ed-d1e300637f77',
+  'engine': 'table-0ml-unified-v3-anchor-geometry',
   'filename': 'image2tab.webp',
   'line_items': [{'confidence': 0.62,
                   'page_index': 1,
@@ -1875,7 +2044,7 @@ Output: [{'detected_columns': ['product', 'quantity', 'reference', 'total', 'uni
 [interdoc-link] docs=1 | pairs=0 | links=0 | sentence_pairs_scored=0 | chunk_pairs_scored=0
 [Component: liaison-inter-docs]
 Type: dict
-Summary: docs=1 | pairs=0 | links=0 | sentence_pairs=0 | chunk_pairs=0 | vector_profile=pipeline100ml | vector_links=0
+Summary: docs=1 | pairs=0 | links=0 | sentence_pairs=0 | chunk_pairs=0 | vector_profile=default | vector_links=0
 Output: {'chunk_pairs_scored': 0,
  'documents_analyzed': 1,
  'links_count': 0,
@@ -1883,7 +2052,7 @@ Output: {'chunk_pairs_scored': 0,
  'pairs_evaluated': 0,
  'sentence_pairs_scored': 0,
  'vector_links_count': 0,
- 'vector_profile': 'pipeline100ml'}
+ 'vector_profile': 'default'}
 
 [elasticsearch] desactive ou indisponible -> fallback flux local.
 [Component: elasticsearch]
@@ -1905,109 +2074,76 @@ Output: {'available': False,
  'nlp_tokens_indexed': 0,
  'nlp_unresolved_rows': 0}
 
-[extraction-regles-100ml] docs=1 | bm25_top_score=2.283687
+[extraction-regles] regex invalide pour 'numero_facture': missing ), unterminated subpattern at position 21 | pattern=(?xim)\b(?:facture\s*(?:n(?:o|°|º)?|num(?:e|é)?ro|number|no\.?|#)|(?:n(?:o|°|º)?|num(?:e|é)?ro)\s*de\s*facture|invoice\s*(?:number|no\.?|#)|رقم\s*الفاتورة|فاتورة\s*(?:رقم|#)?|الفاتورة\s*(?:رقم|#)?)\b[\s\t:;=\-–—#]*([A-Za-z0-9٠-٩ء-ي][A-Za-z0-9٠-٩ء-ي._\/-]{0,30}(?:[ \t][A-Za-z0-9٠-٩ء-ي._\/-]{1,30}){0,2})
+
+[extraction]
+  doc: image2tab.webp | type=FACTURE | status=OK
+  rulesets: common.json, FACTURE.json
+    - doc_date (rule_id=CMN_DATE_01)  x0
+    - email (rule_id=CMN_EMAIL_01)  x0
+    - telephone (rule_id=CMN_PHONE_01)  x0
+    - site (rule_id=CMN_URL_01)  x0
+    - numero_facture (rule_id=INV_NUM_02)  x0
+    - date_facture (rule_id=INV_DATE_02)  x0
+    - date_echeance (rule_id=INV_DUE_DATE_02)  x0
+    - montant_ht (rule_id=INV_AMOUNT_HT_02)  x0
+    - montant_tva (rule_id=INV_AMOUNT_TVA_02)  x0
+    - montant_ttc (rule_id=INV_AMOUNT_TTC_02)  x0
+    - devise (rule_id=INV_CURRENCY_03)  x0
 [Component: extraction-regles]
 Type: list
-Summary: 1 docs | fields=0 | image2tab.webp->FACTURE
-Output: [{'bm25': {'avg_top3_score': 1.119015,
-           'b': 0.75,
-           'best_score': 2.283687,
-           'chunks_total': 9,
-           'k1': 1.5,
-           'query_terms': ['facture'],
-           'top_chunks': [{'page_index': 1,
-                           'score': 2.283687,
-                           'sent_index': 0,
-                           'text_preview': '                                                                '
-                                           'FACTURE\n'
-                                           '\n'
-                                           '\n'
-                                           '\n'
-                                           '\n'
-                                           '\n'
-                                           '\n'},
-                          {'page_index': 1,
-                           'score': 1.073358,
-                           'sent_index': 10,
-                           'text_preview': 'Monatnt  Facture en Lettre   Cinq mille huit cent '
-                                           'quatre vingt huit Dinars Algériens\n'
-                                           '\n'
-                                           '\n'
-                                           '\n'
-                                           '\n'
-                                           '\n'
-                                           '\n'
-                                           '\n'
-                                           '\n'
-                                           '\n'
-                                           '\n'
-                                           '\n'
-                                           '\n'
-                                           '                                                                  '},
-                          {'page_index': 1,
-                           'score': 0.0,
-                           'sent_index': 3,
-                           'text_preview': '   Ma   petite '
-                                           'entreprise                                         '
-                                           'CLIENT\n'
-                                           '\n'
-                                           '   19, rue de place 1° mai                        EL '
-                                           'HANA\n'
-                                           '\n'
-                                           '   16000  Alger  Centre                            DE  '
-                                           'BEJAIA  SETIF\n'
-                                           '\n'
-                                           '\n'
-                                           '   Tel : 00-00-52-12-\n'
-                                           '\n'
-                                           '   Ident Fiscal : 16010000000000\n'
-                                           '\n'
-                                           '   N°art :      160'},
-                          {'page_index': 1,
-                           'score': 0.0,
-                           'sent_index': 4,
-                           'text_preview': '   Référence                     '
-                                           'Produit                           P.Unitaire\n'},
-                          {'page_index': 1,
-                           'score': 0.0,
-                           'sent_index': 5,
-                           'text_preview': '      '
-                                           'c1001                                                            '
-                                           '1.00\n'},
-                          {'page_index': 1,
-                           'score': 0.0,
-                           'sent_index': 7,
-                           'text_preview': 'c1009\n      c1010\n\n\n'},
-                          {'page_index': 1,
-                           'score': 0.0,
-                           'sent_index': 8,
-                           'text_preview': '   Non assujetti à la tva\n'},
-                          {'page_index': 1,
-                           'score': 0.0,
-                           'sent_index': 9,
-                           'text_preview': '                                                                                    '
-                                           '182,006.00\n'
-                                           '\n'
-                                           '\n'
-                                           '\n'
-                                           '\n'
-                                           '   '}]},
-  'classification_status': 'OK',
-  'doc_id': '5068f7ef-b69d-4d75-a798-185f0e119167',
+Summary: 1 docs | fields=11 | image2tab.webp->FACTURE
+Output: [{'classification_status': 'OK',
+  'doc_id': '196cc32c-7799-470b-87ed-d1e300637f77',
   'doc_type': 'FACTURE',
-  'fields': {},
+  'fields': {'date_echeance': {'many': True,
+                               'matches': [],
+                               'rule_id': 'INV_DUE_DATE_02',
+                               'type': 'date'},
+             'date_facture': {'many': True,
+                              'matches': [],
+                              'rule_id': 'INV_DATE_02',
+                              'type': 'date'},
+             'devise': {'many': True,
+                        'matches': [],
+                        'rule_id': 'INV_CURRENCY_03',
+                        'type': 'currency'},
+             'doc_date': {'many': True, 'matches': [], 'rule_id': 'CMN_DATE_01', 'type': 'date'},
+             'email': {'many': True, 'matches': [], 'rule_id': 'CMN_EMAIL_01', 'type': 'email'},
+             'montant_ht': {'many': True,
+                            'matches': [],
+                            'rule_id': 'INV_AMOUNT_HT_02',
+                            'type': 'amount'},
+             'montant_ttc': {'many': True,
+                             'matches': [],
+                             'rule_id': 'INV_AMOUNT_TTC_02',
+                             'type': 'amount'},
+             'montant_tva': {'many': True,
+                             'matches': [],
+                             'rule_id': 'INV_AMOUNT_TVA_02',
+                             'type': 'amount'},
+             'numero_facture': {'many': True,
+                                'matches': [],
+                                'rule_id': 'INV_NUM_02',
+                                'type': 'string'},
+             'site': {'many': True, 'matches': [], 'rule_id': 'CMN_URL_01', 'type': 'url'},
+             'telephone': {'many': True,
+                           'matches': [],
+                           'rule_id': 'CMN_PHONE_01',
+                           'type': 'phone'}},
   'filename': 'image2tab.webp',
-  'ruleset': {'applied_rulesets': ['common.yaml', 'FACTURE.yaml'],
-              'routes_config': {'default_rulesets': ['{doc_type}.yaml'],
+  'ruleset': {'applied_rulesets': ['common.json', 'FACTURE.json'],
+              'routes_config': {'default_rulesets': ['{doc_type}.json'],
                                 'include_common': True,
-                                'ruleset_mapping': {}}}}]
+                                'ruleset_mapping': {'BON_DE_COMMANDE': ['BON_DE_COMMANDE.json'],
+                                                    'CONTRAT': ['CONTRAT.json'],
+                                                    'FACTURE': ['FACTURE.json']}}}}]
 
-[ml100-topic] image2tab.webp | document_primary_topics=['facture', 'huit'] | document_top_topics=['facture', 'huit', 'client', 'mode', 'echeance'] | blocked_terms=11 | topics_removed=2
-[table-100ml] image2tab.webp | tables=2 | rows=13 | cols=['product', 'quantity', 'reference', 'total', 'unit_price']
+[table-0ml] image2tab.webp | tables=2 | rows=13 | cols=['product', 'quantity', 'reference', 'total', 'unit_price']
+[fusion-resultats-0ml] docs=1 | table_docs=1
 [Component: fusion-resultats]
 [fusion-result] source=local-context | docs=1 | es_synced=0
 [fusion-result] JSON fusionne ecrit dans /home/mourad/Bureau/DMS/core/fusion_output.json
-[fusion-resultats-100ml] docs=1 | doc_vectors=1 | bm25_docs=1
 [Component: fusion-resultats]
 Type: dict
 Summary: fusion -> /home/mourad/Bureau/DMS/core/fusion_output.json | source=local-context | docs=1 | es_synced=0

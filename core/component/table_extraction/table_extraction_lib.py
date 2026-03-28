@@ -2133,8 +2133,7 @@ def run_table_extraction(ctx: Dict[str, Any], profile: str) -> List[Dict[str, An
     elif profile == "100ml":
         ctx["TABLE_EXTRACTIONS_100ML"] = out
     else:
-        ctx["TABLE_EXTRACTIONS_50ML"] = out
-        ctx["TABLE_EXTRACTIONS_100ML"] = out
+        ctx["TABLE_EXTRACTIONS_DEFAULT"] = out
     ctx["TABLE_EXTRACTIONS"] = out
 
     print(

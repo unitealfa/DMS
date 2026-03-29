@@ -54,6 +54,8 @@ MIN_LINK_SCORE = 0.15
 MIN_SHARED_TOPICS = 1
 MAX_SHARED_TERMS_PER_MATCH = 8
 MIN_INFORMATIVE_TERM_SCORE = 0.85
+MAX_VECTOR_CHUNK_CANDIDATES = 48
+MAX_VECTOR_CHUNK_PAIRS = 1600
 
 VECTOR_PROFILE_CONFIG = {
     "pipeline50ml": {
@@ -64,6 +66,9 @@ VECTOR_PROFILE_CONFIG = {
         "min_chunk_cosine": 0.15,
         "min_chunk_hybrid": 0.23,
         "vector_accept": 0.24,
+        "max_chunk_candidates": 32,
+        "max_chunk_pairs": 900,
+        "dense_doc_similarity": 0.58,
     },
     "pipeline100ml": {
         "prefix": "ML100",
@@ -73,6 +78,9 @@ VECTOR_PROFILE_CONFIG = {
         "min_chunk_cosine": 0.20,
         "min_chunk_hybrid": 0.30,
         "vector_accept": 0.31,
+        "max_chunk_candidates": 40,
+        "max_chunk_pairs": 1600,
+        "dense_doc_similarity": 0.62,
     },
 }
 
@@ -203,6 +211,27 @@ def _coerce_vector(value: Any) -> List[float]:
 
 def _vector_norm(vec: List[float]) -> float:
     return math.sqrt(sum(float(x) * float(x) for x in vec))
+
+
+def _unit_vector(vec: Any) -> List[float]:
+    raw = _coerce_vector(vec)
+    if not raw:
+        return []
+    norm = _vector_norm(raw)
+    if norm <= 0.0:
+        return []
+    return [float(x) / norm for x in raw]
+
+
+def _unit_cosine_similarity(vec_a: Any, vec_b: Any) -> float:
+    a = _coerce_vector(vec_a)
+    b = _coerce_vector(vec_b)
+    if not a or not b:
+        return 0.0
+    limit = min(len(a), len(b))
+    if limit <= 0:
+        return 0.0
+    return sum(float(a[i]) * float(b[i]) for i in range(limit))
 
 
 def _cosine_similarity(vec_a: Any, vec_b: Any) -> float:
@@ -451,6 +480,9 @@ def _vector_profile(ctx: Dict[str, Any]) -> Dict[str, Any]:
         "min_chunk_cosine": _safe_float(base.get("min_chunk_cosine"), 0.0),
         "min_chunk_hybrid": _safe_float(base.get("min_chunk_hybrid"), 0.0),
         "vector_accept": _safe_float(base.get("vector_accept"), 0.0),
+        "max_chunk_candidates": _safe_int(base.get("max_chunk_candidates"), MAX_VECTOR_CHUNK_CANDIDATES),
+        "max_chunk_pairs": _safe_int(base.get("max_chunk_pairs"), MAX_VECTOR_CHUNK_PAIRS),
+        "dense_doc_similarity": _safe_float(base.get("dense_doc_similarity"), 0.60),
     }
 
 
@@ -475,6 +507,7 @@ def _build_vector_index(ctx: Dict[str, Any]) -> Dict[str, Any]:
             continue
         prepared = dict(row)
         prepared["vector"] = vec
+        prepared["unit_vector"] = _unit_vector(vec)
         for alias in _doc_aliases(row.get("doc_id"), row.get("filename"), 0):
             doc_rows[alias] = prepared
 
@@ -486,6 +519,7 @@ def _build_vector_index(ctx: Dict[str, Any]) -> Dict[str, Any]:
             continue
         prepared = dict(row)
         prepared["vector"] = vec
+        prepared["unit_vector"] = _unit_vector(vec)
         for alias in _doc_aliases(row.get("doc_id"), row.get("filename"), 0):
             chunk_rows.setdefault(alias, []).append(prepared)
 
@@ -619,6 +653,7 @@ def _prepare_docs(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
                             "token_count": _safe_int(row.get("token_count"), len(terms_set)),
                             "lang": row.get("lang"),
                             "vector": _coerce_vector(row.get("vector")),
+                            "unit_vector": _coerce_vector(row.get("unit_vector")) or _unit_vector(row.get("vector")),
                             "chunk_primary_topic": row.get("chunk_primary_topic"),
                             "chunk_topics": _safe_list(row.get("chunk_topics")),
                             "topic_terms": _chunk_topic_terms(row),
@@ -628,7 +663,7 @@ def _prepare_docs(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
         if len(chunk_vectors) > MAX_SENTENCES_PER_DOC:
             chunk_vectors = chunk_vectors[:MAX_SENTENCES_PER_DOC]
 
-        doc_vector = _coerce_vector(doc_vector_row.get("vector"))
+        doc_vector = _coerce_vector(doc_vector_row.get("unit_vector") or doc_vector_row.get("vector"))
         if not doc_vector and chunk_vectors:
             doc_vector = _mean_vector([_coerce_vector(row.get("vector")) for row in chunk_vectors])
 
@@ -753,6 +788,44 @@ def _sorted_shared_terms(shared: Set[str], limit: int = MAX_SHARED_TERMS_PER_MAT
     return terms[:limit]
 
 
+def _chunk_candidate_priority(
+    row: Dict[str, Any],
+    shared_doc_topics: Set[str],
+    shared_signal_terms: Set[str],
+) -> float:
+    topics = set(row.get("topic_terms") or set())
+    terms = set(row.get("terms_set") or set())
+    shared_topics = len(topics.intersection(shared_doc_topics))
+    shared_terms = len(terms.intersection(shared_signal_terms))
+    token_count = _safe_int(row.get("token_count"), len(terms))
+    return (
+        (3.0 * shared_topics)
+        + (1.3 * shared_terms)
+        + (0.4 * min(8, len(topics)))
+        + min(1.2, float(token_count) / 20.0)
+    )
+
+
+def _select_chunk_candidates(
+    chunks: List[Dict[str, Any]],
+    limit: int,
+    shared_doc_topics: Set[str],
+    shared_signal_terms: Set[str],
+) -> List[Dict[str, Any]]:
+    if len(chunks) <= limit:
+        return chunks
+    ranked = sorted(
+        chunks,
+        key=lambda row: (
+            _chunk_candidate_priority(row, shared_doc_topics, shared_signal_terms),
+            _safe_int(row.get("token_count"), 0),
+            len(str(row.get("text") or row.get("text_preview") or "")),
+        ),
+        reverse=True,
+    )
+    return ranked[:limit]
+
+
 def _vector_chunk_matches(
     doc_a: Dict[str, Any],
     doc_b: Dict[str, Any],
@@ -760,47 +833,79 @@ def _vector_chunk_matches(
     shared_doc_topics: Set[str],
     shared_signal_terms: Set[str],
     doc_vector_similarity: float,
-) -> Tuple[List[Dict[str, Any]], int, float, float]:
+) -> Tuple[List[Dict[str, Any]], int, float, float, Dict[str, Any]]:
     if not cfg.get("enabled"):
-        return [], 0, 0.0, 0.0
+        return [], 0, 0.0, 0.0, {}
 
     chunks_a = [row for row in _safe_list(doc_a.get("chunk_vectors")) if isinstance(row, dict)]
     chunks_b = [row for row in _safe_list(doc_b.get("chunk_vectors")) if isinstance(row, dict)]
     if not chunks_a or not chunks_b:
-        return [], 0, 0.0, 0.0
+        return [], 0, 0.0, 0.0, {}
+
+    meta = {
+        "original_chunks_a": len(chunks_a),
+        "original_chunks_b": len(chunks_b),
+        "candidate_chunks_a": len(chunks_a),
+        "candidate_chunks_b": len(chunks_b),
+        "chunk_pair_budget_applied": False,
+        "pairs_skipped_without_overlap": 0,
+    }
 
     if (
         doc_vector_similarity < _safe_float(cfg.get("doc_prefilter"), 0.0)
         and not shared_doc_topics
         and not shared_signal_terms
     ):
-        return [], 0, 0.0, doc_vector_similarity
+        return [], 0, 0.0, doc_vector_similarity, meta
+
+    max_candidates = max(1, _safe_int(cfg.get("max_chunk_candidates"), MAX_VECTOR_CHUNK_CANDIDATES))
+    max_pairs = max(1, _safe_int(cfg.get("max_chunk_pairs"), MAX_VECTOR_CHUNK_PAIRS))
+    if len(chunks_a) * len(chunks_b) > max_pairs:
+        meta["chunk_pair_budget_applied"] = True
+        chunks_a = _select_chunk_candidates(chunks_a, max_candidates, shared_doc_topics, shared_signal_terms)
+        chunks_b = _select_chunk_candidates(chunks_b, max_candidates, shared_doc_topics, shared_signal_terms)
+        if len(chunks_a) * len(chunks_b) > max_pairs:
+            per_side = max(1, int(math.sqrt(max_pairs)))
+            chunks_a = chunks_a[:per_side]
+            chunks_b = chunks_b[:per_side]
+    meta["candidate_chunks_a"] = len(chunks_a)
+    meta["candidate_chunks_b"] = len(chunks_b)
 
     raw: List[Dict[str, Any]] = []
     pairs_scored = 0
     min_cosine = _safe_float(cfg.get("min_chunk_cosine"), 0.0)
     min_hybrid = _safe_float(cfg.get("min_chunk_hybrid"), 0.0)
+    dense_doc_similarity = _safe_float(cfg.get("dense_doc_similarity"), 0.60)
 
     for row_a in chunks_a:
-        vec_a = _coerce_vector(row_a.get("vector"))
+        vec_a = _coerce_vector(row_a.get("unit_vector") or row_a.get("vector"))
         if not vec_a:
             continue
         topics_a = set(row_a.get("topic_terms") or set())
         terms_a = set(row_a.get("terms_set") or set())
 
         for row_b in chunks_b:
-            vec_b = _coerce_vector(row_b.get("vector"))
+            vec_b = _coerce_vector(row_b.get("unit_vector") or row_b.get("vector"))
             if not vec_b:
                 continue
+            topics_b = set(row_b.get("topic_terms") or set())
+            terms_b = set(row_b.get("terms_set") or set())
+            raw_shared_topics = topics_a.intersection(topics_b)
+            raw_shared_terms = terms_a.intersection(terms_b)
+            if (
+                doc_vector_similarity < dense_doc_similarity
+                and not raw_shared_topics
+                and not raw_shared_terms
+            ):
+                meta["pairs_skipped_without_overlap"] = _safe_int(meta.get("pairs_skipped_without_overlap"), 0) + 1
+                continue
             pairs_scored += 1
-            cosine = _cosine_similarity(vec_a, vec_b)
+            cosine = _unit_cosine_similarity(vec_a, vec_b)
             if cosine <= 0.0:
                 continue
 
-            topics_b = set(row_b.get("topic_terms") or set())
-            terms_b = set(row_b.get("terms_set") or set())
-            shared_topics = sorted(topics_a.intersection(topics_b))[:6]
-            shared_terms = _sorted_shared_terms(terms_a.intersection(terms_b))
+            shared_topics = sorted(raw_shared_topics)[:6]
+            shared_terms = _sorted_shared_terms(raw_shared_terms)
 
             min_topics = max(1, min(len(topics_a) or 1, len(topics_b) or 1))
             min_terms = max(1, min(len(terms_a) or 1, len(terms_b) or 1))
@@ -849,7 +954,7 @@ def _vector_chunk_matches(
     selected = raw[:MAX_MATCHES_PER_LINK]
     best_hybrid = float(selected[0].get("score") or 0.0) if selected else 0.0
     best_cosine = float(selected[0].get("vector_similarity") or 0.0) if selected else 0.0
-    return selected, pairs_scored, best_hybrid, best_cosine
+    return selected, pairs_scored, best_hybrid, best_cosine, meta
 
 
 def _build_link(doc_a: Dict[str, Any], doc_b: Dict[str, Any]) -> Tuple[Dict[str, Any], int, int]:
@@ -867,7 +972,7 @@ def _build_link(doc_a: Dict[str, Any], doc_b: Dict[str, Any]) -> Tuple[Dict[str,
             "vector_dim": _safe_int(doc_a.get("vector_dim") or doc_b.get("vector_dim"), 0),
         }
 
-    doc_vector_similarity = _cosine_similarity(doc_a.get("doc_vector"), doc_b.get("doc_vector")) if vector_cfg.get("enabled") else 0.0
+    doc_vector_similarity = _unit_cosine_similarity(doc_a.get("doc_vector"), doc_b.get("doc_vector")) if vector_cfg.get("enabled") else 0.0
 
     pair_sentence_df: Counter = Counter()
     sentences_a = [s for s in _safe_list(doc_a.get("sentences")) if isinstance(s, dict)]
@@ -916,7 +1021,7 @@ def _build_link(doc_a: Dict[str, Any], doc_b: Dict[str, Any]) -> Tuple[Dict[str,
     raw_matches.sort(key=lambda x: float(x.get("score") or 0.0), reverse=True)
     selected_matches = raw_matches[:MAX_MATCHES_PER_LINK]
 
-    vector_chunk_matches, chunk_pairs_scored, best_chunk_score, best_chunk_cosine = _vector_chunk_matches(
+    vector_chunk_matches, chunk_pairs_scored, best_chunk_score, best_chunk_cosine, chunk_meta = _vector_chunk_matches(
         doc_a=doc_a,
         doc_b=doc_b,
         cfg=vector_cfg,
@@ -1008,6 +1113,12 @@ def _build_link(doc_a: Dict[str, Any], doc_b: Dict[str, Any]) -> Tuple[Dict[str,
             "vector_dim": _safe_int(vector_cfg.get("vector_dim"), 0),
             "doc_similarity": round(doc_vector_similarity, 6),
             "chunk_pairs_scored": chunk_pairs_scored,
+            "chunk_pair_budget_applied": bool(chunk_meta.get("chunk_pair_budget_applied")),
+            "candidate_chunks_a": _safe_int(chunk_meta.get("candidate_chunks_a"), 0),
+            "candidate_chunks_b": _safe_int(chunk_meta.get("candidate_chunks_b"), 0),
+            "original_chunks_a": _safe_int(chunk_meta.get("original_chunks_a"), 0),
+            "original_chunks_b": _safe_int(chunk_meta.get("original_chunks_b"), 0),
+            "pairs_skipped_without_overlap": _safe_int(chunk_meta.get("pairs_skipped_without_overlap"), 0),
             "chunk_matches_count": len(vector_chunk_matches),
             "best_chunk_similarity": round(best_chunk_cosine, 6) if vector_chunk_matches else None,
             "best_chunk_hybrid_score": round(best_chunk_score, 6) if vector_chunk_matches else None,

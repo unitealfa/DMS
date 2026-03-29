@@ -545,9 +545,34 @@ def _html_bytes_to_text_preserve(b: bytes) -> str:
 
 def extract_text_native(path: str) -> dict:
     ft = detect_path_type(path)
-    ext = ft.ext.lower()
+    ext = (ft.ext or Path(path).suffix or "").lower()
     filename = Path(path).name
     file_size = _safe_file_size(path)
+
+    # Texte brut
+    if ext == ".txt":
+        text = ""
+        extraction = "native:txt:utf-8"
+        try:
+            text = Path(path).read_text(encoding="utf-8")
+        except Exception:
+            try:
+                text = Path(path).read_text(encoding="utf-8-sig")
+                extraction = "native:txt:utf-8-sig"
+            except Exception:
+                text = Path(path).read_text(encoding="latin-1", errors="ignore")
+                extraction = "native:txt:latin-1"
+        return {
+            "doc_id": str(uuid.uuid4()),
+            "filename": filename,
+            "source_path": path,
+            "size": file_size,
+            "content": "text",
+            "extraction": extraction,
+            "text": text,
+            "pages_text": [text],
+            "page_count_total": 1,
+        }
 
     # PDF
     if ext == ".pdf":

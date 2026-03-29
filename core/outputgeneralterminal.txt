@@ -1,21 +1,24 @@
 [Component: pretraitement-de-docs]
-Type: list
-Summary: 1 fichiers | text=1 | image=0
-Output: [{'content': 'text',
-  'ext': '.pdf',
-  'label': 'PDF document',
-  'mime': 'application/pdf',
-  'path': '/home/mourad/Bureau/DMS/core/documents/facture_test_totaux.pdf',
-  'size': 3114}]
+Type: dict
+Summary: 1 fichiers | text=1 | image=0 | unsupported=0 | missing=0
+Output: {'MISSING_FILES': [],
+ 'PRETRAITEMENT_RESULT': [{'content': 'text',
+                           'ext': '.pdf',
+                           'label': 'PDF document',
+                           'mime': 'application/pdf',
+                           'path': '/home/mourad/Bureau/DMS/core/documents/facture_test_totaux.pdf',
+                           'size': 3114}]}
 
 [skip] content='text' -> /home/mourad/Bureau/DMS/core/documents/facture_test_totaux.pdf
 [info] Aucun fichier à OCR (image_only). Tout ce que tu as donné est détecté comme 'text'.
 [Component: si-image-pretraiter-sinonpass-le-doc]
 Type: dict
-Summary: text=1, image=0, docs_prepped=0
+Summary: text=1, image=0, unsupported=0, missing=0, docs_prepped=0
 Output: {'DOCS': [],
  'IMAGE_ONLY_FILES': [],
- 'TEXT_FILES': ['/home/mourad/Bureau/DMS/core/documents/facture_test_totaux.pdf']}
+ 'MISSING_FILES': [],
+ 'TEXT_FILES': ['/home/mourad/Bureau/DMS/core/documents/facture_test_totaux.pdf'],
+ 'UNSUPPORTED_FILES': []}
 
 [doc] facture_test_totaux.pdf | content=text | extraction=native:pdf:pypdf | pages=1
 [page 1/1]
@@ -75,7 +78,7 @@ second, le montant final ne correspond pas aux calculs de detail.
 Type: list
 Summary: 1 docs | pages=1
 Output: [{'content': 'text',
-  'doc_id': '775adeaf-dbb4-4fe8-9329-b60038ec740b',
+  'doc_id': 'c04a900e-f7a4-4165-88fb-ba62ce8459a7',
   'extraction': 'native:pdf:pypdf',
   'filename': 'facture_test_totaux.pdf',
   'page_count_total': 1,
@@ -225,7 +228,7 @@ Output: [{'anti_confusion_targets': ['BON_DE_COMMANDE', 'CONTRAT', 'DEVIS', 'BON
                         "scores: {'ARTICLE': 17, 'BON_DE_COMMANDE': -36, 'CONTRAT': -32, "
                         "'FACTURE': 59, 'FORMULAIRE': 0}",
   'decision_debug': {'diff': 42, 'second_score': 17, 'top_score': 59},
-  'doc_id': '775adeaf-dbb4-4fe8-9329-b60038ec740b',
+  'doc_id': 'c04a900e-f7a4-4165-88fb-ba62ce8459a7',
   'doc_type': 'FACTURE',
   'filename': 'facture_test_totaux.pdf',
   'keyword_matches': {'anti_confusion_hits': [],
@@ -337,7 +340,7 @@ Output: [{'anti_confusion_targets': ['BON_DE_COMMANDE', 'CONTRAT', 'DEVIS', 'BON
 
 ========================================================================================================================
 [doc] facture_test_totaux.pdf
-  doc_id       : 775adeaf-dbb4-4fe8-9329-b60038ec740b
+  doc_id       : c04a900e-f7a4-4165-88fb-ba62ce8459a7
   content      : image_only
   extraction   : ocr:tesseract
   pages_total  : 1
@@ -416,7 +419,7 @@ second, le montant final ne correspond pas aux calculs de detail.
 
 ========================================================================================================================
 [doc] facture_test_totaux.pdf
-  doc_id       : 775adeaf-dbb4-4fe8-9329-b60038ec740b
+  doc_id       : c04a900e-f7a4-4165-88fb-ba62ce8459a7
   content      : text
   extraction   : native:pdf:pypdf
   pages_total  : 1
@@ -503,7 +506,7 @@ Type: list
 Summary: 2 docs | sentences=14
 Output: [{'chars_total': 2142,
   'content': 'image_only',
-  'doc_id': '775adeaf-dbb4-4fe8-9329-b60038ec740b',
+  'doc_id': 'c04a900e-f7a4-4165-88fb-ba62ce8459a7',
   'extraction': 'ocr:tesseract',
   'filename': 'facture_test_totaux.pdf',
   'page_count_total': 1,
@@ -961,7 +964,7 @@ Output: [{'chars_total': 2142,
   'size': None},
  {'chars_total': 2142,
   'content': 'text',
-  'doc_id': '775adeaf-dbb4-4fe8-9329-b60038ec740b',
+  'doc_id': 'c04a900e-f7a4-4165-88fb-ba62ce8459a7',
   'extraction': 'native:pdf:pypdf',
   'filename': 'facture_test_totaux.pdf',
   'page_count_total': 1,
@@ -1432,7 +1435,7 @@ Type: list
 Summary: Langues executees: en, fr | docs=2 | backend=hash-fallback | component=atripusion-gramatical | pos=hybrid-rules+context-v2 | pos_refined=12/476
 Output: [{'chars_total': 2142,
   'content': 'image_only',
-  'doc_id': '775adeaf-dbb4-4fe8-9329-b60038ec740b',
+  'doc_id': 'c04a900e-f7a4-4165-88fb-ba62ce8459a7',
   'extraction': 'ocr:tesseract',
   'filename': 'facture_test_totaux.pdf',
   'page_count_total': 1,
@@ -1890,7 +1893,7 @@ Output: [{'chars_total': 2142,
   'size': None},
  {'chars_total': 2142,
   'content': 'text',
-  'doc_id': '775adeaf-dbb4-4fe8-9329-b60038ec740b',
+  'doc_id': 'c04a900e-f7a4-4165-88fb-ba62ce8459a7',
   'extraction': 'native:pdf:pypdf',
   'filename': 'facture_test_totaux.pdf',
   'page_count_total': 1,
@@ -2353,7 +2356,7 @@ Output: [{'chars_total': 2142,
 Type: list
 Summary: docs=1 | tables=3 | line_items=6
 Output: [{'detected_columns': ['product', 'quantity', 'reference', 'total', 'total_ht', 'unit_price'],
-  'doc_id': '775adeaf-dbb4-4fe8-9329-b60038ec740b',
+  'doc_id': 'c04a900e-f7a4-4165-88fb-ba62ce8459a7',
   'engine': 'table-100ml-unified-v3-anchor-geometry',
   'filename': 'facture_test_totaux.pdf',
   'line_items': [{'confidence': 1.0,
@@ -2641,8 +2644,8 @@ Output: [{'checks': [{'name': 'rows', 'status': 'ok'}, {'name': 'subtotal', 'sta
   'declared_totals_raw': {'tax': ['3154.00', '3895.00'],
                           'total_ht': ['16600.00', '20500.00', '22000.00'],
                           'total_ttc': []},
-  'doc_id': '775adeaf-dbb4-4fe8-9329-b60038ec740b',
-  'doc_key': 'id:775adeaf-dbb4-4fe8-9329-b60038ec740b',
+  'doc_id': 'c04a900e-f7a4-4165-88fb-ba62ce8459a7',
+  'doc_key': 'id:c04a900e-f7a4-4165-88fb-ba62ce8459a7',
   'engine': 'totals-verification-0ml-v1',
   'expected_total': '25895.00',
   'filename': 'facture_test_totaux.pdf',
@@ -3081,47 +3084,47 @@ Output: [{'checks': [{'name': 'rows', 'status': 'ok'}, {'name': 'subtotal', 'sta
   'verification_status': 'mismatch'}]
 
 [visual-detection-100ml] docs=2 | signature=4 | stamp=4 | barcode=0 | qrcode=0
-  - facture_test_totaux.pdf | pages=1 | signature=1 | stamp=1 | barcode=0 | qrcode=0
-  - facture_test_totaux.pdf | pages=1 | signature=1 | stamp=1 | barcode=0 | qrcode=0
+  - facture_test_totaux.pdf | pages=1/1 | sampled=[1] | signature=1 | stamp=1 | barcode=0 | qrcode=0
+  - facture_test_totaux.pdf | pages=1/1 | sampled=[1] | signature=1 | stamp=1 | barcode=0 | qrcode=0
 [Component: detection-signature-chachet-codebarr]
 Type: list
 Summary: docs=2 | detections=8 | signature=4 | stamp=4 | barcode=0 | qrcode=0
 Output: [{'counts': {'barcode': 0, 'qrcode': 0, 'signature': 2, 'stamp': 2},
-  'detections': [{'bbox_norm': {'x0': 0.558354, 'x1': 0.97649, 'y0': 0.637767, 'y1': 0.716746},
-                  'bbox_px': {'x0': 665, 'x1': 1163, 'y0': 1074, 'y1': 1207},
-                  'page_height': 1684,
+  'detections': [{'bbox_norm': {'x0': 0.418681, 'x1': 0.837363, 'y0': 0.689977, 'y1': 0.769231},
+                  'bbox_px': {'x0': 381, 'x1': 762, 'y0': 888, 'y1': 990},
+                  'page_height': 1287,
                   'page_index': 1,
-                  'page_width': 1191,
-                  'score': 0.542101,
+                  'page_width': 910,
+                  'score': 0.554963,
                   'source': 'vision-heuristics',
                   'type': 'signature'},
-                 {'bbox_norm': {'x0': 0.345928, 'x1': 0.864819, 'y0': 0.679335, 'y1': 0.779097},
-                  'bbox_px': {'x0': 412, 'x1': 1030, 'y0': 1144, 'y1': 1312},
-                  'page_height': 1684,
+                 {'bbox_norm': {'x0': 0.558242, 'x1': 0.976923, 'y0': 0.637141, 'y1': 0.716395},
+                  'bbox_px': {'x0': 508, 'x1': 889, 'y0': 820, 'y1': 922},
+                  'page_height': 1287,
                   'page_index': 1,
-                  'page_width': 1191,
-                  'score': 0.541582,
+                  'page_width': 910,
+                  'score': 0.543462,
                   'source': 'vision-heuristics',
                   'type': 'signature'},
-                 {'bbox_norm': {'x0': 0.117548, 'x1': 0.29639, 'y0': 0.398456, 'y1': 0.577791},
-                  'bbox_px': {'x0': 140, 'x1': 353, 'y0': 671, 'y1': 973},
-                  'page_height': 1684,
+                 {'bbox_norm': {'x0': 0.117582, 'x1': 0.296703, 'y0': 0.398601, 'y1': 0.578089},
+                  'bbox_px': {'x0': 107, 'x1': 270, 'y0': 513, 'y1': 744},
+                  'page_height': 1287,
                   'page_index': 1,
-                  'page_width': 1191,
+                  'page_width': 910,
                   'score': 1.0,
                   'source': 'vision-heuristics',
                   'type': 'stamp'},
-                 {'bbox_norm': {'x0': 0.235936, 'x1': 0.414777, 'y0': 0.398456, 'y1': 0.577791},
-                  'bbox_px': {'x0': 281, 'x1': 494, 'y0': 671, 'y1': 973},
-                  'page_height': 1684,
+                 {'bbox_norm': {'x0': 0.236264, 'x1': 0.414286, 'y0': 0.398601, 'y1': 0.578089},
+                  'bbox_px': {'x0': 215, 'x1': 377, 'y0': 513, 'y1': 744},
+                  'page_height': 1287,
                   'page_index': 1,
-                  'page_width': 1191,
+                  'page_width': 910,
                   'score': 1.0,
                   'source': 'vision-heuristics',
                   'type': 'stamp'}],
   'detections_count': 4,
-  'doc_id': '775adeaf-dbb4-4fe8-9329-b60038ec740b',
-  'doc_key': 'id:775adeaf-dbb4-4fe8-9329-b60038ec740b',
+  'doc_id': 'c04a900e-f7a4-4165-88fb-ba62ce8459a7',
+  'doc_key': 'id:c04a900e-f7a4-4165-88fb-ba62ce8459a7',
   'engine': 'visual-100ml-hybrid-heuristics-v1',
   'filename': 'facture_test_totaux.pdf',
   'has_barcode': False,
@@ -3129,43 +3132,45 @@ Output: [{'counts': {'barcode': 0, 'qrcode': 0, 'signature': 2, 'stamp': 2},
   'has_signature': True,
   'has_stamp': True,
   'pages_scanned': 1,
+  'pages_total': 1,
+  'sampled_pages': [1],
   'source_path': '/home/mourad/Bureau/DMS/core/documents/facture_test_totaux.pdf'},
  {'counts': {'barcode': 0, 'qrcode': 0, 'signature': 2, 'stamp': 2},
-  'detections': [{'bbox_norm': {'x0': 0.558354, 'x1': 0.97649, 'y0': 0.637767, 'y1': 0.716746},
-                  'bbox_px': {'x0': 665, 'x1': 1163, 'y0': 1074, 'y1': 1207},
-                  'page_height': 1684,
+  'detections': [{'bbox_norm': {'x0': 0.418681, 'x1': 0.837363, 'y0': 0.689977, 'y1': 0.769231},
+                  'bbox_px': {'x0': 381, 'x1': 762, 'y0': 888, 'y1': 990},
+                  'page_height': 1287,
                   'page_index': 1,
-                  'page_width': 1191,
-                  'score': 0.542101,
+                  'page_width': 910,
+                  'score': 0.554963,
                   'source': 'vision-heuristics',
                   'type': 'signature'},
-                 {'bbox_norm': {'x0': 0.345928, 'x1': 0.864819, 'y0': 0.679335, 'y1': 0.779097},
-                  'bbox_px': {'x0': 412, 'x1': 1030, 'y0': 1144, 'y1': 1312},
-                  'page_height': 1684,
+                 {'bbox_norm': {'x0': 0.558242, 'x1': 0.976923, 'y0': 0.637141, 'y1': 0.716395},
+                  'bbox_px': {'x0': 508, 'x1': 889, 'y0': 820, 'y1': 922},
+                  'page_height': 1287,
                   'page_index': 1,
-                  'page_width': 1191,
-                  'score': 0.541582,
+                  'page_width': 910,
+                  'score': 0.543462,
                   'source': 'vision-heuristics',
                   'type': 'signature'},
-                 {'bbox_norm': {'x0': 0.117548, 'x1': 0.29639, 'y0': 0.398456, 'y1': 0.577791},
-                  'bbox_px': {'x0': 140, 'x1': 353, 'y0': 671, 'y1': 973},
-                  'page_height': 1684,
+                 {'bbox_norm': {'x0': 0.117582, 'x1': 0.296703, 'y0': 0.398601, 'y1': 0.578089},
+                  'bbox_px': {'x0': 107, 'x1': 270, 'y0': 513, 'y1': 744},
+                  'page_height': 1287,
                   'page_index': 1,
-                  'page_width': 1191,
+                  'page_width': 910,
                   'score': 1.0,
                   'source': 'vision-heuristics',
                   'type': 'stamp'},
-                 {'bbox_norm': {'x0': 0.235936, 'x1': 0.414777, 'y0': 0.398456, 'y1': 0.577791},
-                  'bbox_px': {'x0': 281, 'x1': 494, 'y0': 671, 'y1': 973},
-                  'page_height': 1684,
+                 {'bbox_norm': {'x0': 0.236264, 'x1': 0.414286, 'y0': 0.398601, 'y1': 0.578089},
+                  'bbox_px': {'x0': 215, 'x1': 377, 'y0': 513, 'y1': 744},
+                  'page_height': 1287,
                   'page_index': 1,
-                  'page_width': 1191,
+                  'page_width': 910,
                   'score': 1.0,
                   'source': 'vision-heuristics',
                   'type': 'stamp'}],
   'detections_count': 4,
-  'doc_id': '775adeaf-dbb4-4fe8-9329-b60038ec740b',
-  'doc_key': 'id:775adeaf-dbb4-4fe8-9329-b60038ec740b',
+  'doc_id': 'c04a900e-f7a4-4165-88fb-ba62ce8459a7',
+  'doc_key': 'id:c04a900e-f7a4-4165-88fb-ba62ce8459a7',
   'engine': 'visual-100ml-hybrid-heuristics-v1',
   'filename': 'facture_test_totaux.pdf',
   'has_barcode': False,
@@ -3173,6 +3178,8 @@ Output: [{'counts': {'barcode': 0, 'qrcode': 0, 'signature': 2, 'stamp': 2},
   'has_signature': True,
   'has_stamp': True,
   'pages_scanned': 1,
+  'pages_total': 1,
+  'sampled_pages': [1],
   'source_path': '/home/mourad/Bureau/DMS/core/documents/facture_test_totaux.pdf'}]
 
 [interdoc-link] docs=1 | pairs=0 | links=0 | sentence_pairs_scored=0 | chunk_pairs_scored=0
@@ -3276,7 +3283,7 @@ Output: [{'bm25': {'avg_top3_score': 3.612292,
                            'sent_index': 5,
                            'text_preview': 'TABLEAU 1 - CALCULS CORRECTS\n\n\n'}]},
   'classification_status': 'OK',
-  'doc_id': '775adeaf-dbb4-4fe8-9329-b60038ec740b',
+  'doc_id': 'c04a900e-f7a4-4165-88fb-ba62ce8459a7',
   'doc_type': 'FACTURE',
   'fields': {'date_echeance': {'many': True,
                                'matches': [],
@@ -3367,7 +3374,7 @@ Output: [{'bm25': {'avg_top3_score': 3.612292,
 [ml100-topic] facture_test_totaux.pdf | document_primary_topics=['total', 'art'] | document_top_topics=['total', 'art', 'tva', 'total tva', 'total payer'] | blocked_terms=24 | topics_removed=3
 [table-100ml] facture_test_totaux.pdf | tables=3 | rows=6 | cols=['product', 'quantity', 'reference', 'total', 'total_ht', 'unit_price']
 [totaux-check] facture_test_totaux.pdf | status=mismatch | passed=0 | rows=6/6 | subtotal=37100.00~22000.00 | tax=3895.00 | total=None
-[visual-100ml] facture_test_totaux.pdf | signature=1 | stamp=1 | barcode=0 | qrcode=0 | detections=4
+[visual-100ml] facture_test_totaux.pdf | signature=1 | stamp=1 | barcode=0 | qrcode=0 | detections=4 | pages=1/1
 [Component: fusion-resultats]
 [fusion-result] source=local-context | docs=1 | es_synced=0
 [fusion-result] JSON fusionne ecrit dans /home/mourad/Bureau/DMS/core/fusion_output.json

@@ -187,7 +187,21 @@ def main() -> None:
     logging.info("Pipeline selection: %s", pipeline_name)
 
     # Tee all prints to file + console
-    log_file = (repo_root / "outputgeneralterminal.txt").open("w", encoding="utf-8")
+    log_path = repo_root / "outputgeneralterminal.txt"
+    input_paths = []
+    for raw in inputs:
+        try:
+            input_paths.append(Path(raw).expanduser().resolve())
+        except Exception:
+            continue
+    if log_path.resolve() in input_paths:
+        log_path = repo_root / "outputgeneralterminal.runtime.txt"
+        logging.info(
+            "outputgeneralterminal.txt est utilise comme document d'entree; logs rediriges vers %s",
+            log_path,
+        )
+
+    log_file = log_path.open("w", encoding="utf-8")
     orig_print = builtins.print
 
     def tee_print(*pargs, **pkwargs):

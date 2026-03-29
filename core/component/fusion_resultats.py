@@ -2397,7 +2397,9 @@ def _augment_payload_with_visual_marks_100ml(ctx: Dict[str, Any], payload: Dict[
         structure["visual_marks"] = _safe_list(visual_row.get("detections"))
         structure["visual_marks_summary"] = {
             "engine": visual_row.get("engine"),
+            "pages_total": _safe_int(visual_row.get("pages_total"), 0),
             "pages_scanned": _safe_int(visual_row.get("pages_scanned"), 0),
+            "sampled_pages": _safe_list(visual_row.get("sampled_pages")),
             "detections_count": _safe_int(visual_row.get("detections_count"), 0),
             "has_signature": bool(visual_row.get("has_signature")),
             "has_stamp": bool(visual_row.get("has_stamp")),
@@ -2411,7 +2413,9 @@ def _augment_payload_with_visual_marks_100ml(ctx: Dict[str, Any], payload: Dict[
             extraction = {}
         extraction["visual_detection"] = {
             "engine": visual_row.get("engine"),
+            "pages_total": _safe_int(visual_row.get("pages_total"), 0),
             "pages_scanned": _safe_int(visual_row.get("pages_scanned"), 0),
+            "sampled_pages": _safe_list(visual_row.get("sampled_pages")),
             "detections_count": _safe_int(visual_row.get("detections_count"), 0),
             "has_signature": bool(visual_row.get("has_signature")),
             "has_stamp": bool(visual_row.get("has_stamp")),
@@ -2425,7 +2429,9 @@ def _augment_payload_with_visual_marks_100ml(ctx: Dict[str, Any], payload: Dict[
             components = {}
         components["detection_signature_chachet_codebarr_100ml"] = {
             "engine": visual_row.get("engine"),
+            "pages_total": _safe_int(visual_row.get("pages_total"), 0),
             "pages_scanned": _safe_int(visual_row.get("pages_scanned"), 0),
+            "sampled_pages": _safe_list(visual_row.get("sampled_pages")),
             "detections_count": _safe_int(visual_row.get("detections_count"), 0),
             "has_signature": bool(visual_row.get("has_signature")),
             "has_stamp": bool(visual_row.get("has_stamp")),
@@ -2441,7 +2447,8 @@ def _augment_payload_with_visual_marks_100ml(ctx: Dict[str, Any], payload: Dict[
             f"stamp={1 if visual_row.get('has_stamp') else 0} | "
             f"barcode={1 if visual_row.get('has_barcode') else 0} | "
             f"qrcode={1 if visual_row.get('has_qrcode') else 0} | "
-            f"detections={_safe_int(visual_row.get('detections_count'), 0)}"
+            f"detections={_safe_int(visual_row.get('detections_count'), 0)} | "
+            f"pages={_safe_int(visual_row.get('pages_scanned'), 0)}/{_safe_int(visual_row.get('pages_total'), 0)}"
         )
 
     pipeline = payload.get("pipeline")

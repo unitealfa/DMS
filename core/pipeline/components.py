@@ -150,22 +150,31 @@ class PretraitementComponent(Component):
         if not result:
             raise ValueError("pretraitement-de-docs n'a rien retourne.")
 
+        missing_files = ctx.get("MISSING_FILES") or []
         ctx["PRETRAITEMENT_RESULT"] = result
         ctx["INPUT_FILE"] = [item["path"] for item in result if item.get("path")]
+        ctx["MISSING_FILES"] = missing_files
 
         summary = (
             f"{len(result)} fichiers | "
             f"text={sum(1 for d in result if d.get('content') == 'text')} | "
-            f"image={sum(1 for d in result if d.get('content') == 'image_only')}"
+            f"image={sum(1 for d in result if d.get('content') == 'image_only')} | "
+            f"unsupported={sum(1 for d in result if d.get('content') == 'unsupported')} | "
+            f"missing={len(missing_files)}"
         )
-        self._report(result, summary)
-        return result
+        output = {
+            "PRETRAITEMENT_RESULT": result,
+            "MISSING_FILES": missing_files,
+        }
+        self._report(output, summary)
+        return output
 
 
 class OCRPreprocessComponent(Component):
     def run(self, context: Context) -> Any:
         if "INPUT_FILE" not in context:
             raise ValueError("INPUT_FILE manquant avant OCR.")
+        upstream_missing_files = list(context.get("MISSING_FILES") or [])
 
         # Normaliser en chemins absolus pour eviter les soucis de cwd
         input_files: List[str] = []
@@ -180,6 +189,11 @@ class OCRPreprocessComponent(Component):
 
         text_files = ctx.get("TEXT_FILES") or []
         image_files = ctx.get("IMAGE_ONLY_FILES") or []
+        unsupported_files = ctx.get("UNSUPPORTED_FILES") or []
+        missing_files = []
+        for item in upstream_missing_files + list(ctx.get("MISSING_FILES") or []):
+            if item and item not in missing_files:
+                missing_files.append(item)
         docs = ctx.get("DOCS") or []
 
         # Ne jamais injecter de DOCS artificiels quand les fichiers sont detectes en texte:
@@ -193,6 +207,8 @@ class OCRPreprocessComponent(Component):
         result = {
             "TEXT_FILES": text_files,
             "IMAGE_ONLY_FILES": image_files,
+            "UNSUPPORTED_FILES": unsupported_files,
+            "MISSING_FILES": missing_files,
             "DOCS": docs,
         }
         ctx.update(result)
@@ -200,6 +216,8 @@ class OCRPreprocessComponent(Component):
         summary = (
             f"text={len(result['TEXT_FILES'])}, "
             f"image={len(result['IMAGE_ONLY_FILES'])}, "
+            f"unsupported={len(result['UNSUPPORTED_FILES'])}, "
+            f"missing={len(result['MISSING_FILES'])}, "
             f"docs_prepped={len(result['DOCS'])}"
         )
         self._report(result, summary)

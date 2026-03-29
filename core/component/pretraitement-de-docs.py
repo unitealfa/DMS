@@ -6,6 +6,7 @@ import re
 import zipfile
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Optional, Sequence, Union, List, Dict, Any
 
 
@@ -28,6 +29,7 @@ SEARCH_DIRS = [
     os.getcwd(),
     "/mnt/data",  # utile dans l'environnement ChatGPT
 ]
+MISSING_FILES: List[str] = []
 
 
 @dataclass(frozen=True)
@@ -322,8 +324,8 @@ def _pdf_has_text(path: str) -> bool:
 
 
 def content_kind_two_states(path: str, ftype: FileType) -> str:
-    """Retourne seulement: 'text' ou 'image_only'."""
-    ext = ftype.ext.lower()
+    """Retourne: 'text', 'image_only' ou 'unsupported'."""
+    ext = (ftype.ext or Path(path).suffix or "").lower()
 
     # Images => image_only
     if ext in {".png", ".jpg", ".jpeg", ".webp", ".tif", ".tiff", ".bmp", ".ico"}:
@@ -337,22 +339,28 @@ def content_kind_two_states(path: str, ftype: FileType) -> str:
     if ext in {".docx", ".xlsx", ".pptx", ".odt", ".ods", ".odp", ".epub"}:
         return "text" if _zip_has_text(path, ext) else "image_only"
 
-    # Tout le reste => image_only (car tu veux 2 états)
-    return "image_only"
+    # Texte brut
+    if ext == ".txt":
+        return "text"
+
+    # Tout le reste => unsupported (evite d'envoyer un binaire/texte arbitraire dans OCR)
+    return "unsupported"
 
 
 def analyze_many_two_states(input_file: Optional[Union[str, Sequence[str]]]) -> List[Dict[str, Any]]:
     """
     Sortie:
-      [{"path": ..., "ext": ..., "mime": ..., "label": ..., "content": "text|image_only"}, ...]
+      [{"path": ..., "ext": ..., "mime": ..., "label": ..., "content": "text|image_only|unsupported"}, ...]
     Ignore les fichiers introuvables.
     """
     raw_paths = normalize_input_files(input_file)
     out: List[Dict[str, Any]] = []
+    MISSING_FILES.clear()
 
     for raw in raw_paths:
         p = resolve_path(raw)
         if p is None:
+            MISSING_FILES.append(raw)
             continue
 
         ft = detect_path_type(p)
@@ -366,7 +374,3 @@ def analyze_many_two_states(input_file: Optional[Union[str, Sequence[str]]]) -> 
         })
 
     return out
-
-
-# Test
-analyze_many_two_states(INPUT_FILE)

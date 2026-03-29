@@ -264,7 +264,7 @@ def _pdf_has_text(path: str) -> bool:
 
 
 def content_kind_two_states(path: str, ftype: FileType) -> str:
-    ext = ftype.ext.lower()
+    ext = (ftype.ext or Path(path).suffix or "").lower()
 
     if ext in {".png", ".jpg", ".jpeg", ".webp", ".tif", ".tiff", ".bmp", ".ico"}:
         return "image_only"
@@ -275,7 +275,10 @@ def content_kind_two_states(path: str, ftype: FileType) -> str:
     if ext in {".docx", ".xlsx", ".pptx", ".odt", ".ods", ".odp", ".epub"}:
         return "text" if _zip_has_text(path, ext) else "image_only"
 
-    return "image_only"
+    if ext == ".txt":
+        return "text"
+
+    return "unsupported"
 
 
 # --------- ROUTAGE ---------
@@ -284,6 +287,7 @@ _raw_items = normalize_input_files(ORIGINAL_INPUT_FILE)
 
 IMAGE_ONLY_FILES: List[str] = []
 TEXT_FILES: List[str] = []
+UNSUPPORTED_FILES: List[str] = []
 MISSING_FILES: List[str] = []
 
 for item in _raw_items:
@@ -297,9 +301,12 @@ for item in _raw_items:
 
     if kind == "image_only":
         IMAGE_ONLY_FILES.append(p)
-    else:
+    elif kind == "text":
         TEXT_FILES.append(p)
         print(f"[skip] content='text' -> {p}")
+    else:
+        UNSUPPORTED_FILES.append(p)
+        print(f"[skip] content='unsupported' -> {p}")
 
 # IMPORTANT: ton code OCR (cellule suivante) reste inchangé, il lira INPUT_FILE ici
 INPUT_FILE = IMAGE_ONLY_FILES
@@ -307,6 +314,11 @@ INPUT_FILE = IMAGE_ONLY_FILES
 if MISSING_FILES:
     print("[missing] fichiers introuvables:")
     for m in MISSING_FILES:
+        print(" -", m)
+
+if UNSUPPORTED_FILES:
+    print("[unsupported] fichiers ignores (non geres par OCR):")
+    for m in UNSUPPORTED_FILES:
         print(" -", m)
 
 
@@ -651,37 +663,6 @@ else:
                     "page_index": idx,
                     "page_count": total
                 })
-
-
-DOCS = []
-for item in input_items:
-    path = Path(item)
-    if not path.is_absolute():
-        path = (SCRIPT_DIR / path).resolve()
-
-    if not path.exists():
-        sys.exit(f"INPUT_FILE not found: {path}")
-
-    print(f"[info] Using INPUT_FILE={path}", file=sys.stderr)
-
-    dpi_val = int(getattr(args, "dpi", DEFAULT_DPI) or DEFAULT_DPI)
-    images = _load_images_from_path(path, dpi=dpi_val)
-
-    if len(images) == 1:
-        original = images[0]
-        prepped = preprocess_image(original, enhance)
-        DOCS.append({"path": path, "original": original, "prepped": prepped})
-    else:
-        total = len(images)
-        for idx, original in enumerate(images, start=1):
-            prepped = preprocess_image(original, enhance)
-            DOCS.append({
-                "path": path,
-                "original": original,
-                "prepped": prepped,
-                "page_index": idx,
-                "page_count": total
-            })
 
 try:
     from IPython.display import display as _ipython_display

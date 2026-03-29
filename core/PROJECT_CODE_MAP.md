@@ -128,10 +128,15 @@ Reference implementation:
 - Entree user: `INPUT_FILE`
 - Sortie pretraitement type de contenu: `PRETRAITEMENT_RESULT`
 - Chaque entree `PRETRAITEMENT_RESULT[]` expose `size` (octets)
+- `PRETRAITEMENT_RESULT[].content` peut maintenant valoir:
+  - `text`
+  - `image_only`
+  - `unsupported` (fichier ignore pour OCR)
 
 ### 4.2 Routage OCR vs natif
 - `TEXT_FILES`
 - `IMAGE_ONLY_FILES`
+- `UNSUPPORTED_FILES`
 - `DOCS`
 - resume intermediaire: `PREPROCESS_RESULT`
 
@@ -505,6 +510,73 @@ Reference implementation:
 - Ce fichier est la reference la plus rapide pour localiser une modification precise.
 
 ## 11) Changelog code
+- 2026-03-29:
+  - `main.py`:
+    - ajoute un shebang Unix pour permettre `./main.py <fichier> ...`.
+  - `run-dms`:
+    - nouveau lanceur shell simple qui appelle automatiquement `main.py` avec le Python actif du venv si disponible.
+    - evite la confusion ou le document est tape comme une commande shell.
+  - `README.md`:
+    - exemples corriges:
+      - `./main.py <fichier>`
+      - `./run-dms <fichier>`
+    - ajoute un exemple explicite "faux" vs "correct" pour l'erreur `Permission non accordee`.
+  - `component/pretraitement-de-docs.py`:
+    - ne lance plus de faux "test" au chargement du script.
+    - expose maintenant `MISSING_FILES` quand des chemins d'entree sont invalides/introuvables.
+  - `component/si-image-pretraiter-sinonpass-le-doc.py`:
+    - suppression du doublon de construction `DOCS`, qui causait des doubles logs `Using INPUT_FILE=...`.
+    - `UNSUPPORTED_FILES` reste reserve aux fichiers existants mais non gerables par OCR.
+    - les fichiers introuvables remontent proprement via `MISSING_FILES`.
+  - `pipeline/components.py`:
+    - `pretraitement-de-docs` et `si-image-pretraiter-sinonpass-le-doc` reportent maintenant `missing=...`.
+    - fusionne les `MISSING_FILES` amont/aval pour eviter de perdre l'information entre les etapes.
+  - `component/detection-signature-chachet-codebarr.py`:
+    - corrige le blocage sur gros PDF (> 200 pages) visible dans `bug.txt`.
+    - le rendu PDF ne lance plus `pdftoppm` sur tout le document puis ne garde que les premieres pages.
+    - ajout de `_pdf_page_count()` + `_sample_page_numbers()`:
+      - debut du document
+      - pages intermediaires reparties
+      - fin du document
+    - rendu page par page avec `pdftoppm -f N -l N -singlefile`, timeout borne et DPI reduit.
+    - sortie enrichie:
+      - `pages_total`
+      - `pages_scanned`
+      - `sampled_pages`
+    - print terminal enrichi: `pages=scannees/total` + apercu des pages echantillonnees.
+  - `component/liaison-inter-docs.py`:
+    - corrige un blocage de performance sur les comparaisons vectorielles chunk-a-chunk en `pipeline50ml` / `pipeline100ml`.
+    - les vecteurs document/chunk sont normalises une seule fois puis compares via produit scalaire.
+    - ajoute un budget de calcul par lien:
+      - reduction des chunks candidats (`max_chunk_candidates`)
+      - plafond de paires vectorielles (`max_chunk_pairs`)
+      - skip des paires sans recouvrement lexical/topic quand la similarite document reste faible.
+    - l'audit expose maintenant:
+      - `chunk_pair_budget_applied`
+      - `candidate_chunks_a`
+      - `candidate_chunks_b`
+      - `original_chunks_a`
+      - `original_chunks_b`
+      - `pairs_skipped_without_overlap`
+  - `component/pretraitement-de-docs.py`:
+    - les fichiers non supportes (ex: `Unknown / binary`, `application/octet-stream`) sont maintenant etiquetes `unsupported` au lieu d'etre envoyes vers le flux OCR.
+    - les fichiers `.txt` sont reconnus comme `text`.
+  - `component/si-image-pretraiter-sinonpass-le-doc.py`:
+    - ajoute `UNSUPPORTED_FILES`.
+    - les fichiers `unsupported` sont explicitement ignores avec logs:
+      - `[skip] content='unsupported' -> ...`
+      - `[unsupported] fichiers ignores (non geres par OCR):`
+    - evite le crash `PIL.UnidentifiedImageError` quand un `.txt` ou un binaire non image se retrouve dans l'entree.
+    - les fichiers `.txt` passent dans le flux `text` et ne sont plus envoye a OCR.
+  - `component/output-txt.py`:
+    - ajoute l'extraction native des `.txt` avec fallback d'encodage `utf-8` -> `utf-8-sig` -> `latin-1`.
+    - sortie `extraction`: `native:txt:utf-8`, `native:txt:utf-8-sig` ou `native:txt:latin-1`.
+  - `pipeline/cli.py`:
+    - si `outputgeneralterminal.txt` est fourni comme document d'entree, les logs runtime sont rediriges vers `outputgeneralterminal.runtime.txt` pour ne pas ecraser le document source pendant l'analyse.
+  - `pipeline/components.py`:
+    - reporting enrichi:
+      - `pretraitement-de-docs`: compte `unsupported`
+      - `si-image-pretraiter-sinonpass-le-doc`: expose aussi `UNSUPPORTED_FILES` dans `PREPROCESS_RESULT`.
 - 2026-03-28:
   - `component/verification-totaux.py`:
     - nouveau composant non-ML partage par `default`, `pipeline50ml` et `pipeline100ml`.

@@ -28,6 +28,8 @@ IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tif", ".tiff"}
 PDF_EXTS = {".pdf"}
 MAX_SCAN_PAGES = 20
 MAX_SIDE = 720
+PDF_RENDER_DPI = 110
+MAX_PDF_RENDER_SECONDS = 20
 
 
 def _safe_list(value: Any) -> List[Any]:
@@ -122,34 +124,116 @@ def _open_image_frames(path: Path, max_pages: int) -> List[Image.Image]:
     return out
 
 
-def _render_pdf_pages(path: Path, max_pages: int) -> List[Image.Image]:
-    out: List[Image.Image] = []
-    with tempfile.TemporaryDirectory(prefix="dms_visual_pdf_") as tmpdir:
-        prefix = str(Path(tmpdir) / "page")
-        cmd = ["pdftoppm", "-png", "-r", "144", str(path), prefix]
-        try:
-            subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        except Exception:
-            return []
-        for img_path in sorted(Path(tmpdir).glob("page-*.png"))[:max_pages]:
-            try:
-                with Image.open(img_path) as img:
-                    out.append(img.convert("RGB"))
-            except Exception:
-                continue
+def _pdf_page_count(path: Path) -> int:
+    try:
+        proc = subprocess.run(
+            ["pdfinfo", str(path)],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=5,
+        )
+        text = proc.stdout.decode("utf-8", errors="ignore")
+        for line in text.splitlines():
+            if line.lower().startswith("pages:"):
+                return max(0, int(line.split(":", 1)[1].strip()))
+    except Exception:
+        pass
+    return 0
+
+
+def _sample_page_numbers(total_pages: int, max_pages: int) -> List[int]:
+    if total_pages <= 0:
+        return []
+    if total_pages <= max_pages:
+        return list(range(1, total_pages + 1))
+
+    selected: List[int] = []
+    head = min(4, max_pages // 3 or 1, total_pages)
+    tail = min(4, max(0, max_pages - head), total_pages)
+
+    selected.extend(range(1, head + 1))
+    if tail > 0:
+        selected.extend(range(max(1, total_pages - tail + 1), total_pages + 1))
+
+    remaining = max_pages - len(set(selected))
+    if remaining > 0:
+        start = head + 1
+        end = total_pages - tail
+        if start <= end:
+            span = end - start + 1
+            for i in range(remaining):
+                pos = start + int(round((i + 1) * span / float(remaining + 1))) - 1
+                pos = max(start, min(end, pos))
+                selected.append(pos)
+
+    out = sorted({p for p in selected if 1 <= p <= total_pages})
+    if len(out) > max_pages:
+        out = out[:max_pages]
     return out
 
 
-def _load_doc_pages(source_path: str, max_pages: int = MAX_SCAN_PAGES) -> List[Image.Image]:
+def _render_pdf_page(path: Path, page_number: int) -> Image.Image | None:
+    with tempfile.TemporaryDirectory(prefix="dms_visual_pdf_") as tmpdir:
+        prefix = str(Path(tmpdir) / f"page_{page_number}")
+        cmd = [
+            "pdftoppm",
+            "-png",
+            "-singlefile",
+            "-r",
+            str(PDF_RENDER_DPI),
+            "-f",
+            str(page_number),
+            "-l",
+            str(page_number),
+            str(path),
+            prefix,
+        ]
+        try:
+            subprocess.run(
+                cmd,
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                timeout=MAX_PDF_RENDER_SECONDS,
+            )
+        except Exception:
+            return None
+        img_path = Path(f"{prefix}.png")
+        if not img_path.exists():
+            return None
+        try:
+            with Image.open(img_path) as img:
+                return img.convert("RGB")
+        except Exception:
+            return None
+
+
+def _render_pdf_pages(path: Path, max_pages: int) -> Tuple[List[Image.Image], List[int], int]:
+    total_pages = _pdf_page_count(path)
+    page_numbers = _sample_page_numbers(total_pages, max_pages) if total_pages > 0 else list(range(1, max_pages + 1))
+    out: List[Image.Image] = []
+    scanned: List[int] = []
+    for page_number in page_numbers:
+        img = _render_pdf_page(path, page_number)
+        if img is None:
+            continue
+        out.append(img)
+        scanned.append(page_number)
+    return out, scanned, total_pages
+
+
+def _load_doc_pages(source_path: str, max_pages: int = MAX_SCAN_PAGES) -> Tuple[List[Image.Image], List[int], int]:
     path = Path(source_path)
     if not path.exists():
-        return []
+        return [], [], 0
     ext = path.suffix.lower()
     if ext in IMAGE_EXTS:
-        return _open_image_frames(path, max_pages)
+        frames = _open_image_frames(path, max_pages)
+        return frames, list(range(1, len(frames) + 1)), len(frames)
     if ext in PDF_EXTS:
         return _render_pdf_pages(path, max_pages)
-    return []
+    return [], [], 0
 
 
 def _prepare_arrays(img: Image.Image) -> Tuple["np.ndarray", "np.ndarray", Tuple[int, int], Tuple[float, float]]:
@@ -513,11 +597,14 @@ def run(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
         doc_id = doc.get("doc_id")
         filename = str(doc.get("filename") or f"doc_{idx}")
         source_path = _resolve_source_path(doc, source_map)
-        pages = _load_doc_pages(source_path, max_pages=_safe_int(ctx.get("VISUAL_SCAN_MAX_PAGES"), MAX_SCAN_PAGES))
+        pages, sampled_pages, total_pages = _load_doc_pages(
+            source_path,
+            max_pages=_safe_int(ctx.get("VISUAL_SCAN_MAX_PAGES"), MAX_SCAN_PAGES),
+        )
 
         detections: List[Dict[str, Any]] = []
-        for page_pos, img in enumerate(pages, start=1):
-            detections.extend(_detect_page_marks(img, page_index=page_pos))
+        for page_number, img in zip(sampled_pages, pages):
+            detections.extend(_detect_page_marks(img, page_index=page_number))
         detections = _dedupe_doc_detections(detections)
 
         counts = {
@@ -536,7 +623,9 @@ def run(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
                 "doc_key": _doc_key(doc_id, filename, idx),
                 "engine": "visual-100ml-hybrid-heuristics-v1",
                 "source_path": source_path or None,
+                "pages_total": int(total_pages),
                 "pages_scanned": len(pages),
+                "sampled_pages": sampled_pages,
                 "detections_count": len(detections),
                 "has_signature": bool(counts["signature"]),
                 "has_stamp": bool(counts["stamp"]),
@@ -558,7 +647,8 @@ def run(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
     for row in out:
         print(
             "  - "
-            f"{row.get('filename')} | pages={_safe_int(row.get('pages_scanned'), 0)} | "
+            f"{row.get('filename')} | pages={_safe_int(row.get('pages_scanned'), 0)}/{_safe_int(row.get('pages_total'), 0)} | "
+            f"sampled={_safe_list(row.get('sampled_pages'))[:8]}{'...' if len(_safe_list(row.get('sampled_pages'))) > 8 else ''} | "
             f"signature={1 if row.get('has_signature') else 0} | "
             f"stamp={1 if row.get('has_stamp') else 0} | "
             f"barcode={1 if row.get('has_barcode') else 0} | "

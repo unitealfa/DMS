@@ -19,6 +19,21 @@ Ce dépôt regroupe des scripts de traitement documentaire (prétraitement, OCR,
 python main.py documents/englais.docx
 # ou
 python -m pipeline.cli documents/englais.docx
+# ou
+./main.py documents/englais.docx
+# ou
+./run-dms documents/englais.docx
+```
+
+Important:
+- ne lance jamais le document lui-meme comme commande shell
+- faux:
+```bash
+/home/mourad/Bureau/DMS/core/documents/testwordvw.docx --use-elasticsearch
+```
+- correct:
+```bash
+./run-dms /home/mourad/Bureau/DMS/core/documents/testwordvw.docx --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
 ```
 
 ## Exécution avec Elasticsearch

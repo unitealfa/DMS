@@ -2,6 +2,10 @@
 # test/resources/
 # test/documents/
 
+# Large files
+core/fusion_output.json
+core/outputgeneralterminal.runtime.txt
+
 # Jupyter
 .ipynb_checkpoints/
 

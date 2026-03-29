@@ -5,7 +5,7 @@ Date d'audit: 2026-03-19
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
 - Python files analyses: 32
-- Fonctions/classes indexees: 737 (voir `FUNCTION_INDEX.txt`)
+- Fonctions/classes indexees: 757 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 - Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
@@ -511,6 +511,39 @@ Reference implementation:
 
 ## 11) Changelog code
 - 2026-03-29:
+  - `prompt_output.json`:
+    - sortie JSON stricte regeneree selon la version courante de `prompt.txt`.
+    - aligne le schema final unifie sur les cles racine demandees:
+      - `schema_version`
+      - `generated_at`
+      - `source`
+      - `profile`
+      - `null_policy`
+      - `documents_count`
+      - `documents`
+      - `cross_document_analysis`
+      - `pipeline`
+      - `registries`
+      - `item_templates`
+      - `sql_mapping_hints`
+    - conserve un seul objet JSON racine, avec blocs `default` / `pipeline50ml` / `pipeline100ml` unifies dans le meme template.
+    - initialise les scalaires absents a `null`, les tableaux a `[]` et laisse les objets presents dans la structure finale.
+    - complete avec les champs reels observes dans `fusion_output.json` et les enrichissements statiques de `component/fusion_resultats.py`.
+    - couvre maintenant aussi:
+      - `content.content_type` / `content.classification` / `content.document_kind` / `content.detected_languages`
+      - `text.search.title` / `text.search.keywords`
+      - `nlp.source` / `nlp.level` / `nlp.summary` / `nlp.full`
+      - `classification.scores_audit.*` et `classification.keyword_matches.*`
+      - `extraction.regex_extractions.fields.*` via template dynamique
+      - `extraction.table_extraction.*`
+      - `extraction.totals_verification.*`
+      - `cross_document_analysis.links[*]` avec audit phrase et audit vectoriel
+    - verification de couverture effectuee automatiquement: aucun chemin present dans `fusion_output.json` n'est absent du template final.
+  - `GLOBAL_UNIFIED_PIPELINE_OUTPUT_TEMPLATE.json`:
+    - nouveau contrat JSON global de sortie couvrant `default`, `pipeline50ml` et `pipeline100ml`.
+    - inclut tous les champs observes dans les 3 profils.
+    - les champs specifiques a un profil restent presents et prennent `null` si le pipeline courant ne les alimente pas.
+    - inclut aussi des `item_templates` pour les structures listees (`interdoc_link`, `chunk_embedding_item`, `table_item`, `regex_extraction_item`, `visual_mark_item`, etc.).
   - `main.py`:
     - ajoute un shebang Unix pour permettre `./main.py <fichier> ...`.
   - `run-dms`:

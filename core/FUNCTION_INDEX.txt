@@ -1,7 +1,43 @@
 # FUNCTION_INDEX
 # Regenerated: 2026-03-29
-# Entries: 708
+# Entries: 757
 
+component/atrribution-gramatical/arabcode.py:11:def _install_help
+component/atrribution-gramatical/arabcode.py:87:def simple_tokenize
+component/atrribution-gramatical/arabcode.py:90:def is_punct
+component/atrribution-gramatical/arabcode.py:99:def strip_diacritics
+component/atrribution-gramatical/arabcode.py:102:def norm_alef
+component/atrribution-gramatical/arabcode.py:105:def has_hamza
+component/atrribution-gramatical/arabcode.py:128:def penn_from_analysis
+component/atrribution-gramatical/arabcode.py:132:def lemma_from_analysis
+component/atrribution-gramatical/arabcode.py:152:def override_tag
+component/atrribution-gramatical/arabcode.py:205:def _looks_like_verb_imperfect
+component/atrribution-gramatical/arabcode.py:209:def _safe_split_conj
+component/atrribution-gramatical/arabcode.py:227:def _best_analysis_for
+component/atrribution-gramatical/arabcode.py:233:def _char_overlap_ratio
+component/atrribution-gramatical/arabcode.py:240:def pick_analysis
+component/atrribution-gramatical/arabcode.py:370:def split_proclitics
+component/atrribution-gramatical/arabcode.py:412:def split_enclitics
+component/atrribution-gramatical/arabcode.py:457:def get_ner
+component/atrribution-gramatical/arabcode.py:471:def ner_predict_tokens
+component/atrribution-gramatical/arabcode.py:493:def norm_for_match
+component/atrribution-gramatical/arabcode.py:496:def fix_titles
+component/atrribution-gramatical/arabcode.py:523:def add_year_dates
+component/atrribution-gramatical/arabcode.py:532:def add_currency_codes
+component/atrribution-gramatical/arabcode.py:550:def enforce_bio
+component/atrribution-gramatical/arabcode.py:583:def _is_initial_chain
+component/atrribution-gramatical/arabcode.py:589:def drop_false_pers
+component/atrribution-gramatical/arabcode.py:612:def strip_entity_clitics_for_display
+component/atrribution-gramatical/arabcode.py:628:def bio_to_entities
+component/atrribution-gramatical/arabcode.py:633:def pos_of
+component/atrribution-gramatical/arabcode.py:636:def lemma_of
+component/atrribution-gramatical/arabcode.py:674:def _estimate_clitic_count
+component/atrribution-gramatical/arabcode.py:693:def _lemma_suspicious
+component/atrribution-gramatical/arabcode.py:707:def analyze_sentence
+component/atrribution-gramatical/arabcode.py:871:def split_input_into_sentences
+component/atrribution-gramatical/arabcode.py:881:def run_one_auto
+component/atrribution-gramatical/arabcode.py:885:def run_from_previous_cell
+component/atrribution-gramatical/arabcode.py:942:def main
 component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:30:def _is_punct_like_token
 component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:47:def _normalize_token_fields
 component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:60:def detect_lang
@@ -710,3 +746,16 @@ pipeline/settings.py:84:def safe_repr
 pipeline/settings.py:89:def count_sentences
 pipeline/settings.py:98:def change_dir
 pipeline/settings.py:109:def isolated_argv
+pytesseract.py:14:class TesseractError
+pytesseract.py:18:class TesseractNotFoundError
+pytesseract.py:22:class Output
+pytesseract.py:29:def _split_config
+pytesseract.py:39:def _run_tesseract
+pytesseract.py:60:def _coerce_image_input
+pytesseract.py:72:def _cleanup_temp
+pytesseract.py:81:def get_tesseract_version
+pytesseract.py:90:def get_languages
+pytesseract.py:98:def image_to_osd
+pytesseract.py:107:def image_to_string
+pytesseract.py:119:def _parse_tsv_to_dict
+pytesseract.py:133:def image_to_data

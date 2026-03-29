@@ -1,11 +1,11 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-03-28T22:23:52.809667+00:00",
+  "generated_at": "2026-03-29T10:47:09.179896+00:00",
   "source": "local-context",
   "documents_count": 1,
   "documents": [
     {
-      "document_id": "775adeaf-dbb4-4fe8-9329-b60038ec740b",
+      "document_id": "c04a900e-f7a4-4165-88fb-ba62ce8459a7",
       "file": {
         "name": "facture_test_totaux.pdf",
         "paths": [
@@ -15,7 +15,7 @@
         "page_count": 1
       },
       "classification": {
-        "doc_id": "775adeaf-dbb4-4fe8-9329-b60038ec740b",
+        "doc_id": "c04a900e-f7a4-4165-88fb-ba62ce8459a7",
         "filename": "facture_test_totaux.pdf",
         "doc_type": "FACTURE",
         "status": "OK",
@@ -337,7 +337,7 @@
           "available": false,
           "es_url": "http://localhost:9200",
           "es_index": "dms_documents",
-          "doc_id": "775adeaf-dbb4-4fe8-9329-b60038ec740b",
+          "doc_id": "c04a900e-f7a4-4165-88fb-ba62ce8459a7",
           "nlp_level": "full",
           "nlp_tokens_index": "dms_nlp_tokens",
           "nlp_docs_synced": 0,
@@ -411,7 +411,11 @@
         },
         "detection_signature_chachet_codebarr_100ml": {
           "engine": "visual-100ml-hybrid-heuristics-v1",
+          "pages_total": 1,
           "pages_scanned": 1,
+          "sampled_pages": [
+            1
+          ],
           "detections_count": 4,
           "has_signature": true,
           "has_stamp": true,
@@ -1354,41 +1358,41 @@
         "visual_marks": [
           {
             "type": "signature",
-            "score": 0.542101,
+            "score": 0.554963,
             "bbox_px": {
-              "x0": 665,
-              "y0": 1074,
-              "x1": 1163,
-              "y1": 1207
+              "x0": 381,
+              "y0": 888,
+              "x1": 762,
+              "y1": 990
             },
             "bbox_norm": {
-              "x0": 0.558354,
-              "y0": 0.637767,
-              "x1": 0.97649,
-              "y1": 0.716746
+              "x0": 0.418681,
+              "y0": 0.689977,
+              "x1": 0.837363,
+              "y1": 0.769231
             },
-            "page_width": 1191,
-            "page_height": 1684,
+            "page_width": 910,
+            "page_height": 1287,
             "source": "vision-heuristics",
             "page_index": 1
           },
           {
             "type": "signature",
-            "score": 0.541582,
+            "score": 0.543462,
             "bbox_px": {
-              "x0": 412,
-              "y0": 1144,
-              "x1": 1030,
-              "y1": 1312
+              "x0": 508,
+              "y0": 820,
+              "x1": 889,
+              "y1": 922
             },
             "bbox_norm": {
-              "x0": 0.345928,
-              "y0": 0.679335,
-              "x1": 0.864819,
-              "y1": 0.779097
+              "x0": 0.558242,
+              "y0": 0.637141,
+              "x1": 0.976923,
+              "y1": 0.716395
             },
-            "page_width": 1191,
-            "page_height": 1684,
+            "page_width": 910,
+            "page_height": 1287,
             "source": "vision-heuristics",
             "page_index": 1
           },
@@ -1396,19 +1400,19 @@
             "type": "stamp",
             "score": 1.0,
             "bbox_px": {
-              "x0": 140,
-              "y0": 671,
-              "x1": 353,
-              "y1": 973
+              "x0": 107,
+              "y0": 513,
+              "x1": 270,
+              "y1": 744
             },
             "bbox_norm": {
-              "x0": 0.117548,
-              "y0": 0.398456,
-              "x1": 0.29639,
-              "y1": 0.577791
+              "x0": 0.117582,
+              "y0": 0.398601,
+              "x1": 0.296703,
+              "y1": 0.578089
             },
-            "page_width": 1191,
-            "page_height": 1684,
+            "page_width": 910,
+            "page_height": 1287,
             "source": "vision-heuristics",
             "page_index": 1
           },
@@ -1416,26 +1420,30 @@
             "type": "stamp",
             "score": 1.0,
             "bbox_px": {
-              "x0": 281,
-              "y0": 671,
-              "x1": 494,
-              "y1": 973
+              "x0": 215,
+              "y0": 513,
+              "x1": 377,
+              "y1": 744
             },
             "bbox_norm": {
-              "x0": 0.235936,
-              "y0": 0.398456,
-              "x1": 0.414777,
-              "y1": 0.577791
+              "x0": 0.236264,
+              "y0": 0.398601,
+              "x1": 0.414286,
+              "y1": 0.578089
             },
-            "page_width": 1191,
-            "page_height": 1684,
+            "page_width": 910,
+            "page_height": 1287,
             "source": "vision-heuristics",
             "page_index": 1
           }
         ],
         "visual_marks_summary": {
           "engine": "visual-100ml-hybrid-heuristics-v1",
+          "pages_total": 1,
           "pages_scanned": 1,
+          "sampled_pages": [
+            1
+          ],
           "detections_count": 4,
           "has_signature": true,
           "has_stamp": true,
@@ -1464,7 +1472,7 @@
         "tesseract": [],
         "regex_extractions": [
           {
-            "doc_id": "775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_id": "c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "filename": "facture_test_totaux.pdf",
             "doc_type": "FACTURE",
             "classification_status": "OK",
@@ -2539,7 +2547,11 @@
         },
         "visual_detection": {
           "engine": "visual-100ml-hybrid-heuristics-v1",
+          "pages_total": 1,
           "pages_scanned": 1,
+          "sampled_pages": [
+            1
+          ],
           "detections_count": 4,
           "has_signature": true,
           "has_stamp": true,
@@ -9372,7 +9384,7 @@
         "timestamp": null
       },
       "meta": {
-        "generated_at": "2026-03-28T22:23:52.809652+00:00",
+        "generated_at": "2026-03-29T10:47:09.179872+00:00",
         "schema_version": "2.0",
         "source": "local-context"
       },
@@ -10152,9 +10164,9 @@
         "chunk_count": 10,
         "chunks_embeddings": [
           {
-            "doc_id": "775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_id": "c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "filename": "facture_test_totaux.pdf",
-            "doc_key": "id:775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_key": "id:c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "page_index": 1,
             "sent_index": 0,
             "lang": "fr",
@@ -10947,9 +10959,9 @@
             ]
           },
           {
-            "doc_id": "775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_id": "c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "filename": "facture_test_totaux.pdf",
-            "doc_key": "id:775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_key": "id:c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "page_index": 1,
             "sent_index": 3,
             "lang": "fr",
@@ -11742,9 +11754,9 @@
             ]
           },
           {
-            "doc_id": "775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_id": "c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "filename": "facture_test_totaux.pdf",
-            "doc_key": "id:775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_key": "id:c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "page_index": 1,
             "sent_index": 4,
             "lang": "fr",
@@ -12524,9 +12536,9 @@
             ]
           },
           {
-            "doc_id": "775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_id": "c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "filename": "facture_test_totaux.pdf",
-            "doc_key": "id:775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_key": "id:c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "page_index": 1,
             "sent_index": 5,
             "lang": "fr",
@@ -13315,9 +13327,9 @@
             ]
           },
           {
-            "doc_id": "775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_id": "c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "filename": "facture_test_totaux.pdf",
-            "doc_key": "id:775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_key": "id:c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "page_index": 1,
             "sent_index": 6,
             "lang": "fr",
@@ -14110,9 +14122,9 @@
             ]
           },
           {
-            "doc_id": "775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_id": "c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "filename": "facture_test_totaux.pdf",
-            "doc_key": "id:775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_key": "id:c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "page_index": 1,
             "sent_index": 0,
             "lang": "fr",
@@ -14905,9 +14917,9 @@
             ]
           },
           {
-            "doc_id": "775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_id": "c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "filename": "facture_test_totaux.pdf",
-            "doc_key": "id:775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_key": "id:c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "page_index": 1,
             "sent_index": 3,
             "lang": "fr",
@@ -15700,9 +15712,9 @@
             ]
           },
           {
-            "doc_id": "775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_id": "c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "filename": "facture_test_totaux.pdf",
-            "doc_key": "id:775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_key": "id:c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "page_index": 1,
             "sent_index": 4,
             "lang": "fr",
@@ -16482,9 +16494,9 @@
             ]
           },
           {
-            "doc_id": "775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_id": "c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "filename": "facture_test_totaux.pdf",
-            "doc_key": "id:775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_key": "id:c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "page_index": 1,
             "sent_index": 5,
             "lang": "fr",
@@ -17273,9 +17285,9 @@
             ]
           },
           {
-            "doc_id": "775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_id": "c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "filename": "facture_test_totaux.pdf",
-            "doc_key": "id:775adeaf-dbb4-4fe8-9329-b60038ec740b",
+            "doc_key": "id:c04a900e-f7a4-4165-88fb-ba62ce8459a7",
             "page_index": 1,
             "sent_index": 6,
             "lang": "fr",
@@ -18143,7 +18155,7 @@
     "vector_dim": 768,
     "vector_links_count": 0,
     "links": [],
-    "generated_at": "2026-03-28T22:23:52.763402+00:00"
+    "generated_at": "2026-03-29T10:47:09.126495+00:00"
   },
   "pipeline": {
     "es_enabled": true,

@@ -1,0 +1,1835 @@
+{
+  "schema_version": "dms-unified-final-template-1.0",
+  "generated_at": "2026-03-29T11:28:24.240869+00:00",
+  "source": {
+    "corpus_root": "/home/mourad/Bureau/DMS/core/documents",
+    "input_files": [],
+    "source_mode": "template_reference",
+    "fusion_source": "/home/mourad/Bureau/DMS/core/GLOBAL_UNIFIED_PIPELINE_OUTPUT_TEMPLATE.json",
+    "label": null,
+    "profile_requested": null,
+    "profile_effective": null
+  },
+  "profile": null,
+  "null_policy": {
+    "scalars": null,
+    "arrays": [],
+    "objects": "fully materialized with null leaves or {} when intentionally open-ended"
+  },
+  "documents_count": 0,
+  "documents": [
+    {
+      "document_id": null,
+      "file": {
+        "name": null,
+        "paths": [],
+        "size": null,
+        "page_count": null,
+        "mime": null,
+        "ext": null,
+        "content_mode": null
+      },
+      "classification": {
+        "doc_id": null,
+        "filename": null,
+        "doc_type": null,
+        "status": null,
+        "scores": {
+          "ARTICLE": null,
+          "BON_DE_COMMANDE": null,
+          "CONTRAT": null,
+          "FACTURE": null,
+          "FORMULAIRE": null
+        },
+        "winning_score": null,
+        "threshold": null,
+        "margin": null,
+        "classification_log": null,
+        "scores_audit": {
+          "_dynamic_doc_type_template": {
+            "score_total": null,
+            "matched_keywords": [
+              {
+                "keyword": null,
+                "bucket": null,
+                "count": null,
+                "score": null
+              }
+            ],
+            "matched_keywords_compact": []
+          },
+          "ARTICLE": {
+            "score_total": null,
+            "matched_keywords": [
+              {
+                "keyword": null,
+                "bucket": null,
+                "count": null,
+                "score": null
+              }
+            ],
+            "matched_keywords_compact": []
+          },
+          "BON_DE_COMMANDE": {
+            "score_total": null,
+            "matched_keywords": [
+              {
+                "keyword": null,
+                "bucket": null,
+                "count": null,
+                "score": null
+              }
+            ],
+            "matched_keywords_compact": []
+          },
+          "CONTRAT": {
+            "score_total": null,
+            "matched_keywords": [
+              {
+                "keyword": null,
+                "bucket": null,
+                "count": null,
+                "score": null
+              }
+            ],
+            "matched_keywords_compact": []
+          },
+          "FACTURE": {
+            "score_total": null,
+            "matched_keywords": [
+              {
+                "keyword": null,
+                "bucket": null,
+                "count": null,
+                "score": null
+              }
+            ],
+            "matched_keywords_compact": []
+          },
+          "FORMULAIRE": {
+            "score_total": null,
+            "matched_keywords": [
+              {
+                "keyword": null,
+                "bucket": null,
+                "count": null,
+                "score": null
+              }
+            ],
+            "matched_keywords_compact": []
+          }
+        },
+        "keyword_matches": {
+          "strong": [
+            {
+              "keyword": null,
+              "count": null
+            }
+          ],
+          "medium": [
+            {
+              "keyword": null,
+              "count": null
+            }
+          ],
+          "weak": [
+            {
+              "keyword": null,
+              "count": null
+            }
+          ],
+          "negative": [
+            {
+              "keyword": null,
+              "count": null
+            }
+          ],
+          "strong_negative": [
+            {
+              "keyword": null,
+              "count": null
+            }
+          ],
+          "anti_confusion_hits": [
+            {
+              "keyword": null,
+              "count": null
+            }
+          ]
+        },
+        "anti_confusion_targets": [],
+        "decision_debug": {
+          "top_score": null,
+          "second_score": null,
+          "diff": null
+        }
+      },
+      "doc_type": null,
+      "cross_document": {
+        "linked_documents_count": 0,
+        "link_ids": []
+      },
+      "components": {
+        "pretraitement_de_docs": {
+          "matched_path": null,
+          "detected_ext": null,
+          "detected_mime": null,
+          "detected_label": null,
+          "detected_content": null,
+          "total_files_detected": null,
+          "size": null,
+          "content": null,
+          "ext": null,
+          "mime": null,
+          "label": null
+        },
+        "si_image_pretraiter_sinonpass_le_doc": {
+          "text_files_count": null,
+          "image_only_files_count": null,
+          "unsupported_files_count": null,
+          "missing_files_count": null,
+          "docs_prepped_count": null,
+          "is_text_file": null,
+          "is_image_only_file": null,
+          "docs_prepared_count": null
+        },
+        "output_txt": {
+          "content": null,
+          "extraction": null,
+          "page_count_total": null,
+          "pages_text_count": null,
+          "text_length": null,
+          "size": null,
+          "pages_count": null,
+          "has_text": null
+        },
+        "tokenisation_layout": {
+          "language": null,
+          "pages_count": null,
+          "sentences_count": null,
+          "layout_blocks_count": null,
+          "tokens_count": null,
+          "detected_languages": []
+        },
+        "attribution_grammaticale": {
+          "component": null,
+          "script": null,
+          "backend": null,
+          "model": null,
+          "model_source": null,
+          "model_install": null,
+          "pos_method": null,
+          "pos_refined_count": null,
+          "pos_total": null,
+          "pos_refined_rate": null,
+          "pos_top_tags": [
+            {
+              "pos": null,
+              "count": null
+            }
+          ],
+          "level": null,
+          "language": null,
+          "languages": [],
+          "sentences_count": null,
+          "tokens_count": null,
+          "entities_count": null
+        },
+        "liaison_inter_docs": {
+          "method": null,
+          "links_count_total": null,
+          "linked_documents_count": null,
+          "vector_profile": null
+        },
+        "elasticsearch": {
+          "enabled": null,
+          "available": null,
+          "es_url": null,
+          "es_index": null,
+          "doc_id": null,
+          "nlp_level": null,
+          "nlp_tokens_index": null,
+          "nlp_docs_synced": null,
+          "nlp_tokens_synced": null,
+          "nlp_token_errors": null,
+          "fusion_synced": null
+        },
+        "classification": {
+          "doc_type": null,
+          "status": null,
+          "winning_score": null
+        },
+        "detection_signature_chachet_codebarr": {
+          "engine": null,
+          "pages_scanned": null,
+          "detections_count": null,
+          "has_signature": null,
+          "has_stamp": null,
+          "has_barcode": null,
+          "has_qrcode": null
+        },
+        "verification_totaux": {
+          "engine": null,
+          "verification_status": null,
+          "passed": null,
+          "complete": null,
+          "row_mismatch_count": null,
+          "computed_subtotal": null,
+          "declared_subtotal": null,
+          "declared_tax": null,
+          "declared_total": null,
+          "issue_locations_count": null
+        },
+        "extraction_regles": {
+          "documents_count": null,
+          "fields_count": null
+        },
+        "fusion_resultats": {
+          "source": null,
+          "output_path": null,
+          "es_synced": null
+        },
+        "table_extraction_0ml": {
+          "engine": null,
+          "tables_count": null,
+          "rows_total": null,
+          "detected_columns": []
+        },
+        "tokenisation_layout_50ml": {
+          "embedding_method": null,
+          "vector_dim": null,
+          "document_primary_topics": [],
+          "document_topics_count": null,
+          "chunk_vectors_count": null,
+          "word_vectors_count": null,
+          "topics_removed_by_grammar": null
+        },
+        "extraction_regles_50ml": {
+          "bm25_best_score": null,
+          "bm25_chunks_total": null,
+          "bm25_query_terms_count": null
+        },
+        "table_extraction_50ml": {
+          "engine": null,
+          "tables_count": null,
+          "rows_total": null,
+          "detected_columns": []
+        },
+        "tokenisation_layout_100ml": {
+          "embedding_method": null,
+          "vector_dim": null,
+          "document_primary_topics": [],
+          "document_topics_count": null,
+          "chunk_vectors_count": null,
+          "word_vectors_count": null,
+          "topics_removed_by_grammar": null
+        },
+        "extraction_regles_100ml": {
+          "bm25_best_score": null,
+          "bm25_chunks_total": null,
+          "bm25_query_terms_count": null
+        },
+        "table_extraction_100ml": {
+          "engine": null,
+          "tables_count": null,
+          "rows_total": null,
+          "detected_columns": []
+        },
+        "detection_signature_chachet_codebarr_100ml": {
+          "engine": null,
+          "pages_total": null,
+          "pages_scanned": null,
+          "sampled_pages": [],
+          "detections_count": null,
+          "has_signature": null,
+          "has_stamp": null,
+          "has_barcode": null,
+          "has_qrcode": null
+        }
+      },
+      "text": {
+        "text_raw": null,
+        "text_normalized": null,
+        "normalization": [],
+        "search": {
+          "full_text": null,
+          "title": null,
+          "keywords": []
+        }
+      },
+      "document_structure": {
+        "pages_meta": [],
+        "pages": [
+          {
+            "page_index": null,
+            "text": null,
+            "page_text": null,
+            "lang": null,
+            "source_path": null,
+            "chars": null,
+            "recompose_ok": null,
+            "sentences_layout": [
+              {
+                "page_index": null,
+                "sent_index": null,
+                "text": null,
+                "start": null,
+                "end": null,
+                "chars": null,
+                "line": null,
+                "col": null,
+                "col_index": null,
+                "layout_kind": null,
+                "is_sentence": null,
+                "is_noise": null,
+                "nonspace": null,
+                "spans": [],
+                "header_rows": [],
+                "header_cells": [],
+                "header_source": null,
+                "table_rows": []
+              }
+            ]
+          }
+        ],
+        "sections": [],
+        "blocks": [],
+        "lines": [],
+        "words": [],
+        "headers": [],
+        "footers": [],
+        "lists": [],
+        "tables": [],
+        "figures": [],
+        "equations": [],
+        "key_value_pairs": [],
+        "reading_order": [],
+        "detected_columns": [],
+        "non_text_regions": [],
+        "visual_marks": [
+          {
+            "type": null,
+            "kind": null,
+            "score": null,
+            "confidence": null,
+            "bbox_px": {
+              "x0": null,
+              "y0": null,
+              "x1": null,
+              "y1": null
+            },
+            "bbox_norm": {
+              "x0": null,
+              "y0": null,
+              "x1": null,
+              "y1": null
+            },
+            "page_width": null,
+            "page_height": null,
+            "page_index": null,
+            "source": null,
+            "engine": null,
+            "decoded_value": null
+          }
+        ],
+        "visual_marks_summary": {
+          "engine": null,
+          "pages_total": null,
+          "pages_scanned": null,
+          "sampled_pages": [],
+          "detections_count": null,
+          "has_signature": null,
+          "has_stamp": null,
+          "has_barcode": null,
+          "has_qrcode": null
+        }
+      },
+      "ocr": {
+        "orientation": null,
+        "confidence": null,
+        "engine": null
+      },
+      "extraction": {
+        "image_preprocessing": [
+          {
+            "path": null,
+            "size": null,
+            "ext": null,
+            "mime": null,
+            "label": null,
+            "content": null
+          }
+        ],
+        "method": null,
+        "native": null,
+        "tesseract": [],
+        "regex_extractions": [
+          {
+            "doc_id": null,
+            "filename": null,
+            "doc_type": null,
+            "classification_status": null,
+            "ruleset": {
+              "routes_config": {
+                "include_common": null,
+                "default_rulesets": [],
+                "ruleset_mapping": {
+                  "BON_DE_COMMANDE": [],
+                  "CONTRAT": [],
+                  "FACTURE": []
+                }
+              },
+              "applied_rulesets": []
+            },
+            "fields": {
+              "_dynamic_field_template": {
+                "rule_id": null,
+                "type": null,
+                "many": null,
+                "matches": [
+                  {
+                    "value": null,
+                    "start": null,
+                    "end": null,
+                    "snippet": null,
+                    "page_index": null
+                  }
+                ]
+              },
+              "doc_date": {
+                "rule_id": null,
+                "type": null,
+                "many": null,
+                "matches": [
+                  {
+                    "value": null,
+                    "start": null,
+                    "end": null,
+                    "snippet": null,
+                    "page_index": null
+                  }
+                ]
+              },
+              "email": {
+                "rule_id": null,
+                "type": null,
+                "many": null,
+                "matches": [
+                  {
+                    "value": null,
+                    "start": null,
+                    "end": null,
+                    "snippet": null,
+                    "page_index": null
+                  }
+                ]
+              },
+              "telephone": {
+                "rule_id": null,
+                "type": null,
+                "many": null,
+                "matches": [
+                  {
+                    "value": null,
+                    "start": null,
+                    "end": null,
+                    "snippet": null,
+                    "page_index": null
+                  }
+                ]
+              },
+              "site": {
+                "rule_id": null,
+                "type": null,
+                "many": null,
+                "matches": [
+                  {
+                    "value": null,
+                    "start": null,
+                    "end": null,
+                    "snippet": null,
+                    "page_index": null
+                  }
+                ]
+              },
+              "numero_facture": {
+                "rule_id": null,
+                "type": null,
+                "many": null,
+                "matches": [
+                  {
+                    "value": null,
+                    "start": null,
+                    "end": null,
+                    "snippet": null,
+                    "page_index": null
+                  }
+                ]
+              },
+              "date_facture": {
+                "rule_id": null,
+                "type": null,
+                "many": null,
+                "matches": [
+                  {
+                    "value": null,
+                    "start": null,
+                    "end": null,
+                    "snippet": null,
+                    "page_index": null
+                  }
+                ]
+              },
+              "date_echeance": {
+                "rule_id": null,
+                "type": null,
+                "many": null,
+                "matches": [
+                  {
+                    "value": null,
+                    "start": null,
+                    "end": null,
+                    "snippet": null,
+                    "page_index": null
+                  }
+                ]
+              },
+              "montant_ht": {
+                "rule_id": null,
+                "type": null,
+                "many": null,
+                "matches": [
+                  {
+                    "value": null,
+                    "start": null,
+                    "end": null,
+                    "snippet": null,
+                    "page_index": null
+                  }
+                ]
+              },
+              "montant_tva": {
+                "rule_id": null,
+                "type": null,
+                "many": null,
+                "matches": [
+                  {
+                    "value": null,
+                    "start": null,
+                    "end": null,
+                    "snippet": null,
+                    "page_index": null
+                  }
+                ]
+              },
+              "montant_ttc": {
+                "rule_id": null,
+                "type": null,
+                "many": null,
+                "matches": [
+                  {
+                    "value": null,
+                    "start": null,
+                    "end": null,
+                    "snippet": null,
+                    "page_index": null
+                  }
+                ]
+              },
+              "devise": {
+                "rule_id": null,
+                "type": null,
+                "many": null,
+                "matches": [
+                  {
+                    "value": null,
+                    "start": null,
+                    "end": null,
+                    "snippet": null,
+                    "page_index": null
+                  }
+                ]
+              }
+            },
+            "bm25": {
+              "k1": null,
+              "b": null,
+              "query_terms": [],
+              "chunks_total": null,
+              "top_chunks": [
+                {
+                  "page_index": null,
+                  "sent_index": null,
+                  "score": null,
+                  "text_preview": null
+                }
+              ],
+              "best_score": null,
+              "avg_top3_score": null
+            }
+          }
+        ],
+        "business": {
+          "_dynamic_fields": {}
+        },
+        "relations": [],
+        "quality_checks": [],
+        "bm25": {
+          "best_score": null,
+          "chunks_total": null,
+          "query_terms": [],
+          "best_chunk": null,
+          "top_chunks": [
+            {
+              "page_index": null,
+              "sent_index": null,
+              "score": null,
+              "text_preview": null
+            }
+          ],
+          "k1": null,
+          "b": null,
+          "avg_top3_score": null
+        },
+        "table_extraction": {
+          "engine": null,
+          "tables_count": null,
+          "rows_total": null,
+          "detected_columns": [],
+          "totals": {
+            "tax": null,
+            "total_ht": null,
+            "total_ttc": null
+          },
+          "line_items": [
+            {
+              "table_index": null,
+              "page_index": null,
+              "row_index": null,
+              "reference": null,
+              "product": null,
+              "description": null,
+              "quantity": null,
+              "unit_price": null,
+              "total_ht": null,
+              "total_ttc": null,
+              "total": null,
+              "raw_cells": [],
+              "confidence": null
+            }
+          ],
+          "tables": [
+            {
+              "table_index": null,
+              "page_index": null,
+              "table_type": null,
+              "header_map": {
+                "reference": null,
+                "product": null,
+                "quantity": null,
+                "unit_price": null,
+                "total_ht": null,
+                "total_ttc": null,
+                "total": null
+              },
+              "header_score": null,
+              "detected_columns": [],
+              "rows_count": null,
+              "shape": {
+                "rows_estimated": null,
+                "columns_estimated": null,
+                "source": null
+              },
+              "rows": [
+                {
+                  "table_index": null,
+                  "page_index": null,
+                  "row_index": null,
+                  "reference": null,
+                  "product": null,
+                  "description": null,
+                  "quantity": null,
+                  "unit_price": null,
+                  "total_ht": null,
+                  "total_ttc": null,
+                  "total": null,
+                  "raw_cells": [],
+                  "confidence": null
+                }
+              ]
+            }
+          ]
+        },
+        "totals_verification": {
+          "engine": null,
+          "verification_status": null,
+          "passed": null,
+          "complete": null,
+          "tables_count": null,
+          "rows_total": null,
+          "rows_verified": null,
+          "row_ok_count": null,
+          "row_partial_count": null,
+          "row_mismatch_count": null,
+          "computed_subtotal": null,
+          "declared_subtotal": null,
+          "declared_tax": null,
+          "computed_tax": null,
+          "declared_total": null,
+          "expected_total": null,
+          "subtotal_status": null,
+          "tax_status": null,
+          "total_status": null,
+          "checks": [
+            {
+              "name": null,
+              "status": null
+            }
+          ],
+          "table_anchor": {
+            "page_index": null,
+            "sent_index": null,
+            "layout_kind": null,
+            "line": null,
+            "col": null,
+            "chunk_start": null,
+            "chunk_end": null,
+            "chunk_text_excerpt": null,
+            "match_score": null,
+            "table_index": null,
+            "field": null,
+            "match_start_in_chunk": null,
+            "match_end_in_chunk": null
+          },
+          "subtotal_location": {
+            "page_index": null,
+            "sent_index": null,
+            "layout_kind": null,
+            "line": null,
+            "col": null,
+            "chunk_start": null,
+            "chunk_end": null,
+            "chunk_text_excerpt": null,
+            "match_score": null,
+            "table_index": null,
+            "field": null,
+            "match_start_in_chunk": null,
+            "match_end_in_chunk": null
+          },
+          "tax_location": {
+            "page_index": null,
+            "sent_index": null,
+            "layout_kind": null,
+            "line": null,
+            "col": null,
+            "chunk_start": null,
+            "chunk_end": null,
+            "chunk_text_excerpt": null,
+            "match_score": null,
+            "table_index": null,
+            "field": null,
+            "match_start_in_chunk": null,
+            "match_end_in_chunk": null
+          },
+          "total_location": {
+            "page_index": null,
+            "sent_index": null,
+            "layout_kind": null,
+            "line": null,
+            "col": null,
+            "chunk_start": null,
+            "chunk_end": null,
+            "chunk_text_excerpt": null,
+            "match_score": null,
+            "table_index": null,
+            "field": null,
+            "match_start_in_chunk": null,
+            "match_end_in_chunk": null
+          },
+          "issue_locations": [
+            {
+              "kind": null,
+              "table_index": null,
+              "page_index": null,
+              "computed": null,
+              "declared": null,
+              "source_location": {
+                "page_index": null,
+                "sent_index": null,
+                "layout_kind": null,
+                "line": null,
+                "col": null,
+                "chunk_start": null,
+                "chunk_end": null,
+                "chunk_text_excerpt": null,
+                "match_score": null,
+                "table_index": null,
+                "field": null
+              }
+            }
+          ],
+          "row_audit": [
+            {
+              "page_index": null,
+              "table_index": null,
+              "row_index": null,
+              "label": null,
+              "raw_cells": [],
+              "quantity": null,
+              "unit_price": null,
+              "declared_total": null,
+              "computed_total": null,
+              "effective_total": null,
+              "effective_total_source": null,
+              "status": null,
+              "difference": null,
+              "source_location": {
+                "page_index": null,
+                "sent_index": null,
+                "layout_kind": null,
+                "line": null,
+                "col": null,
+                "chunk_start": null,
+                "chunk_end": null,
+                "chunk_text_excerpt": null,
+                "match_score": null,
+                "table_index": null,
+                "field": null
+              }
+            }
+          ],
+          "declared_totals_raw": {
+            "tax": null,
+            "total_ht": null,
+            "total_ttc": null
+          },
+          "tolerance": null
+        },
+        "visual_detection": {
+          "engine": null,
+          "pages_total": null,
+          "pages_scanned": null,
+          "sampled_pages": [],
+          "detections_count": null,
+          "has_signature": null,
+          "has_stamp": null,
+          "has_barcode": null,
+          "has_qrcode": null
+        }
+      },
+      "nlp": {
+        "language": null,
+        "sentences": [
+          {
+            "filename": null,
+            "page_index": null,
+            "sent_index": null,
+            "lang": null,
+            "text": null
+          }
+        ],
+        "entities": [
+          {
+            "filename": null,
+            "page_index": null,
+            "sent_index": null,
+            "lang": null,
+            "type": null,
+            "text": null
+          }
+        ],
+        "matches": [],
+        "tokens": [
+          {
+            "filename": null,
+            "page_index": null,
+            "sent_index": null,
+            "tok_index": null,
+            "token": null,
+            "pos": null,
+            "lemma": null,
+            "ner": null,
+            "lang": null,
+            "xlmr_backend": null
+          }
+        ],
+        "source": null,
+        "level": null,
+        "summary": {
+          "languages": [],
+          "language_stats": {},
+          "sentences_count": null,
+          "tokens_count": null,
+          "entities_count": null,
+          "top_pos": [],
+          "top_ner": [],
+          "entities_sample": [],
+          "sentences_sample": [],
+          "updated_at": null
+        },
+        "full": {
+          "index": null,
+          "count": null,
+          "returned": null,
+          "truncated": null,
+          "doc_id": null,
+          "tokens": [
+            {
+              "filename": null,
+              "page_index": null,
+              "sent_index": null,
+              "tok_index": null,
+              "token": null,
+              "pos": null,
+              "lemma": null,
+              "ner": null,
+              "lang": null
+            }
+          ],
+          "structure": [],
+          "error": null
+        }
+      },
+      "quality_checks": [
+        {
+          "check": null,
+          "engine": null,
+          "status": null,
+          "passed": null,
+          "complete": null,
+          "row_mismatch_count": null,
+          "rows_verified": null,
+          "computed_subtotal": null,
+          "declared_subtotal": null,
+          "declared_tax": null,
+          "declared_total": null,
+          "issue_locations": [
+            {
+              "kind": null,
+              "table_index": null,
+              "page_index": null,
+              "computed": null,
+              "declared": null,
+              "source_location": {
+                "page_index": null,
+                "sent_index": null,
+                "layout_kind": null,
+                "line": null,
+                "col": null,
+                "chunk_start": null,
+                "chunk_end": null,
+                "chunk_text_excerpt": null,
+                "match_score": null,
+                "table_index": null,
+                "field": null
+              }
+            }
+          ]
+        }
+      ],
+      "human_review": {
+        "required": null,
+        "tasks": []
+      },
+      "processing": {
+        "warnings": [],
+        "logs": [],
+        "pipeline": null,
+        "durations": {},
+        "timestamp": null,
+        "source": null
+      },
+      "meta": {
+        "generated_at": null,
+        "schema_version": null,
+        "source": null,
+        "pipeline_profile": null
+      },
+      "ml0": {
+        "table_extraction": {
+          "engine": null,
+          "tables_count": null,
+          "rows_total": null,
+          "detected_columns": [],
+          "totals": {},
+          "line_items": [],
+          "tables": []
+        }
+      },
+      "ml50": {
+        "embedding_method": null,
+        "vector_dim": null,
+        "document_vector": null,
+        "chunk_count": null,
+        "chunks_embeddings": [
+          {
+            "doc_id": null,
+            "doc_key": null,
+            "filename": null,
+            "page_index": null,
+            "sent_index": null,
+            "text_preview": null,
+            "token_count": null,
+            "lang": null,
+            "vector": null,
+            "chunk_primary_topic": null,
+            "chunk_topics": [
+              {
+                "term": null,
+                "score": null
+              }
+            ]
+          }
+        ],
+        "word_embeddings": [
+          {
+            "filename": null,
+            "page_index": null,
+            "sent_index": null,
+            "tok_index": null,
+            "token": null,
+            "lang": null,
+            "vector": null
+          }
+        ],
+        "document_primary_topics": [],
+        "document_topics": [
+          {
+            "term": null,
+            "score": null
+          }
+        ],
+        "embedding_backend": null,
+        "topics_removed_by_grammar": null
+      },
+      "ml100": {
+        "embedding_method": null,
+        "vector_dim": null,
+        "document_vector": null,
+        "chunk_count": null,
+        "chunks_embeddings": [
+          {
+            "doc_id": null,
+            "doc_key": null,
+            "filename": null,
+            "page_index": null,
+            "sent_index": null,
+            "text_preview": null,
+            "token_count": null,
+            "lang": null,
+            "vector": null,
+            "chunk_primary_topic": null,
+            "chunk_topics": [
+              {
+                "term": null,
+                "score": null
+              }
+            ]
+          }
+        ],
+        "word_embeddings": [
+          {
+            "filename": null,
+            "page_index": null,
+            "sent_index": null,
+            "tok_index": null,
+            "token": null,
+            "lang": null,
+            "vector": null
+          }
+        ],
+        "document_primary_topics": [],
+        "document_topics": [
+          {
+            "term": null,
+            "score": null
+          }
+        ],
+        "embedding_backend": null,
+        "topics_removed_by_grammar": null
+      },
+      "content": {
+        "visual_flags": {
+          "has_signature": null,
+          "has_stamp": null,
+          "has_barcode": null,
+          "has_qrcode": null
+        },
+        "content_type": null,
+        "classification": null,
+        "document_kind": null,
+        "detected_languages": []
+      }
+    }
+  ],
+  "cross_document_analysis": {
+    "method": null,
+    "documents_analyzed": null,
+    "pairs_evaluated": null,
+    "sentence_pairs_scored": null,
+    "chunk_pairs_scored": null,
+    "links_count": null,
+    "vector_profile": null,
+    "embedding_method": null,
+    "embedding_backend": null,
+    "vector_dim": null,
+    "vector_links_count": null,
+    "links": [
+      {
+        "link_id": null,
+        "score": null,
+        "doc_a": {
+          "document_id": null,
+          "filename": null
+        },
+        "doc_b": {
+          "document_id": null,
+          "filename": null
+        },
+        "shared_topics": [
+          {
+            "term": null,
+            "score": null,
+            "doc_a_examples": [],
+            "doc_b_examples": []
+          }
+        ],
+        "score_breakdown": {
+          "topic_overlap": null,
+          "best_sentence_score": null,
+          "signal_overlap": null,
+          "doc_vector_similarity": null,
+          "best_chunk_vector_score": null,
+          "best_chunk_cosine": null
+        },
+        "audit": {
+          "sentence_matches_count": null,
+          "matches": [
+            {
+              "score": null,
+              "shared_terms": [],
+              "shared_topics": [],
+              "phrase_a": {
+                "page_index": null,
+                "sent_index": null,
+                "text": null,
+                "text_excerpt": null,
+                "filename": null,
+                "document_id": null
+              },
+              "phrase_b": {
+                "page_index": null,
+                "sent_index": null,
+                "text": null,
+                "text_excerpt": null,
+                "filename": null,
+                "document_id": null
+              }
+            }
+          ]
+        },
+        "vector_audit": {
+          "profile": null,
+          "embedding_method": null,
+          "embedding_backend": null,
+          "vector_dim": null,
+          "doc_similarity": null,
+          "chunk_pairs_scored": null,
+          "chunk_pair_budget_applied": null,
+          "candidate_chunks_a": null,
+          "candidate_chunks_b": null,
+          "original_chunks_a": null,
+          "original_chunks_b": null,
+          "pairs_skipped_without_overlap": null,
+          "chunk_matches_count": null,
+          "best_chunk_similarity": null,
+          "best_chunk_hybrid_score": null,
+          "chunk_matches": [
+            {
+              "score": null,
+              "vector_similarity": null,
+              "shared_terms": [],
+              "shared_topics": [],
+              "chunk_a": {
+                "page_index": null,
+                "sent_index": null,
+                "text": null,
+                "text_excerpt": null,
+                "filename": null,
+                "document_id": null
+              },
+              "chunk_b": {
+                "page_index": null,
+                "sent_index": null,
+                "text": null,
+                "text_excerpt": null,
+                "filename": null,
+                "document_id": null
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "generated_at": null
+  },
+  "pipeline": {
+    "es_enabled": null,
+    "es_available": null,
+    "es_url": null,
+    "es_index": null,
+    "es_nlp_level": null,
+    "es_nlp_index": null,
+    "es_doc_ids": [],
+    "steps": [],
+    "durations": {},
+    "profile": null,
+    "0ml": {
+      "tables_docs_count": null,
+      "totals_verification_docs_count": null,
+      "totals_verification_ok_docs_count": null,
+      "totals_verification_partial_ok_docs_count": null,
+      "totals_verification_mismatch_docs_count": null,
+      "totals_verification_missing_docs_count": null,
+      "profile_name": "default"
+    },
+    "ml50": {
+      "embedding_method": null,
+      "vector_dim": null,
+      "doc_vectors_count": null,
+      "chunk_vectors_count": null,
+      "word_vectors_count": null,
+      "topics_docs_count": null,
+      "tables_docs_count": null,
+      "totals_verification_docs_count": null,
+      "totals_verification_ok_docs_count": null,
+      "totals_verification_partial_ok_docs_count": null,
+      "totals_verification_mismatch_docs_count": null,
+      "totals_verification_missing_docs_count": null,
+      "profile_name": "pipeline50ml"
+    },
+    "ml100": {
+      "embedding_method": null,
+      "vector_dim": null,
+      "doc_vectors_count": null,
+      "chunk_vectors_count": null,
+      "word_vectors_count": null,
+      "topics_docs_count": null,
+      "tables_docs_count": null,
+      "totals_verification_docs_count": null,
+      "totals_verification_ok_docs_count": null,
+      "totals_verification_partial_ok_docs_count": null,
+      "totals_verification_mismatch_docs_count": null,
+      "totals_verification_missing_docs_count": null,
+      "visual_detection_docs_count": null,
+      "visual_signature_docs_count": null,
+      "visual_stamp_docs_count": null,
+      "visual_barcode_docs_count": null,
+      "visual_qrcode_docs_count": null,
+      "profile_name": "pipeline100ml"
+    }
+  },
+  "registries": {
+    "document_ids": [],
+    "entity_registry": [],
+    "identifier_registry": [],
+    "topic_registry": [],
+    "reference_registry": []
+  },
+  "item_templates": {
+    "interdoc_link": {
+      "link_id": null,
+      "score": null,
+      "doc_a": {
+        "document_id": null,
+        "filename": null
+      },
+      "doc_b": {
+        "document_id": null,
+        "filename": null
+      },
+      "shared_topics": [
+        {
+          "term": null,
+          "score": null,
+          "doc_a_examples": [],
+          "doc_b_examples": []
+        }
+      ],
+      "score_breakdown": {
+        "topic_overlap": null,
+        "best_sentence_score": null,
+        "signal_overlap": null,
+        "doc_vector_similarity": null,
+        "best_chunk_vector_score": null,
+        "best_chunk_cosine": null
+      },
+      "audit": {
+        "sentence_matches_count": null,
+        "matches": [
+          {
+            "score": null,
+            "shared_terms": [],
+            "shared_topics": [],
+            "phrase_a": {
+              "page_index": null,
+              "sent_index": null,
+              "text": null,
+              "text_excerpt": null,
+              "filename": null,
+              "document_id": null
+            },
+            "phrase_b": {
+              "page_index": null,
+              "sent_index": null,
+              "text": null,
+              "text_excerpt": null,
+              "filename": null,
+              "document_id": null
+            }
+          }
+        ]
+      },
+      "vector_audit": {
+        "profile": null,
+        "embedding_method": null,
+        "embedding_backend": null,
+        "vector_dim": null,
+        "doc_similarity": null,
+        "chunk_pairs_scored": null,
+        "chunk_pair_budget_applied": null,
+        "candidate_chunks_a": null,
+        "candidate_chunks_b": null,
+        "original_chunks_a": null,
+        "original_chunks_b": null,
+        "pairs_skipped_without_overlap": null,
+        "chunk_matches_count": null,
+        "best_chunk_similarity": null,
+        "best_chunk_hybrid_score": null,
+        "chunk_matches": [
+          {
+            "score": null,
+            "vector_similarity": null,
+            "shared_terms": [],
+            "shared_topics": [],
+            "chunk_a": {
+              "page_index": null,
+              "sent_index": null,
+              "text": null,
+              "text_excerpt": null,
+              "filename": null,
+              "document_id": null
+            },
+            "chunk_b": {
+              "page_index": null,
+              "sent_index": null,
+              "text": null,
+              "text_excerpt": null,
+              "filename": null,
+              "document_id": null
+            }
+          }
+        ]
+      }
+    },
+    "topic_item": {
+      "term": null,
+      "score": null
+    },
+    "chunk_embedding_item": {
+      "doc_id": null,
+      "doc_key": null,
+      "filename": null,
+      "page_index": null,
+      "sent_index": null,
+      "text_preview": null,
+      "token_count": null,
+      "lang": null,
+      "vector": null,
+      "chunk_primary_topic": null,
+      "chunk_topics": [
+        {
+          "term": null,
+          "score": null
+        }
+      ]
+    },
+    "word_embedding_item": {
+      "filename": null,
+      "page_index": null,
+      "sent_index": null,
+      "tok_index": null,
+      "token": null,
+      "lang": null,
+      "vector": null
+    },
+    "table_item": {
+      "table_index": null,
+      "page_index": null,
+      "table_type": null,
+      "header_map": {
+        "reference": null,
+        "product": null,
+        "quantity": null,
+        "unit_price": null,
+        "total_ht": null,
+        "total_ttc": null,
+        "total": null
+      },
+      "header_score": null,
+      "detected_columns": [],
+      "rows_count": null,
+      "shape": {
+        "rows_estimated": null,
+        "columns_estimated": null,
+        "source": null
+      },
+      "rows": [
+        {
+          "table_index": null,
+          "page_index": null,
+          "row_index": null,
+          "reference": null,
+          "product": null,
+          "description": null,
+          "quantity": null,
+          "unit_price": null,
+          "total_ht": null,
+          "total_ttc": null,
+          "total": null,
+          "raw_cells": [],
+          "confidence": null
+        }
+      ]
+    },
+    "table_line_item": {
+      "table_index": null,
+      "page_index": null,
+      "row_index": null,
+      "reference": null,
+      "product": null,
+      "description": null,
+      "quantity": null,
+      "unit_price": null,
+      "total_ht": null,
+      "total_ttc": null,
+      "total": null,
+      "raw_cells": [],
+      "confidence": null
+    },
+    "regex_extraction_item": {
+      "doc_id": null,
+      "filename": null,
+      "doc_type": null,
+      "classification_status": null,
+      "ruleset": {
+        "routes_config": {
+          "include_common": null,
+          "default_rulesets": [],
+          "ruleset_mapping": {}
+        },
+        "applied_rulesets": []
+      },
+      "fields": {
+        "_dynamic_field_template": {
+          "rule_id": null,
+          "type": null,
+          "many": null,
+          "matches": [
+            {
+              "value": null,
+              "start": null,
+              "end": null,
+              "snippet": null,
+              "page_index": null
+            }
+          ]
+        }
+      },
+      "bm25": {
+        "k1": null,
+        "b": null,
+        "query_terms": [],
+        "chunks_total": null,
+        "top_chunks": [
+          {
+            "page_index": null,
+            "sent_index": null,
+            "score": null,
+            "text_preview": null
+          }
+        ],
+        "best_score": null,
+        "avg_top3_score": null
+      }
+    },
+    "sentence_item": {
+      "sentence_id": null,
+      "page_index": null,
+      "sent_index": null,
+      "lang": null,
+      "text": null,
+      "text_normalized": null,
+      "char_start": null,
+      "char_end": null,
+      "tokens_count": null,
+      "topic": null,
+      "source_location": {}
+    },
+    "token_item": {
+      "filename": null,
+      "page_index": null,
+      "sent_index": null,
+      "tok_index": null,
+      "token": null,
+      "pos": null,
+      "lemma": null,
+      "ner": null,
+      "lang": null,
+      "xlmr_backend": null
+    },
+    "visual_mark_item": {
+      "type": null,
+      "kind": null,
+      "score": null,
+      "confidence": null,
+      "bbox_px": {
+        "x0": null,
+        "y0": null,
+        "x1": null,
+        "y1": null
+      },
+      "bbox_norm": {
+        "x0": null,
+        "y0": null,
+        "x1": null,
+        "y1": null
+      },
+      "page_width": null,
+      "page_height": null,
+      "page_index": null,
+      "source": null,
+      "engine": null,
+      "decoded_value": null
+    },
+    "totals_issue_location_item": {
+      "kind": null,
+      "table_index": null,
+      "page_index": null,
+      "computed": null,
+      "declared": null,
+      "source_location": {
+        "page_index": null,
+        "sent_index": null,
+        "layout_kind": null,
+        "line": null,
+        "col": null,
+        "chunk_start": null,
+        "chunk_end": null,
+        "chunk_text_excerpt": null,
+        "match_score": null,
+        "table_index": null,
+        "field": null
+      }
+    },
+    "classification_keyword_match_item": {
+      "keyword": null,
+      "count": null
+    },
+    "classification_score_keyword_item": {
+      "keyword": null,
+      "bucket": null,
+      "count": null,
+      "score": null
+    },
+    "source_location_item": {
+      "page_index": null,
+      "sent_index": null,
+      "layout_kind": null,
+      "line": null,
+      "col": null,
+      "chunk_start": null,
+      "chunk_end": null,
+      "chunk_text_excerpt": null,
+      "match_score": null,
+      "table_index": null,
+      "field": null,
+      "match_start_in_chunk": null,
+      "match_end_in_chunk": null
+    },
+    "page_item": {
+      "page_index": null,
+      "text": null,
+      "page_text": null,
+      "lang": null,
+      "source_path": null,
+      "chars": null,
+      "recompose_ok": null,
+      "sentences_layout": [
+        {
+          "page_index": null,
+          "sent_index": null,
+          "text": null,
+          "start": null,
+          "end": null,
+          "chars": null,
+          "line": null,
+          "col": null,
+          "col_index": null,
+          "layout_kind": null,
+          "is_sentence": null,
+          "is_noise": null,
+          "nonspace": null,
+          "spans": [],
+          "header_rows": [],
+          "header_cells": [],
+          "header_source": null,
+          "table_rows": []
+        }
+      ]
+    },
+    "regex_field_match_item": {
+      "value": null,
+      "start": null,
+      "end": null,
+      "snippet": null,
+      "page_index": null
+    },
+    "regex_field_item": {
+      "rule_id": null,
+      "type": null,
+      "many": null,
+      "matches": [
+        {
+          "value": null,
+          "start": null,
+          "end": null,
+          "snippet": null,
+          "page_index": null
+        }
+      ]
+    },
+    "bm25_chunk_item": {
+      "page_index": null,
+      "sent_index": null,
+      "score": null,
+      "text_preview": null
+    },
+    "totals_row_audit_item": {
+      "page_index": null,
+      "table_index": null,
+      "row_index": null,
+      "label": null,
+      "raw_cells": [],
+      "quantity": null,
+      "unit_price": null,
+      "declared_total": null,
+      "computed_total": null,
+      "effective_total": null,
+      "effective_total_source": null,
+      "status": null,
+      "difference": null,
+      "source_location": {
+        "page_index": null,
+        "sent_index": null,
+        "layout_kind": null,
+        "line": null,
+        "col": null,
+        "chunk_start": null,
+        "chunk_end": null,
+        "chunk_text_excerpt": null,
+        "match_score": null,
+        "table_index": null,
+        "field": null
+      }
+    },
+    "nlp_sentence_item": {
+      "filename": null,
+      "page_index": null,
+      "sent_index": null,
+      "lang": null,
+      "text": null
+    },
+    "nlp_entity_item": {
+      "filename": null,
+      "page_index": null,
+      "sent_index": null,
+      "lang": null,
+      "type": null,
+      "text": null
+    },
+    "classification_score_audit_item": {
+      "score_total": null,
+      "matched_keywords": [
+        {
+          "keyword": null,
+          "bucket": null,
+          "count": null,
+          "score": null
+        }
+      ],
+      "matched_keywords_compact": []
+    },
+    "quality_check_item": {
+      "check": null,
+      "engine": null,
+      "status": null,
+      "passed": null,
+      "complete": null,
+      "row_mismatch_count": null,
+      "rows_verified": null,
+      "computed_subtotal": null,
+      "declared_subtotal": null,
+      "declared_tax": null,
+      "declared_total": null,
+      "issue_locations": [
+        {
+          "kind": null,
+          "table_index": null,
+          "page_index": null,
+          "computed": null,
+          "declared": null,
+          "source_location": {
+            "page_index": null,
+            "sent_index": null,
+            "layout_kind": null,
+            "line": null,
+            "col": null,
+            "chunk_start": null,
+            "chunk_end": null,
+            "chunk_text_excerpt": null,
+            "match_score": null,
+            "table_index": null,
+            "field": null
+          }
+        }
+      ]
+    }
+  },
+  "sql_mapping_hints": {
+    "documents_table": "documents",
+    "child_tables": [
+      "document_pages",
+      "document_sections",
+      "document_blocks",
+      "document_lines",
+      "document_words",
+      "document_sentences",
+      "document_tokens",
+      "document_entities",
+      "document_relations",
+      "document_tables",
+      "document_table_rows",
+      "document_visual_marks",
+      "document_quality_checks",
+      "document_topics"
+    ],
+    "bridge_tables": [
+      "document_document_links",
+      "document_entity_links",
+      "document_identifier_links",
+      "document_topic_links"
+    ],
+    "stable_ids_required": true
+  }
+}

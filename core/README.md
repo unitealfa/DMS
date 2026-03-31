@@ -206,3 +206,59 @@ ES garde:
   - la classification,
   - l’extraction de règles (résumé + payload complet),
   - les métadonnées (fichier, langue, timestamps, type document).
+
+
+
+utilisation api a distance lacer avec :  python local_api.py --host 0.0.0.0 --port 8765 
+
+une requête HTTP vers :
+
+  http://127.0.0.1:8765/api/run
+
+  avec des fichiers dans un multipart/form-data champ files, alors ça lance le pipeline.
+
+  Le backend exécute alors l’équivalent de :
+
+  python main.py <fichiers_uploades> --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
+
+  Endpoints utiles :
+
+  - page :
+
+  GET http://127.0.0.1:8765/
+
+  - lancer :
+
+  POST http://127.0.0.1:8765/api/run
+
+  - statut :
+
+  GET http://127.0.0.1:8765/api/status
+
+  Important :
+
+  - 127.0.0.1 marche seulement si le front tourne sur la même machine que l’API
+  - si le front est sur une autre machine, il faut utiliser :
+
+  http://IP_DE_LA_MACHINE_BACK:8765
+
+  Format attendu pour lancer :
+
+  - POST /api/run
+  - Content-Type: multipart/form-data
+  - champ fichier : files
+  - plusieurs fichiers possibles avec le même champ files
+
+  Exemple JS :
+
+  const formData = new FormData();
+  formData.append("files", file1);
+  formData.append("files", file2);
+
+  const res = await fetch("http://127.0.0.1:8765/api/run", {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await res.json();
+  console.log(data);

@@ -1,6 +1,6 @@
 # FUNCTION_INDEX
 # Regenerated: 2026-03-31
-# Entries: 757
+# Entries: 785
 
 component/atrribution-gramatical/arabcode.py:11:def _install_help
 component/atrribution-gramatical/arabcode.py:87:def simple_tokenize
@@ -723,6 +723,34 @@ pipeline/elasticsearch.py:1038:def _build_nlp_token_doc_id
 pipeline/elasticsearch.py:1049:def _bulk_index_nlp_tokens
 pipeline/elasticsearch.py:1079:def sync_nlp_results
 pipeline/elasticsearch.py:1254:def maybe_build_store
+pipeline/local_api.py:36:def _pid_from_pid_file
+pipeline/local_api.py:45:def _is_process_alive
+pipeline/local_api.py:55:def _iso_now
+pipeline/local_api.py:59:def _json_bytes
+pipeline/local_api.py:63:def _discover_ipv4_addresses
+pipeline/local_api.py:82:def _candidate_urls
+pipeline/local_api.py:97:def _sanitize_filename
+pipeline/local_api.py:104:def _extract_uploaded_files
+pipeline/local_api.py:139:def save_uploaded_files
+pipeline/local_api.py:162:def build_cli_command
+pipeline/local_api.py:171:class LauncherState
+pipeline/local_api.py:172:def __init__
+pipeline/local_api.py:188:def snapshot
+pipeline/local_api.py:192:def start_job
+pipeline/local_api.py:229:def _wait_for_process
+pipeline/local_api.py:242:class DMSLauncherHandler
+pipeline/local_api.py:246:def launcher_state
+pipeline/local_api.py:249:def _send_json
+pipeline/local_api.py:257:def _send_html_file
+pipeline/local_api.py:265:def log_message
+pipeline/local_api.py:268:def do_GET
+pipeline/local_api.py:284:def do_POST
+pipeline/local_api.py:314:class DMSLauncherServer
+pipeline/local_api.py:317:def __init__
+pipeline/local_api.py:322:def parse_args
+pipeline/local_api.py:329:def serve
+pipeline/local_api.py:354:def _graceful_stop
+pipeline/local_api.py:377:def main
 pipeline/orchestrator.py:24:class PipelineOrchestrator
 pipeline/orchestrator.py:25:def __init__
 pipeline/orchestrator.py:42:def list_steps

@@ -19,3 +19,5 @@ include = ["pipeline"]
 orchestre = "pipeline.cli:main"
 # Alias optionnel si tu préfères `main` (évite l'erreur "no matching result")
 main = "pipeline.cli:main"
+# API locale pour piloter le pipeline depuis index.html
+dms-local-api = "pipeline.local_api:main"

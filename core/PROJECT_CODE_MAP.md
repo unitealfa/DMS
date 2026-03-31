@@ -5,17 +5,20 @@ Date d'audit: 2026-03-19
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
 - Python files analyses: 32
-- Fonctions/classes indexees: 757 (voir `FUNCTION_INDEX.txt`)
+- Fonctions/classes indexees: 785 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 - Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
 ## 2) Points d'entree
 - CLI principal: `main.py` -> `pipeline.cli:main`
+- API locale: `local_api.py` -> `pipeline.local_api:main`
 - CLI package: `orchestre` (defini dans `pyproject.toml`)
+- Script package API locale: `dms-local-api` (defini dans `pyproject.toml`)
 - Parsing des options: `pipeline/cli.py`
 - Orchestrateurs:
   - `pipeline/orchestrator.py` (contient `PipelineOrchestrator` + `Pipeline50MLOrchestrator` + `Pipeline100MLOrchestrator`)
 - Wrappers d'execution des composants: `pipeline/components.py`
+- Serveur HTTP/API local: `pipeline/local_api.py`
 - Document de lecture rapide des 3 pipelines: `EXPLICATION_PIPELINES.txt`
 - Page HTML racine minimale: `index.html` (selection/drop de documents + bouton `Lancer`)
 
@@ -512,6 +515,26 @@ Reference implementation:
 
 ## 11) Changelog code
 - 2026-03-29:
+  - `pipeline/local_api.py`:
+    - nouveau serveur HTTP local sur `localhost`.
+    - expose `GET /` pour servir `index.html`.
+    - expose `POST /api/run` pour uploader les documents selectionnes puis lancer `main.py`.
+    - expose `GET /api/status` pour suivre l'etat du job en cours.
+    - affiche au demarrage le `pid`, le bind host/port et les URLs locales/reseau candidates.
+    - gere un arret propre au `Ctrl+C` / `SIGTERM` en mode foreground.
+    - si le port est deja occupe, renvoie maintenant une erreur explicite avec commande de stop ou proposition de port alternatif.
+    - execute le pipeline via sous-processus avec les memes flags par defaut que la commande CLI:
+      - `--use-elasticsearch`
+      - `--es-nlp-level full`
+      - `--es-nlp-index dms_nlp_tokens`
+    - les sorties du pipeline restent imprimees dans le terminal qui heberge l'API.
+  - `local_api.py`:
+    - lanceur racine simple pour demarrer l'API locale via `python local_api.py`.
+  - `index.html`:
+    - bouton `Lancer` branche sur `POST /api/run`.
+    - polling de `GET /api/status` pour afficher l'etat du job.
+  - `pyproject.toml`:
+    - ajoute la commande package `dms-local-api`.
   - `index.html`:
     - nouvelle page one-page statique a la racine.
     - permet de selectionner ou deposer des documents.

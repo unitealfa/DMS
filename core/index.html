@@ -129,7 +129,7 @@
 <body>
   <main class="page">
     <h1>DMS Launcher</h1>
-    <p>Glisse tes documents ici ou clique pour les sélectionner, puis lance.</p>
+    <p>Glisse tes documents ici ou clique pour les sélectionner, puis lance via l'API locale.</p>
 
     <label class="dropzone" id="dropzone" for="file-input">
       <span>
@@ -155,6 +155,40 @@
     const status = document.getElementById("status");
 
     let selectedFiles = [];
+    let statusTimer = null;
+
+    function stopPolling() {
+      if (statusTimer) {
+        clearInterval(statusTimer);
+        statusTimer = null;
+      }
+    }
+
+    async function refreshJobStatus() {
+      try {
+        const response = await fetch("/api/status");
+        const data = await response.json();
+        if (!data || data.status === "idle") {
+          return;
+        }
+        if (data.status === "running") {
+          status.textContent = `Pipeline en cours... pid=${data.pid} | job=${data.job_id}`;
+          return;
+        }
+        if (data.status === "completed") {
+          status.textContent = `Pipeline terminé avec succès. job=${data.job_id}`;
+          stopPolling();
+          return;
+        }
+        if (data.status === "failed") {
+          status.textContent = `Pipeline terminé en erreur (code ${data.returncode}). job=${data.job_id}`;
+          stopPolling();
+        }
+      } catch (error) {
+        status.textContent = `API locale indisponible: ${error.message}`;
+        stopPolling();
+      }
+    }
 
     function renderFiles() {
       filesList.innerHTML = "";
@@ -194,8 +228,37 @@
       setFiles(event.dataTransfer.files);
     });
 
-    launchBtn.addEventListener("click", () => {
-      status.textContent = `Lancement demandé pour ${selectedFiles.length} document(s).`;
+    launchBtn.addEventListener("click", async () => {
+      if (!selectedFiles.length) {
+        return;
+      }
+
+      const formData = new FormData();
+      selectedFiles.forEach((file) => {
+        formData.append("files", file, file.name);
+      });
+
+      launchBtn.disabled = true;
+      status.textContent = `Upload et lancement de ${selectedFiles.length} document(s)...`;
+
+      try {
+        const response = await fetch("/api/run", {
+          method: "POST",
+          body: formData
+        });
+        const payload = await response.json();
+        if (!response.ok || !payload.ok) {
+          throw new Error(payload.error || "Echec du lancement");
+        }
+        status.textContent = `Pipeline lancé. job=${payload.job.job_id}`;
+        stopPolling();
+        statusTimer = setInterval(refreshJobStatus, 1500);
+        refreshJobStatus();
+      } catch (error) {
+        status.textContent = `Erreur: ${error.message}`;
+      } finally {
+        renderFiles();
+      }
     });
   </script>
 </body>

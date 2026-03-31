@@ -5,7 +5,7 @@ Date d'audit: 2026-03-19
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
 - Python files analyses: 32
-- Fonctions/classes indexees: 785 (voir `FUNCTION_INDEX.txt`)
+- Fonctions/classes indexees: 790 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 - Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
@@ -523,6 +523,10 @@ Reference implementation:
     - affiche au demarrage le `pid`, le bind host/port et les URLs locales/reseau candidates.
     - gere un arret propre au `Ctrl+C` / `SIGTERM` en mode foreground.
     - si le port est deja occupe, renvoie maintenant une erreur explicite avec commande de stop ou proposition de port alternatif.
+    - parsing multipart corrige pour `POST /api/run` (`files`, `files[]`, `file`).
+    - ajoute les en-tetes CORS et `OPTIONS` pour front externe.
+    - expose un etat temps reel enrichi (`current_step`, `progress_percent`, `last_log_line`).
+    - expose aussi `api_version` pour detecter proprement un backend obsolete encore en memoire.
     - execute le pipeline via sous-processus avec les memes flags par defaut que la commande CLI:
       - `--use-elasticsearch`
       - `--es-nlp-level full`
@@ -532,7 +536,11 @@ Reference implementation:
     - lanceur racine simple pour demarrer l'API locale via `python local_api.py`.
   - `index.html`:
     - bouton `Lancer` branche sur `POST /api/run`.
+    - utilise explicitement l'API `http://127.0.0.1:8765`.
     - polling de `GET /api/status` pour afficher l'etat du job.
+    - ajoute une barre de progression et le composant courant du traitement en temps reel.
+    - affiche un message final explicite quand le traitement est termine.
+    - detecte maintenant un backend API trop ancien sur `8765` et affiche un message de relance au lieu de laisser un `400` opaque.
   - `pyproject.toml`:
     - ajoute la commande package `dms-local-api`.
   - `index.html`:

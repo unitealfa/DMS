@@ -18,12 +18,20 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Dict, List
 
+from .cli import PIPELINE_DEFAULT_CODE, _normalize_pipeline_name
+from .orchestrator import PipelineOrchestrator, Pipeline50MLOrchestrator, Pipeline100MLOrchestrator
+
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 INDEX_HTML_PATH = REPO_ROOT / "index.html"
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
 PID_FILE = REPO_ROOT / ".dms_local_api.pid"
+API_VERSION = "dms-local-api-2026-03-31-v2"
+LOG_PATH_CANDIDATES = [
+    REPO_ROOT / "outputgeneralterminal.runtime.txt",
+    REPO_ROOT / "outputgeneralterminal.txt",
+]
 DEFAULT_PIPELINE_ARGS = [
     "--use-elasticsearch",
     "--es-nlp-level",
@@ -52,12 +60,68 @@ def _is_process_alive(pid: int | None) -> bool:
         return False
 
 
+def _active_pipeline_steps() -> List[str]:
+    raw = os.environ.get("PIPELINE_DEFAULT") or os.environ.get("PIPELINE_PROFILE") or PIPELINE_DEFAULT_CODE
+    profile = _normalize_pipeline_name(raw, "default")
+    if profile == "pipeline50ml":
+        return Pipeline50MLOrchestrator(REPO_ROOT).list_steps()
+    if profile == "pipeline100ml":
+        return Pipeline100MLOrchestrator(REPO_ROOT).list_steps()
+    return PipelineOrchestrator(REPO_ROOT).list_steps()
+
+
 def _iso_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
 def _json_bytes(payload: Dict[str, Any]) -> bytes:
     return json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8")
+
+
+def _tail_recent_lines(path: Path, limit: int = 160) -> List[str]:
+    if not path.exists():
+        return []
+    try:
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except Exception:
+        return []
+    return lines[-limit:]
+
+
+def _current_runtime_progress(status: str) -> Dict[str, Any]:
+    steps = _active_pipeline_steps()
+    log_path = next((path for path in LOG_PATH_CANDIDATES if path.exists()), None)
+    lines = _tail_recent_lines(log_path) if log_path else []
+    current_step = None
+    last_log_line = None
+
+    for line in lines:
+        if line.strip():
+            last_log_line = line.strip()
+        marker = "Execution du composant "
+        if marker in line:
+            current_step = line.split(marker, 1)[1].split(" via", 1)[0].strip()
+
+    progress_percent = 0
+    completed_steps = 0
+    if status == "completed":
+        progress_percent = 100
+        completed_steps = len(steps)
+        current_step = current_step or (steps[-1] if steps else None)
+    elif current_step and current_step in steps:
+        step_index = steps.index(current_step)
+        completed_steps = step_index
+        progress_percent = max(3, min(97, int(((step_index + 0.5) / max(len(steps), 1)) * 100)))
+
+    return {
+        "pipeline_steps": steps,
+        "pipeline_steps_count": len(steps),
+        "completed_steps_count": completed_steps,
+        "current_step": current_step,
+        "progress_percent": progress_percent,
+        "last_log_line": last_log_line,
+        "log_path": str(log_path) if log_path else None,
+    }
 
 
 def _discover_ipv4_addresses() -> List[str]:
@@ -112,13 +176,25 @@ def _extract_uploaded_files(handler: BaseHTTPRequestHandler) -> List[Dict[str, A
         environ={
             "REQUEST_METHOD": "POST",
             "CONTENT_TYPE": content_type,
+            "CONTENT_LENGTH": handler.headers.get("Content-Length", "0"),
         },
     )
 
-    if "files" not in form:
-        raise ValueError("Aucun champ 'files' recu.")
+    raw_items = None
+    for field_name in ("files", "files[]", "file"):
+        if field_name in form:
+            raw_items = form[field_name]
+            break
+    if raw_items is None:
+        fallback_items = []
+        for item in form.list or []:
+            if getattr(item, "filename", None):
+                fallback_items.append(item)
+        raw_items = fallback_items
 
-    raw_items = form["files"]
+    if raw_items is None or (isinstance(raw_items, list) and not raw_items):
+        raise ValueError("Aucun champ fichier recu. Le backend attend 'files' ou 'files[]'.")
+
     if not isinstance(raw_items, list):
         raw_items = [raw_items]
 
@@ -126,11 +202,12 @@ def _extract_uploaded_files(handler: BaseHTTPRequestHandler) -> List[Dict[str, A
     for idx, field in enumerate(raw_items, start=1):
         if not getattr(field, "file", None):
             continue
+        payload = field.file.read()
         items.append(
             {
                 "index": idx,
                 "filename": _sanitize_filename(getattr(field, "filename", ""), idx),
-                "file": field.file,
+                "content": payload,
             }
         )
     return items
@@ -154,7 +231,7 @@ def save_uploaded_files(upload_items: List[Dict[str, Any]], job_id: str) -> List
         used_names.add(candidate.lower())
         destination = target_dir / candidate
         with destination.open("wb") as fh:
-            shutil.copyfileobj(item["file"], fh)
+            fh.write(item.get("content") or b"")
         saved_paths.append(destination)
     return saved_paths
 
@@ -187,7 +264,10 @@ class LauncherState:
 
     def snapshot(self) -> Dict[str, Any]:
         with self._lock:
-            return dict(self._current)
+            snap = dict(self._current)
+        snap["api_version"] = API_VERSION
+        snap.update(_current_runtime_progress(str(snap.get("status") or "")))
+        return snap
 
     def start_job(
         self,
@@ -246,9 +326,15 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
     def launcher_state(self) -> LauncherState:
         return self.server.launcher_state  # type: ignore[attr-defined]
 
+    def _send_cors_headers(self) -> None:
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
     def _send_json(self, payload: Dict[str, Any], status: int = HTTPStatus.OK) -> None:
         raw = _json_bytes(payload)
         self.send_response(status)
+        self._send_cors_headers()
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(raw)))
         self.end_headers()
@@ -257,6 +343,7 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
     def _send_html_file(self, path: Path) -> None:
         raw = path.read_bytes()
         self.send_response(HTTPStatus.OK)
+        self._send_cors_headers()
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(raw)))
         self.end_headers()
@@ -280,6 +367,11 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
             return
 
         self._send_json({"error": "Not found"}, status=HTTPStatus.NOT_FOUND)
+
+    def do_OPTIONS(self) -> None:  # noqa: N802
+        self.send_response(HTTPStatus.NO_CONTENT)
+        self._send_cors_headers()
+        self.end_headers()
 
     def do_POST(self) -> None:  # noqa: N802
         if self.path != "/api/run":
@@ -344,6 +436,7 @@ def serve(host: str = DEFAULT_HOST, port: int = DEFAULT_PORT) -> None:
         raise
     PID_FILE.write_text(str(os.getpid()), encoding="utf-8")
     print(f"[local-api] pid={os.getpid()}")
+    print(f"[local-api] api_version={API_VERSION}")
     print(f"[local-api] host bind={host}:{port}")
     for url in _candidate_urls(host, port):
         print(f"[local-api] url={url}")

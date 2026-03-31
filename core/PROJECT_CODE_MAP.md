@@ -17,6 +17,7 @@ Date d'audit: 2026-03-19
   - `pipeline/orchestrator.py` (contient `PipelineOrchestrator` + `Pipeline50MLOrchestrator` + `Pipeline100MLOrchestrator`)
 - Wrappers d'execution des composants: `pipeline/components.py`
 - Document de lecture rapide des 3 pipelines: `EXPLICATION_PIPELINES.txt`
+- Page HTML racine minimale: `index.html` (selection/drop de documents + bouton `Lancer`)
 
 ## 3) Pipeline reel (ordre d'execution)
 - Pipeline `default`:
@@ -511,6 +512,10 @@ Reference implementation:
 
 ## 11) Changelog code
 - 2026-03-29:
+  - `index.html`:
+    - nouvelle page one-page statique a la racine.
+    - permet de selectionner ou deposer des documents.
+    - affiche la liste des fichiers choisis et un bouton `Lancer`.
   - `prompt_output.json`:
     - sortie JSON stricte regeneree selon la version courante de `prompt.txt`.
     - aligne le schema final unifie sur les cles racine demandees:

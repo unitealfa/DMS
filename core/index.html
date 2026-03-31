@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DMS Launcher</title>
+  <style>
+    :root {
+      --bg: #111111;
+      --panel: #1b1b1b;
+      --border: #343434;
+      --text: #f3f3f3;
+      --muted: #a7a7a7;
+      --accent: #f5f5f5;
+      --accent-text: #111111;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at top, #232323 0%, #111111 55%),
+        linear-gradient(180deg, #101010 0%, #171717 100%);
+      color: var(--text);
+      font: 16px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .page {
+      width: min(680px, calc(100vw - 32px));
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: rgba(27, 27, 27, 0.92);
+      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.35);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0 0 18px;
+      color: var(--muted);
+    }
+
+    .dropzone {
+      width: 100%;
+      min-height: 180px;
+      padding: 20px;
+      border: 2px dashed #4a4a4a;
+      border-radius: 16px;
+      background: #151515;
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+      cursor: pointer;
+    }
+
+    .dropzone.dragover {
+      border-color: #d6d6d6;
+      background: #202020;
+      color: var(--text);
+    }
+
+    .dropzone strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text);
+      font-size: 18px;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .files {
+      margin: 18px 0 20px;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    .files li {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #131313;
+      color: var(--text);
+      word-break: break-word;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--accent);
+      color: var(--accent-text);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <h1>DMS Launcher</h1>
+    <p>Glisse tes documents ici ou clique pour les sélectionner, puis lance.</p>
+
+    <label class="dropzone" id="dropzone" for="file-input">
+      <span>
+        <strong>Déposer les documents</strong>
+        PDF, DOCX, TXT, PNG, WEBP, XLSX
+      </span>
+    </label>
+    <input id="file-input" type="file" multiple>
+
+    <ul class="files" id="files-list"></ul>
+
+    <div class="actions">
+      <button id="launch-btn" type="button" disabled>Lancer</button>
+      <span class="status" id="status">Aucun document sélectionné.</span>
+    </div>
+  </main>
+
+  <script>
+    const input = document.getElementById("file-input");
+    const dropzone = document.getElementById("dropzone");
+    const filesList = document.getElementById("files-list");
+    const launchBtn = document.getElementById("launch-btn");
+    const status = document.getElementById("status");
+
+    let selectedFiles = [];
+
+    function renderFiles() {
+      filesList.innerHTML = "";
+      selectedFiles.forEach((file) => {
+        const item = document.createElement("li");
+        item.textContent = `${file.name} (${file.size} octets)`;
+        filesList.appendChild(item);
+      });
+      launchBtn.disabled = selectedFiles.length === 0;
+      status.textContent = selectedFiles.length
+        ? `${selectedFiles.length} document(s) prêt(s).`
+        : "Aucun document sélectionné.";
+    }
+
+    function setFiles(fileList) {
+      selectedFiles = Array.from(fileList || []);
+      renderFiles();
+    }
+
+    input.addEventListener("change", () => setFiles(input.files));
+
+    ["dragenter", "dragover"].forEach((eventName) => {
+      dropzone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        dropzone.classList.add("dragover");
+      });
+    });
+
+    ["dragleave", "drop"].forEach((eventName) => {
+      dropzone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        dropzone.classList.remove("dragover");
+      });
+    });
+
+    dropzone.addEventListener("drop", (event) => {
+      setFiles(event.dataTransfer.files);
+    });
+
+    launchBtn.addEventListener("click", () => {
+      status.textContent = `Lancement demandé pour ${selectedFiles.length} document(s).`;
+    });
+  </script>
+</body>
+</html>

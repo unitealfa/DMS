@@ -1,5 +1,5 @@
 # FUNCTION_INDEX
-# Regenerated: 2026-03-29
+# Regenerated: 2026-03-31
 # Entries: 757
 
 component/atrribution-gramatical/arabcode.py:11:def _install_help

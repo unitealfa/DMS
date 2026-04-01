@@ -1749,6 +1749,59 @@ _PROFILE_AUGMENT_CONFIG: Dict[str, Dict[str, str]] = {
     },
 }
 
+
+def _normalize_pipeline_profile(value: Any) -> str:
+    raw = str(value or "").strip().lower()
+    if raw in {"pipeline50ml", "50ml"}:
+        return "pipeline50ml"
+    if raw in {"pipeline100ml", "100ml"}:
+        return "pipeline100ml"
+    return "pipelinorchestrator"
+
+
+def _active_doc_section(profile: str) -> Optional[str]:
+    normalized = _normalize_pipeline_profile(profile)
+    if normalized == "pipeline50ml":
+        return "ml50"
+    if normalized == "pipeline100ml":
+        return "ml100"
+    return None
+
+
+def _purge_inactive_profile_payload(doc: Dict[str, Any], profile: str) -> None:
+    active_section = _active_doc_section(profile)
+    for section in ("ml50", "ml100"):
+        if section != active_section:
+            doc.pop(section, None)
+
+    components = doc.get("components")
+    if isinstance(components, dict):
+        inactive_component_keys = {
+            "pipelinorchestrator": {
+                "tokenisation_layout_50ml",
+                "tokenisation_layout_100ml",
+                "extraction_regles_50ml",
+                "extraction_regles_100ml",
+                "table_extraction_50ml",
+                "table_extraction_100ml",
+                "detection_signature_chachet_codebarr_100ml",
+            },
+            "pipeline50ml": {
+                "tokenisation_layout_100ml",
+                "extraction_regles_100ml",
+                "table_extraction_100ml",
+                "detection_signature_chachet_codebarr_100ml",
+            },
+            "pipeline100ml": {
+                "tokenisation_layout_50ml",
+                "extraction_regles_50ml",
+                "table_extraction_50ml",
+            },
+        }
+        for key in inactive_component_keys.get(_normalize_pipeline_profile(profile), set()):
+            components.pop(key, None)
+        doc["components"] = components
+
 _GRAMMAR_BLOCK_POS = {
     "PRON", "DET", "ADP", "CCONJ", "SCONJ", "CONJ", "PART", "AUX", "INTJ", "PUNCT", "SYM",
     "ADV", "RB", "RBR", "RBS",
@@ -1954,7 +2007,8 @@ def _filter_chunk_topics(chunks: Any, blocked_terms: Set[str]) -> Tuple[List[Dic
 
 
 def _augment_payload_for_profile(ctx: Dict[str, Any], payload: Dict[str, Any], profile: str) -> Dict[str, Any]:
-    cfg = _PROFILE_AUGMENT_CONFIG.get(str(profile or "").strip().lower())
+    profile = _normalize_pipeline_profile(profile)
+    cfg = _PROFILE_AUGMENT_CONFIG.get(profile)
     if not cfg:
         return payload
 
@@ -1971,6 +2025,7 @@ def _augment_payload_for_profile(ctx: Dict[str, Any], payload: Dict[str, Any], p
     for doc in docs:
         if not isinstance(doc, dict):
             continue
+        _purge_inactive_profile_payload(doc, profile)
         doc_id = doc.get("document_id")
         filename = (doc.get("file") or {}).get("name") if isinstance(doc.get("file"), dict) else None
         key = _profile_doc_key(doc_id, filename)
@@ -2111,8 +2166,8 @@ def _augment_payload_for_profile(ctx: Dict[str, Any], payload: Dict[str, Any], p
 
 
 def _augment_payload_with_default_tables(ctx: Dict[str, Any], payload: Dict[str, Any]) -> Dict[str, Any]:
-    profile = str(ctx.get("PIPELINE_PROFILE") or "default").strip().lower()
-    if profile not in {"default", "pipelinorchestrator", "pipelineorchestrator", "0ml"}:
+    profile = _normalize_pipeline_profile(ctx.get("PIPELINE_PROFILE"))
+    if profile != "pipelinorchestrator":
         return payload
 
     docs = _safe_list(payload.get("documents"))
@@ -2127,6 +2182,7 @@ def _augment_payload_with_default_tables(ctx: Dict[str, Any], payload: Dict[str,
     for doc in docs:
         if not isinstance(doc, dict):
             continue
+        _purge_inactive_profile_payload(doc, profile)
 
         doc_id = doc.get("document_id")
         filename = (doc.get("file") or {}).get("name") if isinstance(doc.get("file"), dict) else None
@@ -2178,7 +2234,7 @@ def _augment_payload_with_default_tables(ctx: Dict[str, Any], payload: Dict[str,
     pipeline = payload.get("pipeline")
     if not isinstance(pipeline, dict):
         pipeline = {}
-    pipeline["profile"] = "default"
+    pipeline["profile"] = "pipelinorchestrator"
     pipeline["0ml"] = {
         "tables_docs_count": len(_safe_list(table_rows)),
     }
@@ -2222,6 +2278,7 @@ def _append_totals_quality_check(doc: Dict[str, Any], verify_row: Dict[str, Any]
 
 
 def _augment_payload_with_totals_verification(ctx: Dict[str, Any], payload: Dict[str, Any], profile: str) -> Dict[str, Any]:
+    profile = _normalize_pipeline_profile(profile)
     docs = _safe_list(payload.get("documents"))
     if not docs:
         return payload
@@ -2239,6 +2296,7 @@ def _augment_payload_with_totals_verification(ctx: Dict[str, Any], payload: Dict
     for doc in docs:
         if not isinstance(doc, dict):
             continue
+        _purge_inactive_profile_payload(doc, profile)
         doc_id = doc.get("document_id")
         filename = (doc.get("file") or {}).get("name") if isinstance(doc.get("file"), dict) else None
         verify_row = totals_map.get(_profile_doc_key(doc_id, filename)) or {}
@@ -2323,12 +2381,12 @@ def _augment_payload_with_totals_verification(ctx: Dict[str, Any], payload: Dict
         pipeline = {}
 
     target = None
-    if str(profile or "").strip().lower() == "pipeline50ml":
+    if profile == "pipeline50ml":
         target = pipeline.get("ml50")
         if not isinstance(target, dict):
             target = {}
         pipeline["ml50"] = target
-    elif str(profile or "").strip().lower() == "pipeline100ml":
+    elif profile == "pipeline100ml":
         target = pipeline.get("ml100")
         if not isinstance(target, dict):
             target = {}
@@ -2352,7 +2410,8 @@ def _augment_payload_with_totals_verification(ctx: Dict[str, Any], payload: Dict
 
 
 def _augment_payload_with_visual_marks_100ml(ctx: Dict[str, Any], payload: Dict[str, Any], profile: str) -> Dict[str, Any]:
-    if str(profile or "").strip().lower() != "pipeline100ml":
+    profile = _normalize_pipeline_profile(profile)
+    if profile != "pipeline100ml":
         return payload
 
     docs = _safe_list(payload.get("documents"))
@@ -2368,6 +2427,7 @@ def _augment_payload_with_visual_marks_100ml(ctx: Dict[str, Any], payload: Dict[
     for doc in docs:
         if not isinstance(doc, dict):
             continue
+        _purge_inactive_profile_payload(doc, profile)
         doc_id = doc.get("document_id")
         filename = (doc.get("file") or {}).get("name") if isinstance(doc.get("file"), dict) else None
         key = _profile_doc_key(doc_id, filename)
@@ -2487,12 +2547,19 @@ def main() -> None:
             payload = build_payload_from_context(ctx)
             payloads = [payload]
 
-    profile = str(ctx.get("PIPELINE_PROFILE") or "default").strip().lower()
+    profile = _normalize_pipeline_profile(ctx.get("PIPELINE_PROFILE"))
+    ctx["PIPELINE_PROFILE"] = profile
     final_payload = _final_output(ctx, payloads, source)
     final_payload = _augment_payload_with_default_tables(ctx, final_payload)
     final_payload = _augment_payload_for_profile(ctx, final_payload, profile)
     final_payload = _augment_payload_with_totals_verification(ctx, final_payload, profile)
     final_payload = _augment_payload_with_visual_marks_100ml(ctx, final_payload, profile)
+    final_payload["profile"] = profile
+    pipeline = final_payload.get("pipeline")
+    if not isinstance(pipeline, dict):
+        pipeline = {}
+    pipeline["profile"] = profile
+    final_payload["pipeline"] = pipeline
     OUTPUT_PATH.write_text(json.dumps(final_payload, ensure_ascii=False, indent=2), encoding="utf-8")
     ctx["FUSION_RESULT"] = str(OUTPUT_PATH)
     ctx["FUSION_PAYLOAD"] = final_payload

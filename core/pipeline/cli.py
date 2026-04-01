@@ -62,12 +62,12 @@ def _env_optional(name: str) -> str | None:
     return raw or None
 
 
-def _normalize_pipeline_name(raw: str | None, default: str = "default") -> str:
+def _normalize_pipeline_name(raw: str | None, default: str = "pipelinorchestrator") -> str:
     aliases = {
-        "default": "default",
-        "pipelineorchestrator": "default",
-        "pipelinorchestrator": "default",
-        "orchestrator": "default",
+        "default": "pipelinorchestrator",
+        "pipelineorchestrator": "pipelinorchestrator",
+        "pipelinorchestrator": "pipelinorchestrator",
+        "orchestrator": "pipelinorchestrator",
         "pipeline50ml": "pipeline50ml",
         "50ml": "pipeline50ml",
         "pipeline100ml": "pipeline100ml",
@@ -80,7 +80,7 @@ def _normalize_pipeline_name(raw: str | None, default: str = "default") -> str:
 
 
 def _env_pipeline(default: str | None = None) -> str:
-    base_default = _normalize_pipeline_name(default or PIPELINE_DEFAULT_CODE, "default")
+    base_default = _normalize_pipeline_name(default or PIPELINE_DEFAULT_CODE, "pipelinorchestrator")
     raw = os.environ.get("PIPELINE_DEFAULT")
     if raw is None:
         raw = os.environ.get("PIPELINE_PROFILE")
@@ -180,7 +180,7 @@ def main() -> None:
     inputs = normalize_input(args.inputs) if args.inputs else []
     repo_root = Path(__file__).resolve().parent.parent
     postgres_status = ensure_postgres_bootstrap(repo_root, start_if_needed=False)
-    pipeline_name = _normalize_pipeline_name(args.pipeline, "default")
+    pipeline_name = _normalize_pipeline_name(args.pipeline, "pipelinorchestrator")
     if pipeline_name == "pipeline100ml":
         orchestrator = Pipeline100MLOrchestrator(repo_root)
     elif pipeline_name == "pipeline50ml":

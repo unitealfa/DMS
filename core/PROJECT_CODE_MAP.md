@@ -5,7 +5,7 @@ Date d'audit: 2026-04-01
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
 - Python files analyses: 41
-- Fonctions/classes indexees: 959 (voir `FUNCTION_INDEX.txt`)
+- Fonctions/classes indexees: 966 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 - Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
@@ -533,6 +533,37 @@ Reference implementation:
 - Ce fichier est la reference la plus rapide pour localiser une modification precise.
 
 ## 11) Changelog code
+- 2026-04-01:
+  - `pipeline/cli.py`:
+    - normalise maintenant les profils de pipeline vers 3 valeurs canoniques uniquement:
+      - `pipelinorchestrator`
+      - `pipeline50ml`
+      - `pipeline100ml`
+    - les alias utilisateur (`default`, `pipelineorchestrator`, `orchestrator`, `50ml`, `100ml`) restent acceptes, mais ne sont plus stockes/imprimes comme profils finaux.
+  - `pipeline/orchestrator.py`:
+    - la pipeline standard injecte maintenant `PIPELINE_PROFILE = "pipelinorchestrator"` au lieu de `default`.
+  - `component/fusion_resultats.py`:
+    - fixe maintenant `profile` et `pipeline.profile` dans `fusion_output.json`.
+    - purge explicitement les blocs ML inactifs (`ml50` / `ml100`) et les composants suffixes inactifs pour eviter toute confusion entre runs 50ml et 100ml.
+    - un run `pipeline100ml` ne garde plus de section `ml50`; un run `pipeline50ml` ne garde plus de section `ml100`; un run `pipelinorchestrator` ne garde aucun bloc ML.
+  - `component/liaison-inter-docs.py`:
+    - n'agrege plus les topics `ML50_TOPICS` et `ML100_TOPICS` ensemble.
+    - utilise uniquement la source topics du profil courant, ce qui evite les melanges de `vector_profile` / topics inter-docs entre 50ml et 100ml.
+  - `pipeline/postgres.py`:
+    - normalise le `pipeline_profile` stocke en base vers `pipelinorchestrator`, `pipeline50ml` ou `pipeline100ml`.
+    - n'insere plus les topics/vecteurs/embeddings/features des deux blocs ML en meme temps.
+    - ne stocke que le bloc actif du run courant dans `dms.document_topics`, `dms.document_vectors`, `dms.document_chunk_embeddings`, `dms.document_word_embeddings` et `dms.document_pipeline_features`.
+    - `topic_source` suit maintenant le vrai profil de run au lieu de `ml50` / `ml100`.
+  - validation reelle specifique profils:
+    - run `pipeline100ml` verifie sur `documents/signettab.png`:
+      - `fusion_output.json`: `profile = pipeline100ml`, aucune section `ml50`.
+      - PostgreSQL: `runs_profile`, `topic_profiles`, `topic_sources`, `vector_profiles`, `chunk_profiles`, `feature_profiles` = `pipeline100ml` uniquement.
+    - run `pipeline50ml` verifie sur `documents/signettab.png`:
+      - `fusion_output.json`: `profile = pipeline50ml`, aucune section `ml100`.
+      - PostgreSQL: `runs_profile`, `topic_profiles`, `topic_sources`, `vector_profiles`, `chunk_profiles`, `word_profiles`, `feature_profiles` = `pipeline50ml` uniquement.
+    - run `pipelinorchestrator` verifie sur `documents/signettab.png`:
+      - `fusion_output.json`: `profile = pipelinorchestrator`, sans `ml50` ni `ml100`.
+      - `postgres-sync`: `pipeline_profile = pipelinorchestrator`.
 - 2026-04-01:
   - `pipeline/postgres.py`:
     - corrige la liaison `dms.document_sentence_layouts.sentence_id -> dms.document_sentences.sentence_id`.

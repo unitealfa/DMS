@@ -73,7 +73,7 @@ class PipelineOrchestrator:
         context: Context = {"INPUT_FILE": normalize_input(input_files)}
         if context_overrides:
             context.update(context_overrides)
-        context["PIPELINE_PROFILE"] = str(context.get("PIPELINE_PROFILE") or "default")
+        context["PIPELINE_PROFILE"] = str(context.get("PIPELINE_PROFILE") or "pipelinorchestrator")
         selected = self._select_components(only, upto, start)
         context["PIPELINE_STEPS"] = [c.name for c in selected]
         for comp in selected:

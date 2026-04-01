@@ -117,6 +117,24 @@ def _normalize_term(value: Any) -> str:
     return txt
 
 
+def _normalize_pipeline_profile(value: Any) -> str:
+    raw = str(value or "").strip().lower()
+    if raw in {"pipeline50ml", "50ml"}:
+        return "pipeline50ml"
+    if raw in {"pipeline100ml", "100ml"}:
+        return "pipeline100ml"
+    return "pipelinorchestrator"
+
+
+def _active_topic_sources(ctx: Dict[str, Any]) -> Tuple[str, ...]:
+    profile = _normalize_pipeline_profile(ctx.get("PIPELINE_PROFILE"))
+    if profile == "pipeline50ml":
+        return ("ML50_TOPICS",)
+    if profile == "pipeline100ml":
+        return ("ML100_TOPICS",)
+    return ()
+
+
 def _filename_aliases(filename: Any) -> List[str]:
     raw = str(filename or "").strip()
     if not raw:
@@ -451,7 +469,7 @@ def _dedupe_docs(rows: Any) -> List[Dict[str, Any]]:
 
 def _index_topic_rows(ctx: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
     out: Dict[str, Dict[str, Any]] = {}
-    for source in TOPIC_SOURCES:
+    for source in _active_topic_sources(ctx):
         for row in _safe_list(ctx.get(source)):
             if not isinstance(row, dict):
                 continue
@@ -462,7 +480,7 @@ def _index_topic_rows(ctx: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
 
 
 def _vector_profile(ctx: Dict[str, Any]) -> Dict[str, Any]:
-    profile = str(ctx.get("PIPELINE_PROFILE") or "").strip().lower()
+    profile = _normalize_pipeline_profile(ctx.get("PIPELINE_PROFILE"))
     base = VECTOR_PROFILE_CONFIG.get(profile)
     if not base:
         return {"enabled": False, "profile": profile}

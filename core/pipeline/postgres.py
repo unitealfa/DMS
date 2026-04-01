@@ -108,6 +108,36 @@ def _safe_bool(value: Any, default: bool) -> bool:
     return str(value).strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _normalize_pipeline_profile(value: Any) -> str:
+    raw = str(value or "").strip().lower()
+    if raw in {"pipeline50ml", "50ml"}:
+        return "pipeline50ml"
+    if raw in {"pipeline100ml", "100ml"}:
+        return "pipeline100ml"
+    return "pipelinorchestrator"
+
+
+def _active_ml_block_names(profile: Any, doc: Optional[Dict[str, Any]] = None) -> List[str]:
+    normalized = _normalize_pipeline_profile(profile)
+    preferred: List[str]
+    if normalized == "pipeline50ml":
+        preferred = ["ml50"]
+    elif normalized == "pipeline100ml":
+        preferred = ["ml100"]
+    else:
+        preferred = []
+
+    if doc is None:
+        return preferred
+
+    out: List[str] = []
+    for block_name in preferred:
+        block = _safe_dict(doc.get(block_name))
+        if block:
+            out.append(block_name)
+    return out
+
+
 def _optional_bool(value: Any) -> Optional[bool]:
     if value is None:
         return None
@@ -1278,6 +1308,7 @@ def _build_run_row(
     fusion_path: Optional[Path],
     now_iso: str,
 ) -> Dict[str, Any]:
+    profile = _normalize_pipeline_profile(profile)
     completed_at = str(payload.get("generated_at") or now_iso).strip() or now_iso
     started_at = completed_at
     pipeline = _safe_dict(payload.get("pipeline"))
@@ -1288,7 +1319,7 @@ def _build_run_row(
     return {
         "run_id": run_id,
         "pipeline_profile": profile,
-        "profile": str(payload.get("profile") or profile).strip() or profile,
+        "profile": _normalize_pipeline_profile(payload.get("profile") or profile),
         "pipeline_version": None,
         "mapping_version": DEFAULT_MAPPING_VERSION,
         "payload_schema_version": str(payload.get("schema_version") or "").strip() or None,
@@ -1348,6 +1379,7 @@ def _build_document_row(
     document_id: str,
     now_iso: str,
 ) -> Dict[str, Any]:
+    profile = _normalize_pipeline_profile(profile)
     classification = _safe_dict(doc.get("classification"))
     content = _safe_dict(doc.get("content"))
     processing = _safe_dict(doc.get("processing"))
@@ -2764,10 +2796,12 @@ def _build_document_topic_rows(
     *,
     run_id: str,
     document_id: str,
+    profile: str,
     now_iso: str,
 ) -> List[Dict[str, Any]]:
     rows: List[Dict[str, Any]] = []
-    for block_name in ("ml50", "ml100"):
+    normalized_profile = _normalize_pipeline_profile(profile)
+    for block_name in _active_ml_block_names(normalized_profile, doc):
         block = _safe_dict(doc.get(block_name))
         if not block:
             continue
@@ -2788,9 +2822,9 @@ def _build_document_topic_rows(
                     "topic_id": _stable_hash_id("topic", run_id, document_id, block_name, "document", rank, term),
                     "document_id": document_id,
                     "run_id": run_id,
-                    "pipeline_profile": block_name,
+                    "pipeline_profile": normalized_profile,
                     "topic_scope": "document",
-                    "topic_source": block_name,
+                    "topic_source": normalized_profile,
                     "page_index": None,
                     "sent_index": None,
                     "topic_rank": rank,
@@ -2811,9 +2845,9 @@ def _build_document_topic_rows(
                     "topic_id": _stable_hash_id("topic", run_id, document_id, block_name, "document_primary", rank, text),
                     "document_id": document_id,
                     "run_id": run_id,
-                    "pipeline_profile": block_name,
+                    "pipeline_profile": normalized_profile,
                     "topic_scope": "document_primary",
-                    "topic_source": block_name,
+                    "topic_source": normalized_profile,
                     "page_index": None,
                     "sent_index": None,
                     "topic_rank": rank,
@@ -2837,9 +2871,9 @@ def _build_document_topic_rows(
                         "topic_id": _stable_hash_id("topic", run_id, document_id, block_name, "chunk_primary", chunk_page or "", chunk_sent or "", primary),
                         "document_id": document_id,
                         "run_id": run_id,
-                        "pipeline_profile": block_name,
+                        "pipeline_profile": normalized_profile,
                         "topic_scope": "chunk_primary",
-                        "topic_source": block_name,
+                        "topic_source": normalized_profile,
                         "page_index": chunk_page,
                         "sent_index": chunk_sent,
                         "topic_rank": 1,
@@ -2867,9 +2901,9 @@ def _build_document_topic_rows(
                         "topic_id": _stable_hash_id("topic", run_id, document_id, block_name, "chunk", chunk_page or "", chunk_sent or "", rank, term),
                         "document_id": document_id,
                         "run_id": run_id,
-                        "pipeline_profile": block_name,
+                        "pipeline_profile": normalized_profile,
                         "topic_scope": "chunk",
-                        "topic_source": block_name,
+                        "topic_source": normalized_profile,
                         "page_index": chunk_page,
                         "sent_index": chunk_sent,
                         "topic_rank": rank,
@@ -3075,10 +3109,12 @@ def _build_document_vector_rows(
     *,
     run_id: str,
     document_id: str,
+    profile: str,
     now_iso: str,
 ) -> List[Dict[str, Any]]:
     rows: List[Dict[str, Any]] = []
-    for block_name in ("ml50", "ml100"):
+    normalized_profile = _normalize_pipeline_profile(profile)
+    for block_name in _active_ml_block_names(normalized_profile, doc):
         block = _safe_dict(doc.get(block_name))
         vector = block.get("document_vector")
         if not block or not isinstance(vector, list) or not vector:
@@ -3088,7 +3124,7 @@ def _build_document_vector_rows(
                 "vector_id": _stable_hash_id("docvec", run_id, document_id, block_name),
                 "document_id": document_id,
                 "run_id": run_id,
-                "pipeline_profile": block_name,
+                "pipeline_profile": normalized_profile,
                 "vector_scope": "document",
                 "method": str(block.get("embedding_method") or "").strip() or None,
                 "model": str(block.get("model") or "").strip() or None,
@@ -3111,10 +3147,12 @@ def _build_document_chunk_embedding_rows(
     *,
     run_id: str,
     document_id: str,
+    profile: str,
     now_iso: str,
 ) -> List[Dict[str, Any]]:
     rows: List[Dict[str, Any]] = []
-    for block_name in ("ml50", "ml100"):
+    normalized_profile = _normalize_pipeline_profile(profile)
+    for block_name in _active_ml_block_names(normalized_profile, doc):
         block = _safe_dict(doc.get(block_name))
         for ordinal, chunk in enumerate(_safe_list(block.get("chunks_embeddings")), start=1):
             if not isinstance(chunk, dict):
@@ -3125,7 +3163,7 @@ def _build_document_chunk_embedding_rows(
                     "chunk_embedding_id": _stable_hash_id("chunkvec", run_id, document_id, block_name, chunk.get("page_index") or "", chunk.get("sent_index") or "", ordinal),
                     "document_id": document_id,
                     "run_id": run_id,
-                    "pipeline_profile": block_name,
+                    "pipeline_profile": normalized_profile,
                     "page_index": _coerce_int(chunk.get("page_index")),
                     "sent_index": _coerce_int(chunk.get("sent_index")),
                     "lang": str(chunk.get("lang") or "").strip() or None,
@@ -3148,10 +3186,12 @@ def _build_document_word_embedding_rows(
     *,
     run_id: str,
     document_id: str,
+    profile: str,
     now_iso: str,
 ) -> List[Dict[str, Any]]:
     rows: List[Dict[str, Any]] = []
-    for block_name in ("ml50", "ml100"):
+    normalized_profile = _normalize_pipeline_profile(profile)
+    for block_name in _active_ml_block_names(normalized_profile, doc):
         block = _safe_dict(doc.get(block_name))
         for ordinal, word in enumerate(_safe_list(block.get("word_embeddings")), start=1):
             if not isinstance(word, dict):
@@ -3162,7 +3202,7 @@ def _build_document_word_embedding_rows(
                     "word_embedding_id": _stable_hash_id("wordvec", run_id, document_id, block_name, word.get("page_index") or "", word.get("sent_index") or "", word.get("tok_index") or "", ordinal),
                     "document_id": document_id,
                     "run_id": run_id,
-                    "pipeline_profile": block_name,
+                    "pipeline_profile": normalized_profile,
                     "page_index": _coerce_int(word.get("page_index")),
                     "sent_index": _coerce_int(word.get("sent_index")),
                     "tok_index": _coerce_int(word.get("tok_index")),
@@ -3779,14 +3819,14 @@ def _build_document_feature_rows(
             },
         )
 
-    for block_name in ("ml50", "ml100"):
+    for block_name in _active_ml_block_names(profile, doc):
         block = _safe_dict(doc.get(block_name))
         if not block:
             continue
         add_feature(
             "embeddings",
-            block_name,
-            backend=block_name,
+            _normalize_pipeline_profile(profile),
+            backend=_normalize_pipeline_profile(profile),
             method=block.get("embedding_method"),
             vector_dim=block.get("vector_dim"),
             count_value=block.get("chunk_count"),
@@ -4494,12 +4534,13 @@ def sync_fusion_payload_to_postgres(
     links = _extract_links(payload)
     status["documents_total"] = len(documents)
     status["links_total"] = len(links)
-    profile = str(
+    profile = _normalize_pipeline_profile(
         pipeline_profile
         or payload.get("pipeline_profile")
         or _safe_dict(payload.get("pipeline")).get("profile")
-        or "default"
-    ).strip() or "default"
+        or payload.get("profile")
+        or "pipelinorchestrator"
+    )
     source_value = str(source or payload.get("source") or "fusion-resultats").strip() or "fusion-resultats"
     current_run_id = str(run_id or payload.get("run_id") or "").strip()
     if not current_run_id:
@@ -4947,7 +4988,13 @@ def sync_fusion_payload_to_postgres(
                 skip_update_columns=["created_at"],
             )
 
-            topic_rows = _build_document_topic_rows(doc, run_id=current_run_id, document_id=document_id, now_iso=now_iso)
+            topic_rows = _build_document_topic_rows(
+                doc,
+                run_id=current_run_id,
+                document_id=document_id,
+                profile=profile,
+                now_iso=now_iso,
+            )
             status["topics_upserted"] += _append_upsert_rows(
                 statements,
                 "dms.document_topics",
@@ -5051,7 +5098,13 @@ def sync_fusion_payload_to_postgres(
             status["vectors_upserted"] += _append_upsert_rows(
                 statements,
                 "dms.document_vectors",
-                _build_document_vector_rows(doc, run_id=current_run_id, document_id=document_id, now_iso=now_iso),
+                _build_document_vector_rows(
+                    doc,
+                    run_id=current_run_id,
+                    document_id=document_id,
+                    profile=profile,
+                    now_iso=now_iso,
+                ),
                 conflict_columns=["vector_id"],
                 json_columns=["vector_json", "payload_json"],
                 skip_update_columns=["created_at"],
@@ -5059,7 +5112,13 @@ def sync_fusion_payload_to_postgres(
             status["chunk_embeddings_upserted"] += _append_upsert_rows(
                 statements,
                 "dms.document_chunk_embeddings",
-                _build_document_chunk_embedding_rows(doc, run_id=current_run_id, document_id=document_id, now_iso=now_iso),
+                _build_document_chunk_embedding_rows(
+                    doc,
+                    run_id=current_run_id,
+                    document_id=document_id,
+                    profile=profile,
+                    now_iso=now_iso,
+                ),
                 conflict_columns=["chunk_embedding_id"],
                 json_columns=["chunk_topics_json", "vector_json", "payload_json"],
                 skip_update_columns=["created_at"],
@@ -5067,7 +5126,13 @@ def sync_fusion_payload_to_postgres(
             status["word_embeddings_upserted"] += _append_upsert_rows(
                 statements,
                 "dms.document_word_embeddings",
-                _build_document_word_embedding_rows(doc, run_id=current_run_id, document_id=document_id, now_iso=now_iso),
+                _build_document_word_embedding_rows(
+                    doc,
+                    run_id=current_run_id,
+                    document_id=document_id,
+                    profile=profile,
+                    now_iso=now_iso,
+                ),
                 conflict_columns=["word_embedding_id"],
                 json_columns=["vector_json", "payload_json"],
                 skip_update_columns=["created_at"],

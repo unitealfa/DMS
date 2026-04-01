@@ -1,11 +1,11 @@
 # Project Code Map (DMS Core)
 
-Date d'audit: 2026-03-19
+Date d'audit: 2026-04-01
 
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
 - Python files analyses: 41
-- Fonctions/classes indexees: 848 (voir `FUNCTION_INDEX.txt`)
+- Fonctions/classes indexees: 923 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 - Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
@@ -24,6 +24,7 @@ Date d'audit: 2026-03-19
 - Configuration base/tables PostgreSQL: `component/postgres/postgres_schema.py`
 - Composant sync PostgreSQL final: `component/postgres/postgres-sync.py`
 - Document de lecture rapide des 3 pipelines: `EXPLICATION_PIPELINES.txt`
+- Plan SQL de mise en base des sorties documentaires: `POSTGRES_DOCUMENT_SCHEMA_PLAN.txt`
 - Page HTML racine minimale: `index.html` (selection/drop de documents + bouton `Lancer`)
 
 ## 3) Pipeline reel (ordre d'execution)
@@ -51,7 +52,9 @@ Date d'audit: 2026-03-19
      - lit `FUSION_PAYLOAD` / `fusion_output.json`,
      - tente de demarrer PostgreSQL automatiquement au moment du composant,
      - cree la base cible si absente,
-     - pour l'instant, ecrit seulement un log minimal par document (`heure + fichier + "tout est ok"`) dans `dms_pipeline_launch_logs`,
+     - cree/met a jour le schema `dms` si les tables manquent,
+     - insere les sorties finales dans `dms.runs`, `dms.ingest_queue`, `dms.documents`, `dms.document_texts`, `dms.document_payloads`, `dms.document_extraction_summaries`, `dms.document_extractions`, `dms.document_regex_fields`, `dms.document_regex_matches`, `dms.document_bm25_chunks`, `dms.document_relations`, `dms.document_component_audit`, `dms.document_pages`, `dms.document_sections`, `dms.document_blocks`, `dms.document_lines`, `dms.document_words`, `dms.document_headers`, `dms.document_footers`, `dms.document_lists`, `dms.document_figures`, `dms.document_equations`, `dms.document_key_value_pairs`, `dms.document_reading_order`, `dms.document_non_text_regions`, `dms.document_visual_marks`, `dms.document_tables`, `dms.document_table_rows`, `dms.document_quality_checks`, `dms.document_quality_issue_locations`, `dms.document_quality_row_audit`, `dms.document_quality_declared_locations`, `dms.document_quality_check_steps`, `dms.document_sentences`, `dms.document_entities`, `dms.document_tokens`, `dms.document_nlp_matches`, `dms.document_topics`, `dms.document_vectors`, `dms.document_chunk_embeddings`, `dms.document_word_embeddings`, `dms.document_links`, `dms.document_link_shared_topics`, `dms.document_link_sentence_matches`, `dms.document_link_chunk_matches` et `dms.document_pipeline_features`,
+     - laisse les champs absents en `NULL` et ne cree pas de lignes enfants quand une liste est vide,
      - ajoute un audit `postgres_sync` dans `fusion_output.json`.
 - Pipeline `pipeline50ml`:
   1. `pretraitement-de-docs`
@@ -85,8 +88,8 @@ Date d'audit: 2026-03-19
      - ajout `ml50` + BM25 dans `fusion_output.json`,
      - filtrage des topics grammaticaux (pronoms/determinants/conjonctions/adverbes) via `NLP_TOKENS` du composant grammaire.
   13. `postgres-sync` (`component/postgres/postgres-sync.py`):
-     - meme preparation SQL finale que la pipeline standard,
-     - pour l'instant, journalise seulement `date + fichier + ok`.
+     - meme preparation SQL finale que la pipeline standard, avec persistance detaillee des blocs ML/NLP/tables/regex/liens,
+     - persiste la sortie finale fusionnee dans le schema `dms` avec la meme logique `NULL/JSONB`.
 - Pipeline `pipeline100ml`:
   1. `pretraitement-de-docs`
   2. `si-image-pretraiter-sinonpass-le-doc`
@@ -129,8 +132,8 @@ Date d'audit: 2026-03-19
      - filtrage des topics grammaticaux (pronoms/determinants/conjonctions/adverbes) via `NLP_TOKENS` du composant grammaire,
      - ajout des sorties visuelles dans `content.visual_flags`, `document_structure.visual_marks`, `document_structure.visual_marks_summary`, `extraction.visual_detection`, `components.detection_signature_chachet_codebarr_100ml` et `pipeline.ml100`.
   14. `postgres-sync` (`component/postgres/postgres-sync.py`):
-     - meme preparation SQL finale que les autres pipelines,
-     - pour l'instant, journalise seulement `date + fichier + ok`.
+     - meme preparation SQL finale que les autres pipelines, avec persistance detaillee des embeddings/topics/liaisons,
+     - persiste la sortie finale fusionnee dans le schema `dms` avec la meme logique `NULL/JSONB`.
 
 Selection runtime:
 - CLI: `--pipeline default|pipelinorchestrator|pipeline50ml|pipeline100ml`
@@ -594,20 +597,24 @@ Reference implementation:
   - `component/postgres/postgres_connection.py`:
     - fichier unique de controle de la connexion PostgreSQL et de la synchro SQL finale.
     - contient `host`, `port`, `user`, `password`, base admin, activation bootstrap, activation sync, audit `fusion_output.json` et commandes de demarrage automatique.
-    - la synchro actuelle est volontairement minimale: seulement `heure + fichier + "tout est ok"`.
+    - la synchro actuelle pousse la sortie finale fusionnee dans le schema `dms`.
   - `component/postgres/postgres_schema.py`:
     - fichier unique de controle du nom de la base cible et des tables/index a creer automatiquement.
     - base cible par defaut: `dms_core`.
-    - table initiale unique: `dms_pipeline_launch_logs`.
+    - schema documentaire cible: `dms.runs`, `dms.ingest_queue`, `dms.documents`, `dms.document_texts`, `dms.document_payloads`, `dms.run_payload_nodes`, `dms.document_payload_nodes`, `dms.document_identifiers`, `dms.document_classification_scores`, `dms.document_classification_score_audit`, `dms.document_classification_keyword_matches`, `dms.document_anti_confusion_hits`, `dms.document_anti_confusion_targets`, `dms.document_extraction_summaries`, `dms.document_extractions`, `dms.document_regex_fields`, `dms.document_regex_matches`, `dms.document_bm25_chunks`, `dms.document_relations`, `dms.document_component_audit`, `dms.document_pages`, `dms.document_pages_meta`, `dms.document_sections`, `dms.document_blocks`, `dms.document_lines`, `dms.document_words`, `dms.document_headers`, `dms.document_footers`, `dms.document_lists`, `dms.document_figures`, `dms.document_equations`, `dms.document_key_value_pairs`, `dms.document_reading_order`, `dms.document_non_text_regions`, `dms.document_visual_marks`, `dms.document_text_normalization_items`, `dms.document_search_keywords`, `dms.document_business_fields`, `dms.document_tables`, `dms.document_table_rows`, `dms.document_table_cells`, `dms.document_quality_checks`, `dms.document_quality_issue_locations`, `dms.document_quality_row_audit`, `dms.document_quality_declared_locations`, `dms.document_quality_check_steps`, `dms.document_topics`, `dms.document_sentences`, `dms.document_sentence_layouts`, `dms.document_sentence_spans`, `dms.document_tokens`, `dms.document_nlp_matches`, `dms.document_entities`, `dms.document_vectors`, `dms.document_chunk_embeddings`, `dms.document_word_embeddings`, `dms.document_layout_header_rows`, `dms.document_layout_header_cells`, `dms.document_layout_table_rows`, `dms.document_links`, `dms.document_link_shared_terms`, `dms.document_link_shared_topics`, `dms.document_link_sentence_matches`, `dms.document_link_chunk_matches`, `dms.document_pipeline_features`, `dms.document_human_review_tasks`, `dms.document_processing_warnings`, `dms.document_processing_logs`, `dms.document_processing_steps`, `dms.document_processing_durations`, `dms.document_component_metrics`, `dms.stable_id_registry`.
+    - vues de pont exposees automatiquement: `dms.document_document_links`, `dms.document_entity_links`, `dms.document_identifier_links`, `dms.document_topic_links`.
+    - enrichissements recents du schema: projection generique de payload (`run_payload_nodes`, `document_payload_nodes`), granularite cellule de tableau (`document_table_cells`), classification detaillee, ponts inter-docs, layout fin (`pages_meta`, `sentence_layouts`, `sentence_spans`, `layout_header_*`, `layout_table_rows`), zones de processing/human review/component metrics, registre `stable_id_registry`, colonnes structurees supplementaires pour `quality_checks` (computed_tax, row_ok_count, row_partial_count, rows_total, statuses, anchors, declared_totals_raw, tolerance), `visual_marks` (kind/confidence/page dimensions/engine/decoded value), `sentences/tokens/entities` (offsets, source_location, xlmr_backend, canonical_text) et `document_relations` (subject/predicate/object/evidence).
   - `pipeline/postgres.py`:
     - bootstrap PostgreSQL non destructif + synchro SQL finale.
     - charge les 2 fichiers de config dedies sous `component/postgres/`.
     - tente de joindre PostgreSQL local, de le demarrer si indisponible, de creer la base si absente, puis de creer les tables/index manquants.
-    - pour l'instant, ecrit seulement un log minimal dans `dms_pipeline_launch_logs`.
+    - applique maintenant le SQL de bootstrap en 2 phases: pre-migrations avant les tables, puis `ALTER TABLE` et vues de pont apres creation des tables, ce qui evite les erreurs `relation ... does not exist` au demarrage.
+    - mappe `fusion_output.json` vers le schema `dms` en gardant les gros blocs variables en `JSONB`, en decomposant les listes 1->N principales (regex/quality/nlp/ml/liens/pages/components/table_cells), en projetant tout le payload vers `run_payload_nodes` / `document_payload_nodes`, en alimentant les tables detaillees de classification/identifiants/layout/processing/review/shared_terms/registry et en laissant les champs absents en `NULL`.
+    - la garantie pratique de non-perte repose maintenant sur 3 niveaux complementaires: `raw_document_json`, tables detaillees specialisées, et projection generique des chemins JSON.
     - log un statut detaille (`ready`, `database_created`, `tables_ready`, `tables_missing`, `auto_start_commands`, `auto_start_errors`, etc.).
   - `component/postgres/postgres-sync.py`:
     - nouveau composant final de pipeline.
-    - consomme `FUSION_PAYLOAD`, ecrit un log minimal par document dans PostgreSQL, puis reinjecte un bloc `postgres_sync` dans `fusion_output.json`.
+    - consomme `FUSION_PAYLOAD`, lance la synchro SQL complete vers PostgreSQL, puis reinjecte un bloc `postgres_sync` dans `fusion_output.json`.
   - `pipeline/cli.py` + `pipeline/local_api.py`:
     - declenchent maintenant le bootstrap PostgreSQL au demarrage.
     - exposent le statut PostgreSQL dans le contexte runtime (`POSTGRES_*`) et dans les logs de l'API locale.

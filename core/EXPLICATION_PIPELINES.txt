@@ -235,13 +235,21 @@ Ce que chaque composant extrait ou produit
 17) `postgres-sync`
 - lit `FUSION_PAYLOAD` / `fusion_output.json`
 - tente de joindre PostgreSQL et de le demarrer automatiquement
-- cree la base si absente, puis la table de test si elle manque
-- pour l'instant, ecrit seulement un log minimal par document:
-  - heure de lancement
-  - nom du fichier
-  - texte `tout est ok`
-- table actuellement ecrite:
-  - `dms_pipeline_launch_logs`
+- cree la base si absente, puis le schema `dms` et ses tables V1 si elles manquent
+- insere la sortie finale dans:
+  - `dms.runs`
+  - `dms.ingest_queue`
+  - `dms.documents`
+  - `dms.document_texts`
+  - `dms.document_payloads`
+  - `dms.document_extractions`
+  - `dms.document_tables`
+  - `dms.document_table_rows`
+  - `dms.document_quality_checks`
+  - `dms.document_links`
+  - `dms.document_pipeline_features`
+- les champs absents restent `NULL`
+- les blocs variables restent en `JSONB`
 - ajoute un bloc `postgres_sync` dans `fusion_output.json`
 - techno principale:
   - bootstrap SQL: `pipeline/postgres.py`

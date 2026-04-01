@@ -1,850 +1,927 @@
-# FUNCTION_INDEX
-# Regenerated: 2026-04-01
-# Entries: 846
+FUNCTION_INDEX
+python_files=41
+entries=923
 
-component/atrribution-gramatical/arabcode.py:102:def norm_alef
-component/atrribution-gramatical/arabcode.py:105:def has_hamza
-component/atrribution-gramatical/arabcode.py:11:def _install_help
-component/atrribution-gramatical/arabcode.py:128:def penn_from_analysis
-component/atrribution-gramatical/arabcode.py:132:def lemma_from_analysis
-component/atrribution-gramatical/arabcode.py:152:def override_tag
-component/atrribution-gramatical/arabcode.py:205:def _looks_like_verb_imperfect
-component/atrribution-gramatical/arabcode.py:209:def _safe_split_conj
-component/atrribution-gramatical/arabcode.py:227:def _best_analysis_for
-component/atrribution-gramatical/arabcode.py:233:def _char_overlap_ratio
-component/atrribution-gramatical/arabcode.py:240:def pick_analysis
-component/atrribution-gramatical/arabcode.py:370:def split_proclitics
-component/atrribution-gramatical/arabcode.py:412:def split_enclitics
-component/atrribution-gramatical/arabcode.py:457:def get_ner
-component/atrribution-gramatical/arabcode.py:471:def ner_predict_tokens
-component/atrribution-gramatical/arabcode.py:493:def norm_for_match
-component/atrribution-gramatical/arabcode.py:496:def fix_titles
-component/atrribution-gramatical/arabcode.py:523:def add_year_dates
-component/atrribution-gramatical/arabcode.py:532:def add_currency_codes
-component/atrribution-gramatical/arabcode.py:550:def enforce_bio
-component/atrribution-gramatical/arabcode.py:583:def _is_initial_chain
-component/atrribution-gramatical/arabcode.py:589:def drop_false_pers
-component/atrribution-gramatical/arabcode.py:612:def strip_entity_clitics_for_display
-component/atrribution-gramatical/arabcode.py:628:def bio_to_entities
-component/atrribution-gramatical/arabcode.py:633:def pos_of
-component/atrribution-gramatical/arabcode.py:636:def lemma_of
-component/atrribution-gramatical/arabcode.py:674:def _estimate_clitic_count
-component/atrribution-gramatical/arabcode.py:693:def _lemma_suspicious
-component/atrribution-gramatical/arabcode.py:707:def analyze_sentence
-component/atrribution-gramatical/arabcode.py:871:def split_input_into_sentences
-component/atrribution-gramatical/arabcode.py:87:def simple_tokenize
-component/atrribution-gramatical/arabcode.py:881:def run_one_auto
-component/atrribution-gramatical/arabcode.py:885:def run_from_previous_cell
-component/atrribution-gramatical/arabcode.py:90:def is_punct
-component/atrribution-gramatical/arabcode.py:942:def main
-component/atrribution-gramatical/arabcode.py:99:def strip_diacritics
-component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:30:def _is_punct_like_token
-component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:47:def _normalize_token_fields
-component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:60:def detect_lang
-component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:73:def get_previous_cell_input
-component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:84:def iter_sentences_from_input
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:105:def _average_vectors
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:117:def _env_true
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:122:def _is_offline_mode
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:132:def _resolve_model_for_loading
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:177:def _is_punct_like_token
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:195:def _normalize_token_fields
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:209:def _strip_accents
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:214:def _norm_token
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:220:def detect_lang
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:234:def get_previous_cell_input
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:246:def iter_sentences_from_input
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:327:def _basic_tokenize
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:331:def _normalize_lemma
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:342:def _guess_pos
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:386:def _cosine
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:399:def _build_pos_prototypes
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:432:def _refine_pos_tags
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:519:def _hash_vec
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:529:class _XLMRContextEncoder
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:530:def __init__
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:577:def encode_token_lists
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:639:def _heuristic_ner
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:657:def _run
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:86:def _zeros_vec
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:90:def _zeros_matrix
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:94:def _vector_norm
-component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:98:def _normalize_vector
-component/atrribution-gramatical/engcode.py:103:def _is_punct
-component/atrribution-gramatical/engcode.py:106:def _is_number
-component/atrribution-gramatical/engcode.py:12:def print_install_help
-component/atrribution-gramatical/engcode.py:149:def _lower
-component/atrribution-gramatical/engcode.py:152:def _has_apostrophe
-component/atrribution-gramatical/engcode.py:155:def _norm_apos
-component/atrribution-gramatical/engcode.py:177:def _looks_like_word
-component/atrribution-gramatical/engcode.py:180:def _split_plural_possessive
-component/atrribution-gramatical/engcode.py:192:def split_contractions
-component/atrribution-gramatical/engcode.py:265:def tokenize_with_spans
-component/atrribution-gramatical/engcode.py:290:def guess_pos_heur
-component/atrribution-gramatical/engcode.py:330:def map_penn_to_simple
-component/atrribution-gramatical/engcode.py:367:def pos_tag_simple
-component/atrribution-gramatical/engcode.py:387:def looks_like_nounish
-component/atrribution-gramatical/engcode.py:39:def _ensure_nltk
-component/atrribution-gramatical/engcode.py:400:def resolve_s_contractions
-component/atrribution-gramatical/engcode.py:435:def _penn_to_wordnet_simple
-component/atrribution-gramatical/engcode.py:447:def lemma_en
-component/atrribution-gramatical/engcode.py:488:def fix_buffalo_pos
-component/atrribution-gramatical/engcode.py:504:def date_spans
-component/atrribution-gramatical/engcode.py:529:def currency_spans
-component/atrribution-gramatical/engcode.py:547:def load_hf_ner
-component/atrribution-gramatical/engcode.py:569:def _norm_ner_label
-component/atrribution-gramatical/engcode.py:578:def hf_spans
-component/atrribution-gramatical/engcode.py:599:def apply_spans_to_tokens
-component/atrribution-gramatical/engcode.py:610:def enforce_bio
-component/atrribution-gramatical/engcode.py:619:def fix_buffalo_ner
-component/atrribution-gramatical/engcode.py:659:def _is_initial_chain
-component/atrribution-gramatical/engcode.py:665:def drop_false_pers
-component/atrribution-gramatical/engcode.py:691:def _join_entity_tokens
-component/atrribution-gramatical/engcode.py:698:def entities_from_bio
-component/atrribution-gramatical/engcode.py:721:def print_table
-component/atrribution-gramatical/engcode.py:730:def fallback_ner_labels
-component/atrribution-gramatical/engcode.py:756:def run_one
-component/atrribution-gramatical/engcode.py:859:def split_input_into_sentences
-component/atrribution-gramatical/engcode.py:873:def get_ner_pipe
-component/atrribution-gramatical/engcode.py:88:class Tok
-component/atrribution-gramatical/engcode.py:890:def run_one_auto
-component/atrribution-gramatical/engcode.py:894:def run_from_previous_cell
-component/atrribution-gramatical/engcode.py:951:def main
-component/atrribution-gramatical/frcode.py:1002:def main
-component/atrribution-gramatical/frcode.py:104:def _norm_apo
-component/atrribution-gramatical/frcode.py:107:def _has_letters
-component/atrribution-gramatical/frcode.py:110:def _is_punct
-component/atrribution-gramatical/frcode.py:113:def _is_dash
-component/atrribution-gramatical/frcode.py:116:def _is_number
-component/atrribution-gramatical/frcode.py:119:def _is_acronym
-component/atrribution-gramatical/frcode.py:122:def _is_capitalized_word
-component/atrribution-gramatical/frcode.py:125:def _is_hyphenated_word
-component/atrribution-gramatical/frcode.py:128:def _is_email
-component/atrribution-gramatical/frcode.py:12:def print_install_help
-component/atrribution-gramatical/frcode.py:131:def _is_url
-component/atrribution-gramatical/frcode.py:135:def _is_ipv4
-component/atrribution-gramatical/frcode.py:138:def _is_hash
-component/atrribution-gramatical/frcode.py:141:def _is_id
-component/atrribution-gramatical/frcode.py:144:def _split_trailing_punct_if_needed
-component/atrribution-gramatical/frcode.py:174:def tokenize_raw
-component/atrribution-gramatical/frcode.py:184:def split_elisions
-component/atrribution-gramatical/frcode.py:208:def tokenize_with_spans
-component/atrribution-gramatical/frcode.py:283:def guess_pos
-component/atrribution-gramatical/frcode.py:368:def lemma_fr
-component/atrribution-gramatical/frcode.py:442:def date_spans
-component/atrribution-gramatical/frcode.py:490:def currency_spans
-component/atrribution-gramatical/frcode.py:508:def _norm_ner_label
-component/atrribution-gramatical/frcode.py:517:def load_hf_ner
-component/atrribution-gramatical/frcode.py:539:def hf_spans
-component/atrribution-gramatical/frcode.py:560:def apply_spans_to_tokens
-component/atrribution-gramatical/frcode.py:571:def enforce_bio
-component/atrribution-gramatical/frcode.py:601:def _is_initial_chain
-component/atrribution-gramatical/frcode.py:607:def drop_false_pers
-component/atrribution-gramatical/frcode.py:630:def ner_rules_spans
-component/atrribution-gramatical/frcode.py:700:def improve_pos_with_ner
-component/atrribution-gramatical/frcode.py:713:def _tok_lower
-component/atrribution-gramatical/frcode.py:716:def _is_function_word
-component/atrribution-gramatical/frcode.py:720:def _looks_like_proper
-component/atrribution-gramatical/frcode.py:777:def join_fr
-component/atrribution-gramatical/frcode.py:794:def entities_from_bio
-component/atrribution-gramatical/frcode.py:816:def print_table
-component/atrribution-gramatical/frcode.py:828:def run_one
-component/atrribution-gramatical/frcode.py:914:def split_input_into_sentences
-component/atrribution-gramatical/frcode.py:928:def get_ner_pipe
-component/atrribution-gramatical/frcode.py:945:def run_one_auto
-component/atrribution-gramatical/frcode.py:948:def run_from_previous_cell
-component/atrribution-gramatical/frcode.py:99:class Tok
-component/clasification.py:105:def _build_DOCS_from_input
-component/clasification.py:161:def _doc_text_len
-component/clasification.py:169:def _drop_empty_duplicates
-component/clasification.py:185:def classify_scores
-component/clasification.py:197:def _push_audit
-component/clasification.py:19:def _load_json
-component/clasification.py:213:def add_score
-component/clasification.py:25:def _strip_accents
-component/clasification.py:281:def decide
-component/clasification.py:31:def _norm_text
-component/clasification.py:339:def _bucket_pairs
-component/clasification.py:36:def _norm_keyword
-component/clasification.py:400:def _fmt
-component/clasification.py:40:def _ensure_kw_dict
-component/clasification.py:59:def load_classification_configs
-component/clasification.py:92:def _get_previous_cell_input
-component/detection-signature-chachet-codebarr.py:110:def _pil_to_cv_bgr
-component/detection-signature-chachet-codebarr.py:117:def _open_image_frames
-component/detection-signature-chachet-codebarr.py:127:def _pdf_page_count
-component/detection-signature-chachet-codebarr.py:145:def _sample_page_numbers
-component/detection-signature-chachet-codebarr.py:176:def _render_pdf_page
-component/detection-signature-chachet-codebarr.py:212:def _render_pdf_pages
-component/detection-signature-chachet-codebarr.py:226:def _load_doc_pages
-component/detection-signature-chachet-codebarr.py:239:def _prepare_arrays
-component/detection-signature-chachet-codebarr.py:260:def _transition_density
-component/detection-signature-chachet-codebarr.py:268:def _score_signature
-component/detection-signature-chachet-codebarr.py:290:def _score_stamp
-component/detection-signature-chachet-codebarr.py:309:def _score_qrcode
-component/detection-signature-chachet-codebarr.py:327:def _score_barcode
-component/detection-signature-chachet-codebarr.py:346:def _detect_qr_barcode_decoders
-component/detection-signature-chachet-codebarr.py:35:def _safe_list
-component/detection-signature-chachet-codebarr.py:39:def _safe_int
-component/detection-signature-chachet-codebarr.py:429:def _bbox_iou
-component/detection-signature-chachet-codebarr.py:449:def _scan_windows
-component/detection-signature-chachet-codebarr.py:46:def _safe_float
-component/detection-signature-chachet-codebarr.py:53:def _doc_key
-component/detection-signature-chachet-codebarr.py:544:def _detect_page_marks
-component/detection-signature-chachet-codebarr.py:558:def _dedupe_doc_detections
-component/detection-signature-chachet-codebarr.py:585:def run
-component/detection-signature-chachet-codebarr.py:63:def _build_source_path_map
-component/detection-signature-chachet-codebarr.py:67:def _add
-component/detection-signature-chachet-codebarr.py:88:def _iter_docs
-component/detection-signature-chachet-codebarr.py:95:def _resolve_source_path
-component/elasticsearch.py:22:def _normalize_ids
-component/elasticsearch.py:32:def run
-component/extraction/extraction-regles-100ml.py:125:def _bm25_scores
-component/extraction/extraction-regles-100ml.py:15:def _tokenize
-component/extraction/extraction-regles-100ml.py:166:def _run_base_extraction
-component/extraction/extraction-regles-100ml.py:172:def _add_bm25
-component/extraction/extraction-regles-100ml.py:19:def _safe_int
-component/extraction/extraction-regles-100ml.py:26:def _doc_key
-component/extraction/extraction-regles-100ml.py:34:def _iter_doc_chunks
-component/extraction/extraction-regles-100ml.py:77:def _build_docs_lookup
-component/extraction/extraction-regles-100ml.py:96:def _collect_query_terms
-component/extraction/extraction-regles-50ml.py:125:def _bm25_scores
-component/extraction/extraction-regles-50ml.py:15:def _tokenize
-component/extraction/extraction-regles-50ml.py:166:def _run_base_extraction
-component/extraction/extraction-regles-50ml.py:172:def _add_bm25
-component/extraction/extraction-regles-50ml.py:19:def _safe_int
-component/extraction/extraction-regles-50ml.py:26:def _doc_key
-component/extraction/extraction-regles-50ml.py:34:def _iter_doc_chunks
-component/extraction/extraction-regles-50ml.py:77:def _build_docs_lookup
-component/extraction/extraction-regles-50ml.py:96:def _collect_query_terms
-component/extraction/extraction-regles-yaml.py:114:def _load_yaml
-component/extraction/extraction-regles-yaml.py:124:def _load_json_like_yaml
-component/extraction/extraction-regles-yaml.py:129:def _load_routes
-component/extraction/extraction-regles-yaml.py:149:def _resolve_rulesets
-component/extraction/extraction-regles-yaml.py:164:def load_extractors_for
-component/extraction/extraction-regles-yaml.py:188:def _get_input_docs
-component/extraction/extraction-regles-yaml.py:197:def _page_text_from_page
-component/extraction/extraction-regles-yaml.py:213:def _norm_text
-component/extraction/extraction-regles-yaml.py:220:def _normalize_digits
-component/extraction/extraction-regles-yaml.py:224:def _strip_control_and_escapes
-component/extraction/extraction-regles-yaml.py:240:def _clean_value
-component/extraction/extraction-regles-yaml.py:247:def _normalize_email_value
-component/extraction/extraction-regles-yaml.py:257:def _normalize_url_value
-component/extraction/extraction-regles-yaml.py:266:def _normalize_phone_value
-component/extraction/extraction-regles-yaml.py:277:def _first_non_empty_line
-component/extraction/extraction-regles-yaml.py:286:def _find_label_in_line
-component/extraction/extraction-regles-yaml.py:306:def _value_after_label
-component/extraction/extraction-regles-yaml.py:331:def _split_tokens_rough
-component/extraction/extraction-regles-yaml.py:351:def _extract_date_value
-component/extraction/extraction-regles-yaml.py:373:def _extract_amount_value
-component/extraction/extraction-regles-yaml.py:386:def _extract_currency_value
-component/extraction/extraction-regles-yaml.py:394:def _detect_emails
-component/extraction/extraction-regles-yaml.py:408:def _detect_urls
-component/extraction/extraction-regles-yaml.py:418:def _detect_phones
-component/extraction/extraction-regles-yaml.py:436:def _detect_values_by_type
-component/extraction/extraction-regles-yaml.py:456:def _normalize_value_by_type
-component/extraction/extraction-regles-yaml.py:476:def _make_match
-component/extraction/extraction-regles-yaml.py:493:def _apply_extractor_to_page
-component/extraction/extraction-regles-yaml.py:550:def _build_cls_map
-component/extraction/extraction-regles-yaml.py:561:def _classification_for
-component/extraction/extraction-regles-yaml.py:571:def _doc_text_score
-component/extraction/extraction-regles-yaml.py:584:def _dedupe_docs
-component/extraction/extraction-regles-yaml.py:612:def _unique_keep_order
-component/extraction/extraction-regles-yaml.py:623:def run
-component/extraction/extraction-regles.py:105:def _get_input_docs
-component/extraction/extraction-regles.py:116:def _page_text_from_page
-component/extraction/extraction-regles.py:133:def apply_extractors_to_page
-component/extraction/extraction-regles.py:148:def _record
-component/extraction/extraction-regles.py:182:def _build_cls_map
-component/extraction/extraction-regles.py:193:def _classification_for
-component/extraction/extraction-regles.py:203:def _doc_text_score
-component/extraction/extraction-regles.py:216:def _dedupe_docs
-component/extraction/extraction-regles.py:244:def run
-component/extraction/extraction-regles.py:25:def _load_json
-component/extraction/extraction-regles.py:32:def _compile_regex
-component/extraction/extraction-regles.py:48:def _load_routes
-component/extraction/extraction-regles.py:65:def _resolve_rulesets
-component/extraction/extraction-regles.py:80:def load_extractors_for
-component/fusion_resultats.py:1020:def _final_output
-component/fusion_resultats.py:1049:def extract_text_raw
-component/fusion_resultats.py:1078:def extract_pages_meta
-component/fusion_resultats.py:1084:def extract_pages
-component/fusion_resultats.py:110:def _interdoc_output
-component/fusion_resultats.py:1111:def extract_classification
-component/fusion_resultats.py:1117:def extract_doc_type
-component/fusion_resultats.py:1121:def extract_extractions
-component/fusion_resultats.py:1125:def extract_detected_languages
-component/fusion_resultats.py:1129:def _text_from_tok_pages
-component/fusion_resultats.py:1140:def _pages_from_final_doc
-component/fusion_resultats.py:1154:def _collect_local_tokens_for_doc
-component/fusion_resultats.py:1224:def _pick_local_final_doc
-component/fusion_resultats.py:1237:def _pick_local_classification
-component/fusion_resultats.py:1250:def _build_local_payload_for_doc
-component/fusion_resultats.py:1365:def build_payloads_from_context
-component/fusion_resultats.py:1398:def build_payload_from_context
-component/fusion_resultats.py:139:def _iso_now
-component/fusion_resultats.py:143:def _basename
-component/fusion_resultats.py:152:def _norm_filename
-component/fusion_resultats.py:156:def _same_filename
-component/fusion_resultats.py:1570:def _es_text_from_pages
-component/fusion_resultats.py:1581:def _es_pages
-component/fusion_resultats.py:1597:def build_payload_from_es_source
-component/fusion_resultats.py:162:def _safe_non_negative_int
-component/fusion_resultats.py:1703:def build_payloads_from_es
-component/fusion_resultats.py:172:def _size_from_paths
-component/fusion_resultats.py:1775:def _profile_norm_term
-component/fusion_resultats.py:1785:def _profile_doc_key
-component/fusion_resultats.py:1795:def _profile_doc_aliases
-component/fusion_resultats.py:1807:def _profile_index_rows
-component/fusion_resultats.py:1823:def _profile_group_rows
-component/fusion_resultats.py:1840:def _profile_pick_bm25
-component/fusion_resultats.py:1848:def _is_grammar_noise
-component/fusion_resultats.py:1864:def _build_grammar_block_map
-component/fusion_resultats.py:1883:def _collect_blocked_terms
-component/fusion_resultats.py:1896:def _is_blocked_topic_term
-component/fusion_resultats.py:1912:def _filter_topics
-component/fusion_resultats.py:1938:def _filter_chunk_topics
-component/fusion_resultats.py:1956:def _augment_payload_for_profile
-component/fusion_resultats.py:196:def _size_maps_from_pretraitement
-component/fusion_resultats.py:2113:def _augment_payload_with_default_tables
-component/fusion_resultats.py:2196:def _append_totals_quality_check
-component/fusion_resultats.py:2224:def _augment_payload_with_totals_verification
-component/fusion_resultats.py:227:def _resolve_file_size
-component/fusion_resultats.py:2354:def _augment_payload_with_visual_marks_100ml
-component/fusion_resultats.py:2472:def main
-component/fusion_resultats.py:252:def _row_belongs_to_doc
-component/fusion_resultats.py:264:def _filter_rows_for_doc
-component/fusion_resultats.py:274:def _doc_key
-component/fusion_resultats.py:287:def _doc_text_score
-component/fusion_resultats.py:304:def _dedupe_docs
-component/fusion_resultats.py:33:def ns
-component/fusion_resultats.py:344:def _normalize_pages_from_doc
-component/fusion_resultats.py:358:def _filter_and_dedupe_extractions
-component/fusion_resultats.py:37:def first
-component/fusion_resultats.py:399:def _default_nlp_tokens_index
-component/fusion_resultats.py:407:def _search_index
-component/fusion_resultats.py:41:def merge_list
-component/fusion_resultats.py:427:def _fetch_nlp_tokens
-component/fusion_resultats.py:49:def _safe_list
-component/fusion_resultats.py:504:def _structure_nlp_tokens
-component/fusion_resultats.py:53:def _safe_load_json
-component/fusion_resultats.py:552:def _nlp_from_es_and_ctx
-component/fusion_resultats.py:62:def _safe_int
-component/fusion_resultats.py:69:def _interdoc_aliases
-component/fusion_resultats.py:728:def _build_map
-component/fusion_resultats.py:743:def _pick_from_map
-component/fusion_resultats.py:755:def _same_doc_hint
-component/fusion_resultats.py:764:def _extract_component_views
-component/fusion_resultats.py:91:def _interdoc_link_ids_for_doc
-component/fusion_resultats.py:971:def _to_document_output
-component/liaison-inter-docs.py:103:def _safe_float
-component/liaison-inter-docs.py:110:def _normalize_term
-component/liaison-inter-docs.py:1140:def _compute_links
-component/liaison-inter-docs.py:1161:def _build_doc_links_index
-component/liaison-inter-docs.py:1182:def run
-component/liaison-inter-docs.py:120:def _filename_aliases
-component/liaison-inter-docs.py:136:def _sentence_key
-component/liaison-inter-docs.py:140:def _is_semantic_pos
-component/liaison-inter-docs.py:156:def _is_informative_term
-component/liaison-inter-docs.py:173:def _tokenize_terms
-component/liaison-inter-docs.py:183:def _split_to_sentences
-component/liaison-inter-docs.py:193:def _clip_text
-component/liaison-inter-docs.py:200:def _coerce_vector
-component/liaison-inter-docs.py:212:def _vector_norm
-component/liaison-inter-docs.py:216:def _unit_vector
-component/liaison-inter-docs.py:226:def _unit_cosine_similarity
-component/liaison-inter-docs.py:237:def _cosine_similarity
-component/liaison-inter-docs.py:255:def _mean_vector
-component/liaison-inter-docs.py:273:def _doc_key
-component/liaison-inter-docs.py:283:def _doc_aliases
-component/liaison-inter-docs.py:297:def _extract_classification_terms
-component/liaison-inter-docs.py:316:def _build_classification_index
-component/liaison-inter-docs.py:330:def _build_semantic_sentence_index
-component/liaison-inter-docs.py:359:def _lookup_semantic_terms
-component/liaison-inter-docs.py:373:def _iter_doc_sentences
-component/liaison-inter-docs.py:426:def _doc_text_score
-component/liaison-inter-docs.py:434:def _dedupe_docs
-component/liaison-inter-docs.py:452:def _index_topic_rows
-component/liaison-inter-docs.py:464:def _vector_profile
-component/liaison-inter-docs.py:489:def _build_vector_index
-component/liaison-inter-docs.py:533:def _extract_topics
-component/liaison-inter-docs.py:560:def _chunk_topic_terms
-component/liaison-inter-docs.py:574:def _prepare_docs
-component/liaison-inter-docs.py:694:def _score_informative_term
-component/liaison-inter-docs.py:709:def _sentence_match_score
-component/liaison-inter-docs.py:762:def _topic_examples_for_doc
-component/liaison-inter-docs.py:785:def _sorted_shared_terms
-component/liaison-inter-docs.py:791:def _chunk_candidate_priority
-component/liaison-inter-docs.py:809:def _select_chunk_candidates
-component/liaison-inter-docs.py:829:def _vector_chunk_matches
-component/liaison-inter-docs.py:88:def _iso_now
-component/liaison-inter-docs.py:92:def _safe_list
-component/liaison-inter-docs.py:960:def _build_link
-component/liaison-inter-docs.py:96:def _safe_int
-component/output-txt.py:127:def _render_layout_from_data
-component/output-txt.py:238:def _basename
-component/output-txt.py:248:def _safe_file_size
-component/output-txt.py:257:def _doc_size_from_sources
-component/output-txt.py:371:def _get_pdf_reader_with_name
-component/output-txt.py:383:def _pdf_extract_text_preserve_layout
-component/output-txt.py:395:def _docx_xml_to_text
-component/output-txt.py:414:def _pptx_slide_xml_to_text
-component/output-txt.py:434:def _xlsx_col_to_index
-component/output-txt.py:442:def _xlsx_shared_strings
-component/output-txt.py:454:def _xlsx_sheet_to_text
-component/output-txt.py:504:def _odf_content_to_text
-component/output-txt.py:508:def walk
-component/output-txt.py:51:def build_config
-component/output-txt.py:535:def _html_bytes_to_text_preserve
-component/output-txt.py:546:def extract_text_native
-component/output-txt.py:56:class _DummyFT
-component/output-txt.py:57:def __init__
-component/output-txt.py:60:def detect_path_type
-component/output-txt.py:72:def _median
-component/output-txt.py:83:def _estimate_char_metrics
-component/postgres/postgres-sync.py:24:def _load_payload_from_disk
-component/postgres/postgres-sync.py:32:def main
-component/pretraitement-de-docs.py:164:def _xml_text_len
-component/pretraitement-de-docs.py:178:def _zip_has_text
-component/pretraitement-de-docs.py:249:def _get_pdf_reader
-component/pretraitement-de-docs.py:262:def _pdf_has_text
-component/pretraitement-de-docs.py:326:def content_kind_two_states
-component/pretraitement-de-docs.py:350:def analyze_many_two_states
-component/pretraitement-de-docs.py:36:class FileType
-component/pretraitement-de-docs.py:44:def normalize_input_files
-component/pretraitement-de-docs.py:59:def resolve_path
-component/pretraitement-de-docs.py:79:def _safe_file_size
-component/pretraitement-de-docs.py:88:def _read_head
-component/pretraitement-de-docs.py:93:def detect_path_type
-component/si-image-pretraiter-sinonpass-le-doc.py:148:def _xml_text_len
-component/si-image-pretraiter-sinonpass-le-doc.py:161:def _zip_has_text
-component/si-image-pretraiter-sinonpass-le-doc.py:224:def _get_pdf_reader
-component/si-image-pretraiter-sinonpass-le-doc.py:236:def _pdf_has_text
-component/si-image-pretraiter-sinonpass-le-doc.py:266:def content_kind_two_states
-component/si-image-pretraiter-sinonpass-le-doc.py:335:class EnhanceOptions
-component/si-image-pretraiter-sinonpass-le-doc.py:353:def build_config
-component/si-image-pretraiter-sinonpass-le-doc.py:379:def ensure_environment
-component/si-image-pretraiter-sinonpass-le-doc.py:399:def auto_rotate_if_needed
-component/si-image-pretraiter-sinonpass-le-doc.py:419:def preprocess_image
-component/si-image-pretraiter-sinonpass-le-doc.py:46:class FileType
-component/si-image-pretraiter-sinonpass-le-doc.py:500:def parse_args
-component/si-image-pretraiter-sinonpass-le-doc.py:52:def _read_head
-component/si-image-pretraiter-sinonpass-le-doc.py:573:def _normalize_input_files
-component/si-image-pretraiter-sinonpass-le-doc.py:57:def normalize_input_files
-component/si-image-pretraiter-sinonpass-le-doc.py:605:def _load_images_from_path
-component/si-image-pretraiter-sinonpass-le-doc.py:71:def resolve_path
-component/si-image-pretraiter-sinonpass-le-doc.py:85:def detect_path_type
-component/table_extraction/table-extraction.py:14:def _resolve_profile
-component/table_extraction/table_extraction_lib.py:1039:def _extract_totals_from_line
-component/table_extraction/table_extraction_lib.py:1054:def _row_to_item
-component/table_extraction/table_extraction_lib.py:1062:def get
-component/table_extraction/table_extraction_lib.py:1160:def _extract_doc_tables
-component/table_extraction/table_extraction_lib.py:1328:def _augment_code_only_rows_from_header
-component/table_extraction/table_extraction_lib.py:1422:def _build_source_path_map
-component/table_extraction/table_extraction_lib.py:1426:def _add
-component/table_extraction/table_extraction_lib.py:1447:def _should_run_ocr_fallback
-component/table_extraction/table_extraction_lib.py:1481:def _parse_ocr_row_line
-component/table_extraction/table_extraction_lib.py:148:def _safe_list
-component/table_extraction/table_extraction_lib.py:152:def _doc_key
-component/table_extraction/table_extraction_lib.py:1566:def _parse_ocr_table_rows
-component/table_extraction/table_extraction_lib.py:1616:def _guess_total_field_key
-component/table_extraction/table_extraction_lib.py:1624:def _parse_ocr_totals_rows
-component/table_extraction/table_extraction_lib.py:162:def _doc_text_score
-component/table_extraction/table_extraction_lib.py:1675:def _ocr_fallback_tables_from_image
-component/table_extraction/table_extraction_lib.py:1691:def _build_variants
-component/table_extraction/table_extraction_lib.py:172:def _dedupe_docs
-component/table_extraction/table_extraction_lib.py:1761:def _merge_ocr_fallback_rows
-component/table_extraction/table_extraction_lib.py:1774:def _sig
-component/table_extraction/table_extraction_lib.py:1866:def _merge_ocr_totals_rows
-component/table_extraction/table_extraction_lib.py:188:def _norm_text
-component/table_extraction/table_extraction_lib.py:1951:def _extract_code_keys_from_text
-component/table_extraction/table_extraction_lib.py:1964:def _table_metrics
-component/table_extraction/table_extraction_lib.py:1986:def _infer_detected_columns_from_rows
-component/table_extraction/table_extraction_lib.py:198:def _compact_spaces
-component/table_extraction/table_extraction_lib.py:2004:def _prune_redundant_tables
-component/table_extraction/table_extraction_lib.py:204:def _line_token_spans
-component/table_extraction/table_extraction_lib.py:2083:def run_table_extraction
-component/table_extraction/table_extraction_lib.py:215:def _line_segment_spans
-component/table_extraction/table_extraction_lib.py:245:def _line_geometry
-component/table_extraction/table_extraction_lib.py:296:def _alignment_with_neighbor
-component/table_extraction/table_extraction_lib.py:308:def _line_tabularity_score
-component/table_extraction/table_extraction_lib.py:328:def _anchors_from_header_geom
-component/table_extraction/table_extraction_lib.py:346:def _anchor_matches
-component/table_extraction/table_extraction_lib.py:359:def _cells_from_anchors
-component/table_extraction/table_extraction_lib.py:381:def _collect_blocks_anchor
-component/table_extraction/table_extraction_lib.py:476:def _merge_blocks
-component/table_extraction/table_extraction_lib.py:494:def _split_line_cells
-component/table_extraction/table_extraction_lib.py:524:def _is_probable_code
-component/table_extraction/table_extraction_lib.py:535:def _normalize_reference_code
-component/table_extraction/table_extraction_lib.py:549:def _extract_reference_code
-component/table_extraction/table_extraction_lib.py:565:def _clean_ocr_label
-component/table_extraction/table_extraction_lib.py:574:def _guess_product_number_from_reference
-component/table_extraction/table_extraction_lib.py:589:def _token_is_numeric_tail
-component/table_extraction/table_extraction_lib.py:604:def _merge_numeric_tokens
-component/table_extraction/table_extraction_lib.py:627:def _split_dense_numeric_tail
-component/table_extraction/table_extraction_lib.py:651:def _split_dense_header_cells
-component/table_extraction/table_extraction_lib.py:681:def _is_numeric_like
-component/table_extraction/table_extraction_lib.py:696:def _to_amount
-component/table_extraction/table_extraction_lib.py:738:def _normalize_number_token
-component/table_extraction/table_extraction_lib.py:780:def _to_quantity
-component/table_extraction/table_extraction_lib.py:805:def _header_score
-component/table_extraction/table_extraction_lib.py:832:def _detect_header_map
-component/table_extraction/table_extraction_lib.py:856:def _line_header_hint_score
-component/table_extraction/table_extraction_lib.py:861:def _is_header_like_line
-component/table_extraction/table_extraction_lib.py:868:def _line_looks_tabular
-component/table_extraction/table_extraction_lib.py:898:def _is_strong_single_row
-component/table_extraction/table_extraction_lib.py:911:def _collect_blocks
-component/table_extraction/table_extraction_lib.py:942:def _infer_map_from_rows
-component/tokenisation_layout/tokenisation-layout-100ml.py:108:def _prune_topic_redundancy
-component/tokenisation_layout/tokenisation-layout-100ml.py:129:def _extract_terms_from_keyword_item
-component/tokenisation_layout/tokenisation-layout-100ml.py:141:def _build_topic_boost_terms
-component/tokenisation_layout/tokenisation-layout-100ml.py:163:def _apply
-component/tokenisation_layout/tokenisation-layout-100ml.py:188:def _hash_index_sign
-component/tokenisation_layout/tokenisation-layout-100ml.py:195:def _vector_norm
-component/tokenisation_layout/tokenisation-layout-100ml.py:199:def _hash_text_vector
-component/tokenisation_layout/tokenisation-layout-100ml.py:215:def _mean_vectors
-component/tokenisation_layout/tokenisation-layout-100ml.py:230:def _to_list
-component/tokenisation_layout/tokenisation-layout-100ml.py:234:def _iter_doc_chunks
-component/tokenisation_layout/tokenisation-layout-100ml.py:255:def _extract_topics_from_chunks
-component/tokenisation_layout/tokenisation-layout-100ml.py:290:def _extract_chunk_topics
-component/tokenisation_layout/tokenisation-layout-100ml.py:319:def _doc_key
-component/tokenisation_layout/tokenisation-layout-100ml.py:327:class _TransformerEmbedder
-component/tokenisation_layout/tokenisation-layout-100ml.py:328:def __init__
-component/tokenisation_layout/tokenisation-layout-100ml.py:35:def _safe_int
-component/tokenisation_layout/tokenisation-layout-100ml.py:361:def embed_texts
-component/tokenisation_layout/tokenisation-layout-100ml.py:413:def _run_base_tokenisation
-component/tokenisation_layout/tokenisation-layout-100ml.py:419:def _augment_with_ml100
-component/tokenisation_layout/tokenisation-layout-100ml.py:42:def _norm_token
-component/tokenisation_layout/tokenisation-layout-100ml.py:46:def _tokenize
-component/tokenisation_layout/tokenisation-layout-100ml.py:50:def _norm_topic_term
-component/tokenisation_layout/tokenisation-layout-100ml.py:60:def _is_topic_candidate
-component/tokenisation_layout/tokenisation-layout-100ml.py:81:def _tokens_to_topic_terms
-component/tokenisation_layout/tokenisation-layout-100ml.py:97:def _score_term_quality
-component/tokenisation_layout/tokenisation-layout-50ml.py:100:def _score_term_quality
-component/tokenisation_layout/tokenisation-layout-50ml.py:112:def _prune_topic_redundancy
-component/tokenisation_layout/tokenisation-layout-50ml.py:134:def _extract_terms_from_keyword_item
-component/tokenisation_layout/tokenisation-layout-50ml.py:147:def _build_topic_boost_terms
-component/tokenisation_layout/tokenisation-layout-50ml.py:170:def _apply
-component/tokenisation_layout/tokenisation-layout-50ml.py:195:def _char_ngrams
-component/tokenisation_layout/tokenisation-layout-50ml.py:211:def _hash_index_sign
-component/tokenisation_layout/tokenisation-layout-50ml.py:218:def _vector_norm
-component/tokenisation_layout/tokenisation-layout-50ml.py:222:def _fasttext_like_vector
-component/tokenisation_layout/tokenisation-layout-50ml.py:234:def _mean_vectors
-component/tokenisation_layout/tokenisation-layout-50ml.py:249:def _to_list
-component/tokenisation_layout/tokenisation-layout-50ml.py:253:def _iter_doc_chunks
-component/tokenisation_layout/tokenisation-layout-50ml.py:274:def _extract_topics_from_chunks
-component/tokenisation_layout/tokenisation-layout-50ml.py:309:def _extract_chunk_topics
-component/tokenisation_layout/tokenisation-layout-50ml.py:338:def _doc_key
-component/tokenisation_layout/tokenisation-layout-50ml.py:346:def _run_base_tokenisation
-component/tokenisation_layout/tokenisation-layout-50ml.py:352:def _augment_with_ml50
-component/tokenisation_layout/tokenisation-layout-50ml.py:35:def _safe_int
-component/tokenisation_layout/tokenisation-layout-50ml.py:42:def _norm_token
-component/tokenisation_layout/tokenisation-layout-50ml.py:46:def _tokenize
-component/tokenisation_layout/tokenisation-layout-50ml.py:50:def _norm_topic_term
-component/tokenisation_layout/tokenisation-layout-50ml.py:61:def _is_topic_candidate
-component/tokenisation_layout/tokenisation-layout-50ml.py:82:def _tokens_to_topic_terms
-component/tokenisation_layout/tokenisation-layout.py:106:def _load_punkt_pickle
-component/tokenisation_layout/tokenisation-layout.py:1083:def _k
-component/tokenisation_layout/tokenisation-layout.py:1099:def build_noise_keys_for_doc
-component/tokenisation_layout/tokenisation-layout.py:113:def _split_sentence_fallback
-component/tokenisation_layout/tokenisation-layout.py:1142:def chunk_is_noise
-component/tokenisation_layout/tokenisation-layout.py:1171:def _nonspace_len
-component/tokenisation_layout/tokenisation-layout.py:1174:def _line_col_from_offset
-component/tokenisation_layout/tokenisation-layout.py:1185:def _safe_str
-component/tokenisation_layout/tokenisation-layout.py:1191:def _unique_keep_order
-component/tokenisation_layout/tokenisation-layout.py:1200:def _pdf_extract_pages_text
-component/tokenisation_layout/tokenisation-layout.py:1213:def _pdf_page_count
-component/tokenisation_layout/tokenisation-layout.py:1223:def _safe_file_size
-component/tokenisation_layout/tokenisation-layout.py:1232:def _doc_size_from_paths
-component/tokenisation_layout/tokenisation-layout.py:126:def split_punkt_layout
-component/tokenisation_layout/tokenisation-layout.py:142:def _split_on_newline_gap
-component/tokenisation_layout/tokenisation-layout.py:1460:def _sort_key
-component/tokenisation_layout/tokenisation-layout.py:1471:def _select_doc
-component/tokenisation_layout/tokenisation-layout.py:1498:def print_one_doc
-component/tokenisation_layout/tokenisation-layout.py:15:def _get_pdf_reader
-component/tokenisation_layout/tokenisation-layout.py:161:def _split_on_lang_switch
-component/tokenisation_layout/tokenisation-layout.py:189:def sentence_chunks_layout
-component/tokenisation_layout/tokenisation-layout.py:209:def _iter_line_spans
-component/tokenisation_layout/tokenisation-layout.py:220:def _collapse_ws
-component/tokenisation_layout/tokenisation-layout.py:223:def _mask_digits
-component/tokenisation_layout/tokenisation-layout.py:250:def _is_section_start_line
-component/tokenisation_layout/tokenisation-layout.py:273:def _merge_label_only
-component/tokenisation_layout/tokenisation-layout.py:285:def split_sections_layout
-component/tokenisation_layout/tokenisation-layout.py:319:def split_paragraphs_layout
-component/tokenisation_layout/tokenisation-layout.py:334:def chunk_layout_universal
-component/tokenisation_layout/tokenisation-layout.py:404:def _space_runs_ge
-component/tokenisation_layout/tokenisation-layout.py:407:def _has_big_gap
-component/tokenisation_layout/tokenisation-layout.py:410:def _num_tokens
-component/tokenisation_layout/tokenisation-layout.py:413:def _dec_tokens
-component/tokenisation_layout/tokenisation-layout.py:416:def _is_table_line
-component/tokenisation_layout/tokenisation-layout.py:42:def _ensure_nltk
-component/tokenisation_layout/tokenisation-layout.py:431:def _cluster_centers
-component/tokenisation_layout/tokenisation-layout.py:452:def _upper_ratio
-component/tokenisation_layout/tokenisation-layout.py:459:def _sep_spans
-component/tokenisation_layout/tokenisation-layout.py:478:def _line_segments_by_gaps
-component/tokenisation_layout/tokenisation-layout.py:499:def _looks_like_title_line
-component/tokenisation_layout/tokenisation-layout.py:511:def _is_multicol_candidate_line
-component/tokenisation_layout/tokenisation-layout.py:537:def _looks_like_header_pair
-component/tokenisation_layout/tokenisation-layout.py:547:def _looks_like_addressish
-component/tokenisation_layout/tokenisation-layout.py:557:def _normalize_kv_generic
-component/tokenisation_layout/tokenisation-layout.py:585:def _strip_sep_lines
-component/tokenisation_layout/tokenisation-layout.py:596:def _assign_to_centers
-component/tokenisation_layout/tokenisation-layout.py:608:def _merge_close_columns
-component/tokenisation_layout/tokenisation-layout.py:641:def _is_grid_like
-component/tokenisation_layout/tokenisation-layout.py:64:def detect_lang
-component/tokenisation_layout/tokenisation-layout.py:653:def _is_micro_table_like
-component/tokenisation_layout/tokenisation-layout.py:667:def _transpose_or_group_multicol
-component/tokenisation_layout/tokenisation-layout.py:844:def _looks_like_paragraphish
-component/tokenisation_layout/tokenisation-layout.py:854:def _is_address_continuation_line
-component/tokenisation_layout/tokenisation-layout.py:879:def _collect_table_block
-component/tokenisation_layout/tokenisation-layout.py:886:def _looks_like_wrap_line
-component/tokenisation_layout/tokenisation-layout.py:93:def split_ar_layout
-component/tokenisation_layout/tokenisation-layout.py:947:def _make_span_item
-component/tokenisation_layout/tokenisation-layout.py:960:def layout_items
-component/tokenisation_layout/tokenisation-layout.py:975:def _starts_table
-component/tokenisation_layout/tokenisation-layout.py:978:def _starts_multicol
-component/verification-totaux.py:100:def _build_chunk_lookup
-component/verification-totaux.py:13:def _safe_list
-component/verification-totaux.py:140:def _value_position_in_text
-component/verification-totaux.py:149:def _locate_chunk
-component/verification-totaux.py:17:def _safe_int
-component/verification-totaux.py:214:def _dominant_table_index
-component/verification-totaux.py:226:def _table_anchor_location
-component/verification-totaux.py:24:def _safe_float
-component/verification-totaux.py:254:def _row_total_candidate
-component/verification-totaux.py:262:def _row_label
-component/verification-totaux.py:270:def _candidate_values
-component/verification-totaux.py:285:def _pick_nearest
-component/verification-totaux.py:291:def _pick_total_candidate
-component/verification-totaux.py:309:def _pick_subtotal_candidate
-component/verification-totaux.py:316:def _pick_tax_candidate
-component/verification-totaux.py:31:def _to_decimal
-component/verification-totaux.py:329:def _verify_row
-component/verification-totaux.py:404:def _doc_key
-component/verification-totaux.py:414:def _locate_total_value
-component/verification-totaux.py:442:def _verify_doc
-component/verification-totaux.py:62:def _money_str
-component/verification-totaux.py:647:def run
-component/verification-totaux.py:68:def _is_close
-component/verification-totaux.py:74:def _norm_match_text
-component/verification-totaux.py:82:def _doc_aliases
-pipeline/cli.py:173:def main
-pipeline/cli.py:210:def tee_print
-pipeline/cli.py:40:def _env_bool
-pipeline/cli.py:47:def _env_int
-pipeline/cli.py:57:def _env_optional
-pipeline/cli.py:65:def _normalize_pipeline_name
-pipeline/cli.py:82:def _env_pipeline
-pipeline/cli.py:90:def _normalize_step_name
-pipeline/cli.py:99:def parse_cli
-pipeline/components.py:112:def _report
-pipeline/components.py:120:class PretraitementComponent
-pipeline/components.py:121:def run
-pipeline/components.py:173:class OCRPreprocessComponent
-pipeline/components.py:174:def run
-pipeline/components.py:227:class OutputTxtComponent
-pipeline/components.py:228:def run
-pipeline/components.py:238:def _doc_pages_count
-pipeline/components.py:249:class TokenisationLayoutComponent
-pipeline/components.py:250:def run
-pipeline/components.py:276:class GrammarComponent
-pipeline/components.py:277:def run
-pipeline/components.py:318:class TableExtractionComponent
-pipeline/components.py:319:def run
-pipeline/components.py:32:def _doc_has_meaningful_text
-pipeline/components.py:341:class TotalsVerificationComponent
-pipeline/components.py:342:def run
-pipeline/components.py:361:class VisualMarksDetectionComponent
-pipeline/components.py:362:def run
-pipeline/components.py:393:class InterDocLinkingComponent
-pipeline/components.py:394:def run
-pipeline/components.py:425:class ElasticsearchComponent
-pipeline/components.py:426:def run
-pipeline/components.py:466:class ClassificationComponent
-pipeline/components.py:467:def run
-pipeline/components.py:513:class RuleExtractionComponent
-pipeline/components.py:514:def run
-pipeline/components.py:563:class FusionResultComponent
-pipeline/components.py:566:def run
-pipeline/components.py:59:def _drop_empty_duplicate_docs
-pipeline/components.py:609:class PostgresSyncComponent
-pipeline/components.py:612:def run
-pipeline/components.py:84:class Component
-pipeline/components.py:88:def run
-pipeline/components.py:91:def _execute_script
-pipeline/elasticsearch.py:1015:def _ensure_nlp_tokens_index
-pipeline/elasticsearch.py:1038:def _build_nlp_token_doc_id
-pipeline/elasticsearch.py:1049:def _bulk_index_nlp_tokens
-pipeline/elasticsearch.py:1079:def sync_nlp_results
-pipeline/elasticsearch.py:120:def _append_one
-pipeline/elasticsearch.py:1254:def maybe_build_store
-pipeline/elasticsearch.py:160:def _run_auto_start_command
-pipeline/elasticsearch.py:195:def _wait_for_es_ping
-pipeline/elasticsearch.py:204:def _try_auto_start_elasticsearch
-pipeline/elasticsearch.py:274:def _same_es_target
-pipeline/elasticsearch.py:280:def _split_words
-pipeline/elasticsearch.py:285:def _json_serialize
-pipeline/elasticsearch.py:292:def _normalize_nlp_level
-pipeline/elasticsearch.py:303:def _normalize_nlp_index
-pipeline/elasticsearch.py:311:def _to_clean_str
-pipeline/elasticsearch.py:316:def _top_counter_items
-pipeline/elasticsearch.py:320:def _extract_entities
-pipeline/elasticsearch.py:33:def _iso_now
-pipeline/elasticsearch.py:354:def _entities_sample_flat
-pipeline/elasticsearch.py:366:def build_es_doc_id
-pipeline/elasticsearch.py:379:def _file_size_from_paths
-pipeline/elasticsearch.py:37:def _unique_keep_order
-pipeline/elasticsearch.py:405:def _extract_doc_size
-pipeline/elasticsearch.py:417:def _page_text_from_page
-pipeline/elasticsearch.py:439:def flatten_tok_doc_for_index
-pipeline/elasticsearch.py:48:def _safe_int
-pipeline/elasticsearch.py:525:class ElasticsearchStore
-pipeline/elasticsearch.py:526:def __init__
-pipeline/elasticsearch.py:542:def _request
-pipeline/elasticsearch.py:55:def _safe_positive_int
-pipeline/elasticsearch.py:588:def ping
-pipeline/elasticsearch.py:595:def ensure_index
-pipeline/elasticsearch.py:65:def _is_local_es_url
-pipeline/elasticsearch.py:678:def ensure_custom_index
-pipeline/elasticsearch.py:690:def delete_by_query
-pipeline/elasticsearch.py:700:def bulk_ndjson
-pipeline/elasticsearch.py:70:def _normalize_command
-pipeline/elasticsearch.py:712:def upsert_document
-pipeline/elasticsearch.py:719:def update_fields
-pipeline/elasticsearch.py:722:def get_document
-pipeline/elasticsearch.py:730:def mget
-pipeline/elasticsearch.py:744:def search
-pipeline/elasticsearch.py:755:def find_document_id
-pipeline/elasticsearch.py:774:def index_tok_docs
-pipeline/elasticsearch.py:791:def _group_passages_by_page
-pipeline/elasticsearch.py:804:def to_classification_docs
-pipeline/elasticsearch.py:83:def _format_command
-pipeline/elasticsearch.py:847:def to_extraction_docs
-pipeline/elasticsearch.py:87:def _resolve_auto_start_commands
-pipeline/elasticsearch.py:890:def fetch_sources_for_ids
-pipeline/elasticsearch.py:897:def update_classification_results
-pipeline/elasticsearch.py:90:def _append_many
-pipeline/elasticsearch.py:924:def update_extraction_results
-pipeline/elasticsearch.py:970:def _build_nlp_doc_lookup
-pipeline/elasticsearch.py:990:def _resolve_nlp_doc_id
-pipeline/local_api.py:106:def _discover_ipv4_addresses
-pipeline/local_api.py:125:def _candidate_urls
-pipeline/local_api.py:140:def _sanitize_filename
-pipeline/local_api.py:147:def _extract_uploaded_files
-pipeline/local_api.py:195:def save_uploaded_files
-pipeline/local_api.py:218:def build_cli_command
-pipeline/local_api.py:227:class LauncherState
-pipeline/local_api.py:228:def __init__
-pipeline/local_api.py:244:def snapshot
-pipeline/local_api.py:251:def start_job
-pipeline/local_api.py:288:def _wait_for_process
-pipeline/local_api.py:301:class DMSLauncherHandler
-pipeline/local_api.py:305:def launcher_state
-pipeline/local_api.py:308:def _send_cors_headers
-pipeline/local_api.py:313:def _send_json
-pipeline/local_api.py:322:def _send_html_file
-pipeline/local_api.py:331:def log_message
-pipeline/local_api.py:334:def do_GET
-pipeline/local_api.py:350:def do_OPTIONS
-pipeline/local_api.py:355:def do_POST
-pipeline/local_api.py:385:class DMSLauncherServer
-pipeline/local_api.py:388:def __init__
-pipeline/local_api.py:393:def parse_args
-pipeline/local_api.py:400:def serve
-pipeline/local_api.py:42:def _active_pipeline_steps
-pipeline/local_api.py:430:def _graceful_stop
-pipeline/local_api.py:451:def main
-pipeline/local_api.py:52:def _iso_now
-pipeline/local_api.py:56:def _json_bytes
-pipeline/local_api.py:60:def _tail_recent_lines
-pipeline/local_api.py:70:def _current_runtime_progress
-pipeline/orchestrator.py:111:def list_steps
-pipeline/orchestrator.py:114:def _select_components
-pipeline/orchestrator.py:132:def run
-pipeline/orchestrator.py:153:class Pipeline100MLOrchestrator
-pipeline/orchestrator.py:160:def __init__
-pipeline/orchestrator.py:179:def list_steps
-pipeline/orchestrator.py:182:def _select_components
-pipeline/orchestrator.py:200:def run
-pipeline/orchestrator.py:25:class PipelineOrchestrator
-pipeline/orchestrator.py:26:def __init__
-pipeline/orchestrator.py:44:def list_steps
-pipeline/orchestrator.py:47:def _select_components
-pipeline/orchestrator.py:65:def run
-pipeline/orchestrator.py:86:class Pipeline50MLOrchestrator
-pipeline/orchestrator.py:93:def __init__
-pipeline/postgres.py:112:def _format_command
-pipeline/postgres.py:116:def _load_python_module
-pipeline/postgres.py:127:def _resolve_path
-pipeline/postgres.py:135:def _resolve_first_existing_path
-pipeline/postgres.py:145:def _normalize_sql_entries
-pipeline/postgres.py:162:def _utc_now_iso
-pipeline/postgres.py:166:def _payload_documents
-pipeline/postgres.py:176:def _json_sql_literal
-pipeline/postgres.py:187:def _sql_nullable_text
-pipeline/postgres.py:196:def _sql_nullable_int
-pipeline/postgres.py:205:def _sql_nullable_float
-pipeline/postgres.py:214:def _sql_nullable_timestamp
-pipeline/postgres.py:223:def _stable_hash_id
-pipeline/postgres.py:229:def _extract_filename
-pipeline/postgres.py:234:def _extract_document_id
-pipeline/postgres.py:246:def _extract_doc_type
-pipeline/postgres.py:254:def _extract_classification_status
-pipeline/postgres.py:260:def _extract_content_mode
-pipeline/postgres.py:266:def _extract_file_size
-pipeline/postgres.py:275:def _extract_page_count
-pipeline/postgres.py:291:def _extract_links
-pipeline/postgres.py:296:def _build_psql_stdin_cmd
-pipeline/postgres.py:313:def load_postgres_connection_config
-pipeline/postgres.py:34:class PostgresConnectionConfig
-pipeline/postgres.py:364:def load_postgres_schema_config
-pipeline/postgres.py:376:def _pg_env
-pipeline/postgres.py:388:def _run_command
-pipeline/postgres.py:423:def _quote_sql_literal
-pipeline/postgres.py:427:def _quote_sql_ident
-pipeline/postgres.py:431:def _build_psql_cmd
-pipeline/postgres.py:439:def _postgres_ping
-pipeline/postgres.py:460:def _wait_for_postgres
-pipeline/postgres.py:469:def _resolve_start_commands
-pipeline/postgres.py:490:def _try_auto_start_postgres
-pipeline/postgres.py:544:def _run_scalar_sql
-pipeline/postgres.py:552:def _run_exec_sql
-pipeline/postgres.py:559:def _run_exec_sql_stdin
-pipeline/postgres.py:566:def _database_exists
-pipeline/postgres.py:571:def _create_database_if_missing
-pipeline/postgres.py:583:def _table_exists
-pipeline/postgres.py:591:def _apply_schema
-pipeline/postgres.py:61:class PostgresSchemaConfig
-pipeline/postgres.py:623:def _finalize_or_raise
-pipeline/postgres.py:629:def _finalize_sync_or_raise
-pipeline/postgres.py:635:def ensure_postgres_bootstrap
-pipeline/postgres.py:709:def build_postgres_sync_audit
-pipeline/postgres.py:70:def _safe_int
-pipeline/postgres.py:740:def attach_postgres_sync_audit
-pipeline/postgres.py:747:def sync_fusion_payload_to_postgres
-pipeline/postgres.py:77:def _safe_float
-pipeline/postgres.py:84:def _safe_bool
-pipeline/postgres.py:90:def _safe_dict
-pipeline/postgres.py:94:def _safe_list
-pipeline/postgres.py:98:def _normalize_command
-pipeline/settings.py:109:def isolated_argv
-pipeline/settings.py:20:def load_dotenv
-pipeline/settings.py:55:def configure_logging
-pipeline/settings.py:66:def normalize_input
-pipeline/settings.py:71:def _split_item
-pipeline/settings.py:84:def safe_repr
-pipeline/settings.py:89:def count_sentences
-pipeline/settings.py:98:def change_dir
-pytesseract.py:107:def image_to_string
-pytesseract.py:119:def _parse_tsv_to_dict
-pytesseract.py:133:def image_to_data
-pytesseract.py:14:class TesseractError
-pytesseract.py:18:class TesseractNotFoundError
-pytesseract.py:22:class Output
-pytesseract.py:29:def _split_config
-pytesseract.py:39:def _run_tesseract
-pytesseract.py:60:def _coerce_image_input
-pytesseract.py:72:def _cleanup_temp
-pytesseract.py:81:def get_tesseract_version
-pytesseract.py:90:def get_languages
-pytesseract.py:98:def image_to_osd
+component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:30 | FunctionDef | _is_punct_like_token
+component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:47 | FunctionDef | _normalize_token_fields
+component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:60 | FunctionDef | detect_lang
+component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:73 | FunctionDef | get_previous_cell_input
+component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:84 | FunctionDef | iter_sentences_from_input
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:86 | FunctionDef | _zeros_vec
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:90 | FunctionDef | _zeros_matrix
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:94 | FunctionDef | _vector_norm
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:98 | FunctionDef | _normalize_vector
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:105 | FunctionDef | _average_vectors
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:117 | FunctionDef | _env_true
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:122 | FunctionDef | _is_offline_mode
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:132 | FunctionDef | _resolve_model_for_loading
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:177 | FunctionDef | _is_punct_like_token
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:195 | FunctionDef | _normalize_token_fields
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:209 | FunctionDef | _strip_accents
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:214 | FunctionDef | _norm_token
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:220 | FunctionDef | detect_lang
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:234 | FunctionDef | get_previous_cell_input
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:246 | FunctionDef | iter_sentences_from_input
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:327 | FunctionDef | _basic_tokenize
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:331 | FunctionDef | _normalize_lemma
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:342 | FunctionDef | _guess_pos
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:386 | FunctionDef | _cosine
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:399 | FunctionDef | _build_pos_prototypes
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:432 | FunctionDef | _refine_pos_tags
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:519 | FunctionDef | _hash_vec
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:529 | ClassDef | _XLMRContextEncoder
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:530 | FunctionDef | __init__
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:577 | FunctionDef | encode_token_lists
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:639 | FunctionDef | _heuristic_ner
+component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py:657 | FunctionDef | _run
+component/atrribution-gramatical/engcode.py:12 | FunctionDef | print_install_help
+component/atrribution-gramatical/engcode.py:39 | FunctionDef | _ensure_nltk
+component/atrribution-gramatical/engcode.py:88 | ClassDef | Tok
+component/atrribution-gramatical/engcode.py:103 | FunctionDef | _is_punct
+component/atrribution-gramatical/engcode.py:106 | FunctionDef | _is_number
+component/atrribution-gramatical/engcode.py:149 | FunctionDef | _lower
+component/atrribution-gramatical/engcode.py:152 | FunctionDef | _has_apostrophe
+component/atrribution-gramatical/engcode.py:155 | FunctionDef | _norm_apos
+component/atrribution-gramatical/engcode.py:177 | FunctionDef | _looks_like_word
+component/atrribution-gramatical/engcode.py:180 | FunctionDef | _split_plural_possessive
+component/atrribution-gramatical/engcode.py:192 | FunctionDef | split_contractions
+component/atrribution-gramatical/engcode.py:265 | FunctionDef | tokenize_with_spans
+component/atrribution-gramatical/engcode.py:290 | FunctionDef | guess_pos_heur
+component/atrribution-gramatical/engcode.py:330 | FunctionDef | map_penn_to_simple
+component/atrribution-gramatical/engcode.py:367 | FunctionDef | pos_tag_simple
+component/atrribution-gramatical/engcode.py:387 | FunctionDef | looks_like_nounish
+component/atrribution-gramatical/engcode.py:400 | FunctionDef | resolve_s_contractions
+component/atrribution-gramatical/engcode.py:435 | FunctionDef | _penn_to_wordnet_simple
+component/atrribution-gramatical/engcode.py:447 | FunctionDef | lemma_en
+component/atrribution-gramatical/engcode.py:488 | FunctionDef | fix_buffalo_pos
+component/atrribution-gramatical/engcode.py:504 | FunctionDef | date_spans
+component/atrribution-gramatical/engcode.py:529 | FunctionDef | currency_spans
+component/atrribution-gramatical/engcode.py:547 | FunctionDef | load_hf_ner
+component/atrribution-gramatical/engcode.py:569 | FunctionDef | _norm_ner_label
+component/atrribution-gramatical/engcode.py:578 | FunctionDef | hf_spans
+component/atrribution-gramatical/engcode.py:599 | FunctionDef | apply_spans_to_tokens
+component/atrribution-gramatical/engcode.py:610 | FunctionDef | enforce_bio
+component/atrribution-gramatical/engcode.py:619 | FunctionDef | fix_buffalo_ner
+component/atrribution-gramatical/engcode.py:659 | FunctionDef | _is_initial_chain
+component/atrribution-gramatical/engcode.py:665 | FunctionDef | drop_false_pers
+component/atrribution-gramatical/engcode.py:691 | FunctionDef | _join_entity_tokens
+component/atrribution-gramatical/engcode.py:698 | FunctionDef | entities_from_bio
+component/atrribution-gramatical/engcode.py:721 | FunctionDef | print_table
+component/atrribution-gramatical/engcode.py:730 | FunctionDef | fallback_ner_labels
+component/atrribution-gramatical/engcode.py:756 | FunctionDef | run_one
+component/atrribution-gramatical/engcode.py:859 | FunctionDef | split_input_into_sentences
+component/atrribution-gramatical/engcode.py:873 | FunctionDef | get_ner_pipe
+component/atrribution-gramatical/engcode.py:890 | FunctionDef | run_one_auto
+component/atrribution-gramatical/engcode.py:894 | FunctionDef | run_from_previous_cell
+component/atrribution-gramatical/engcode.py:951 | FunctionDef | main
+component/atrribution-gramatical/frcode.py:12 | FunctionDef | print_install_help
+component/atrribution-gramatical/frcode.py:99 | ClassDef | Tok
+component/atrribution-gramatical/frcode.py:104 | FunctionDef | _norm_apo
+component/atrribution-gramatical/frcode.py:107 | FunctionDef | _has_letters
+component/atrribution-gramatical/frcode.py:110 | FunctionDef | _is_punct
+component/atrribution-gramatical/frcode.py:113 | FunctionDef | _is_dash
+component/atrribution-gramatical/frcode.py:116 | FunctionDef | _is_number
+component/atrribution-gramatical/frcode.py:119 | FunctionDef | _is_acronym
+component/atrribution-gramatical/frcode.py:122 | FunctionDef | _is_capitalized_word
+component/atrribution-gramatical/frcode.py:125 | FunctionDef | _is_hyphenated_word
+component/atrribution-gramatical/frcode.py:128 | FunctionDef | _is_email
+component/atrribution-gramatical/frcode.py:131 | FunctionDef | _is_url
+component/atrribution-gramatical/frcode.py:135 | FunctionDef | _is_ipv4
+component/atrribution-gramatical/frcode.py:138 | FunctionDef | _is_hash
+component/atrribution-gramatical/frcode.py:141 | FunctionDef | _is_id
+component/atrribution-gramatical/frcode.py:144 | FunctionDef | _split_trailing_punct_if_needed
+component/atrribution-gramatical/frcode.py:174 | FunctionDef | tokenize_raw
+component/atrribution-gramatical/frcode.py:184 | FunctionDef | split_elisions
+component/atrribution-gramatical/frcode.py:208 | FunctionDef | tokenize_with_spans
+component/atrribution-gramatical/frcode.py:283 | FunctionDef | guess_pos
+component/atrribution-gramatical/frcode.py:368 | FunctionDef | lemma_fr
+component/atrribution-gramatical/frcode.py:442 | FunctionDef | date_spans
+component/atrribution-gramatical/frcode.py:490 | FunctionDef | currency_spans
+component/atrribution-gramatical/frcode.py:508 | FunctionDef | _norm_ner_label
+component/atrribution-gramatical/frcode.py:517 | FunctionDef | load_hf_ner
+component/atrribution-gramatical/frcode.py:539 | FunctionDef | hf_spans
+component/atrribution-gramatical/frcode.py:560 | FunctionDef | apply_spans_to_tokens
+component/atrribution-gramatical/frcode.py:571 | FunctionDef | enforce_bio
+component/atrribution-gramatical/frcode.py:601 | FunctionDef | _is_initial_chain
+component/atrribution-gramatical/frcode.py:607 | FunctionDef | drop_false_pers
+component/atrribution-gramatical/frcode.py:630 | FunctionDef | ner_rules_spans
+component/atrribution-gramatical/frcode.py:700 | FunctionDef | improve_pos_with_ner
+component/atrribution-gramatical/frcode.py:713 | FunctionDef | _tok_lower
+component/atrribution-gramatical/frcode.py:716 | FunctionDef | _is_function_word
+component/atrribution-gramatical/frcode.py:720 | FunctionDef | _looks_like_proper
+component/atrribution-gramatical/frcode.py:777 | FunctionDef | join_fr
+component/atrribution-gramatical/frcode.py:794 | FunctionDef | entities_from_bio
+component/atrribution-gramatical/frcode.py:816 | FunctionDef | print_table
+component/atrribution-gramatical/frcode.py:828 | FunctionDef | run_one
+component/atrribution-gramatical/frcode.py:914 | FunctionDef | split_input_into_sentences
+component/atrribution-gramatical/frcode.py:928 | FunctionDef | get_ner_pipe
+component/atrribution-gramatical/frcode.py:945 | FunctionDef | run_one_auto
+component/atrribution-gramatical/frcode.py:948 | FunctionDef | run_from_previous_cell
+component/atrribution-gramatical/frcode.py:1002 | FunctionDef | main
+component/clasification.py:19 | FunctionDef | _load_json
+component/clasification.py:25 | FunctionDef | _strip_accents
+component/clasification.py:31 | FunctionDef | _norm_text
+component/clasification.py:36 | FunctionDef | _norm_keyword
+component/clasification.py:40 | FunctionDef | _ensure_kw_dict
+component/clasification.py:59 | FunctionDef | load_classification_configs
+component/clasification.py:92 | FunctionDef | _get_previous_cell_input
+component/clasification.py:105 | FunctionDef | _build_DOCS_from_input
+component/clasification.py:161 | FunctionDef | _doc_text_len
+component/clasification.py:169 | FunctionDef | _drop_empty_duplicates
+component/clasification.py:185 | FunctionDef | classify_scores
+component/clasification.py:197 | FunctionDef | _push_audit
+component/clasification.py:213 | FunctionDef | add_score
+component/clasification.py:281 | FunctionDef | decide
+component/clasification.py:339 | FunctionDef | _bucket_pairs
+component/clasification.py:400 | FunctionDef | _fmt
+component/detection-signature-chachet-codebarr.py:35 | FunctionDef | _safe_list
+component/detection-signature-chachet-codebarr.py:39 | FunctionDef | _safe_int
+component/detection-signature-chachet-codebarr.py:46 | FunctionDef | _safe_float
+component/detection-signature-chachet-codebarr.py:53 | FunctionDef | _doc_key
+component/detection-signature-chachet-codebarr.py:63 | FunctionDef | _build_source_path_map
+component/detection-signature-chachet-codebarr.py:67 | FunctionDef | _add
+component/detection-signature-chachet-codebarr.py:88 | FunctionDef | _iter_docs
+component/detection-signature-chachet-codebarr.py:95 | FunctionDef | _resolve_source_path
+component/detection-signature-chachet-codebarr.py:110 | FunctionDef | _pil_to_cv_bgr
+component/detection-signature-chachet-codebarr.py:117 | FunctionDef | _open_image_frames
+component/detection-signature-chachet-codebarr.py:127 | FunctionDef | _pdf_page_count
+component/detection-signature-chachet-codebarr.py:145 | FunctionDef | _sample_page_numbers
+component/detection-signature-chachet-codebarr.py:176 | FunctionDef | _render_pdf_page
+component/detection-signature-chachet-codebarr.py:212 | FunctionDef | _render_pdf_pages
+component/detection-signature-chachet-codebarr.py:226 | FunctionDef | _load_doc_pages
+component/detection-signature-chachet-codebarr.py:239 | FunctionDef | _prepare_arrays
+component/detection-signature-chachet-codebarr.py:260 | FunctionDef | _transition_density
+component/detection-signature-chachet-codebarr.py:268 | FunctionDef | _score_signature
+component/detection-signature-chachet-codebarr.py:290 | FunctionDef | _score_stamp
+component/detection-signature-chachet-codebarr.py:309 | FunctionDef | _score_qrcode
+component/detection-signature-chachet-codebarr.py:327 | FunctionDef | _score_barcode
+component/detection-signature-chachet-codebarr.py:346 | FunctionDef | _detect_qr_barcode_decoders
+component/detection-signature-chachet-codebarr.py:429 | FunctionDef | _bbox_iou
+component/detection-signature-chachet-codebarr.py:449 | FunctionDef | _scan_windows
+component/detection-signature-chachet-codebarr.py:544 | FunctionDef | _detect_page_marks
+component/detection-signature-chachet-codebarr.py:558 | FunctionDef | _dedupe_doc_detections
+component/detection-signature-chachet-codebarr.py:585 | FunctionDef | run
+component/elasticsearch.py:22 | FunctionDef | _normalize_ids
+component/elasticsearch.py:32 | FunctionDef | run
+component/extraction/extraction-regles-100ml.py:15 | FunctionDef | _tokenize
+component/extraction/extraction-regles-100ml.py:19 | FunctionDef | _safe_int
+component/extraction/extraction-regles-100ml.py:26 | FunctionDef | _doc_key
+component/extraction/extraction-regles-100ml.py:34 | FunctionDef | _iter_doc_chunks
+component/extraction/extraction-regles-100ml.py:77 | FunctionDef | _build_docs_lookup
+component/extraction/extraction-regles-100ml.py:96 | FunctionDef | _collect_query_terms
+component/extraction/extraction-regles-100ml.py:125 | FunctionDef | _bm25_scores
+component/extraction/extraction-regles-100ml.py:166 | FunctionDef | _run_base_extraction
+component/extraction/extraction-regles-100ml.py:172 | FunctionDef | _add_bm25
+component/extraction/extraction-regles-50ml.py:15 | FunctionDef | _tokenize
+component/extraction/extraction-regles-50ml.py:19 | FunctionDef | _safe_int
+component/extraction/extraction-regles-50ml.py:26 | FunctionDef | _doc_key
+component/extraction/extraction-regles-50ml.py:34 | FunctionDef | _iter_doc_chunks
+component/extraction/extraction-regles-50ml.py:77 | FunctionDef | _build_docs_lookup
+component/extraction/extraction-regles-50ml.py:96 | FunctionDef | _collect_query_terms
+component/extraction/extraction-regles-50ml.py:125 | FunctionDef | _bm25_scores
+component/extraction/extraction-regles-50ml.py:166 | FunctionDef | _run_base_extraction
+component/extraction/extraction-regles-50ml.py:172 | FunctionDef | _add_bm25
+component/extraction/extraction-regles-yaml.py:114 | FunctionDef | _load_yaml
+component/extraction/extraction-regles-yaml.py:124 | FunctionDef | _load_json_like_yaml
+component/extraction/extraction-regles-yaml.py:129 | FunctionDef | _load_routes
+component/extraction/extraction-regles-yaml.py:149 | FunctionDef | _resolve_rulesets
+component/extraction/extraction-regles-yaml.py:164 | FunctionDef | load_extractors_for
+component/extraction/extraction-regles-yaml.py:188 | FunctionDef | _get_input_docs
+component/extraction/extraction-regles-yaml.py:197 | FunctionDef | _page_text_from_page
+component/extraction/extraction-regles-yaml.py:213 | FunctionDef | _norm_text
+component/extraction/extraction-regles-yaml.py:220 | FunctionDef | _normalize_digits
+component/extraction/extraction-regles-yaml.py:224 | FunctionDef | _strip_control_and_escapes
+component/extraction/extraction-regles-yaml.py:240 | FunctionDef | _clean_value
+component/extraction/extraction-regles-yaml.py:247 | FunctionDef | _normalize_email_value
+component/extraction/extraction-regles-yaml.py:257 | FunctionDef | _normalize_url_value
+component/extraction/extraction-regles-yaml.py:266 | FunctionDef | _normalize_phone_value
+component/extraction/extraction-regles-yaml.py:277 | FunctionDef | _first_non_empty_line
+component/extraction/extraction-regles-yaml.py:286 | FunctionDef | _find_label_in_line
+component/extraction/extraction-regles-yaml.py:306 | FunctionDef | _value_after_label
+component/extraction/extraction-regles-yaml.py:331 | FunctionDef | _split_tokens_rough
+component/extraction/extraction-regles-yaml.py:351 | FunctionDef | _extract_date_value
+component/extraction/extraction-regles-yaml.py:373 | FunctionDef | _extract_amount_value
+component/extraction/extraction-regles-yaml.py:386 | FunctionDef | _extract_currency_value
+component/extraction/extraction-regles-yaml.py:394 | FunctionDef | _detect_emails
+component/extraction/extraction-regles-yaml.py:408 | FunctionDef | _detect_urls
+component/extraction/extraction-regles-yaml.py:418 | FunctionDef | _detect_phones
+component/extraction/extraction-regles-yaml.py:436 | FunctionDef | _detect_values_by_type
+component/extraction/extraction-regles-yaml.py:456 | FunctionDef | _normalize_value_by_type
+component/extraction/extraction-regles-yaml.py:476 | FunctionDef | _make_match
+component/extraction/extraction-regles-yaml.py:493 | FunctionDef | _apply_extractor_to_page
+component/extraction/extraction-regles-yaml.py:550 | FunctionDef | _build_cls_map
+component/extraction/extraction-regles-yaml.py:561 | FunctionDef | _classification_for
+component/extraction/extraction-regles-yaml.py:571 | FunctionDef | _doc_text_score
+component/extraction/extraction-regles-yaml.py:584 | FunctionDef | _dedupe_docs
+component/extraction/extraction-regles-yaml.py:612 | FunctionDef | _unique_keep_order
+component/extraction/extraction-regles-yaml.py:623 | FunctionDef | run
+component/extraction/extraction-regles.py:25 | FunctionDef | _load_json
+component/extraction/extraction-regles.py:32 | FunctionDef | _compile_regex
+component/extraction/extraction-regles.py:48 | FunctionDef | _load_routes
+component/extraction/extraction-regles.py:65 | FunctionDef | _resolve_rulesets
+component/extraction/extraction-regles.py:80 | FunctionDef | load_extractors_for
+component/extraction/extraction-regles.py:105 | FunctionDef | _get_input_docs
+component/extraction/extraction-regles.py:116 | FunctionDef | _page_text_from_page
+component/extraction/extraction-regles.py:133 | FunctionDef | apply_extractors_to_page
+component/extraction/extraction-regles.py:148 | FunctionDef | _record
+component/extraction/extraction-regles.py:182 | FunctionDef | _build_cls_map
+component/extraction/extraction-regles.py:193 | FunctionDef | _classification_for
+component/extraction/extraction-regles.py:203 | FunctionDef | _doc_text_score
+component/extraction/extraction-regles.py:216 | FunctionDef | _dedupe_docs
+component/extraction/extraction-regles.py:244 | FunctionDef | run
+component/fusion_resultats.py:33 | FunctionDef | ns
+component/fusion_resultats.py:37 | FunctionDef | first
+component/fusion_resultats.py:41 | FunctionDef | merge_list
+component/fusion_resultats.py:49 | FunctionDef | _safe_list
+component/fusion_resultats.py:53 | FunctionDef | _safe_load_json
+component/fusion_resultats.py:62 | FunctionDef | _safe_int
+component/fusion_resultats.py:69 | FunctionDef | _interdoc_aliases
+component/fusion_resultats.py:91 | FunctionDef | _interdoc_link_ids_for_doc
+component/fusion_resultats.py:110 | FunctionDef | _interdoc_output
+component/fusion_resultats.py:139 | FunctionDef | _iso_now
+component/fusion_resultats.py:143 | FunctionDef | _basename
+component/fusion_resultats.py:152 | FunctionDef | _norm_filename
+component/fusion_resultats.py:156 | FunctionDef | _same_filename
+component/fusion_resultats.py:162 | FunctionDef | _safe_non_negative_int
+component/fusion_resultats.py:172 | FunctionDef | _size_from_paths
+component/fusion_resultats.py:196 | FunctionDef | _size_maps_from_pretraitement
+component/fusion_resultats.py:227 | FunctionDef | _resolve_file_size
+component/fusion_resultats.py:252 | FunctionDef | _row_belongs_to_doc
+component/fusion_resultats.py:264 | FunctionDef | _filter_rows_for_doc
+component/fusion_resultats.py:274 | FunctionDef | _doc_key
+component/fusion_resultats.py:287 | FunctionDef | _doc_text_score
+component/fusion_resultats.py:304 | FunctionDef | _dedupe_docs
+component/fusion_resultats.py:344 | FunctionDef | _normalize_pages_from_doc
+component/fusion_resultats.py:358 | FunctionDef | _filter_and_dedupe_extractions
+component/fusion_resultats.py:399 | FunctionDef | _default_nlp_tokens_index
+component/fusion_resultats.py:407 | FunctionDef | _search_index
+component/fusion_resultats.py:427 | FunctionDef | _fetch_nlp_tokens
+component/fusion_resultats.py:504 | FunctionDef | _structure_nlp_tokens
+component/fusion_resultats.py:552 | FunctionDef | _nlp_from_es_and_ctx
+component/fusion_resultats.py:728 | FunctionDef | _build_map
+component/fusion_resultats.py:743 | FunctionDef | _pick_from_map
+component/fusion_resultats.py:755 | FunctionDef | _same_doc_hint
+component/fusion_resultats.py:764 | FunctionDef | _extract_component_views
+component/fusion_resultats.py:971 | FunctionDef | _to_document_output
+component/fusion_resultats.py:1020 | FunctionDef | _final_output
+component/fusion_resultats.py:1049 | FunctionDef | extract_text_raw
+component/fusion_resultats.py:1078 | FunctionDef | extract_pages_meta
+component/fusion_resultats.py:1084 | FunctionDef | extract_pages
+component/fusion_resultats.py:1111 | FunctionDef | extract_classification
+component/fusion_resultats.py:1117 | FunctionDef | extract_doc_type
+component/fusion_resultats.py:1121 | FunctionDef | extract_extractions
+component/fusion_resultats.py:1125 | FunctionDef | extract_detected_languages
+component/fusion_resultats.py:1129 | FunctionDef | _text_from_tok_pages
+component/fusion_resultats.py:1140 | FunctionDef | _pages_from_final_doc
+component/fusion_resultats.py:1154 | FunctionDef | _collect_local_tokens_for_doc
+component/fusion_resultats.py:1224 | FunctionDef | _pick_local_final_doc
+component/fusion_resultats.py:1237 | FunctionDef | _pick_local_classification
+component/fusion_resultats.py:1250 | FunctionDef | _build_local_payload_for_doc
+component/fusion_resultats.py:1365 | FunctionDef | build_payloads_from_context
+component/fusion_resultats.py:1398 | FunctionDef | build_payload_from_context
+component/fusion_resultats.py:1570 | FunctionDef | _es_text_from_pages
+component/fusion_resultats.py:1581 | FunctionDef | _es_pages
+component/fusion_resultats.py:1597 | FunctionDef | build_payload_from_es_source
+component/fusion_resultats.py:1703 | FunctionDef | build_payloads_from_es
+component/fusion_resultats.py:1775 | FunctionDef | _profile_norm_term
+component/fusion_resultats.py:1785 | FunctionDef | _profile_doc_key
+component/fusion_resultats.py:1795 | FunctionDef | _profile_doc_aliases
+component/fusion_resultats.py:1807 | FunctionDef | _profile_index_rows
+component/fusion_resultats.py:1823 | FunctionDef | _profile_group_rows
+component/fusion_resultats.py:1840 | FunctionDef | _profile_pick_bm25
+component/fusion_resultats.py:1848 | FunctionDef | _is_grammar_noise
+component/fusion_resultats.py:1864 | FunctionDef | _build_grammar_block_map
+component/fusion_resultats.py:1883 | FunctionDef | _collect_blocked_terms
+component/fusion_resultats.py:1896 | FunctionDef | _is_blocked_topic_term
+component/fusion_resultats.py:1912 | FunctionDef | _filter_topics
+component/fusion_resultats.py:1938 | FunctionDef | _filter_chunk_topics
+component/fusion_resultats.py:1956 | FunctionDef | _augment_payload_for_profile
+component/fusion_resultats.py:2113 | FunctionDef | _augment_payload_with_default_tables
+component/fusion_resultats.py:2196 | FunctionDef | _append_totals_quality_check
+component/fusion_resultats.py:2224 | FunctionDef | _augment_payload_with_totals_verification
+component/fusion_resultats.py:2354 | FunctionDef | _augment_payload_with_visual_marks_100ml
+component/fusion_resultats.py:2472 | FunctionDef | main
+component/liaison-inter-docs.py:88 | FunctionDef | _iso_now
+component/liaison-inter-docs.py:92 | FunctionDef | _safe_list
+component/liaison-inter-docs.py:96 | FunctionDef | _safe_int
+component/liaison-inter-docs.py:103 | FunctionDef | _safe_float
+component/liaison-inter-docs.py:110 | FunctionDef | _normalize_term
+component/liaison-inter-docs.py:120 | FunctionDef | _filename_aliases
+component/liaison-inter-docs.py:136 | FunctionDef | _sentence_key
+component/liaison-inter-docs.py:140 | FunctionDef | _is_semantic_pos
+component/liaison-inter-docs.py:156 | FunctionDef | _is_informative_term
+component/liaison-inter-docs.py:173 | FunctionDef | _tokenize_terms
+component/liaison-inter-docs.py:183 | FunctionDef | _split_to_sentences
+component/liaison-inter-docs.py:193 | FunctionDef | _clip_text
+component/liaison-inter-docs.py:200 | FunctionDef | _coerce_vector
+component/liaison-inter-docs.py:212 | FunctionDef | _vector_norm
+component/liaison-inter-docs.py:216 | FunctionDef | _unit_vector
+component/liaison-inter-docs.py:226 | FunctionDef | _unit_cosine_similarity
+component/liaison-inter-docs.py:237 | FunctionDef | _cosine_similarity
+component/liaison-inter-docs.py:255 | FunctionDef | _mean_vector
+component/liaison-inter-docs.py:273 | FunctionDef | _doc_key
+component/liaison-inter-docs.py:283 | FunctionDef | _doc_aliases
+component/liaison-inter-docs.py:297 | FunctionDef | _extract_classification_terms
+component/liaison-inter-docs.py:316 | FunctionDef | _build_classification_index
+component/liaison-inter-docs.py:330 | FunctionDef | _build_semantic_sentence_index
+component/liaison-inter-docs.py:359 | FunctionDef | _lookup_semantic_terms
+component/liaison-inter-docs.py:373 | FunctionDef | _iter_doc_sentences
+component/liaison-inter-docs.py:426 | FunctionDef | _doc_text_score
+component/liaison-inter-docs.py:434 | FunctionDef | _dedupe_docs
+component/liaison-inter-docs.py:452 | FunctionDef | _index_topic_rows
+component/liaison-inter-docs.py:464 | FunctionDef | _vector_profile
+component/liaison-inter-docs.py:489 | FunctionDef | _build_vector_index
+component/liaison-inter-docs.py:533 | FunctionDef | _extract_topics
+component/liaison-inter-docs.py:560 | FunctionDef | _chunk_topic_terms
+component/liaison-inter-docs.py:574 | FunctionDef | _prepare_docs
+component/liaison-inter-docs.py:694 | FunctionDef | _score_informative_term
+component/liaison-inter-docs.py:709 | FunctionDef | _sentence_match_score
+component/liaison-inter-docs.py:762 | FunctionDef | _topic_examples_for_doc
+component/liaison-inter-docs.py:785 | FunctionDef | _sorted_shared_terms
+component/liaison-inter-docs.py:791 | FunctionDef | _chunk_candidate_priority
+component/liaison-inter-docs.py:809 | FunctionDef | _select_chunk_candidates
+component/liaison-inter-docs.py:829 | FunctionDef | _vector_chunk_matches
+component/liaison-inter-docs.py:960 | FunctionDef | _build_link
+component/liaison-inter-docs.py:1140 | FunctionDef | _compute_links
+component/liaison-inter-docs.py:1161 | FunctionDef | _build_doc_links_index
+component/liaison-inter-docs.py:1182 | FunctionDef | run
+component/output-txt.py:51 | FunctionDef | build_config
+component/output-txt.py:56 | ClassDef | _DummyFT
+component/output-txt.py:57 | FunctionDef | __init__
+component/output-txt.py:60 | FunctionDef | detect_path_type
+component/output-txt.py:72 | FunctionDef | _median
+component/output-txt.py:83 | FunctionDef | _estimate_char_metrics
+component/output-txt.py:127 | FunctionDef | _render_layout_from_data
+component/output-txt.py:238 | FunctionDef | _basename
+component/output-txt.py:248 | FunctionDef | _safe_file_size
+component/output-txt.py:257 | FunctionDef | _doc_size_from_sources
+component/output-txt.py:371 | FunctionDef | _get_pdf_reader_with_name
+component/output-txt.py:383 | FunctionDef | _pdf_extract_text_preserve_layout
+component/output-txt.py:395 | FunctionDef | _docx_xml_to_text
+component/output-txt.py:414 | FunctionDef | _pptx_slide_xml_to_text
+component/output-txt.py:434 | FunctionDef | _xlsx_col_to_index
+component/output-txt.py:442 | FunctionDef | _xlsx_shared_strings
+component/output-txt.py:454 | FunctionDef | _xlsx_sheet_to_text
+component/output-txt.py:504 | FunctionDef | _odf_content_to_text
+component/output-txt.py:508 | FunctionDef | walk
+component/output-txt.py:535 | FunctionDef | _html_bytes_to_text_preserve
+component/output-txt.py:546 | FunctionDef | extract_text_native
+component/postgres/postgres-sync.py:24 | FunctionDef | _load_payload_from_disk
+component/postgres/postgres-sync.py:32 | FunctionDef | main
+component/pretraitement-de-docs.py:36 | ClassDef | FileType
+component/pretraitement-de-docs.py:44 | FunctionDef | normalize_input_files
+component/pretraitement-de-docs.py:59 | FunctionDef | resolve_path
+component/pretraitement-de-docs.py:79 | FunctionDef | _safe_file_size
+component/pretraitement-de-docs.py:88 | FunctionDef | _read_head
+component/pretraitement-de-docs.py:93 | FunctionDef | detect_path_type
+component/pretraitement-de-docs.py:164 | FunctionDef | _xml_text_len
+component/pretraitement-de-docs.py:178 | FunctionDef | _zip_has_text
+component/pretraitement-de-docs.py:249 | FunctionDef | _get_pdf_reader
+component/pretraitement-de-docs.py:262 | FunctionDef | _pdf_has_text
+component/pretraitement-de-docs.py:326 | FunctionDef | content_kind_two_states
+component/pretraitement-de-docs.py:350 | FunctionDef | analyze_many_two_states
+component/si-image-pretraiter-sinonpass-le-doc.py:46 | ClassDef | FileType
+component/si-image-pretraiter-sinonpass-le-doc.py:52 | FunctionDef | _read_head
+component/si-image-pretraiter-sinonpass-le-doc.py:57 | FunctionDef | normalize_input_files
+component/si-image-pretraiter-sinonpass-le-doc.py:71 | FunctionDef | resolve_path
+component/si-image-pretraiter-sinonpass-le-doc.py:85 | FunctionDef | detect_path_type
+component/si-image-pretraiter-sinonpass-le-doc.py:148 | FunctionDef | _xml_text_len
+component/si-image-pretraiter-sinonpass-le-doc.py:161 | FunctionDef | _zip_has_text
+component/si-image-pretraiter-sinonpass-le-doc.py:224 | FunctionDef | _get_pdf_reader
+component/si-image-pretraiter-sinonpass-le-doc.py:236 | FunctionDef | _pdf_has_text
+component/si-image-pretraiter-sinonpass-le-doc.py:266 | FunctionDef | content_kind_two_states
+component/si-image-pretraiter-sinonpass-le-doc.py:335 | ClassDef | EnhanceOptions
+component/si-image-pretraiter-sinonpass-le-doc.py:353 | FunctionDef | build_config
+component/si-image-pretraiter-sinonpass-le-doc.py:379 | FunctionDef | ensure_environment
+component/si-image-pretraiter-sinonpass-le-doc.py:399 | FunctionDef | auto_rotate_if_needed
+component/si-image-pretraiter-sinonpass-le-doc.py:419 | FunctionDef | preprocess_image
+component/si-image-pretraiter-sinonpass-le-doc.py:500 | FunctionDef | parse_args
+component/si-image-pretraiter-sinonpass-le-doc.py:573 | FunctionDef | _normalize_input_files
+component/si-image-pretraiter-sinonpass-le-doc.py:605 | FunctionDef | _load_images_from_path
+component/table_extraction/table-extraction.py:14 | FunctionDef | _resolve_profile
+component/table_extraction/table_extraction_lib.py:148 | FunctionDef | _safe_list
+component/table_extraction/table_extraction_lib.py:152 | FunctionDef | _doc_key
+component/table_extraction/table_extraction_lib.py:162 | FunctionDef | _doc_text_score
+component/table_extraction/table_extraction_lib.py:172 | FunctionDef | _dedupe_docs
+component/table_extraction/table_extraction_lib.py:188 | FunctionDef | _norm_text
+component/table_extraction/table_extraction_lib.py:198 | FunctionDef | _compact_spaces
+component/table_extraction/table_extraction_lib.py:204 | FunctionDef | _line_token_spans
+component/table_extraction/table_extraction_lib.py:215 | FunctionDef | _line_segment_spans
+component/table_extraction/table_extraction_lib.py:245 | FunctionDef | _line_geometry
+component/table_extraction/table_extraction_lib.py:296 | FunctionDef | _alignment_with_neighbor
+component/table_extraction/table_extraction_lib.py:308 | FunctionDef | _line_tabularity_score
+component/table_extraction/table_extraction_lib.py:328 | FunctionDef | _anchors_from_header_geom
+component/table_extraction/table_extraction_lib.py:346 | FunctionDef | _anchor_matches
+component/table_extraction/table_extraction_lib.py:359 | FunctionDef | _cells_from_anchors
+component/table_extraction/table_extraction_lib.py:381 | FunctionDef | _collect_blocks_anchor
+component/table_extraction/table_extraction_lib.py:476 | FunctionDef | _merge_blocks
+component/table_extraction/table_extraction_lib.py:494 | FunctionDef | _split_line_cells
+component/table_extraction/table_extraction_lib.py:524 | FunctionDef | _is_probable_code
+component/table_extraction/table_extraction_lib.py:535 | FunctionDef | _normalize_reference_code
+component/table_extraction/table_extraction_lib.py:549 | FunctionDef | _extract_reference_code
+component/table_extraction/table_extraction_lib.py:565 | FunctionDef | _clean_ocr_label
+component/table_extraction/table_extraction_lib.py:574 | FunctionDef | _guess_product_number_from_reference
+component/table_extraction/table_extraction_lib.py:589 | FunctionDef | _token_is_numeric_tail
+component/table_extraction/table_extraction_lib.py:604 | FunctionDef | _merge_numeric_tokens
+component/table_extraction/table_extraction_lib.py:627 | FunctionDef | _split_dense_numeric_tail
+component/table_extraction/table_extraction_lib.py:651 | FunctionDef | _split_dense_header_cells
+component/table_extraction/table_extraction_lib.py:681 | FunctionDef | _is_numeric_like
+component/table_extraction/table_extraction_lib.py:696 | FunctionDef | _to_amount
+component/table_extraction/table_extraction_lib.py:738 | FunctionDef | _normalize_number_token
+component/table_extraction/table_extraction_lib.py:780 | FunctionDef | _to_quantity
+component/table_extraction/table_extraction_lib.py:805 | FunctionDef | _header_score
+component/table_extraction/table_extraction_lib.py:832 | FunctionDef | _detect_header_map
+component/table_extraction/table_extraction_lib.py:856 | FunctionDef | _line_header_hint_score
+component/table_extraction/table_extraction_lib.py:861 | FunctionDef | _is_header_like_line
+component/table_extraction/table_extraction_lib.py:868 | FunctionDef | _line_looks_tabular
+component/table_extraction/table_extraction_lib.py:898 | FunctionDef | _is_strong_single_row
+component/table_extraction/table_extraction_lib.py:911 | FunctionDef | _collect_blocks
+component/table_extraction/table_extraction_lib.py:942 | FunctionDef | _infer_map_from_rows
+component/table_extraction/table_extraction_lib.py:1039 | FunctionDef | _extract_totals_from_line
+component/table_extraction/table_extraction_lib.py:1054 | FunctionDef | _row_to_item
+component/table_extraction/table_extraction_lib.py:1062 | FunctionDef | get
+component/table_extraction/table_extraction_lib.py:1160 | FunctionDef | _extract_doc_tables
+component/table_extraction/table_extraction_lib.py:1328 | FunctionDef | _augment_code_only_rows_from_header
+component/table_extraction/table_extraction_lib.py:1422 | FunctionDef | _build_source_path_map
+component/table_extraction/table_extraction_lib.py:1426 | FunctionDef | _add
+component/table_extraction/table_extraction_lib.py:1447 | FunctionDef | _should_run_ocr_fallback
+component/table_extraction/table_extraction_lib.py:1481 | FunctionDef | _parse_ocr_row_line
+component/table_extraction/table_extraction_lib.py:1566 | FunctionDef | _parse_ocr_table_rows
+component/table_extraction/table_extraction_lib.py:1616 | FunctionDef | _guess_total_field_key
+component/table_extraction/table_extraction_lib.py:1624 | FunctionDef | _parse_ocr_totals_rows
+component/table_extraction/table_extraction_lib.py:1675 | FunctionDef | _ocr_fallback_tables_from_image
+component/table_extraction/table_extraction_lib.py:1691 | FunctionDef | _build_variants
+component/table_extraction/table_extraction_lib.py:1761 | FunctionDef | _merge_ocr_fallback_rows
+component/table_extraction/table_extraction_lib.py:1774 | FunctionDef | _sig
+component/table_extraction/table_extraction_lib.py:1866 | FunctionDef | _merge_ocr_totals_rows
+component/table_extraction/table_extraction_lib.py:1951 | FunctionDef | _extract_code_keys_from_text
+component/table_extraction/table_extraction_lib.py:1964 | FunctionDef | _table_metrics
+component/table_extraction/table_extraction_lib.py:1986 | FunctionDef | _infer_detected_columns_from_rows
+component/table_extraction/table_extraction_lib.py:2004 | FunctionDef | _prune_redundant_tables
+component/table_extraction/table_extraction_lib.py:2083 | FunctionDef | run_table_extraction
+component/tokenisation_layout/tokenisation-layout-100ml.py:35 | FunctionDef | _safe_int
+component/tokenisation_layout/tokenisation-layout-100ml.py:42 | FunctionDef | _norm_token
+component/tokenisation_layout/tokenisation-layout-100ml.py:46 | FunctionDef | _tokenize
+component/tokenisation_layout/tokenisation-layout-100ml.py:50 | FunctionDef | _norm_topic_term
+component/tokenisation_layout/tokenisation-layout-100ml.py:60 | FunctionDef | _is_topic_candidate
+component/tokenisation_layout/tokenisation-layout-100ml.py:81 | FunctionDef | _tokens_to_topic_terms
+component/tokenisation_layout/tokenisation-layout-100ml.py:97 | FunctionDef | _score_term_quality
+component/tokenisation_layout/tokenisation-layout-100ml.py:108 | FunctionDef | _prune_topic_redundancy
+component/tokenisation_layout/tokenisation-layout-100ml.py:129 | FunctionDef | _extract_terms_from_keyword_item
+component/tokenisation_layout/tokenisation-layout-100ml.py:141 | FunctionDef | _build_topic_boost_terms
+component/tokenisation_layout/tokenisation-layout-100ml.py:163 | FunctionDef | _apply
+component/tokenisation_layout/tokenisation-layout-100ml.py:188 | FunctionDef | _hash_index_sign
+component/tokenisation_layout/tokenisation-layout-100ml.py:195 | FunctionDef | _vector_norm
+component/tokenisation_layout/tokenisation-layout-100ml.py:199 | FunctionDef | _hash_text_vector
+component/tokenisation_layout/tokenisation-layout-100ml.py:215 | FunctionDef | _mean_vectors
+component/tokenisation_layout/tokenisation-layout-100ml.py:230 | FunctionDef | _to_list
+component/tokenisation_layout/tokenisation-layout-100ml.py:234 | FunctionDef | _iter_doc_chunks
+component/tokenisation_layout/tokenisation-layout-100ml.py:255 | FunctionDef | _extract_topics_from_chunks
+component/tokenisation_layout/tokenisation-layout-100ml.py:290 | FunctionDef | _extract_chunk_topics
+component/tokenisation_layout/tokenisation-layout-100ml.py:319 | FunctionDef | _doc_key
+component/tokenisation_layout/tokenisation-layout-100ml.py:327 | ClassDef | _TransformerEmbedder
+component/tokenisation_layout/tokenisation-layout-100ml.py:328 | FunctionDef | __init__
+component/tokenisation_layout/tokenisation-layout-100ml.py:361 | FunctionDef | embed_texts
+component/tokenisation_layout/tokenisation-layout-100ml.py:413 | FunctionDef | _run_base_tokenisation
+component/tokenisation_layout/tokenisation-layout-100ml.py:419 | FunctionDef | _augment_with_ml100
+component/tokenisation_layout/tokenisation-layout-50ml.py:35 | FunctionDef | _safe_int
+component/tokenisation_layout/tokenisation-layout-50ml.py:42 | FunctionDef | _norm_token
+component/tokenisation_layout/tokenisation-layout-50ml.py:46 | FunctionDef | _tokenize
+component/tokenisation_layout/tokenisation-layout-50ml.py:50 | FunctionDef | _norm_topic_term
+component/tokenisation_layout/tokenisation-layout-50ml.py:61 | FunctionDef | _is_topic_candidate
+component/tokenisation_layout/tokenisation-layout-50ml.py:82 | FunctionDef | _tokens_to_topic_terms
+component/tokenisation_layout/tokenisation-layout-50ml.py:100 | FunctionDef | _score_term_quality
+component/tokenisation_layout/tokenisation-layout-50ml.py:112 | FunctionDef | _prune_topic_redundancy
+component/tokenisation_layout/tokenisation-layout-50ml.py:134 | FunctionDef | _extract_terms_from_keyword_item
+component/tokenisation_layout/tokenisation-layout-50ml.py:147 | FunctionDef | _build_topic_boost_terms
+component/tokenisation_layout/tokenisation-layout-50ml.py:170 | FunctionDef | _apply
+component/tokenisation_layout/tokenisation-layout-50ml.py:195 | FunctionDef | _char_ngrams
+component/tokenisation_layout/tokenisation-layout-50ml.py:211 | FunctionDef | _hash_index_sign
+component/tokenisation_layout/tokenisation-layout-50ml.py:218 | FunctionDef | _vector_norm
+component/tokenisation_layout/tokenisation-layout-50ml.py:222 | FunctionDef | _fasttext_like_vector
+component/tokenisation_layout/tokenisation-layout-50ml.py:234 | FunctionDef | _mean_vectors
+component/tokenisation_layout/tokenisation-layout-50ml.py:249 | FunctionDef | _to_list
+component/tokenisation_layout/tokenisation-layout-50ml.py:253 | FunctionDef | _iter_doc_chunks
+component/tokenisation_layout/tokenisation-layout-50ml.py:274 | FunctionDef | _extract_topics_from_chunks
+component/tokenisation_layout/tokenisation-layout-50ml.py:309 | FunctionDef | _extract_chunk_topics
+component/tokenisation_layout/tokenisation-layout-50ml.py:338 | FunctionDef | _doc_key
+component/tokenisation_layout/tokenisation-layout-50ml.py:346 | FunctionDef | _run_base_tokenisation
+component/tokenisation_layout/tokenisation-layout-50ml.py:352 | FunctionDef | _augment_with_ml50
+component/tokenisation_layout/tokenisation-layout.py:15 | FunctionDef | _get_pdf_reader
+component/tokenisation_layout/tokenisation-layout.py:42 | FunctionDef | _ensure_nltk
+component/tokenisation_layout/tokenisation-layout.py:64 | FunctionDef | detect_lang
+component/tokenisation_layout/tokenisation-layout.py:93 | FunctionDef | split_ar_layout
+component/tokenisation_layout/tokenisation-layout.py:106 | FunctionDef | _load_punkt_pickle
+component/tokenisation_layout/tokenisation-layout.py:113 | FunctionDef | _split_sentence_fallback
+component/tokenisation_layout/tokenisation-layout.py:126 | FunctionDef | split_punkt_layout
+component/tokenisation_layout/tokenisation-layout.py:142 | FunctionDef | _split_on_newline_gap
+component/tokenisation_layout/tokenisation-layout.py:161 | FunctionDef | _split_on_lang_switch
+component/tokenisation_layout/tokenisation-layout.py:189 | FunctionDef | sentence_chunks_layout
+component/tokenisation_layout/tokenisation-layout.py:209 | FunctionDef | _iter_line_spans
+component/tokenisation_layout/tokenisation-layout.py:220 | FunctionDef | _collapse_ws
+component/tokenisation_layout/tokenisation-layout.py:223 | FunctionDef | _mask_digits
+component/tokenisation_layout/tokenisation-layout.py:250 | FunctionDef | _is_section_start_line
+component/tokenisation_layout/tokenisation-layout.py:273 | FunctionDef | _merge_label_only
+component/tokenisation_layout/tokenisation-layout.py:285 | FunctionDef | split_sections_layout
+component/tokenisation_layout/tokenisation-layout.py:319 | FunctionDef | split_paragraphs_layout
+component/tokenisation_layout/tokenisation-layout.py:334 | FunctionDef | chunk_layout_universal
+component/tokenisation_layout/tokenisation-layout.py:404 | FunctionDef | _space_runs_ge
+component/tokenisation_layout/tokenisation-layout.py:407 | FunctionDef | _has_big_gap
+component/tokenisation_layout/tokenisation-layout.py:410 | FunctionDef | _num_tokens
+component/tokenisation_layout/tokenisation-layout.py:413 | FunctionDef | _dec_tokens
+component/tokenisation_layout/tokenisation-layout.py:416 | FunctionDef | _is_table_line
+component/tokenisation_layout/tokenisation-layout.py:431 | FunctionDef | _cluster_centers
+component/tokenisation_layout/tokenisation-layout.py:452 | FunctionDef | _upper_ratio
+component/tokenisation_layout/tokenisation-layout.py:459 | FunctionDef | _sep_spans
+component/tokenisation_layout/tokenisation-layout.py:478 | FunctionDef | _line_segments_by_gaps
+component/tokenisation_layout/tokenisation-layout.py:499 | FunctionDef | _looks_like_title_line
+component/tokenisation_layout/tokenisation-layout.py:511 | FunctionDef | _is_multicol_candidate_line
+component/tokenisation_layout/tokenisation-layout.py:537 | FunctionDef | _looks_like_header_pair
+component/tokenisation_layout/tokenisation-layout.py:547 | FunctionDef | _looks_like_addressish
+component/tokenisation_layout/tokenisation-layout.py:557 | FunctionDef | _normalize_kv_generic
+component/tokenisation_layout/tokenisation-layout.py:585 | FunctionDef | _strip_sep_lines
+component/tokenisation_layout/tokenisation-layout.py:596 | FunctionDef | _assign_to_centers
+component/tokenisation_layout/tokenisation-layout.py:608 | FunctionDef | _merge_close_columns
+component/tokenisation_layout/tokenisation-layout.py:641 | FunctionDef | _is_grid_like
+component/tokenisation_layout/tokenisation-layout.py:653 | FunctionDef | _is_micro_table_like
+component/tokenisation_layout/tokenisation-layout.py:667 | FunctionDef | _transpose_or_group_multicol
+component/tokenisation_layout/tokenisation-layout.py:844 | FunctionDef | _looks_like_paragraphish
+component/tokenisation_layout/tokenisation-layout.py:854 | FunctionDef | _is_address_continuation_line
+component/tokenisation_layout/tokenisation-layout.py:879 | FunctionDef | _collect_table_block
+component/tokenisation_layout/tokenisation-layout.py:886 | FunctionDef | _looks_like_wrap_line
+component/tokenisation_layout/tokenisation-layout.py:947 | FunctionDef | _make_span_item
+component/tokenisation_layout/tokenisation-layout.py:960 | FunctionDef | layout_items
+component/tokenisation_layout/tokenisation-layout.py:975 | FunctionDef | _starts_table
+component/tokenisation_layout/tokenisation-layout.py:978 | FunctionDef | _starts_multicol
+component/tokenisation_layout/tokenisation-layout.py:1083 | FunctionDef | _k
+component/tokenisation_layout/tokenisation-layout.py:1099 | FunctionDef | build_noise_keys_for_doc
+component/tokenisation_layout/tokenisation-layout.py:1142 | FunctionDef | chunk_is_noise
+component/tokenisation_layout/tokenisation-layout.py:1171 | FunctionDef | _nonspace_len
+component/tokenisation_layout/tokenisation-layout.py:1174 | FunctionDef | _line_col_from_offset
+component/tokenisation_layout/tokenisation-layout.py:1185 | FunctionDef | _safe_str
+component/tokenisation_layout/tokenisation-layout.py:1191 | FunctionDef | _unique_keep_order
+component/tokenisation_layout/tokenisation-layout.py:1200 | FunctionDef | _pdf_extract_pages_text
+component/tokenisation_layout/tokenisation-layout.py:1213 | FunctionDef | _pdf_page_count
+component/tokenisation_layout/tokenisation-layout.py:1223 | FunctionDef | _safe_file_size
+component/tokenisation_layout/tokenisation-layout.py:1232 | FunctionDef | _doc_size_from_paths
+component/tokenisation_layout/tokenisation-layout.py:1460 | FunctionDef | _sort_key
+component/tokenisation_layout/tokenisation-layout.py:1471 | FunctionDef | _select_doc
+component/tokenisation_layout/tokenisation-layout.py:1498 | FunctionDef | print_one_doc
+component/verification-totaux.py:13 | FunctionDef | _safe_list
+component/verification-totaux.py:17 | FunctionDef | _safe_int
+component/verification-totaux.py:24 | FunctionDef | _safe_float
+component/verification-totaux.py:31 | FunctionDef | _to_decimal
+component/verification-totaux.py:62 | FunctionDef | _money_str
+component/verification-totaux.py:68 | FunctionDef | _is_close
+component/verification-totaux.py:74 | FunctionDef | _norm_match_text
+component/verification-totaux.py:82 | FunctionDef | _doc_aliases
+component/verification-totaux.py:100 | FunctionDef | _build_chunk_lookup
+component/verification-totaux.py:140 | FunctionDef | _value_position_in_text
+component/verification-totaux.py:149 | FunctionDef | _locate_chunk
+component/verification-totaux.py:214 | FunctionDef | _dominant_table_index
+component/verification-totaux.py:226 | FunctionDef | _table_anchor_location
+component/verification-totaux.py:254 | FunctionDef | _row_total_candidate
+component/verification-totaux.py:262 | FunctionDef | _row_label
+component/verification-totaux.py:270 | FunctionDef | _candidate_values
+component/verification-totaux.py:285 | FunctionDef | _pick_nearest
+component/verification-totaux.py:291 | FunctionDef | _pick_total_candidate
+component/verification-totaux.py:309 | FunctionDef | _pick_subtotal_candidate
+component/verification-totaux.py:316 | FunctionDef | _pick_tax_candidate
+component/verification-totaux.py:329 | FunctionDef | _verify_row
+component/verification-totaux.py:404 | FunctionDef | _doc_key
+component/verification-totaux.py:414 | FunctionDef | _locate_total_value
+component/verification-totaux.py:442 | FunctionDef | _verify_doc
+component/verification-totaux.py:647 | FunctionDef | run
+pipeline/cli.py:40 | FunctionDef | _env_bool
+pipeline/cli.py:47 | FunctionDef | _env_int
+pipeline/cli.py:57 | FunctionDef | _env_optional
+pipeline/cli.py:65 | FunctionDef | _normalize_pipeline_name
+pipeline/cli.py:82 | FunctionDef | _env_pipeline
+pipeline/cli.py:90 | FunctionDef | _normalize_step_name
+pipeline/cli.py:99 | FunctionDef | parse_cli
+pipeline/cli.py:173 | FunctionDef | main
+pipeline/cli.py:210 | FunctionDef | tee_print
+pipeline/components.py:32 | FunctionDef | _doc_has_meaningful_text
+pipeline/components.py:59 | FunctionDef | _drop_empty_duplicate_docs
+pipeline/components.py:84 | ClassDef | Component
+pipeline/components.py:88 | FunctionDef | run
+pipeline/components.py:91 | FunctionDef | _execute_script
+pipeline/components.py:112 | FunctionDef | _report
+pipeline/components.py:120 | ClassDef | PretraitementComponent
+pipeline/components.py:121 | FunctionDef | run
+pipeline/components.py:173 | ClassDef | OCRPreprocessComponent
+pipeline/components.py:174 | FunctionDef | run
+pipeline/components.py:227 | ClassDef | OutputTxtComponent
+pipeline/components.py:228 | FunctionDef | run
+pipeline/components.py:238 | FunctionDef | _doc_pages_count
+pipeline/components.py:249 | ClassDef | TokenisationLayoutComponent
+pipeline/components.py:250 | FunctionDef | run
+pipeline/components.py:276 | ClassDef | GrammarComponent
+pipeline/components.py:277 | FunctionDef | run
+pipeline/components.py:318 | ClassDef | TableExtractionComponent
+pipeline/components.py:319 | FunctionDef | run
+pipeline/components.py:341 | ClassDef | TotalsVerificationComponent
+pipeline/components.py:342 | FunctionDef | run
+pipeline/components.py:361 | ClassDef | VisualMarksDetectionComponent
+pipeline/components.py:362 | FunctionDef | run
+pipeline/components.py:393 | ClassDef | InterDocLinkingComponent
+pipeline/components.py:394 | FunctionDef | run
+pipeline/components.py:425 | ClassDef | ElasticsearchComponent
+pipeline/components.py:426 | FunctionDef | run
+pipeline/components.py:466 | ClassDef | ClassificationComponent
+pipeline/components.py:467 | FunctionDef | run
+pipeline/components.py:513 | ClassDef | RuleExtractionComponent
+pipeline/components.py:514 | FunctionDef | run
+pipeline/components.py:563 | ClassDef | FusionResultComponent
+pipeline/components.py:566 | FunctionDef | run
+pipeline/components.py:609 | ClassDef | PostgresSyncComponent
+pipeline/components.py:612 | FunctionDef | run
+pipeline/elasticsearch.py:33 | FunctionDef | _iso_now
+pipeline/elasticsearch.py:37 | FunctionDef | _unique_keep_order
+pipeline/elasticsearch.py:48 | FunctionDef | _safe_int
+pipeline/elasticsearch.py:55 | FunctionDef | _safe_positive_int
+pipeline/elasticsearch.py:65 | FunctionDef | _is_local_es_url
+pipeline/elasticsearch.py:70 | FunctionDef | _normalize_command
+pipeline/elasticsearch.py:83 | FunctionDef | _format_command
+pipeline/elasticsearch.py:87 | FunctionDef | _resolve_auto_start_commands
+pipeline/elasticsearch.py:90 | FunctionDef | _append_many
+pipeline/elasticsearch.py:120 | FunctionDef | _append_one
+pipeline/elasticsearch.py:160 | FunctionDef | _run_auto_start_command
+pipeline/elasticsearch.py:195 | FunctionDef | _wait_for_es_ping
+pipeline/elasticsearch.py:204 | FunctionDef | _try_auto_start_elasticsearch
+pipeline/elasticsearch.py:274 | FunctionDef | _same_es_target
+pipeline/elasticsearch.py:280 | FunctionDef | _split_words
+pipeline/elasticsearch.py:285 | FunctionDef | _json_serialize
+pipeline/elasticsearch.py:292 | FunctionDef | _normalize_nlp_level
+pipeline/elasticsearch.py:303 | FunctionDef | _normalize_nlp_index
+pipeline/elasticsearch.py:311 | FunctionDef | _to_clean_str
+pipeline/elasticsearch.py:316 | FunctionDef | _top_counter_items
+pipeline/elasticsearch.py:320 | FunctionDef | _extract_entities
+pipeline/elasticsearch.py:354 | FunctionDef | _entities_sample_flat
+pipeline/elasticsearch.py:366 | FunctionDef | build_es_doc_id
+pipeline/elasticsearch.py:379 | FunctionDef | _file_size_from_paths
+pipeline/elasticsearch.py:405 | FunctionDef | _extract_doc_size
+pipeline/elasticsearch.py:417 | FunctionDef | _page_text_from_page
+pipeline/elasticsearch.py:439 | FunctionDef | flatten_tok_doc_for_index
+pipeline/elasticsearch.py:525 | ClassDef | ElasticsearchStore
+pipeline/elasticsearch.py:526 | FunctionDef | __init__
+pipeline/elasticsearch.py:542 | FunctionDef | _request
+pipeline/elasticsearch.py:588 | FunctionDef | ping
+pipeline/elasticsearch.py:595 | FunctionDef | ensure_index
+pipeline/elasticsearch.py:678 | FunctionDef | ensure_custom_index
+pipeline/elasticsearch.py:690 | FunctionDef | delete_by_query
+pipeline/elasticsearch.py:700 | FunctionDef | bulk_ndjson
+pipeline/elasticsearch.py:712 | FunctionDef | upsert_document
+pipeline/elasticsearch.py:719 | FunctionDef | update_fields
+pipeline/elasticsearch.py:722 | FunctionDef | get_document
+pipeline/elasticsearch.py:730 | FunctionDef | mget
+pipeline/elasticsearch.py:744 | FunctionDef | search
+pipeline/elasticsearch.py:755 | FunctionDef | find_document_id
+pipeline/elasticsearch.py:774 | FunctionDef | index_tok_docs
+pipeline/elasticsearch.py:791 | FunctionDef | _group_passages_by_page
+pipeline/elasticsearch.py:804 | FunctionDef | to_classification_docs
+pipeline/elasticsearch.py:847 | FunctionDef | to_extraction_docs
+pipeline/elasticsearch.py:890 | FunctionDef | fetch_sources_for_ids
+pipeline/elasticsearch.py:897 | FunctionDef | update_classification_results
+pipeline/elasticsearch.py:924 | FunctionDef | update_extraction_results
+pipeline/elasticsearch.py:970 | FunctionDef | _build_nlp_doc_lookup
+pipeline/elasticsearch.py:990 | FunctionDef | _resolve_nlp_doc_id
+pipeline/elasticsearch.py:1015 | FunctionDef | _ensure_nlp_tokens_index
+pipeline/elasticsearch.py:1038 | FunctionDef | _build_nlp_token_doc_id
+pipeline/elasticsearch.py:1049 | FunctionDef | _bulk_index_nlp_tokens
+pipeline/elasticsearch.py:1079 | FunctionDef | sync_nlp_results
+pipeline/elasticsearch.py:1254 | FunctionDef | maybe_build_store
+pipeline/local_api.py:42 | FunctionDef | _active_pipeline_steps
+pipeline/local_api.py:52 | FunctionDef | _iso_now
+pipeline/local_api.py:56 | FunctionDef | _json_bytes
+pipeline/local_api.py:60 | FunctionDef | _tail_recent_lines
+pipeline/local_api.py:70 | FunctionDef | _current_runtime_progress
+pipeline/local_api.py:106 | FunctionDef | _discover_ipv4_addresses
+pipeline/local_api.py:125 | FunctionDef | _candidate_urls
+pipeline/local_api.py:140 | FunctionDef | _sanitize_filename
+pipeline/local_api.py:147 | FunctionDef | _extract_uploaded_files
+pipeline/local_api.py:195 | FunctionDef | save_uploaded_files
+pipeline/local_api.py:218 | FunctionDef | build_cli_command
+pipeline/local_api.py:227 | ClassDef | LauncherState
+pipeline/local_api.py:228 | FunctionDef | __init__
+pipeline/local_api.py:244 | FunctionDef | snapshot
+pipeline/local_api.py:251 | FunctionDef | start_job
+pipeline/local_api.py:288 | FunctionDef | _wait_for_process
+pipeline/local_api.py:301 | ClassDef | DMSLauncherHandler
+pipeline/local_api.py:305 | FunctionDef | launcher_state
+pipeline/local_api.py:308 | FunctionDef | _send_cors_headers
+pipeline/local_api.py:313 | FunctionDef | _send_json
+pipeline/local_api.py:322 | FunctionDef | _send_html_file
+pipeline/local_api.py:331 | FunctionDef | log_message
+pipeline/local_api.py:334 | FunctionDef | do_GET
+pipeline/local_api.py:350 | FunctionDef | do_OPTIONS
+pipeline/local_api.py:355 | FunctionDef | do_POST
+pipeline/local_api.py:385 | ClassDef | DMSLauncherServer
+pipeline/local_api.py:388 | FunctionDef | __init__
+pipeline/local_api.py:393 | FunctionDef | parse_args
+pipeline/local_api.py:400 | FunctionDef | serve
+pipeline/local_api.py:430 | FunctionDef | _graceful_stop
+pipeline/local_api.py:451 | FunctionDef | main
+pipeline/orchestrator.py:25 | ClassDef | PipelineOrchestrator
+pipeline/orchestrator.py:26 | FunctionDef | __init__
+pipeline/orchestrator.py:44 | FunctionDef | list_steps
+pipeline/orchestrator.py:47 | FunctionDef | _select_components
+pipeline/orchestrator.py:65 | FunctionDef | run
+pipeline/orchestrator.py:86 | ClassDef | Pipeline50MLOrchestrator
+pipeline/orchestrator.py:93 | FunctionDef | __init__
+pipeline/orchestrator.py:111 | FunctionDef | list_steps
+pipeline/orchestrator.py:114 | FunctionDef | _select_components
+pipeline/orchestrator.py:132 | FunctionDef | run
+pipeline/orchestrator.py:153 | ClassDef | Pipeline100MLOrchestrator
+pipeline/orchestrator.py:160 | FunctionDef | __init__
+pipeline/orchestrator.py:179 | FunctionDef | list_steps
+pipeline/orchestrator.py:182 | FunctionDef | _select_components
+pipeline/orchestrator.py:200 | FunctionDef | run
+pipeline/postgres.py:55 | ClassDef | PostgresConnectionConfig
+pipeline/postgres.py:82 | ClassDef | PostgresSchemaConfig
+pipeline/postgres.py:91 | FunctionDef | _safe_int
+pipeline/postgres.py:98 | FunctionDef | _safe_float
+pipeline/postgres.py:105 | FunctionDef | _safe_bool
+pipeline/postgres.py:111 | FunctionDef | _optional_bool
+pipeline/postgres.py:124 | FunctionDef | _safe_dict
+pipeline/postgres.py:128 | FunctionDef | _safe_list
+pipeline/postgres.py:132 | FunctionDef | _pick_first_non_empty
+pipeline/postgres.py:144 | FunctionDef | _json_or_none
+pipeline/postgres.py:154 | FunctionDef | _normalize_command
+pipeline/postgres.py:168 | FunctionDef | _format_command
+pipeline/postgres.py:172 | FunctionDef | _load_python_module
+pipeline/postgres.py:183 | FunctionDef | _resolve_path
+pipeline/postgres.py:191 | FunctionDef | _resolve_first_existing_path
+pipeline/postgres.py:201 | FunctionDef | _normalize_sql_entries
+pipeline/postgres.py:218 | FunctionDef | _utc_now_iso
+pipeline/postgres.py:222 | FunctionDef | _payload_documents
+pipeline/postgres.py:232 | FunctionDef | _json_sql_literal
+pipeline/postgres.py:243 | FunctionDef | _quote_sql_literal
+pipeline/postgres.py:247 | FunctionDef | _quote_sql_ident
+pipeline/postgres.py:251 | FunctionDef | _quote_sql_table_ident
+pipeline/postgres.py:255 | FunctionDef | _sql_nullable_text
+pipeline/postgres.py:264 | FunctionDef | _sql_nullable_int
+pipeline/postgres.py:273 | FunctionDef | _sql_nullable_float
+pipeline/postgres.py:285 | FunctionDef | _sql_nullable_timestamp
+pipeline/postgres.py:294 | FunctionDef | _coerce_timestamp_text
+pipeline/postgres.py:310 | FunctionDef | _sql_value
+pipeline/postgres.py:328 | FunctionDef | _stable_hash_id
+pipeline/postgres.py:334 | FunctionDef | _sha256_bytes
+pipeline/postgres.py:338 | FunctionDef | _sha256_text
+pipeline/postgres.py:347 | FunctionDef | _sha256_json
+pipeline/postgres.py:357 | FunctionDef | _sha256_file
+pipeline/postgres.py:372 | FunctionDef | _coerce_float
+pipeline/postgres.py:399 | FunctionDef | _coerce_int
+pipeline/postgres.py:409 | FunctionDef | _extract_filename
+pipeline/postgres.py:414 | FunctionDef | _extract_document_id
+pipeline/postgres.py:426 | FunctionDef | _extract_doc_type
+pipeline/postgres.py:434 | FunctionDef | _extract_classification_status
+pipeline/postgres.py:440 | FunctionDef | _extract_content_mode
+pipeline/postgres.py:446 | FunctionDef | _extract_file_size
+pipeline/postgres.py:455 | FunctionDef | _extract_page_count
+pipeline/postgres.py:471 | FunctionDef | _extract_links
+pipeline/postgres.py:476 | FunctionDef | _extract_file_paths
+pipeline/postgres.py:502 | FunctionDef | _extract_primary_path
+pipeline/postgres.py:514 | FunctionDef | _extract_file_ext
+pipeline/postgres.py:520 | FunctionDef | _extract_file_mime
+pipeline/postgres.py:528 | FunctionDef | _flatten_languages
+pipeline/postgres.py:532 | FunctionDef | add
+pipeline/postgres.py:559 | FunctionDef | _extract_languages
+pipeline/postgres.py:576 | FunctionDef | _extract_language_primary
+pipeline/postgres.py:581 | FunctionDef | _extract_visual_flags
+pipeline/postgres.py:587 | FunctionDef | _extract_ocr_confidence_avg
+pipeline/postgres.py:602 | FunctionDef | _extract_table_detection_score_avg
+pipeline/postgres.py:627 | FunctionDef | _extract_last_error_message
+pipeline/postgres.py:639 | FunctionDef | _has_ocr
+pipeline/postgres.py:653 | FunctionDef | _has_tables
+pipeline/postgres.py:664 | FunctionDef | _has_visual_marks
+pipeline/postgres.py:677 | FunctionDef | _has_links
+pipeline/postgres.py:682 | FunctionDef | _has_errors
+pipeline/postgres.py:687 | FunctionDef | _extract_quality_score
+pipeline/postgres.py:697 | FunctionDef | _extract_search_keywords
+pipeline/postgres.py:704 | FunctionDef | _extract_search_title
+pipeline/postgres.py:711 | FunctionDef | _extract_search_full_text
+pipeline/postgres.py:718 | FunctionDef | _extract_content_source
+pipeline/postgres.py:724 | FunctionDef | _extract_source_document_key
+pipeline/postgres.py:738 | FunctionDef | _extract_regex_matches_count
+pipeline/postgres.py:743 | FunctionDef | _extract_business_keys_count
+pipeline/postgres.py:752 | FunctionDef | _extract_relations_count
+pipeline/postgres.py:757 | FunctionDef | _extract_bm25_hits_count
+pipeline/postgres.py:767 | FunctionDef | _extract_visual_detection_count
+pipeline/postgres.py:776 | FunctionDef | _build_psql_stdin_cmd
+pipeline/postgres.py:793 | FunctionDef | load_postgres_connection_config
+pipeline/postgres.py:844 | FunctionDef | load_postgres_schema_config
+pipeline/postgres.py:856 | FunctionDef | _pg_env
+pipeline/postgres.py:868 | FunctionDef | _run_command
+pipeline/postgres.py:903 | FunctionDef | _build_psql_cmd
+pipeline/postgres.py:911 | FunctionDef | _postgres_ping
+pipeline/postgres.py:932 | FunctionDef | _wait_for_postgres
+pipeline/postgres.py:941 | FunctionDef | _resolve_start_commands
+pipeline/postgres.py:962 | FunctionDef | _try_auto_start_postgres
+pipeline/postgres.py:1015 | FunctionDef | _run_scalar_sql
+pipeline/postgres.py:1023 | FunctionDef | _run_exec_sql
+pipeline/postgres.py:1030 | FunctionDef | _run_exec_sql_stdin
+pipeline/postgres.py:1037 | FunctionDef | _database_exists
+pipeline/postgres.py:1042 | FunctionDef | _create_database_if_missing
+pipeline/postgres.py:1054 | FunctionDef | _split_schema_table
+pipeline/postgres.py:1062 | FunctionDef | _table_exists
+pipeline/postgres.py:1071 | FunctionDef | _split_schema_sql_phases
+pipeline/postgres.py:1086 | FunctionDef | _apply_schema
+pipeline/postgres.py:1124 | FunctionDef | _finalize_or_raise
+pipeline/postgres.py:1130 | FunctionDef | _finalize_sync_or_raise
+pipeline/postgres.py:1136 | FunctionDef | ensure_postgres_bootstrap
+pipeline/postgres.py:1210 | FunctionDef | _build_upsert_statement
+pipeline/postgres.py:1242 | FunctionDef | _append_upsert_rows
+pipeline/postgres.py:1268 | FunctionDef | _run_payload_view
+pipeline/postgres.py:1272 | FunctionDef | _build_run_row
+pipeline/postgres.py:1316 | FunctionDef | _build_ingest_row
+pipeline/postgres.py:1342 | FunctionDef | _build_document_row
+pipeline/postgres.py:1417 | FunctionDef | _build_document_text_row
+pipeline/postgres.py:1436 | FunctionDef | _build_document_payload_row
+pipeline/postgres.py:1464 | FunctionDef | _build_document_extraction_summary_row
+pipeline/postgres.py:1497 | FunctionDef | _text_excerpt
+pipeline/postgres.py:1506 | FunctionDef | _json_path_append_key
+pipeline/postgres.py:1513 | FunctionDef | _json_path_append_index
+pipeline/postgres.py:1517 | FunctionDef | _source_section_from_json_path
+pipeline/postgres.py:1539 | FunctionDef | _json_node_kind
+pipeline/postgres.py:1549 | FunctionDef | _json_value_type
+pipeline/postgres.py:1561 | FunctionDef | _payload_scalar_columns
+pipeline/postgres.py:1605 | FunctionDef | _walk_payload_nodes
+pipeline/postgres.py:1704 | FunctionDef | _build_run_payload_node_rows
+pipeline/postgres.py:1714 | FunctionDef | _build_document_payload_node_rows
+pipeline/postgres.py:1724 | FunctionDef | _iter_leaf_values
+pipeline/postgres.py:1750 | FunctionDef | _extract_item_text_excerpt
+pipeline/postgres.py:1767 | FunctionDef | _normalize_identifier_value
+pipeline/postgres.py:1777 | FunctionDef | _is_identifier_like_field
+pipeline/postgres.py:1802 | FunctionDef | _parse_compact_keyword_match
+pipeline/postgres.py:1818 | FunctionDef | _make_registry_row
+pipeline/postgres.py:1847 | FunctionDef | _build_document_identifier_rows
+pipeline/postgres.py:1863 | FunctionDef | add_identifier
+pipeline/postgres.py:1966 | FunctionDef | _build_document_classification_rows
+pipeline/postgres.py:2108 | FunctionDef | _build_document_page_meta_rows
+pipeline/postgres.py:2141 | FunctionDef | _build_document_sentence_layout_row_sets
+pipeline/postgres.py:2293 | FunctionDef | _build_document_text_aux_rows
+pipeline/postgres.py:2345 | FunctionDef | _build_document_business_field_rows
+pipeline/postgres.py:2396 | FunctionDef | _build_document_human_review_task_rows
+pipeline/postgres.py:2426 | FunctionDef | _build_document_processing_rows
+pipeline/postgres.py:2514 | FunctionDef | _build_document_component_metric_rows
+pipeline/postgres.py:2548 | FunctionDef | _collect_link_term_examples
+pipeline/postgres.py:2570 | FunctionDef | _component_status_text
+pipeline/postgres.py:2578 | FunctionDef | _build_document_component_audit_rows
+pipeline/postgres.py:2614 | FunctionDef | _build_document_page_rows
+pipeline/postgres.py:2647 | FunctionDef | _build_generic_structure_rows
+pipeline/postgres.py:2679 | FunctionDef | _build_document_visual_mark_rows
+pipeline/postgres.py:2723 | FunctionDef | _build_document_structure_detail_row_sets
+pipeline/postgres.py:2759 | FunctionDef | _build_document_topic_rows
+pipeline/postgres.py:2884 | FunctionDef | _build_document_sentence_rows
+pipeline/postgres.py:2929 | FunctionDef | _build_document_token_rows
+pipeline/postgres.py:2979 | FunctionDef | _build_document_entity_rows
+pipeline/postgres.py:3025 | FunctionDef | _build_document_nlp_match_rows
+pipeline/postgres.py:3064 | FunctionDef | _vector_dim_from_payload
+pipeline/postgres.py:3070 | FunctionDef | _build_document_vector_rows
+pipeline/postgres.py:3106 | FunctionDef | _build_document_chunk_embedding_rows
+pipeline/postgres.py:3143 | FunctionDef | _build_document_word_embedding_rows
+pipeline/postgres.py:3179 | FunctionDef | _row_signature
+pipeline/postgres.py:3194 | FunctionDef | _table_row_to_sql_row
+pipeline/postgres.py:3251 | FunctionDef | _build_document_table_rows
+pipeline/postgres.py:3259 | FunctionDef | add_table_source
+pipeline/postgres.py:3354 | FunctionDef | _build_document_table_cell_rows
+pipeline/postgres.py:3483 | FunctionDef | _build_quality_check_row
+pipeline/postgres.py:3532 | FunctionDef | _iter_quality_rows
+pipeline/postgres.py:3547 | FunctionDef | _merge_table_row_quality_audit
+pipeline/postgres.py:3579 | FunctionDef | _build_document_quality_rows
+pipeline/postgres.py:3693 | FunctionDef | _feature_payload_summary
+pipeline/postgres.py:3698 | FunctionDef | _build_document_feature_rows
+pipeline/postgres.py:3708 | FunctionDef | add_feature
+pipeline/postgres.py:3849 | FunctionDef | _build_document_extraction_detail_rows
+pipeline/postgres.py:4001 | FunctionDef | _collect_shared_terms
+pipeline/postgres.py:4015 | FunctionDef | _build_link_document_lookup
+pipeline/postgres.py:4026 | FunctionDef | _resolve_link_endpoint_id
+pipeline/postgres.py:4034 | FunctionDef | _build_document_link_shared_term_rows
+pipeline/postgres.py:4080 | FunctionDef | _build_document_link_rows
+pipeline/postgres.py:4204 | FunctionDef | _build_stable_registry_rows
+pipeline/postgres.py:4219 | FunctionDef | add
+pipeline/postgres.py:4315 | FunctionDef | build_postgres_sync_audit
+pipeline/postgres.py:4371 | FunctionDef | attach_postgres_sync_audit
+pipeline/postgres.py:4378 | FunctionDef | sync_fusion_payload_to_postgres
+pipeline/settings.py:20 | FunctionDef | load_dotenv
+pipeline/settings.py:55 | FunctionDef | configure_logging
+pipeline/settings.py:66 | FunctionDef | normalize_input
+pipeline/settings.py:71 | FunctionDef | _split_item
+pipeline/settings.py:84 | FunctionDef | safe_repr
+pipeline/settings.py:89 | FunctionDef | count_sentences
+pipeline/settings.py:98 | FunctionDef | change_dir
+pipeline/settings.py:109 | FunctionDef | isolated_argv
+pytesseract.py:14 | ClassDef | TesseractError
+pytesseract.py:18 | ClassDef | TesseractNotFoundError
+pytesseract.py:22 | ClassDef | Output
+pytesseract.py:29 | FunctionDef | _split_config
+pytesseract.py:39 | FunctionDef | _run_tesseract
+pytesseract.py:60 | FunctionDef | _coerce_image_input
+pytesseract.py:72 | FunctionDef | _cleanup_temp
+pytesseract.py:81 | FunctionDef | get_tesseract_version
+pytesseract.py:90 | FunctionDef | get_languages
+pytesseract.py:98 | FunctionDef | image_to_osd
+pytesseract.py:107 | FunctionDef | image_to_string
+pytesseract.py:119 | FunctionDef | _parse_tsv_to_dict
+pytesseract.py:133 | FunctionDef | image_to_data

@@ -7,10 +7,8 @@ Tu controles ici :
 - le demarrage automatique local si PostgreSQL n'est pas joignable
 - l'activation de la synchro finale vers la base
 - le fait d'ecrire un audit `postgres_sync` dans `fusion_output.json`
-- pour l'instant, la synchro ecrit seulement un log minimal
-  `temps + nom du fichier + ok` dans PostgreSQL
 
-Le nom de la base et le schema des tables sont geres dans :
+Le schema cible et les tables sont geres dans :
 `component/postgres/postgres_schema.py`
 """
 
@@ -56,8 +54,8 @@ POSTGRES_START_COMMANDS = [
 ]
 
 # Synchronisation finale vers PostgreSQL.
-# Pour l'instant le composant n'envoie qu'un log minimal par document
-# dans `dms_pipeline_launch_logs` (date + fichier + status `ok`).
+# Le composant final cree/met a jour le schema V1 puis insere les sorties de
+# `fusion_output.json` dans les tables `dms.*`.
 POSTGRES_SYNC_ENABLED = True
 POSTGRES_SYNC_STRICT = False
 POSTGRES_SYNC_WRITE_FUSION_AUDIT = True

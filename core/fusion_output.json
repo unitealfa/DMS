@@ -21738,30 +21738,28 @@
     "enabled": true,
     "sync_enabled": true,
     "sync_write_fusion_audit": true,
-    "ready": true,
+    "ready": false,
     "host": "127.0.0.1",
     "port": 5432,
     "database": "dms_core",
-    "run_id": "run-20260401T105104231880Z",
+    "run_id": "run-20260401T143835737924Z",
     "pipeline_profile": "pipeline100ml",
     "source": "local-context",
-    "log_entries_created": 1,
+    "log_entries_created": 0,
     "run_upserted": 0,
     "documents_total": 1,
     "documents_upserted": 0,
     "links_total": 0,
     "links_upserted": 0,
     "database_created": false,
-    "schema_ready": true,
-    "tables_ready": [
-      "dms_pipeline_launch_logs"
-    ],
+    "schema_ready": false,
+    "tables_ready": [],
     "tables_missing": [],
     "config_path": "/home/mourad/Bureau/DMS/core/component/postgres/postgres_connection.py",
     "schema_config_path": "/home/mourad/Bureau/DMS/core/component/postgres/postgres_schema.py",
     "fusion_path": "/home/mourad/Bureau/DMS/core/fusion_output.json",
     "fusion_audit_written": false,
-    "skipped": null,
-    "error": null
+    "skipped": "bootstrap_not_ready",
+    "error": "PostgreSQL indisponible sur 127.0.0.1:5432"
   }
 }

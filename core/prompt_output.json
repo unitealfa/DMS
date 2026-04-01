@@ -1,15 +1,7 @@
 {
   "schema_version": "dms-unified-final-template-1.0",
   "generated_at": "2026-03-29T11:28:24.240869+00:00",
-  "source": {
-    "corpus_root": "/home/mourad/Bureau/DMS/core/documents",
-    "input_files": [],
-    "source_mode": "template_reference",
-    "fusion_source": "/home/mourad/Bureau/DMS/core/GLOBAL_UNIFIED_PIPELINE_OUTPUT_TEMPLATE.json",
-    "label": null,
-    "profile_requested": null,
-    "profile_effective": null
-  },
+  "source": null,
   "profile": null,
   "null_policy": {
     "scalars": null,
@@ -68,7 +60,9 @@
                 "score": null
               }
             ],
-            "matched_keywords_compact": []
+            "matched_keywords_compact": [
+              null
+            ]
           },
           "BON_DE_COMMANDE": {
             "score_total": null,
@@ -80,7 +74,9 @@
                 "score": null
               }
             ],
-            "matched_keywords_compact": []
+            "matched_keywords_compact": [
+              null
+            ]
           },
           "CONTRAT": {
             "score_total": null,
@@ -92,7 +88,9 @@
                 "score": null
               }
             ],
-            "matched_keywords_compact": []
+            "matched_keywords_compact": [
+              null
+            ]
           },
           "FACTURE": {
             "score_total": null,
@@ -104,7 +102,9 @@
                 "score": null
               }
             ],
-            "matched_keywords_compact": []
+            "matched_keywords_compact": [
+              null
+            ]
           },
           "FORMULAIRE": {
             "score_total": null,
@@ -116,7 +116,9 @@
                 "score": null
               }
             ],
-            "matched_keywords_compact": []
+            "matched_keywords_compact": [
+              null
+            ]
           }
         },
         "keyword_matches": {
@@ -157,7 +159,9 @@
             }
           ]
         },
-        "anti_confusion_targets": [],
+        "anti_confusion_targets": [
+          null
+        ],
         "decision_debug": {
           "top_score": null,
           "second_score": null,
@@ -209,7 +213,9 @@
           "sentences_count": null,
           "layout_blocks_count": null,
           "tokens_count": null,
-          "detected_languages": []
+          "detected_languages": [
+            null
+          ]
         },
         "attribution_grammaticale": {
           "component": null,
@@ -293,12 +299,16 @@
           "engine": null,
           "tables_count": null,
           "rows_total": null,
-          "detected_columns": []
+          "detected_columns": [
+            null
+          ]
         },
         "tokenisation_layout_50ml": {
           "embedding_method": null,
           "vector_dim": null,
-          "document_primary_topics": [],
+          "document_primary_topics": [
+            null
+          ],
           "document_topics_count": null,
           "chunk_vectors_count": null,
           "word_vectors_count": null,
@@ -313,12 +323,16 @@
           "engine": null,
           "tables_count": null,
           "rows_total": null,
-          "detected_columns": []
+          "detected_columns": [
+            null
+          ]
         },
         "tokenisation_layout_100ml": {
           "embedding_method": null,
           "vector_dim": null,
-          "document_primary_topics": [],
+          "document_primary_topics": [
+            null
+          ],
           "document_topics_count": null,
           "chunk_vectors_count": null,
           "word_vectors_count": null,
@@ -333,13 +347,17 @@
           "engine": null,
           "tables_count": null,
           "rows_total": null,
-          "detected_columns": []
+          "detected_columns": [
+            null
+          ]
         },
         "detection_signature_chachet_codebarr_100ml": {
           "engine": null,
           "pages_total": null,
           "pages_scanned": null,
-          "sampled_pages": [],
+          "sampled_pages": [
+            null
+          ],
           "detections_count": null,
           "has_signature": null,
           "has_stamp": null,
@@ -350,11 +368,17 @@
       "text": {
         "text_raw": null,
         "text_normalized": null,
-        "normalization": [],
+        "normalization": [
+          {
+            "_dynamic_fields": {}
+          }
+        ],
         "search": {
           "full_text": null,
           "title": null,
-          "keywords": []
+          "keywords": [
+            null
+          ]
         }
       },
       "document_structure": {
@@ -383,22 +407,80 @@
                 "is_sentence": null,
                 "is_noise": null,
                 "nonspace": null,
-                "spans": [],
-                "header_rows": [],
-                "header_cells": [],
+                "spans": [
+                  [
+                    null,
+                    null
+                  ]
+                ],
+                "header_rows": {
+                  "_one_of": [
+                    null,
+                    [
+                      {
+                        "_dynamic_fields": {}
+                      }
+                    ]
+                  ]
+                },
+                "header_cells": {
+                  "_one_of": [
+                    null,
+                    [
+                      {
+                        "_dynamic_fields": {}
+                      }
+                    ]
+                  ]
+                },
                 "header_source": null,
-                "table_rows": []
+                "table_rows": {
+                  "_one_of": [
+                    null,
+                    [
+                      {
+                        "_dynamic_fields": {}
+                      }
+                    ]
+                  ]
+                }
               }
             ]
           }
         ],
-        "sections": [],
-        "blocks": [],
-        "lines": [],
-        "words": [],
-        "headers": [],
-        "footers": [],
-        "lists": [],
+        "sections": [
+          {
+            "_dynamic_fields": {}
+          }
+        ],
+        "blocks": [
+          {
+            "_dynamic_fields": {}
+          }
+        ],
+        "lines": [
+          {
+            "_dynamic_fields": {}
+          }
+        ],
+        "words": [
+          null
+        ],
+        "headers": [
+          {
+            "_dynamic_fields": {}
+          }
+        ],
+        "footers": [
+          {
+            "_dynamic_fields": {}
+          }
+        ],
+        "lists": [
+          {
+            "_dynamic_fields": {}
+          }
+        ],
         "tables": [
           {
             "table_index": null,
@@ -440,12 +522,34 @@
             ]
           }
         ],
-        "figures": [],
-        "equations": [],
-        "key_value_pairs": [],
-        "reading_order": [],
-        "detected_columns": [],
-        "non_text_regions": [],
+        "figures": [
+          {
+            "_dynamic_fields": {}
+          }
+        ],
+        "equations": [
+          {
+            "_dynamic_fields": {}
+          }
+        ],
+        "key_value_pairs": [
+          {
+            "_dynamic_fields": {}
+          }
+        ],
+        "reading_order": [
+          {
+            "_dynamic_fields": {}
+          }
+        ],
+        "detected_columns": [
+          null
+        ],
+        "non_text_regions": [
+          {
+            "_dynamic_fields": {}
+          }
+        ],
         "visual_marks": [
           {
             "type": null,
@@ -501,8 +605,17 @@
           }
         ],
         "method": null,
-        "native": null,
-        "tesseract": [],
+        "native": {
+          "_one_of": [
+            null,
+            [
+              null
+            ]
+          ]
+        },
+        "tesseract": [
+          null
+        ],
         "regex_extractions": [
           {
             "doc_id": null,
@@ -512,14 +625,24 @@
             "ruleset": {
               "routes_config": {
                 "include_common": null,
-                "default_rulesets": [],
+                "default_rulesets": [
+                  null
+                ],
                 "ruleset_mapping": {
-                  "BON_DE_COMMANDE": [],
-                  "CONTRAT": [],
-                  "FACTURE": []
+                  "BON_DE_COMMANDE": [
+                    null
+                  ],
+                  "CONTRAT": [
+                    null
+                  ],
+                  "FACTURE": [
+                    null
+                  ]
                 }
               },
-              "applied_rulesets": []
+              "applied_rulesets": [
+                null
+              ]
             },
             "fields": {
               "_dynamic_field_template": {
@@ -694,7 +817,9 @@
             "bm25": {
               "k1": null,
               "b": null,
-              "query_terms": [],
+              "query_terms": [
+                null
+              ],
               "chunks_total": null,
               "top_chunks": [
                 {
@@ -720,14 +845,23 @@
             "predicate": null,
             "object": null,
             "confidence": null,
-            "evidence": null
+            "evidence": [
+              null
+            ]
           }
         ],
         "quality_checks": [
           {
             "name": null,
             "status": null,
-            "details": null
+            "details": {
+              "_one_of": [
+                null,
+                {
+                  "_dynamic_fields": {}
+                }
+              ]
+            }
           }
         ],
         "bm25": {
@@ -751,11 +885,46 @@
           "engine": null,
           "tables_count": null,
           "rows_total": null,
-          "detected_columns": [],
+          "detected_columns": [
+            null
+          ],
           "totals": {
-            "tax": null,
-            "total_ht": null,
-            "total_ttc": null
+            "tax": {
+              "_one_of": [
+                null,
+                [
+                  null
+                ],
+                ""
+              ]
+            },
+            "total_ht": {
+              "_one_of": [
+                null,
+                [
+                  null
+                ],
+                ""
+              ]
+            },
+            "total_ttc": {
+              "_one_of": [
+                null,
+                [
+                  null
+                ],
+                ""
+              ]
+            },
+            "total": {
+              "_one_of": [
+                null,
+                [
+                  null
+                ],
+                ""
+              ]
+            }
           },
           "line_items": [
             {
@@ -770,7 +939,9 @@
               "total_ht": null,
               "total_ttc": null,
               "total": null,
-              "raw_cells": [],
+              "raw_cells": [
+                null
+              ],
               "confidence": null
             }
           ],
@@ -789,7 +960,9 @@
                 "total": null
               },
               "header_score": null,
-              "detected_columns": [],
+              "detected_columns": [
+                null
+              ],
               "rows_count": null,
               "shape": {
                 "rows_estimated": null,
@@ -809,7 +982,9 @@
                   "total_ht": null,
                   "total_ttc": null,
                   "total": null,
-                  "raw_cells": [],
+                  "raw_cells": [
+                    null
+                  ],
                   "confidence": null
                 }
               ]
@@ -920,7 +1095,9 @@
                 "chunk_text_excerpt": null,
                 "match_score": null,
                 "table_index": null,
-                "field": null
+                "field": null,
+                "match_start_in_chunk": null,
+                "match_end_in_chunk": null
               }
             }
           ],
@@ -930,7 +1107,9 @@
               "table_index": null,
               "row_index": null,
               "label": null,
-              "raw_cells": [],
+              "raw_cells": [
+                null
+              ],
               "quantity": null,
               "unit_price": null,
               "declared_total": null,
@@ -955,9 +1134,42 @@
             }
           ],
           "declared_totals_raw": {
-            "tax": null,
-            "total_ht": null,
-            "total_ttc": null
+            "tax": {
+              "_one_of": [
+                null,
+                [
+                  null
+                ],
+                ""
+              ]
+            },
+            "total_ht": {
+              "_one_of": [
+                null,
+                [
+                  null
+                ],
+                ""
+              ]
+            },
+            "total_ttc": {
+              "_one_of": [
+                null,
+                [
+                  null
+                ],
+                ""
+              ]
+            },
+            "total": {
+              "_one_of": [
+                null,
+                [
+                  null
+                ],
+                ""
+              ]
+            }
           },
           "tolerance": null
         },
@@ -965,7 +1177,9 @@
           "engine": null,
           "pages_total": null,
           "pages_scanned": null,
-          "sampled_pages": [],
+          "sampled_pages": [
+            null
+          ],
           "detections_count": null,
           "has_signature": null,
           "has_stamp": null,
@@ -981,7 +1195,8 @@
             "page_index": null,
             "sent_index": null,
             "lang": null,
-            "text": null
+            "text": null,
+            "doc_id": null
           }
         ],
         "entities": [
@@ -991,7 +1206,8 @@
             "sent_index": null,
             "lang": null,
             "type": null,
-            "text": null
+            "text": null,
+            "doc_id": null
           }
         ],
         "matches": [
@@ -1003,7 +1219,9 @@
             "sent_index": null,
             "start": null,
             "end": null,
-            "snippet": null
+            "snippet": null,
+            "doc_id": null,
+            "filename": null
           }
         ],
         "tokens": [
@@ -1017,7 +1235,8 @@
             "lemma": null,
             "ner": null,
             "lang": null,
-            "xlmr_backend": null
+            "xlmr_backend": null,
+            "doc_id": null
           }
         ],
         "source": null,
@@ -1119,7 +1338,9 @@
                 "chunk_text_excerpt": null,
                 "match_score": null,
                 "table_index": null,
-                "field": null
+                "field": null,
+                "match_start_in_chunk": null,
+                "match_end_in_chunk": null
               }
             }
           ]
@@ -1127,12 +1348,20 @@
       ],
       "human_review": {
         "required": null,
-        "tasks": []
+        "tasks": [
+          null
+        ]
       },
       "processing": {
-        "warnings": [],
-        "logs": [],
-        "pipeline": null,
+        "warnings": [
+          null
+        ],
+        "logs": [
+          null
+        ],
+        "pipeline": [
+          null
+        ],
         "durations": {
           "x": null,
           "_dynamic_duration_template": null
@@ -1160,7 +1389,9 @@
       "ml50": {
         "embedding_method": null,
         "vector_dim": null,
-        "document_vector": null,
+        "document_vector": [
+          null
+        ],
         "chunk_count": null,
         "chunks_embeddings": [
           {
@@ -1172,7 +1403,9 @@
             "text_preview": null,
             "token_count": null,
             "lang": null,
-            "vector": null,
+            "vector": [
+              null
+            ],
             "chunk_primary_topic": null,
             "chunk_topics": [
               {
@@ -1190,10 +1423,15 @@
             "tok_index": null,
             "token": null,
             "lang": null,
-            "vector": null
+            "vector": [
+              null
+            ],
+            "doc_id": null
           }
         ],
-        "document_primary_topics": [],
+        "document_primary_topics": [
+          null
+        ],
         "document_topics": [
           {
             "term": null,
@@ -1206,7 +1444,9 @@
       "ml100": {
         "embedding_method": null,
         "vector_dim": null,
-        "document_vector": null,
+        "document_vector": [
+          null
+        ],
         "chunk_count": null,
         "chunks_embeddings": [
           {
@@ -1218,7 +1458,9 @@
             "text_preview": null,
             "token_count": null,
             "lang": null,
-            "vector": null,
+            "vector": [
+              null
+            ],
             "chunk_primary_topic": null,
             "chunk_topics": [
               {
@@ -1236,10 +1478,15 @@
             "tok_index": null,
             "token": null,
             "lang": null,
-            "vector": null
+            "vector": [
+              null
+            ],
+            "doc_id": null
           }
         ],
-        "document_primary_topics": [],
+        "document_primary_topics": [
+          null
+        ],
         "document_topics": [
           {
             "term": null,
@@ -1291,8 +1538,28 @@
           {
             "term": null,
             "score": null,
-            "doc_a_examples": [],
-            "doc_b_examples": []
+            "doc_a_examples": [
+              {
+                "_one_of": [
+                  null,
+                  "",
+                  {
+                    "_dynamic_fields": {}
+                  }
+                ]
+              }
+            ],
+            "doc_b_examples": [
+              {
+                "_one_of": [
+                  null,
+                  "",
+                  {
+                    "_dynamic_fields": {}
+                  }
+                ]
+              }
+            ]
           }
         ],
         "score_breakdown": {
@@ -1308,8 +1575,12 @@
           "matches": [
             {
               "score": null,
-              "shared_terms": [],
-              "shared_topics": [],
+              "shared_terms": [
+                null
+              ],
+              "shared_topics": [
+                null
+              ],
               "phrase_a": {
                 "page_index": null,
                 "sent_index": null,
@@ -1349,8 +1620,12 @@
             {
               "score": null,
               "vector_similarity": null,
-              "shared_terms": [],
-              "shared_topics": [],
+              "shared_terms": [
+                null
+              ],
+              "shared_topics": [
+                null
+              ],
               "chunk_a": {
                 "page_index": null,
                 "sent_index": null,
@@ -1381,8 +1656,12 @@
     "es_index": null,
     "es_nlp_level": null,
     "es_nlp_index": null,
-    "es_doc_ids": [],
-    "steps": [],
+    "es_doc_ids": [
+      null
+    ],
+    "steps": [
+      null
+    ],
     "durations": {
       "all": null,
       "_dynamic_duration_template": null
@@ -1456,8 +1735,28 @@
         {
           "term": null,
           "score": null,
-          "doc_a_examples": [],
-          "doc_b_examples": []
+          "doc_a_examples": [
+            {
+              "_one_of": [
+                null,
+                "",
+                {
+                  "_dynamic_fields": {}
+                }
+              ]
+            }
+          ],
+          "doc_b_examples": [
+            {
+              "_one_of": [
+                null,
+                "",
+                {
+                  "_dynamic_fields": {}
+                }
+              ]
+            }
+          ]
         }
       ],
       "score_breakdown": {
@@ -1473,8 +1772,12 @@
         "matches": [
           {
             "score": null,
-            "shared_terms": [],
-            "shared_topics": [],
+            "shared_terms": [
+              null
+            ],
+            "shared_topics": [
+              null
+            ],
             "phrase_a": {
               "page_index": null,
               "sent_index": null,
@@ -1514,8 +1817,12 @@
           {
             "score": null,
             "vector_similarity": null,
-            "shared_terms": [],
-            "shared_topics": [],
+            "shared_terms": [
+              null
+            ],
+            "shared_topics": [
+              null
+            ],
             "chunk_a": {
               "page_index": null,
               "sent_index": null,
@@ -1549,7 +1856,9 @@
       "text_preview": null,
       "token_count": null,
       "lang": null,
-      "vector": null,
+      "vector": [
+        null
+      ],
       "chunk_primary_topic": null,
       "chunk_topics": [
         {
@@ -1565,7 +1874,10 @@
       "tok_index": null,
       "token": null,
       "lang": null,
-      "vector": null
+      "vector": [
+        null
+      ],
+      "doc_id": null
     },
     "table_item": {
       "table_index": null,
@@ -1581,7 +1893,9 @@
         "total": null
       },
       "header_score": null,
-      "detected_columns": [],
+      "detected_columns": [
+        null
+      ],
       "rows_count": null,
       "shape": {
         "rows_estimated": null,
@@ -1601,7 +1915,9 @@
           "total_ht": null,
           "total_ttc": null,
           "total": null,
-          "raw_cells": [],
+          "raw_cells": [
+            null
+          ],
           "confidence": null
         }
       ]
@@ -1618,7 +1934,9 @@
       "total_ht": null,
       "total_ttc": null,
       "total": null,
-      "raw_cells": [],
+      "raw_cells": [
+        null
+      ],
       "confidence": null
     },
     "regex_extraction_item": {
@@ -1678,7 +1996,8 @@
       "char_end": null,
       "tokens_count": null,
       "topic": null,
-      "source_location": {}
+      "source_location": {},
+      "doc_id": null
     },
     "token_item": {
       "filename": null,
@@ -1690,7 +2009,8 @@
       "lemma": null,
       "ner": null,
       "lang": null,
-      "xlmr_backend": null
+      "xlmr_backend": null,
+      "doc_id": null
     },
     "visual_mark_item": {
       "type": null,
@@ -1784,11 +2104,43 @@
           "is_sentence": null,
           "is_noise": null,
           "nonspace": null,
-          "spans": [],
-          "header_rows": [],
-          "header_cells": [],
+          "spans": [
+            [
+              null,
+              null
+            ]
+          ],
+          "header_rows": {
+            "_one_of": [
+              null,
+              [
+                {
+                  "_dynamic_fields": {}
+                }
+              ]
+            ]
+          },
+          "header_cells": {
+            "_one_of": [
+              null,
+              [
+                {
+                  "_dynamic_fields": {}
+                }
+              ]
+            ]
+          },
           "header_source": null,
-          "table_rows": []
+          "table_rows": {
+            "_one_of": [
+              null,
+              [
+                {
+                  "_dynamic_fields": {}
+                }
+              ]
+            ]
+          }
         }
       ]
     },
@@ -1852,7 +2204,8 @@
       "page_index": null,
       "sent_index": null,
       "lang": null,
-      "text": null
+      "text": null,
+      "doc_id": null
     },
     "nlp_entity_item": {
       "filename": null,
@@ -1860,7 +2213,8 @@
       "sent_index": null,
       "lang": null,
       "type": null,
-      "text": null
+      "text": null,
+      "doc_id": null
     },
     "classification_score_audit_item": {
       "score_total": null,
@@ -1904,10 +2258,20 @@
             "chunk_text_excerpt": null,
             "match_score": null,
             "table_index": null,
-            "field": null
+            "field": null,
+            "match_start_in_chunk": null,
+            "match_end_in_chunk": null
           }
         }
-      ]
+      ],
+      "details": {
+        "_one_of": [
+          null,
+          {
+            "_dynamic_fields": {}
+          }
+        ]
+      }
     }
   },
   "sql_mapping_hints": {
@@ -1935,5 +2299,14 @@
       "document_topic_links"
     ],
     "stable_ids_required": true
+  },
+  "source_context": {
+    "corpus_root": "/home/mourad/Bureau/DMS/core/documents",
+    "input_files": [],
+    "source_mode": "template_reference",
+    "fusion_source": "/home/mourad/Bureau/DMS/core/GLOBAL_UNIFIED_PIPELINE_OUTPUT_TEMPLATE.json",
+    "label": null,
+    "profile_requested": null,
+    "profile_effective": null
   }
 }

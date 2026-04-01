@@ -570,6 +570,10 @@ Reference implementation:
     - complete avec les 37 chemins precedemment manquants.
     - les structures reelles sous `documents[]` ont ete enrichies, pas seulement `item_templates`.
     - verification locale faite contre `PROMPT_OUTPUT_MISSING_37_PATHS.txt`: `missing_count = 0`.
+    - complete ensuite avec les ecarts de forme restants observes entre le template et le runtime reel:
+      - champs scalar/list ou scalar/object documentes via unions `_one_of` quand necessaire (`source`, `native`, `totals.*`, `declared_totals_raw.*`, `header_rows/header_cells/table_rows`, etc.).
+      - enrichissement des structures ouvertes et listes reelles (`doc_id` dans `nlp.*`, vecteurs `ml50/ml100`, `quality_checks.details`, exemples inter-docs, `spans`, blocs/sections/lignes/headers/footers/...`).
+    - verification finale locale faite contre `fusion_output.json` + sorties synthetiques `default` / `pipeline50ml` / `pipeline100ml`: `issue_count = 0`.
     - initialise les scalaires absents a `null`, les tableaux a `[]` et laisse les objets presents dans la structure finale.
     - complete avec les champs reels observes dans `fusion_output.json` et les enrichissements statiques de `component/fusion_resultats.py`.
     - couvre maintenant aussi:

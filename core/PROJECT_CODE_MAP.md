@@ -563,6 +563,13 @@ Reference implementation:
       - `item_templates`
       - `sql_mapping_hints`
     - conserve un seul objet JSON racine, avec blocs `default` / `pipeline50ml` / `pipeline100ml` unifies dans le meme template.
+  - `PROMPT_OUTPUT_MISSING_37_PATHS.txt`:
+    - inventaire des 37 chemins encore absents de `prompt_output.json` par rapport a l'union reelle des sorties `pipelinorchestrator` / `pipeline50ml` / `pipeline100ml`.
+    - sert de liste de rattrapage avant de pouvoir considerer `prompt_output.json` comme couverture complete des 3 pipelines.
+  - `prompt_output.json`:
+    - complete avec les 37 chemins precedemment manquants.
+    - les structures reelles sous `documents[]` ont ete enrichies, pas seulement `item_templates`.
+    - verification locale faite contre `PROMPT_OUTPUT_MISSING_37_PATHS.txt`: `missing_count = 0`.
     - initialise les scalaires absents a `null`, les tableaux a `[]` et laisse les objets presents dans la structure finale.
     - complete avec les champs reels observes dans `fusion_output.json` et les enrichissements statiques de `component/fusion_resultats.py`.
     - couvre maintenant aussi:

@@ -399,7 +399,47 @@
         "headers": [],
         "footers": [],
         "lists": [],
-        "tables": [],
+        "tables": [
+          {
+            "table_index": null,
+            "page_index": null,
+            "table_type": null,
+            "header_map": {
+              "reference": null,
+              "product": null,
+              "quantity": null,
+              "unit_price": null,
+              "total_ht": null,
+              "total_ttc": null,
+              "total": null
+            },
+            "header_score": null,
+            "detected_columns": [],
+            "rows_count": null,
+            "shape": {
+              "rows_estimated": null,
+              "columns_estimated": null,
+              "source": null
+            },
+            "rows": [
+              {
+                "table_index": null,
+                "page_index": null,
+                "row_index": null,
+                "reference": null,
+                "product": null,
+                "description": null,
+                "quantity": null,
+                "unit_price": null,
+                "total_ht": null,
+                "total_ttc": null,
+                "total": null,
+                "confidence": null,
+                "raw_cells": []
+              }
+            ]
+          }
+        ],
         "figures": [],
         "equations": [],
         "key_value_pairs": [],
@@ -670,10 +710,26 @@
           }
         ],
         "business": {
-          "_dynamic_fields": {}
+          "_dynamic_fields": {},
+          "some_business_key": null
         },
-        "relations": [],
-        "quality_checks": [],
+        "relations": [
+          {
+            "type": null,
+            "subject": null,
+            "predicate": null,
+            "object": null,
+            "confidence": null,
+            "evidence": null
+          }
+        ],
+        "quality_checks": [
+          {
+            "name": null,
+            "status": null,
+            "details": null
+          }
+        ],
         "bm25": {
           "best_score": null,
           "chunks_total": null,
@@ -938,7 +994,18 @@
             "text": null
           }
         ],
-        "matches": [],
+        "matches": [
+          {
+            "kind": null,
+            "rule_id": null,
+            "value": null,
+            "page_index": null,
+            "sent_index": null,
+            "start": null,
+            "end": null,
+            "snippet": null
+          }
+        ],
         "tokens": [
           {
             "filename": null,
@@ -957,13 +1024,34 @@
         "level": null,
         "summary": {
           "languages": [],
-          "language_stats": {},
+          "language_stats": {
+            "fr": null,
+            "_dynamic_language_template": null
+          },
           "sentences_count": null,
           "tokens_count": null,
           "entities_count": null,
-          "top_pos": [],
-          "top_ner": [],
-          "entities_sample": [],
+          "top_pos": [
+            {
+              "pos": null,
+              "count": null
+            }
+          ],
+          "top_ner": [
+            {
+              "label": null,
+              "count": null
+            }
+          ],
+          "entities_sample": [
+            {
+              "text": null,
+              "type": null,
+              "page_index": null,
+              "sent_index": null,
+              "lang": null
+            }
+          ],
           "sentences_sample": [],
           "updated_at": null
         },
@@ -986,7 +1074,17 @@
               "lang": null
             }
           ],
-          "structure": [],
+          "structure": [
+            {
+              "page_index": null,
+              "sent_index": null,
+              "line": null,
+              "layout_kind": null,
+              "text": null,
+              "start": null,
+              "end": null
+            }
+          ],
           "error": null
         }
       },
@@ -1035,7 +1133,10 @@
         "warnings": [],
         "logs": [],
         "pipeline": null,
-        "durations": {},
+        "durations": {
+          "x": null,
+          "_dynamic_duration_template": null
+        },
         "timestamp": null,
         "source": null
       },
@@ -1282,7 +1383,10 @@
     "es_nlp_index": null,
     "es_doc_ids": [],
     "steps": [],
-    "durations": {},
+    "durations": {
+      "all": null,
+      "_dynamic_duration_template": null
+    },
     "profile": null,
     "0ml": {
       "tables_docs_count": null,

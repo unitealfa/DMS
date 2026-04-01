@@ -4,8 +4,8 @@ Date d'audit: 2026-03-19
 
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
-- Python files analyses: 32
-- Fonctions/classes indexees: 790 (voir `FUNCTION_INDEX.txt`)
+- Python files analyses: 41
+- Fonctions/classes indexees: 848 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 - Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
@@ -19,6 +19,10 @@ Date d'audit: 2026-03-19
   - `pipeline/orchestrator.py` (contient `PipelineOrchestrator` + `Pipeline50MLOrchestrator` + `Pipeline100MLOrchestrator`)
 - Wrappers d'execution des composants: `pipeline/components.py`
 - Serveur HTTP/API local: `pipeline/local_api.py`
+- Bootstrap + sync PostgreSQL: `pipeline/postgres.py`
+- Configuration connexion PostgreSQL: `component/postgres/postgres_connection.py`
+- Configuration base/tables PostgreSQL: `component/postgres/postgres_schema.py`
+- Composant sync PostgreSQL final: `component/postgres/postgres-sync.py`
 - Document de lecture rapide des 3 pipelines: `EXPLICATION_PIPELINES.txt`
 - Page HTML racine minimale: `index.html` (selection/drop de documents + bouton `Lancer`)
 
@@ -43,6 +47,12 @@ Date d'audit: 2026-03-19
   10. `elasticsearch`
   11. `extraction-regles`
   12. `fusion-resultats` (debug/fusion finale, non bloquant en erreur)
+  13. `postgres-sync` (`component/postgres/postgres-sync.py`):
+     - lit `FUSION_PAYLOAD` / `fusion_output.json`,
+     - tente de demarrer PostgreSQL automatiquement au moment du composant,
+     - cree la base cible si absente,
+     - pour l'instant, ecrit seulement un log minimal par document (`heure + fichier + "tout est ok"`) dans `dms_pipeline_launch_logs`,
+     - ajoute un audit `postgres_sync` dans `fusion_output.json`.
 - Pipeline `pipeline50ml`:
   1. `pretraitement-de-docs`
   2. `si-image-pretraiter-sinonpass-le-doc`
@@ -74,6 +84,9 @@ Date d'audit: 2026-03-19
      - fichier unique de fusion, branche `pipeline50ml` incluse dans le meme script,
      - ajout `ml50` + BM25 dans `fusion_output.json`,
      - filtrage des topics grammaticaux (pronoms/determinants/conjonctions/adverbes) via `NLP_TOKENS` du composant grammaire.
+  13. `postgres-sync` (`component/postgres/postgres-sync.py`):
+     - meme preparation SQL finale que la pipeline standard,
+     - pour l'instant, journalise seulement `date + fichier + ok`.
 - Pipeline `pipeline100ml`:
   1. `pretraitement-de-docs`
   2. `si-image-pretraiter-sinonpass-le-doc`
@@ -115,6 +128,9 @@ Date d'audit: 2026-03-19
      - ajout `ml100` + BM25 dans `fusion_output.json`,
      - filtrage des topics grammaticaux (pronoms/determinants/conjonctions/adverbes) via `NLP_TOKENS` du composant grammaire,
      - ajout des sorties visuelles dans `content.visual_flags`, `document_structure.visual_marks`, `document_structure.visual_marks_summary`, `extraction.visual_detection`, `components.detection_signature_chachet_codebarr_100ml` et `pipeline.ml100`.
+  14. `postgres-sync` (`component/postgres/postgres-sync.py`):
+     - meme preparation SQL finale que les autres pipelines,
+     - pour l'instant, journalise seulement `date + fichier + ok`.
 
 Selection runtime:
 - CLI: `--pipeline default|pipelinorchestrator|pipeline50ml|pipeline100ml`
@@ -521,6 +537,7 @@ Reference implementation:
     - expose `POST /api/run` pour uploader les documents selectionnes puis lancer `main.py`.
     - expose `GET /api/status` pour suivre l'etat du job en cours.
     - affiche au demarrage le `pid`, le bind host/port et les URLs locales/reseau candidates.
+    - n'ecrit plus de fichier `.dms_local_api.pid`; le `pid` n'est affiche qu'en terminal.
     - gere un arret propre au `Ctrl+C` / `SIGTERM` en mode foreground.
     - si le port est deja occupe, renvoie maintenant une erreur explicite avec commande de stop ou proposition de port alternatif.
     - parsing multipart corrige pour `POST /api/run` (`files`, `files[]`, `file`).
@@ -574,6 +591,28 @@ Reference implementation:
       - champs scalar/list ou scalar/object documentes via unions `_one_of` quand necessaire (`source`, `native`, `totals.*`, `declared_totals_raw.*`, `header_rows/header_cells/table_rows`, etc.).
       - enrichissement des structures ouvertes et listes reelles (`doc_id` dans `nlp.*`, vecteurs `ml50/ml100`, `quality_checks.details`, exemples inter-docs, `spans`, blocs/sections/lignes/headers/footers/...`).
     - verification finale locale faite contre `fusion_output.json` + sorties synthetiques `default` / `pipeline50ml` / `pipeline100ml`: `issue_count = 0`.
+  - `component/postgres/postgres_connection.py`:
+    - fichier unique de controle de la connexion PostgreSQL et de la synchro SQL finale.
+    - contient `host`, `port`, `user`, `password`, base admin, activation bootstrap, activation sync, audit `fusion_output.json` et commandes de demarrage automatique.
+    - la synchro actuelle est volontairement minimale: seulement `heure + fichier + "tout est ok"`.
+  - `component/postgres/postgres_schema.py`:
+    - fichier unique de controle du nom de la base cible et des tables/index a creer automatiquement.
+    - base cible par defaut: `dms_core`.
+    - table initiale unique: `dms_pipeline_launch_logs`.
+  - `pipeline/postgres.py`:
+    - bootstrap PostgreSQL non destructif + synchro SQL finale.
+    - charge les 2 fichiers de config dedies sous `component/postgres/`.
+    - tente de joindre PostgreSQL local, de le demarrer si indisponible, de creer la base si absente, puis de creer les tables/index manquants.
+    - pour l'instant, ecrit seulement un log minimal dans `dms_pipeline_launch_logs`.
+    - log un statut detaille (`ready`, `database_created`, `tables_ready`, `tables_missing`, `auto_start_commands`, `auto_start_errors`, etc.).
+  - `component/postgres/postgres-sync.py`:
+    - nouveau composant final de pipeline.
+    - consomme `FUSION_PAYLOAD`, ecrit un log minimal par document dans PostgreSQL, puis reinjecte un bloc `postgres_sync` dans `fusion_output.json`.
+  - `pipeline/cli.py` + `pipeline/local_api.py`:
+    - declenchent maintenant le bootstrap PostgreSQL au demarrage.
+    - exposent le statut PostgreSQL dans le contexte runtime (`POSTGRES_*`) et dans les logs de l'API locale.
+  - `prompt_output.json`:
+    - enrichi avec le nouveau bloc top-level `postgres_sync` pour rester aligne avec `fusion_output.json`.
     - initialise les scalaires absents a `null`, les tableaux a `[]` et laisse les objets presents dans la structure finale.
     - complete avec les champs reels observes dans `fusion_output.json` et les enrichissements statiques de `component/fusion_resultats.py`.
     - couvre maintenant aussi:

@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 
 from .orchestrator import PipelineOrchestrator, Pipeline50MLOrchestrator, Pipeline100MLOrchestrator
+from .postgres import ensure_postgres_bootstrap
 from .settings import configure_logging, load_dotenv, normalize_input
 
 # Pipeline par defaut configurable directement dans le code.
@@ -32,6 +33,7 @@ _STEP_CHOICES = [
     "elasticsearch",
     "extraction-regles",
     "fusion-resultats",
+    "postgres-sync",
 ]
 
 
@@ -177,6 +179,7 @@ def main() -> None:
 
     inputs = normalize_input(args.inputs) if args.inputs else []
     repo_root = Path(__file__).resolve().parent.parent
+    postgres_status = ensure_postgres_bootstrap(repo_root, start_if_needed=False)
     pipeline_name = _normalize_pipeline_name(args.pipeline, "default")
     if pipeline_name == "pipeline100ml":
         orchestrator = Pipeline100MLOrchestrator(repo_root)
@@ -250,6 +253,17 @@ def main() -> None:
                 "ML100_BATCH_SIZE": _env_int("ML100_BATCH_SIZE", 8),
                 "ML100_HASH_FALLBACK_DIM": _env_int("ML100_HASH_FALLBACK_DIM", 384),
                 "PIPELINE_PROFILE": pipeline_name,
+                "POSTGRES_STATUS": postgres_status,
+                "POSTGRES_ENABLED": bool(postgres_status.get("enabled")),
+                "POSTGRES_READY": bool(postgres_status.get("ready")),
+                "POSTGRES_SYNC_ENABLED": bool(postgres_status.get("sync_enabled")),
+                "POSTGRES_HOST": postgres_status.get("host"),
+                "POSTGRES_PORT": postgres_status.get("port"),
+                "POSTGRES_USER": postgres_status.get("user"),
+                "POSTGRES_DATABASE": postgres_status.get("database"),
+                "POSTGRES_TABLES": postgres_status.get("tables_expected") or [],
+                "POSTGRES_CONFIG_PATH": postgres_status.get("config_path"),
+                "POSTGRES_SCHEMA_CONFIG_PATH": postgres_status.get("schema_config_path"),
             },
         )
     except Exception as exc:

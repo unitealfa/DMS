@@ -2308,5 +2308,33 @@
     "label": null,
     "profile_requested": null,
     "profile_effective": null
+  },
+  "postgres_sync": {
+    "enabled": null,
+    "sync_enabled": null,
+    "sync_write_fusion_audit": null,
+    "ready": null,
+    "host": null,
+    "port": null,
+    "database": null,
+    "run_id": null,
+    "pipeline_profile": null,
+    "source": null,
+    "run_upserted": null,
+    "documents_total": null,
+    "documents_upserted": null,
+    "links_total": null,
+    "links_upserted": null,
+    "database_created": null,
+    "schema_ready": null,
+    "tables_ready": [],
+    "tables_missing": [],
+    "config_path": null,
+    "schema_config_path": null,
+    "fusion_path": null,
+    "fusion_audit_written": null,
+    "skipped": null,
+    "error": null,
+    "log_entries_created": null
   }
 }

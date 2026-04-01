@@ -20,13 +20,13 @@ from typing import Any, Dict, List
 
 from .cli import PIPELINE_DEFAULT_CODE, _normalize_pipeline_name
 from .orchestrator import PipelineOrchestrator, Pipeline50MLOrchestrator, Pipeline100MLOrchestrator
+from .postgres import ensure_postgres_bootstrap
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 INDEX_HTML_PATH = REPO_ROOT / "index.html"
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
-PID_FILE = REPO_ROOT / ".dms_local_api.pid"
 API_VERSION = "dms-local-api-2026-03-31-v2"
 LOG_PATH_CANDIDATES = [
     REPO_ROOT / "outputgeneralterminal.runtime.txt",
@@ -39,27 +39,6 @@ DEFAULT_PIPELINE_ARGS = [
     "--es-nlp-index",
     "dms_nlp_tokens",
 ]
-
-
-def _pid_from_pid_file() -> int | None:
-    try:
-        raw = PID_FILE.read_text(encoding="utf-8").strip()
-        value = int(raw)
-        return value if value > 0 else None
-    except Exception:
-        return None
-
-
-def _is_process_alive(pid: int | None) -> bool:
-    if not pid:
-        return False
-    try:
-        os.kill(pid, 0)
-        return True
-    except OSError:
-        return False
-
-
 def _active_pipeline_steps() -> List[str]:
     raw = os.environ.get("PIPELINE_DEFAULT") or os.environ.get("PIPELINE_PROFILE") or PIPELINE_DEFAULT_CODE
     profile = _normalize_pipeline_name(raw, "default")
@@ -419,25 +398,29 @@ def parse_args(argv: List[str] | None = None) -> argparse.Namespace:
 
 
 def serve(host: str = DEFAULT_HOST, port: int = DEFAULT_PORT) -> None:
+    postgres_status = ensure_postgres_bootstrap(REPO_ROOT, start_if_needed=False)
     try:
         server = DMSLauncherServer((host, port), DMSLauncherHandler)
     except OSError as exc:
         if getattr(exc, "errno", None) == 98:
-            pid = _pid_from_pid_file()
-            if _is_process_alive(pid):
-                raise RuntimeError(
-                    f"Le port {port} est deja utilise. Un serveur DMS local semble deja actif (pid={pid}). "
-                    f"Arrete-le avec: kill {pid}"
-                ) from exc
             raise RuntimeError(
                 f"Le port {port} est deja utilise. Lance sur un autre port, par exemple: "
                 f"python local_api.py --host {host} --port 8766"
             ) from exc
         raise
-    PID_FILE.write_text(str(os.getpid()), encoding="utf-8")
     print(f"[local-api] pid={os.getpid()}")
     print(f"[local-api] api_version={API_VERSION}")
     print(f"[local-api] host bind={host}:{port}")
+    print(
+        "[local-api] postgres "
+        f"enabled={1 if postgres_status.get('enabled') else 0} | "
+        f"ready={1 if postgres_status.get('ready') else 0} | "
+        f"db={postgres_status.get('database')} | "
+        f"created={1 if postgres_status.get('database_created') else 0} | "
+        f"tables={len(postgres_status.get('tables_ready') or [])}/{len(postgres_status.get('tables_expected') or [])}"
+    )
+    if postgres_status.get("error"):
+        print(f"[local-api] postgres_error={postgres_status.get('error')}")
     for url in _candidate_urls(host, port):
         print(f"[local-api] url={url}")
     print("[local-api] le bouton Lancer de index.html executera main.py avec les fichiers uploades")
@@ -462,8 +445,6 @@ def serve(host: str = DEFAULT_HOST, port: int = DEFAULT_PORT) -> None:
         signal.signal(signal.SIGINT, previous_int)
         signal.signal(signal.SIGTERM, previous_term)
         server.server_close()
-        if PID_FILE.exists():
-            PID_FILE.unlink(missing_ok=True)
         print("[local-api] serveur arrete")
 
 

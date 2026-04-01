@@ -604,3 +604,27 @@ class FusionResultComponent(Component):
         summary = f"fusion -> {fusion} | source={source} | docs={doc_count} | es_synced={es_synced}"
         self._report(output, summary)
         return output
+
+
+class PostgresSyncComponent(Component):
+    """Synchronise le `fusion_output.json` final vers PostgreSQL."""
+
+    def run(self, context: Context) -> Any:
+        ctx = self._execute_script(context)
+        output = ctx.get("POSTGRES_SYNC")
+        if not isinstance(output, dict):
+            raise ValueError("postgres-sync n'a retourne aucun POSTGRES_SYNC exploitable.")
+
+        summary = (
+            f"ready={1 if output.get('ready') else 0} | "
+            f"db={output.get('database')} | "
+            f"run={output.get('run_id')} | "
+            f"logs={int(output.get('log_entries_created') or 0)} | "
+            f"docs={int(output.get('documents_total') or 0)}"
+        )
+        if output.get("skipped"):
+            summary += f" | skipped={output.get('skipped')}"
+        if output.get("error"):
+            summary += f" | error={output.get('error')}"
+        self._report(output, summary)
+        return output

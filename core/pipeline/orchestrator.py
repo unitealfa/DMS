@@ -7,6 +7,7 @@ from .components import (
     ClassificationComponent,
     ElasticsearchComponent,
     InterDocLinkingComponent,
+    PostgresSyncComponent,
     RuleExtractionComponent,
     GrammarComponent,
     OCRPreprocessComponent,
@@ -37,6 +38,7 @@ class PipelineOrchestrator:
             ElasticsearchComponent("elasticsearch", COMPONENT_DIR / "elasticsearch.py"),
             RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction" / "extraction-regles.py"),
             FusionResultComponent("fusion-resultats", COMPONENT_DIR / "fusion_resultats.py"),
+            PostgresSyncComponent("postgres-sync", COMPONENT_DIR / "postgres" / "postgres-sync.py"),
         ]
 
     def list_steps(self) -> List[str]:
@@ -103,6 +105,7 @@ class Pipeline50MLOrchestrator:
             ElasticsearchComponent("elasticsearch", COMPONENT_DIR / "elasticsearch.py"),
             RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction" / "extraction-regles-50ml.py"),
             FusionResultComponent("fusion-resultats", COMPONENT_DIR / "fusion_resultats.py"),
+            PostgresSyncComponent("postgres-sync", COMPONENT_DIR / "postgres" / "postgres-sync.py"),
         ]
 
     def list_steps(self) -> List[str]:
@@ -170,6 +173,7 @@ class Pipeline100MLOrchestrator:
             ElasticsearchComponent("elasticsearch", COMPONENT_DIR / "elasticsearch.py"),
             RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction" / "extraction-regles-100ml.py"),
             FusionResultComponent("fusion-resultats", COMPONENT_DIR / "fusion_resultats.py"),
+            PostgresSyncComponent("postgres-sync", COMPONENT_DIR / "postgres" / "postgres-sync.py"),
         ]
 
     def list_steps(self) -> List[str]:

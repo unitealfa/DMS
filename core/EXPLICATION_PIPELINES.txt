@@ -31,10 +31,13 @@ Pipeline 1: PipelineOrchestrator
 - `ClassificationComponent("clasification", "component/clasification.py")`
 - `TokenisationLayoutComponent("tokenisation-layout", "component/tokenisation_layout/tokenisation-layout.py")`
 - `GrammarComponent("atripusion-gramatical", "component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py")`
+- `TableExtractionComponent("table-extraction", "component/table_extraction/table-extraction.py")`
+- `TotalsVerificationComponent("verification-totaux", "component/verification-totaux.py")`
 - `InterDocLinkingComponent("liaison-inter-docs", "component/liaison-inter-docs.py")`
 - `ElasticsearchComponent("elasticsearch", "component/elasticsearch.py")`
 - `RuleExtractionComponent("extraction-regles", "component/extraction/extraction-regles.py")`
 - `FusionResultComponent("fusion-resultats", "component/fusion_resultats.py")`
+- `PostgresSyncComponent("postgres-sync", "component/postgres/postgres-sync.py")`
 `]`
 
 Pipeline 2: Pipeline50MLOrchestrator
@@ -46,10 +49,12 @@ Pipeline 2: Pipeline50MLOrchestrator
 - `TokenisationLayoutComponent("tokenisation-layout", "component/tokenisation_layout/tokenisation-layout-50ml.py")`
 - `GrammarComponent("atripusion-gramatical", "component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py")`
 - `TableExtractionComponent("table-extraction", "component/table_extraction/table-extraction.py")`
+- `TotalsVerificationComponent("verification-totaux", "component/verification-totaux.py")`
 - `InterDocLinkingComponent("liaison-inter-docs", "component/liaison-inter-docs.py")`
 - `ElasticsearchComponent("elasticsearch", "component/elasticsearch.py")`
 - `RuleExtractionComponent("extraction-regles", "component/extraction/extraction-regles-50ml.py")`
 - `FusionResultComponent("fusion-resultats", "component/fusion_resultats.py")`
+- `PostgresSyncComponent("postgres-sync", "component/postgres/postgres-sync.py")`
 `]`
 
 Pipeline 3: Pipeline100MLOrchestrator
@@ -61,10 +66,13 @@ Pipeline 3: Pipeline100MLOrchestrator
 - `TokenisationLayoutComponent("tokenisation-layout", "component/tokenisation_layout/tokenisation-layout-100ml.py")`
 - `GrammarComponent("atripusion-gramatical", "component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py")`
 - `TableExtractionComponent("table-extraction", "component/table_extraction/table-extraction.py")`
+- `TotalsVerificationComponent("verification-totaux", "component/verification-totaux.py")`
+- `VisualMarksDetectionComponent("detection-signature-chachet-codebarr", "component/detection-signature-chachet-codebarr.py")`
 - `InterDocLinkingComponent("liaison-inter-docs", "component/liaison-inter-docs.py")`
 - `ElasticsearchComponent("elasticsearch", "component/elasticsearch.py")`
 - `RuleExtractionComponent("extraction-regles", "component/extraction/extraction-regles-100ml.py")`
 - `FusionResultComponent("fusion-resultats", "component/fusion_resultats.py")`
+- `PostgresSyncComponent("postgres-sync", "component/postgres/postgres-sync.py")`
 `]`
 
 Comment les composants sont relies
@@ -75,14 +83,17 @@ Comment les composants sont relies
 - `clasification` lit `FINAL_DOCS` et produit `RESULTS`
 - `tokenisation-layout` lit surtout `FINAL_DOCS` + `RESULTS` et produit `TOK_DOCS` / `selected`
 - `atripusion-gramatical` lit `TOK_DOCS` / `selected` et produit `NLP_*`
-- `table-extraction` (50ml et 100ml seulement) lit les docs tokenises/pages OCR et produit `TABLE_EXTRACTIONS*`
+- `table-extraction` lit les docs tokenises/pages OCR et produit `TABLE_EXTRACTIONS*`
+- `verification-totaux` lit les tableaux et produit `TOTALS_VERIFICATION`
+- `detection-signature-chachet-codebarr` (100ml seulement) produit `VISUAL_MARKS_DETECTIONS*`
 - `liaison-inter-docs` lit les topics / tokens / phrases et produit `INTERDOC_*`
 - `elasticsearch` indexe ou synchronise les donnees et produit `ES_*`
 - `extraction-regles` lit surtout classification + texte + parfois ES et produit `EXTRACTIONS`
 - `fusion-resultats` fusionne tout dans `fusion_output.json` et produit `FUSION_*`
+- `postgres-sync` lit `FUSION_PAYLOAD` et pousse la sortie finale vers PostgreSQL
 
 Flux logique court
-- fichier -> type de contenu -> texte final -> classification -> phrases/chunks/tokens -> grammaire/NER/lemma/POS -> tables -> liens inter-docs -> sync Elasticsearch -> extraction metier -> JSON final
+- fichier -> type de contenu -> texte final -> classification -> phrases/chunks/tokens -> grammaire/NER/lemma/POS -> tables -> verification totaux -> visuel 100ml -> liens inter-docs -> sync Elasticsearch -> extraction metier -> JSON final -> sync PostgreSQL
 
 Ce que chaque composant extrait ou produit
 
@@ -221,10 +232,28 @@ Ce que chaque composant extrait ou produit
 - techno principale: fusion context locale + ajout conditionnel des branches `default`, `ml50`, `ml100`, `bm25`, `elasticsearch`
 - sorties principales: `FUSION_RESULT`, `FUSION_PAYLOAD`, `FUSION_PAYLOADS`
 
+17) `postgres-sync`
+- lit `FUSION_PAYLOAD` / `fusion_output.json`
+- tente de joindre PostgreSQL et de le demarrer automatiquement
+- cree la base si absente, puis la table de test si elle manque
+- pour l'instant, ecrit seulement un log minimal par document:
+  - heure de lancement
+  - nom du fichier
+  - texte `tout est ok`
+- table actuellement ecrite:
+  - `dms_pipeline_launch_logs`
+- ajoute un bloc `postgres_sync` dans `fusion_output.json`
+- techno principale:
+  - bootstrap SQL: `pipeline/postgres.py`
+  - config connexion: `component/postgres/postgres_connection.py`
+  - config schema: `component/postgres/postgres_schema.py`
+- sorties principales: `POSTGRES_STATUS`, `POSTGRES_SYNC`, `PIPELINE_RUN_ID`
+
 Resume simple
 - `PipelineOrchestrator` = pipeline standard
 - `Pipeline50MLOrchestrator` = pipeline standard + topics/vecteurs legers + tables + extraction YAML/BM25
 - `Pipeline100MLOrchestrator` = pipeline standard + embeddings Transformer + grammaire XLM-R + tables + extraction YAML/BM25
+- les 3 pipelines finissent maintenant aussi par `postgres-sync` si le composant est inclus dans la run
 
 Points importants sur les technos vraiment utilisees
 - `Tesseract` est bien utilise pour l'OCR.
@@ -235,6 +264,9 @@ Points importants sur les technos vraiment utilisees
 - `Word2Vec` n'est pas utilise actuellement.
 - la pipeline 50ml utilise un mode `fasttext-like` local par hashing subword, pas un modele Word2Vec.
 - la classification actuelle est surtout basee sur des mots-cles et scores de regles JSON.
+- PostgreSQL est pilote par 2 fichiers separes:
+  - `component/postgres/postgres_connection.py`
+  - `component/postgres/postgres_schema.py`
 
 Fichier code a retenir
 - choix par defaut: `pipeline/cli.py`

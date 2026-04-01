@@ -114,7 +114,7 @@ def _normalize_pipeline_profile(value: Any) -> str:
         return "pipeline50ml"
     if raw in {"pipeline100ml", "100ml"}:
         return "pipeline100ml"
-    return "pipelinorchestrator"
+    return "pipeline0ml"
 
 
 def _active_ml_block_names(profile: Any, doc: Optional[Dict[str, Any]] = None) -> List[str]:
@@ -4539,7 +4539,7 @@ def sync_fusion_payload_to_postgres(
         or payload.get("pipeline_profile")
         or _safe_dict(payload.get("pipeline")).get("profile")
         or payload.get("profile")
-        or "pipelinorchestrator"
+        or "pipeline0ml"
     )
     source_value = str(source or payload.get("source") or "fusion-resultats").strip() or "fusion-resultats"
     current_run_id = str(run_id or payload.get("run_id") or "").strip()

@@ -1756,7 +1756,7 @@ def _normalize_pipeline_profile(value: Any) -> str:
         return "pipeline50ml"
     if raw in {"pipeline100ml", "100ml"}:
         return "pipeline100ml"
-    return "pipelinorchestrator"
+    return "pipeline0ml"
 
 
 def _active_doc_section(profile: str) -> Optional[str]:
@@ -1777,7 +1777,7 @@ def _purge_inactive_profile_payload(doc: Dict[str, Any], profile: str) -> None:
     components = doc.get("components")
     if isinstance(components, dict):
         inactive_component_keys = {
-            "pipelinorchestrator": {
+            "pipeline0ml": {
                 "tokenisation_layout_50ml",
                 "tokenisation_layout_100ml",
                 "extraction_regles_50ml",
@@ -2167,7 +2167,7 @@ def _augment_payload_for_profile(ctx: Dict[str, Any], payload: Dict[str, Any], p
 
 def _augment_payload_with_default_tables(ctx: Dict[str, Any], payload: Dict[str, Any]) -> Dict[str, Any]:
     profile = _normalize_pipeline_profile(ctx.get("PIPELINE_PROFILE"))
-    if profile != "pipelinorchestrator":
+    if profile != "pipeline0ml":
         return payload
 
     docs = _safe_list(payload.get("documents"))
@@ -2234,7 +2234,7 @@ def _augment_payload_with_default_tables(ctx: Dict[str, Any], payload: Dict[str,
     pipeline = payload.get("pipeline")
     if not isinstance(pipeline, dict):
         pipeline = {}
-    pipeline["profile"] = "pipelinorchestrator"
+    pipeline["profile"] = "pipeline0ml"
     pipeline["0ml"] = {
         "tables_docs_count": len(_safe_list(table_rows)),
     }

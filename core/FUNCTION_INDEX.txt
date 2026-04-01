@@ -1,43 +1,7 @@
 FUNCTION_INDEX
 python_files=41
-entries=966
+entries=930
 
-component/atrribution-gramatical/arabcode.py:11 | FunctionDef | _install_help
-component/atrribution-gramatical/arabcode.py:87 | FunctionDef | simple_tokenize
-component/atrribution-gramatical/arabcode.py:90 | FunctionDef | is_punct
-component/atrribution-gramatical/arabcode.py:99 | FunctionDef | strip_diacritics
-component/atrribution-gramatical/arabcode.py:102 | FunctionDef | norm_alef
-component/atrribution-gramatical/arabcode.py:105 | FunctionDef | has_hamza
-component/atrribution-gramatical/arabcode.py:128 | FunctionDef | penn_from_analysis
-component/atrribution-gramatical/arabcode.py:132 | FunctionDef | lemma_from_analysis
-component/atrribution-gramatical/arabcode.py:152 | FunctionDef | override_tag
-component/atrribution-gramatical/arabcode.py:205 | FunctionDef | _looks_like_verb_imperfect
-component/atrribution-gramatical/arabcode.py:209 | FunctionDef | _safe_split_conj
-component/atrribution-gramatical/arabcode.py:227 | FunctionDef | _best_analysis_for
-component/atrribution-gramatical/arabcode.py:233 | FunctionDef | _char_overlap_ratio
-component/atrribution-gramatical/arabcode.py:240 | FunctionDef | pick_analysis
-component/atrribution-gramatical/arabcode.py:370 | FunctionDef | split_proclitics
-component/atrribution-gramatical/arabcode.py:412 | FunctionDef | split_enclitics
-component/atrribution-gramatical/arabcode.py:457 | FunctionDef | get_ner
-component/atrribution-gramatical/arabcode.py:471 | FunctionDef | ner_predict_tokens
-component/atrribution-gramatical/arabcode.py:493 | FunctionDef | norm_for_match
-component/atrribution-gramatical/arabcode.py:496 | FunctionDef | fix_titles
-component/atrribution-gramatical/arabcode.py:523 | FunctionDef | add_year_dates
-component/atrribution-gramatical/arabcode.py:532 | FunctionDef | add_currency_codes
-component/atrribution-gramatical/arabcode.py:550 | FunctionDef | enforce_bio
-component/atrribution-gramatical/arabcode.py:583 | FunctionDef | _is_initial_chain
-component/atrribution-gramatical/arabcode.py:589 | FunctionDef | drop_false_pers
-component/atrribution-gramatical/arabcode.py:612 | FunctionDef | strip_entity_clitics_for_display
-component/atrribution-gramatical/arabcode.py:628 | FunctionDef | bio_to_entities
-component/atrribution-gramatical/arabcode.py:633 | FunctionDef | pos_of
-component/atrribution-gramatical/arabcode.py:636 | FunctionDef | lemma_of
-component/atrribution-gramatical/arabcode.py:674 | FunctionDef | _estimate_clitic_count
-component/atrribution-gramatical/arabcode.py:693 | FunctionDef | _lemma_suspicious
-component/atrribution-gramatical/arabcode.py:707 | FunctionDef | analyze_sentence
-component/atrribution-gramatical/arabcode.py:871 | FunctionDef | split_input_into_sentences
-component/atrribution-gramatical/arabcode.py:881 | FunctionDef | run_one_auto
-component/atrribution-gramatical/arabcode.py:885 | FunctionDef | run_from_previous_cell
-component/atrribution-gramatical/arabcode.py:942 | FunctionDef | main
 component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:30 | FunctionDef | _is_punct_like_token
 component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:47 | FunctionDef | _normalize_token_fields
 component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py:60 | FunctionDef | detect_lang
@@ -637,11 +601,11 @@ pipeline/cli.py:40 | FunctionDef | _env_bool
 pipeline/cli.py:47 | FunctionDef | _env_int
 pipeline/cli.py:57 | FunctionDef | _env_optional
 pipeline/cli.py:65 | FunctionDef | _normalize_pipeline_name
-pipeline/cli.py:82 | FunctionDef | _env_pipeline
-pipeline/cli.py:90 | FunctionDef | _normalize_step_name
-pipeline/cli.py:99 | FunctionDef | parse_cli
-pipeline/cli.py:173 | FunctionDef | main
-pipeline/cli.py:210 | FunctionDef | tee_print
+pipeline/cli.py:81 | FunctionDef | _env_pipeline
+pipeline/cli.py:89 | FunctionDef | _normalize_step_name
+pipeline/cli.py:98 | FunctionDef | parse_cli
+pipeline/cli.py:172 | FunctionDef | main
+pipeline/cli.py:209 | FunctionDef | tee_print
 pipeline/components.py:32 | FunctionDef | _doc_has_meaningful_text
 pipeline/components.py:59 | FunctionDef | _drop_empty_duplicate_docs
 pipeline/components.py:84 | ClassDef | Component
@@ -763,7 +727,7 @@ pipeline/local_api.py:393 | FunctionDef | parse_args
 pipeline/local_api.py:400 | FunctionDef | serve
 pipeline/local_api.py:430 | FunctionDef | _graceful_stop
 pipeline/local_api.py:451 | FunctionDef | main
-pipeline/orchestrator.py:25 | ClassDef | PipelineOrchestrator
+pipeline/orchestrator.py:25 | ClassDef | Pipeline0MLOrchestrator
 pipeline/orchestrator.py:26 | FunctionDef | __init__
 pipeline/orchestrator.py:44 | FunctionDef | list_steps
 pipeline/orchestrator.py:47 | FunctionDef | _select_components

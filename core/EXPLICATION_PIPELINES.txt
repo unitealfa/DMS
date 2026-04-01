@@ -8,7 +8,7 @@ Comment choisir la pipeline a lancer
 - fichier a modifier: `pipeline/cli.py`
 - variable actuelle: `PIPELINE_DEFAULT_CODE = "pipeline100ml"`
 - valeurs utiles:
-  - `"default"` ou `"pipelinorchestrator"` -> lance `PipelineOrchestrator`
+  - `"default"` ou `"pipeline0ml"` -> lance `Pipeline0MLOrchestrator`
   - `"pipeline50ml"` -> lance `Pipeline50MLOrchestrator`
   - `"pipeline100ml"` -> lance `Pipeline100MLOrchestrator`
 - en phase de test actuelle, il suffit donc de changer cette variable puis relancer le code.
@@ -17,13 +17,13 @@ Comment choisir la pipeline a lancer
 Selection runtime
 - `pipeline/cli.py` lit `PIPELINE_DEFAULT_CODE`
 - puis choisit:
-  - `PipelineOrchestrator(...)`
+  - `Pipeline0MLOrchestrator(...)`
   - ou `Pipeline50MLOrchestrator(...)`
   - ou `Pipeline100MLOrchestrator(...)`
 - ensuite l'orchestrateur parcourt `self.components` dans l'ordre.
 - chaque composant lit le `context` commun, ajoute ses sorties, puis le composant suivant reutilise ces donnees.
 
-Pipeline 1: PipelineOrchestrator
+Pipeline 1: Pipeline0MLOrchestrator
 `self.components = [`
 - `PretraitementComponent("pretraitement-de-docs", "component/pretraitement-de-docs.py")`
 - `OCRPreprocessComponent("si-image-pretraiter-sinonpass-le-doc", "component/si-image-pretraiter-sinonpass-le-doc.py")`
@@ -126,7 +126,7 @@ Ce que chaque composant extrait ou produit
 - important: pas de BERT, pas de Word2Vec, pas de BM25 dans ce composant
 - sortie principale: `RESULTS`
 
-5) `tokenisation-layout` version default
+5) `tokenisation-layout` version pipeline0ml
 - decoupe en phrases / segments / tokens avec infos de layout
 - prepare les pages, chunks, sentences pour la suite
 - techno principale: heuristiques layout/regex/multicolonnes OCR ou natif
@@ -134,7 +134,7 @@ Ce que chaque composant extrait ou produit
 - sortie principale: `TOK_DOCS` ou `selected`
 
 6) `tokenisation-layout` version 50ml
-- fait la meme base que la version default
+- fait la meme base que la version pipeline0ml
 - ajoute une couche ML legere type FastText-like / hashing subword
 - calcule des vecteurs mot, chunk et document
 - extrait des topics de chunk et des topics document
@@ -143,7 +143,7 @@ Ce que chaque composant extrait ou produit
 - sorties principales: `TOK_DOCS`, `selected`, structures `ML50_*`
 
 7) `tokenisation-layout` version 100ml
-- fait la meme base que la version default
+- fait la meme base que la version pipeline0ml
 - ajoute des embeddings Transformer / XLM-R-BERT avec pooling
 - calcule un embedding par chunk et un embedding document
 - extrait des topics de chunk et des topics document
@@ -199,7 +199,7 @@ Ce que chaque composant extrait ou produit
 - en mode `--es-nlp-level full`, les tokens vont dans l'index dedie `dms_nlp_tokens`
 - sorties principales: `ES_DOC_IDS`, `ES_AVAILABLE`, `ES_CLASSIFICATION_SYNCED`, `ES_EXTRACTION_SYNCED`, `ES_NLP_SYNC`
 
-13) `extraction-regles` version default
+13) `extraction-regles` version pipeline0ml
 - applique les regles metier standard
 - extrait des champs utiles selon le document
 - techno principale: extraction regles/regex standard
@@ -229,7 +229,7 @@ Ce que chaque composant extrait ou produit
 - les regroupe par document
 - structure la sortie finale pour humain + machine
 - ecrit `fusion_output.json`
-- techno principale: fusion context locale + ajout conditionnel des branches `default`, `ml50`, `ml100`, `bm25`, `elasticsearch`
+- techno principale: fusion context locale + ajout conditionnel des branches `0ml`, `ml50`, `ml100`, `bm25`, `elasticsearch`
 - sorties principales: `FUSION_RESULT`, `FUSION_PAYLOAD`, `FUSION_PAYLOADS`
 
 17) `postgres-sync`
@@ -258,7 +258,7 @@ Ce que chaque composant extrait ou produit
 - sorties principales: `POSTGRES_STATUS`, `POSTGRES_SYNC`, `PIPELINE_RUN_ID`
 
 Resume simple
-- `PipelineOrchestrator` = pipeline standard
+- `Pipeline0MLOrchestrator` = pipeline standard
 - `Pipeline50MLOrchestrator` = pipeline standard + topics/vecteurs legers + tables + extraction YAML/BM25
 - `Pipeline100MLOrchestrator` = pipeline standard + embeddings Transformer + grammaire XLM-R + tables + extraction YAML/BM25
 - les 3 pipelines finissent maintenant aussi par `postgres-sync` si le composant est inclus dans la run

@@ -22,7 +22,7 @@ from .components import (
 from .settings import COMPONENT_DIR, Context, InputLike, normalize_input
 
 
-class PipelineOrchestrator:
+class Pipeline0MLOrchestrator:
     def __init__(self, base_dir: Path):
         self.base_dir = base_dir
         self.components = [
@@ -73,7 +73,7 @@ class PipelineOrchestrator:
         context: Context = {"INPUT_FILE": normalize_input(input_files)}
         if context_overrides:
             context.update(context_overrides)
-        context["PIPELINE_PROFILE"] = str(context.get("PIPELINE_PROFILE") or "pipelinorchestrator")
+        context["PIPELINE_PROFILE"] = str(context.get("PIPELINE_PROFILE") or "pipeline0ml")
         selected = self._select_components(only, upto, start)
         context["PIPELINE_STEPS"] = [c.name for c in selected]
         for comp in selected:

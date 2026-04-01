@@ -5,7 +5,7 @@ Date d'audit: 2026-04-01
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
 - Python files analyses: 41
-- Fonctions/classes indexees: 966 (voir `FUNCTION_INDEX.txt`)
+- Fonctions/classes indexees: 930 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 - Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
@@ -16,7 +16,7 @@ Date d'audit: 2026-04-01
 - Script package API locale: `dms-local-api` (defini dans `pyproject.toml`)
 - Parsing des options: `pipeline/cli.py`
 - Orchestrateurs:
-  - `pipeline/orchestrator.py` (contient `PipelineOrchestrator` + `Pipeline50MLOrchestrator` + `Pipeline100MLOrchestrator`)
+  - `pipeline/orchestrator.py` (contient `Pipeline0MLOrchestrator` + `Pipeline50MLOrchestrator` + `Pipeline100MLOrchestrator`)
 - Wrappers d'execution des composants: `pipeline/components.py`
 - Serveur HTTP/API local: `pipeline/local_api.py`
 - Bootstrap + sync PostgreSQL: `pipeline/postgres.py`
@@ -28,7 +28,7 @@ Date d'audit: 2026-04-01
 - Page HTML racine minimale: `index.html` (selection/drop de documents + bouton `Lancer`)
 
 ## 3) Pipeline reel (ordre d'execution)
-- Pipeline `default`:
+- Pipeline `pipeline0ml` (alias CLI `default`):
   1. `pretraitement-de-docs`
   2. `si-image-pretraiter-sinonpass-le-doc`
   3. `output-txt`
@@ -112,7 +112,7 @@ Date d'audit: 2026-04-01
      - meilleure detection des tableaux denses/serres OCR,
      - sortie context: `TABLE_EXTRACTIONS_100ML` + `TABLE_EXTRACTIONS`.
   8. `verification-totaux` (`component/verification-totaux.py`):
-     - verification non-ML partagee avec `default` et `pipeline50ml`,
+     - verification non-ML partagee avec `pipeline0ml` et `pipeline50ml`,
      - produit un audit totals/rows reutilise dans `fusion_output.json`.
   9. `detection-signature-chachet-codebarr` (`component/detection-signature-chachet-codebarr.py`):
      - detection visuelle des signatures, cachets, codes-barres et QR codes,
@@ -136,8 +136,8 @@ Date d'audit: 2026-04-01
      - persiste la sortie finale fusionnee dans le schema `dms` avec la meme logique `NULL/JSONB`.
 
 Selection runtime:
-- CLI: `--pipeline default|pipelinorchestrator|pipeline50ml|pipeline100ml`
-- variable d'environnement par defaut: `PIPELINE_DEFAULT` (ex: `pipelinorchestrator`, `pipeline50ml` ou `pipeline100ml`; fallback `PIPELINE_PROFILE`)
+- CLI: `--pipeline default|pipeline0ml|pipeline50ml|pipeline100ml`
+- variable d'environnement par defaut: `PIPELINE_DEFAULT` (ex: `pipeline0ml`, `pipeline50ml` ou `pipeline100ml`; fallback `PIPELINE_PROFILE`)
 - etapes CLI: `--only/--upto/--start` utilisent `atripusion-gramatical` (alias legacy accepte: `atripusion-gramatical-en-utilisant-les3ficherla`).
 
 Reference implementation:
@@ -469,7 +469,7 @@ Reference implementation:
 ### 6.1 Orchestration (`pipeline/`)
 - `pipeline/settings.py`: logging, normalize input, context managers cwd/argv, chargement `.env` optionnel.
 - `pipeline/components.py`: wrappers des composants scripts + resumes + sync ES.
-- `pipeline/orchestrator.py`: contient les 3 orchestrateurs (`PipelineOrchestrator`, `Pipeline50MLOrchestrator`, `Pipeline100MLOrchestrator`) + selection `only/upto/start`.
+- `pipeline/orchestrator.py`: contient les 3 orchestrateurs (`Pipeline0MLOrchestrator`, `Pipeline50MLOrchestrator`, `Pipeline100MLOrchestrator`) + selection `only/upto/start`.
 - `pipeline/cli.py`: CLI + chargement `.env` + tee print vers `outputgeneralterminal.txt`.
 - `pipeline/elasticsearch.py`: store HTTP ES + auth + flatten/index + auto-start local ES (POSIX/Windows) + fallback docs + sync classification/extraction + sync NLP (summary/full).
 - `pytesseract.py`: shim local compatible `pytesseract` base sur le binaire `tesseract` (OCR CLI, OSD, TSV, langues, version) quand le package Python n'est pas installe.
@@ -534,23 +534,27 @@ Reference implementation:
 
 ## 11) Changelog code
 - 2026-04-01:
+  - renommage standard:
+    - la pipeline standard s'appelle maintenant `pipeline0ml` partout.
+    - la classe standard s'appelle maintenant `Pipeline0MLOrchestrator`.
+    - les logs, la fusion finale, PostgreSQL et la documentation n'utilisent plus l'ancien nom de la pipeline standard.
   - `pipeline/cli.py`:
     - normalise maintenant les profils de pipeline vers 3 valeurs canoniques uniquement:
-      - `pipelinorchestrator`
+      - `pipeline0ml`
       - `pipeline50ml`
       - `pipeline100ml`
-    - les alias utilisateur (`default`, `pipelineorchestrator`, `orchestrator`, `50ml`, `100ml`) restent acceptes, mais ne sont plus stockes/imprimes comme profils finaux.
+    - les alias utilisateur (`default`, `pipeline0ml`, `50ml`, `100ml`) restent acceptes, mais ne sont plus stockes/imprimes comme profils finaux.
   - `pipeline/orchestrator.py`:
-    - la pipeline standard injecte maintenant `PIPELINE_PROFILE = "pipelinorchestrator"` au lieu de `default`.
+    - la pipeline standard injecte maintenant `PIPELINE_PROFILE = "pipeline0ml"` au lieu de `default`.
   - `component/fusion_resultats.py`:
     - fixe maintenant `profile` et `pipeline.profile` dans `fusion_output.json`.
     - purge explicitement les blocs ML inactifs (`ml50` / `ml100`) et les composants suffixes inactifs pour eviter toute confusion entre runs 50ml et 100ml.
-    - un run `pipeline100ml` ne garde plus de section `ml50`; un run `pipeline50ml` ne garde plus de section `ml100`; un run `pipelinorchestrator` ne garde aucun bloc ML.
+    - un run `pipeline100ml` ne garde plus de section `ml50`; un run `pipeline50ml` ne garde plus de section `ml100`; un run `pipeline0ml` ne garde aucun bloc ML.
   - `component/liaison-inter-docs.py`:
     - n'agrege plus les topics `ML50_TOPICS` et `ML100_TOPICS` ensemble.
     - utilise uniquement la source topics du profil courant, ce qui evite les melanges de `vector_profile` / topics inter-docs entre 50ml et 100ml.
   - `pipeline/postgres.py`:
-    - normalise le `pipeline_profile` stocke en base vers `pipelinorchestrator`, `pipeline50ml` ou `pipeline100ml`.
+    - normalise le `pipeline_profile` stocke en base vers `pipeline0ml`, `pipeline50ml` ou `pipeline100ml`.
     - n'insere plus les topics/vecteurs/embeddings/features des deux blocs ML en meme temps.
     - ne stocke que le bloc actif du run courant dans `dms.document_topics`, `dms.document_vectors`, `dms.document_chunk_embeddings`, `dms.document_word_embeddings` et `dms.document_pipeline_features`.
     - `topic_source` suit maintenant le vrai profil de run au lieu de `ml50` / `ml100`.
@@ -561,15 +565,15 @@ Reference implementation:
     - run `pipeline50ml` verifie sur `documents/signettab.png`:
       - `fusion_output.json`: `profile = pipeline50ml`, aucune section `ml100`.
       - PostgreSQL: `runs_profile`, `topic_profiles`, `topic_sources`, `vector_profiles`, `chunk_profiles`, `word_profiles`, `feature_profiles` = `pipeline50ml` uniquement.
-    - run `pipelinorchestrator` verifie sur `documents/signettab.png`:
-      - `fusion_output.json`: `profile = pipelinorchestrator`, sans `ml50` ni `ml100`.
-      - `postgres-sync`: `pipeline_profile = pipelinorchestrator`.
+    - run `pipeline0ml` verifie sur `documents/signettab.png`:
+      - `fusion_output.json`: `profile = pipeline0ml`, sans `ml50` ni `ml100`.
+      - `postgres-sync`: `pipeline_profile = pipeline0ml`.
 - 2026-04-01:
   - `pipeline/postgres.py`:
     - corrige la liaison `dms.document_sentence_layouts.sentence_id -> dms.document_sentences.sentence_id`.
     - le `sentence_id` d'un layout n'est maintenant renseigne que si la phrase existe reellement dans `document_sentences`, ce qui evite les erreurs de cle etrangere quand la segmentation `sentences_layout` differe de la segmentation `nlp.sentences`.
   - validation runtime reelle:
-    - runs complets executes avec PostgreSQL local reel sur les 3 pipelines `default`, `pipeline50ml` et `pipeline100ml`.
+    - runs complets executes avec PostgreSQL local reel sur les 3 pipelines `pipeline0ml`, `pipeline50ml` et `pipeline100ml`.
     - document texte riche teste: `documents/contrat_regex_test_corpus_fr_en_ar.pdf`.
     - document OCR/tableau teste: `documents/signettab.png`.
     - resultat: `EXIT:0` sur les 6 runs, `postgres-sync` en `ready=1`, aucune erreur SQL finale observee.
@@ -623,9 +627,9 @@ Reference implementation:
       - `registries`
       - `item_templates`
       - `sql_mapping_hints`
-    - conserve un seul objet JSON racine, avec blocs `default` / `pipeline50ml` / `pipeline100ml` unifies dans le meme template.
+    - conserve un seul objet JSON racine, avec blocs `pipeline0ml` / `pipeline50ml` / `pipeline100ml` unifies dans le meme template.
   - `PROMPT_OUTPUT_MISSING_37_PATHS.txt`:
-    - inventaire des 37 chemins encore absents de `prompt_output.json` par rapport a l'union reelle des sorties `pipelinorchestrator` / `pipeline50ml` / `pipeline100ml`.
+    - inventaire des 37 chemins encore absents de `prompt_output.json` par rapport a l'union reelle des sorties `pipeline0ml` / `pipeline50ml` / `pipeline100ml`.
     - sert de liste de rattrapage avant de pouvoir considerer `prompt_output.json` comme couverture complete des 3 pipelines.
   - `prompt_output.json`:
     - complete avec les 37 chemins precedemment manquants.
@@ -634,7 +638,7 @@ Reference implementation:
     - complete ensuite avec les ecarts de forme restants observes entre le template et le runtime reel:
       - champs scalar/list ou scalar/object documentes via unions `_one_of` quand necessaire (`source`, `native`, `totals.*`, `declared_totals_raw.*`, `header_rows/header_cells/table_rows`, etc.).
       - enrichissement des structures ouvertes et listes reelles (`doc_id` dans `nlp.*`, vecteurs `ml50/ml100`, `quality_checks.details`, exemples inter-docs, `spans`, blocs/sections/lignes/headers/footers/...`).
-    - verification finale locale faite contre `fusion_output.json` + sorties synthetiques `default` / `pipeline50ml` / `pipeline100ml`: `issue_count = 0`.
+    - verification finale locale faite contre `fusion_output.json` + sorties synthetiques `pipeline0ml` / `pipeline50ml` / `pipeline100ml`: `issue_count = 0`.
   - `component/postgres/postgres_connection.py`:
     - fichier unique de controle de la connexion PostgreSQL et de la synchro SQL finale.
     - contient `host`, `port`, `user`, `password`, base admin, activation bootstrap, activation sync, audit `fusion_output.json` et commandes de demarrage automatique.
@@ -674,7 +678,7 @@ Reference implementation:
       - `cross_document_analysis.links[*]` avec audit phrase et audit vectoriel
     - verification de couverture effectuee automatiquement: aucun chemin present dans `fusion_output.json` n'est absent du template final.
   - `GLOBAL_UNIFIED_PIPELINE_OUTPUT_TEMPLATE.json`:
-    - nouveau contrat JSON global de sortie couvrant `default`, `pipeline50ml` et `pipeline100ml`.
+    - nouveau contrat JSON global de sortie couvrant `pipeline0ml`, `pipeline50ml` et `pipeline100ml`.
     - inclut tous les champs observes dans les 3 profils.
     - les champs specifiques a un profil restent presents et prennent `null` si le pipeline courant ne les alimente pas.
     - inclut aussi des `item_templates` pour les structures listees (`interdoc_link`, `chunk_embedding_item`, `table_item`, `regex_extraction_item`, `visual_mark_item`, etc.).
@@ -791,7 +795,7 @@ Reference implementation:
   - `EXPLICATION_PIPELINES.txt`:
     - nouveau fichier texte de lecture rapide pour les 3 pipelines.
     - explique la selection runtime via `PIPELINE_DEFAULT_CODE` dans `pipeline/cli.py`.
-    - liste les `self.components` exacts de `PipelineOrchestrator`, `Pipeline50MLOrchestrator` et `Pipeline100MLOrchestrator`.
+    - liste les `self.components` exacts de `Pipeline0MLOrchestrator`, `Pipeline50MLOrchestrator` et `Pipeline100MLOrchestrator`.
     - resume le chainage des composants et les informations extraites par chaque etape.
     - precise aussi les technos/moteurs utilises par composant: `tesseract`, `simplemma`, `WordNet`, `camel_tools`, BERT NER legacy, `xlm-roberta-base`, BM25 maison, et les non-usages comme `Word2Vec`.
   - `component/si-image-pretraiter-sinonpass-le-doc.py`:
@@ -817,7 +821,7 @@ Reference implementation:
     - suppression de la dependance dure a `numpy`.
     - calcul des vecteurs FastText-like/hash et moyennes en listes Python pures.
   - `pipeline/orchestrator.py`:
-    - reintegre `table-extraction` dans la pipeline `default` apres `atripusion-gramatical`.
+    - reintegre `table-extraction` dans la pipeline `pipeline0ml` apres `atripusion-gramatical`.
   - `component/table_extraction/table-extraction.py`:
     - distingue maintenant le profil `0ml`/`default` au lieu de se faire passer pour `100ml`.
     - expose `TABLE_EXTRACTIONS_DEFAULT` pour la branche standard.
@@ -1007,7 +1011,7 @@ Reference implementation:
     - quality boost `shared_terms`: filtrage semantique via POS/lemma (`NLP_TOKENS`), stopwords/noise et bonus des signaux `topics + classification`.
     - enrichissement audit: `phrase_a`/`phrase_b` portent maintenant `document_id` + `filename`, et `shared_topics[]` inclut `doc_a_examples` / `doc_b_examples` (extraits de phrases par document).
   - `pipeline/components.py` + `pipeline/orchestrator.py` + `pipeline/cli.py`:
-    - ajout de l'etape `liaison-inter-docs` dans les 3 pipelines (`default`, `pipeline50ml`, `pipeline100ml`) entre grammaire et Elasticsearch.
+    - ajout de l'etape `liaison-inter-docs` dans les 3 pipelines (`pipeline0ml`, `pipeline50ml`, `pipeline100ml`) entre grammaire et Elasticsearch.
     - ajout de `liaison-inter-docs` dans les options `--only`, `--upto`, `--start`.
   - `component/fusion_resultats.py`:
     - ajout du bloc top-level `cross_document_analysis` (liens + audit complet, sans duplication par document).
@@ -1116,8 +1120,8 @@ Reference implementation:
     - clic sur un composant: affichage d'un output exemple + explication de chaque champ.
 - 2026-03-15:
   - `pipeline/cli.py`:
-    - ajout de la selection pipeline `--pipeline default|pipelinorchestrator|pipeline50ml|pipeline100ml`,
-    - ajout du pilotage par variable d'environnement `PIPELINE_DEFAULT` (ex: `pipelinorchestrator`, `pipeline50ml` ou `pipeline100ml`; fallback `PIPELINE_PROFILE`),
+    - ajout de la selection pipeline `--pipeline default|pipeline0ml|pipeline50ml|pipeline100ml`,
+    - ajout du pilotage par variable d'environnement `PIPELINE_DEFAULT` (ex: `pipeline0ml`, `pipeline50ml` ou `pipeline100ml`; fallback `PIPELINE_PROFILE`),
     - ajout du pilotage direct dans le code via `PIPELINE_DEFAULT_CODE` (utilise si aucune variable n'est fournie),
     - log explicite de la pipeline selectionnee,
     - ajout des options de contexte `ML100_MODEL_NAME`, `ML100_MAX_LENGTH`, `ML100_BATCH_SIZE`, `ML100_HASH_FALLBACK_DIM`.

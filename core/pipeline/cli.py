@@ -6,12 +6,12 @@ import builtins
 import os
 from pathlib import Path
 
-from .orchestrator import PipelineOrchestrator, Pipeline50MLOrchestrator, Pipeline100MLOrchestrator
+from .orchestrator import Pipeline0MLOrchestrator, Pipeline50MLOrchestrator, Pipeline100MLOrchestrator
 from .postgres import ensure_postgres_bootstrap
 from .settings import configure_logging, load_dotenv, normalize_input
 
 # Pipeline par defaut configurable directement dans le code.
-# Valeurs supportees: "pipelinorchestrator" | "pipeline50ml" | "pipeline100ml"
+# Valeurs supportees: "pipeline0ml" | "pipeline50ml" | "pipeline100ml"
 PIPELINE_DEFAULT_CODE = "pipeline100ml"
 
 _STEP_ALIASES = {
@@ -62,12 +62,11 @@ def _env_optional(name: str) -> str | None:
     return raw or None
 
 
-def _normalize_pipeline_name(raw: str | None, default: str = "pipelinorchestrator") -> str:
+def _normalize_pipeline_name(raw: str | None, default: str = "pipeline0ml") -> str:
     aliases = {
-        "default": "pipelinorchestrator",
-        "pipelineorchestrator": "pipelinorchestrator",
-        "pipelinorchestrator": "pipelinorchestrator",
-        "orchestrator": "pipelinorchestrator",
+        "default": "pipeline0ml",
+        "pipeline0ml": "pipeline0ml",
+        "0ml": "pipeline0ml",
         "pipeline50ml": "pipeline50ml",
         "50ml": "pipeline50ml",
         "pipeline100ml": "pipeline100ml",
@@ -80,7 +79,7 @@ def _normalize_pipeline_name(raw: str | None, default: str = "pipelinorchestrato
 
 
 def _env_pipeline(default: str | None = None) -> str:
-    base_default = _normalize_pipeline_name(default or PIPELINE_DEFAULT_CODE, "pipelinorchestrator")
+    base_default = _normalize_pipeline_name(default or PIPELINE_DEFAULT_CODE, "pipeline0ml")
     raw = os.environ.get("PIPELINE_DEFAULT")
     if raw is None:
         raw = os.environ.get("PIPELINE_PROFILE")
@@ -108,10 +107,10 @@ def parse_cli() -> argparse.Namespace:
     )
     parser.add_argument(
         "--pipeline",
-        choices=["default", "pipelinorchestrator", "pipeline50ml", "pipeline100ml"],
+        choices=["default", "pipeline0ml", "pipeline50ml", "pipeline100ml"],
         default=_env_pipeline(),
         help=(
-            "Pipeline a executer: default/pipelinorchestrator (pipeline actuelle) ou pipeline50ml "
+            "Pipeline a executer: default/pipeline0ml (pipeline actuelle) ou pipeline50ml "
             "(tokenisation/extraction/fusion enrichies ML FastText-like + grammaire EN/FR/AR) ou "
             "pipeline100ml (embeddings Transformer BERT/XLM-R + pooling + grammaire XLM-R EN/FR/AR)."
         ),
@@ -180,13 +179,13 @@ def main() -> None:
     inputs = normalize_input(args.inputs) if args.inputs else []
     repo_root = Path(__file__).resolve().parent.parent
     postgres_status = ensure_postgres_bootstrap(repo_root, start_if_needed=False)
-    pipeline_name = _normalize_pipeline_name(args.pipeline, "pipelinorchestrator")
+    pipeline_name = _normalize_pipeline_name(args.pipeline, "pipeline0ml")
     if pipeline_name == "pipeline100ml":
         orchestrator = Pipeline100MLOrchestrator(repo_root)
     elif pipeline_name == "pipeline50ml":
         orchestrator = Pipeline50MLOrchestrator(repo_root)
     else:
-        orchestrator = PipelineOrchestrator(repo_root)
+        orchestrator = Pipeline0MLOrchestrator(repo_root)
     logging.info("Pipeline selection: %s", pipeline_name)
 
     # Tee all prints to file + console

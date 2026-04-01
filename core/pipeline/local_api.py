@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from .cli import PIPELINE_DEFAULT_CODE, _normalize_pipeline_name
-from .orchestrator import PipelineOrchestrator, Pipeline50MLOrchestrator, Pipeline100MLOrchestrator
+from .orchestrator import Pipeline0MLOrchestrator, Pipeline50MLOrchestrator, Pipeline100MLOrchestrator
 from .postgres import ensure_postgres_bootstrap
 
 
@@ -41,12 +41,12 @@ DEFAULT_PIPELINE_ARGS = [
 ]
 def _active_pipeline_steps() -> List[str]:
     raw = os.environ.get("PIPELINE_DEFAULT") or os.environ.get("PIPELINE_PROFILE") or PIPELINE_DEFAULT_CODE
-    profile = _normalize_pipeline_name(raw, "default")
+    profile = _normalize_pipeline_name(raw, "pipeline0ml")
     if profile == "pipeline50ml":
         return Pipeline50MLOrchestrator(REPO_ROOT).list_steps()
     if profile == "pipeline100ml":
         return Pipeline100MLOrchestrator(REPO_ROOT).list_steps()
-    return PipelineOrchestrator(REPO_ROOT).list_steps()
+    return Pipeline0MLOrchestrator(REPO_ROOT).list_steps()
 
 
 def _iso_now() -> str:

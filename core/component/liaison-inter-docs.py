@@ -123,7 +123,7 @@ def _normalize_pipeline_profile(value: Any) -> str:
         return "pipeline50ml"
     if raw in {"pipeline100ml", "100ml"}:
         return "pipeline100ml"
-    return "pipelinorchestrator"
+    return "pipeline0ml"
 
 
 def _active_topic_sources(ctx: Dict[str, Any]) -> Tuple[str, ...]:

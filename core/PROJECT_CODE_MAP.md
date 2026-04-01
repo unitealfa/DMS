@@ -5,7 +5,7 @@ Date d'audit: 2026-04-01
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
 - Python files analyses: 41
-- Fonctions/classes indexees: 923 (voir `FUNCTION_INDEX.txt`)
+- Fonctions/classes indexees: 959 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 - Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
@@ -533,6 +533,16 @@ Reference implementation:
 - Ce fichier est la reference la plus rapide pour localiser une modification precise.
 
 ## 11) Changelog code
+- 2026-04-01:
+  - `pipeline/postgres.py`:
+    - corrige la liaison `dms.document_sentence_layouts.sentence_id -> dms.document_sentences.sentence_id`.
+    - le `sentence_id` d'un layout n'est maintenant renseigne que si la phrase existe reellement dans `document_sentences`, ce qui evite les erreurs de cle etrangere quand la segmentation `sentences_layout` differe de la segmentation `nlp.sentences`.
+  - validation runtime reelle:
+    - runs complets executes avec PostgreSQL local reel sur les 3 pipelines `default`, `pipeline50ml` et `pipeline100ml`.
+    - document texte riche teste: `documents/contrat_regex_test_corpus_fr_en_ar.pdf`.
+    - document OCR/tableau teste: `documents/signettab.png`.
+    - resultat: `EXIT:0` sur les 6 runs, `postgres-sync` en `ready=1`, aucune erreur SQL finale observee.
+    - verification SQL directe sur `dms_core` faite apres runs: presence confirmee des lignes dans `dms.runs`, `dms.documents`, `dms.document_payloads`, `dms.run_payload_nodes`, `dms.document_payload_nodes`, `dms.document_identifiers`, `dms.document_classification_scores`, `dms.document_regex_fields`, `dms.document_regex_matches`, `dms.document_quality_checks`, `dms.document_sentences`, `dms.document_sentence_layouts`, `dms.document_sentence_spans`, `dms.document_tokens`, `dms.document_entities`, `dms.document_topics`, `dms.document_vectors`, `dms.document_chunk_embeddings`, `dms.document_word_embeddings`, `dms.document_visual_marks`, `dms.document_tables`, `dms.document_table_rows`, `dms.document_table_cells`, `dms.document_pipeline_features`, `dms.document_component_audit`, `dms.document_component_metrics` et `dms.stable_id_registry` selon la pipeline et le document testes.
 - 2026-03-29:
   - `pipeline/local_api.py`:
     - nouveau serveur HTTP local sur `localhost`.

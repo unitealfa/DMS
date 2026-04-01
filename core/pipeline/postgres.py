@@ -2144,6 +2144,7 @@ def _build_document_sentence_layout_row_sets(
     run_id: str,
     document_id: str,
     now_iso: str,
+    valid_sentence_ids: Optional[set[str]] = None,
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]]]:
     structure = _safe_dict(doc.get("document_structure"))
     layout_rows: List[Dict[str, Any]] = []
@@ -2162,7 +2163,9 @@ def _build_document_sentence_layout_row_sets(
             sent_index = _coerce_int(_pick_first_non_empty(raw.get("sent_index"), layout_ordinal - 1))
             sentence_id = None
             if text:
-                sentence_id = _stable_hash_id("sentence", run_id, document_id, page_index or "", sent_index or "", text)
+                candidate_sentence_id = _stable_hash_id("sentence", run_id, document_id, page_index or "", sent_index or "", text)
+                if valid_sentence_ids is None or candidate_sentence_id in valid_sentence_ids:
+                    sentence_id = candidate_sentence_id
             sentence_layout_id = _stable_hash_id("sentlayout", run_id, document_id, page_index or "", sent_index or "", layout_ordinal, text)
             layout_rows.append(
                 {
@@ -4967,6 +4970,7 @@ def sync_fusion_payload_to_postgres(
                 run_id=current_run_id,
                 document_id=document_id,
                 now_iso=now_iso,
+                valid_sentence_ids={str(row.get("sentence_id")) for row in sentence_rows if row.get("sentence_id")},
             )
             status["sentence_layouts_upserted"] += _append_upsert_rows(
                 statements,

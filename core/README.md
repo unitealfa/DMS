@@ -79,7 +79,7 @@ Consequence:
 - `POST /api/run`
   - recoit les fichiers uploades, les sauve en temporaire, puis lance le pipeline
 - `GET /api/status`
-  - retourne l'etat du job courant (idle/running/completed/failed) + progression
+  - retourne l'etat simple du job courant (`idle` / `running` / `completed` / `failed`) et la derniere information utile pour l'UI
 - `OPTIONS /api/run` et `OPTIONS /api/status`
   - preflight CORS
 
@@ -113,10 +113,12 @@ python main.py <fichiers_uploades_temp> --use-elasticsearch --es-nlp-level full 
 Les fichiers selectionnes dans le navigateur sont copies dans un dossier temporaire (`/tmp/...`) avant execution.
 
 ### 6) Suivi temps reel dans la page
-`index.html` interroge periodiquement `GET /api/status` pour afficher:
-- etape courante (`current_step`)
-- pourcentage (`progress_percent`)
-- derniere ligne utile (`last_log_line`)
+`index.html` interroge periodiquement `GET /api/status` pour savoir si le job est:
+- en cours
+- termine
+- en erreur
+
+Pendant le traitement, la page affiche seulement un loader et un message simple.
 
 Quand `status=completed`:
 - la page affiche "Traitement termine"

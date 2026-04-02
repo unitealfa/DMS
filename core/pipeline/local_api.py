@@ -39,14 +39,79 @@ DEFAULT_PIPELINE_ARGS = [
     "--es-nlp-index",
     "dms_nlp_tokens",
 ]
-def _active_pipeline_steps() -> List[str]:
+
+PIPELINE_LABELS = {
+    "pipeline0ml": "Pipeline 0ML",
+    "pipeline50ml": "Pipeline 50ML",
+    "pipeline100ml": "Pipeline 100ML",
+}
+
+PIPELINE_DESCRIPTIONS = {
+    "pipeline0ml": "Baseline non-ML routing with classic tokenisation, grammar, rule extraction and totals verification.",
+    "pipeline50ml": "Hybrid ML retrieval pipeline with 50ML tokenisation and extraction components plus grammar refinement.",
+    "pipeline100ml": "Transformer-grade pipeline with 100ML tokenisation, XLM-R grammar and visual marks detection.",
+}
+
+
+def _active_pipeline_profile() -> str:
     raw = os.environ.get("PIPELINE_DEFAULT") or os.environ.get("PIPELINE_PROFILE") or PIPELINE_DEFAULT_CODE
-    profile = _normalize_pipeline_name(raw, "pipeline0ml")
+    return _normalize_pipeline_name(raw, "pipeline0ml")
+
+
+def _active_pipeline_source() -> str:
+    if os.environ.get("PIPELINE_DEFAULT"):
+        return "PIPELINE_DEFAULT"
+    if os.environ.get("PIPELINE_PROFILE"):
+        return "PIPELINE_PROFILE"
+    return "PIPELINE_DEFAULT_CODE"
+
+
+def _pipeline_orchestrator(profile: str):
     if profile == "pipeline50ml":
-        return Pipeline50MLOrchestrator(REPO_ROOT).list_steps()
+        return Pipeline50MLOrchestrator(REPO_ROOT)
     if profile == "pipeline100ml":
-        return Pipeline100MLOrchestrator(REPO_ROOT).list_steps()
-    return Pipeline0MLOrchestrator(REPO_ROOT).list_steps()
+        return Pipeline100MLOrchestrator(REPO_ROOT)
+    return Pipeline0MLOrchestrator(REPO_ROOT)
+
+
+def _active_pipeline_steps() -> List[str]:
+    profile = _active_pipeline_profile()
+    return _pipeline_orchestrator(profile).list_steps()
+
+
+def _active_pipeline_metadata() -> Dict[str, Any]:
+    profile = _active_pipeline_profile()
+    orchestrator = _pipeline_orchestrator(profile)
+    components = []
+    for component in getattr(orchestrator, "components", []):
+        script_path = getattr(component, "script", None)
+        script_value = ""
+        script_name = ""
+        if script_path is not None:
+            try:
+                script_name = Path(script_path).name
+                script_value = str(Path(script_path).resolve().relative_to(REPO_ROOT))
+            except Exception:
+                script_value = str(script_path)
+        components.append(
+            {
+                "step": getattr(component, "name", ""),
+                "component_class": component.__class__.__name__,
+                "script": script_name,
+                "script_path": script_value,
+            }
+        )
+
+    return {
+        "pipeline_profile": profile,
+        "pipeline_label": PIPELINE_LABELS.get(profile, profile),
+        "pipeline_description": PIPELINE_DESCRIPTIONS.get(profile, ""),
+        "pipeline_source": _active_pipeline_source(),
+        "pipeline_steps": [item["step"] for item in components],
+        "pipeline_steps_count": len(components),
+        "pipeline_components": components,
+        "pipeline_component_count": len(components),
+    }
 
 
 def _iso_now() -> str:
@@ -68,7 +133,8 @@ def _tail_recent_lines(path: Path, limit: int = 160) -> List[str]:
 
 
 def _current_runtime_progress(status: str) -> Dict[str, Any]:
-    steps = _active_pipeline_steps()
+    metadata = _active_pipeline_metadata()
+    steps = list(metadata.get("pipeline_steps") or [])
     log_path = next((path for path in LOG_PATH_CANDIDATES if path.exists()), None)
     lines = _tail_recent_lines(log_path) if log_path else []
     current_step = None
@@ -93,8 +159,7 @@ def _current_runtime_progress(status: str) -> Dict[str, Any]:
         progress_percent = max(3, min(97, int(((step_index + 0.5) / max(len(steps), 1)) * 100)))
 
     return {
-        "pipeline_steps": steps,
-        "pipeline_steps_count": len(steps),
+        **metadata,
         "completed_steps_count": completed_steps,
         "current_step": current_step,
         "progress_percent": progress_percent,
@@ -280,6 +345,7 @@ class LauncherState:
                 "error": None,
                 "upload_dir": str(file_paths[0].parent) if file_paths else None,
             }
+            self._current.update(_active_pipeline_metadata())
 
             watcher = threading.Thread(target=self._wait_for_process, args=(process, job_id), daemon=True)
             watcher.start()

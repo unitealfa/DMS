@@ -110,21 +110,24 @@
       gap: 8px;
     }
 
-    .progress-track {
-      width: 100%;
-      height: 12px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: #121212;
+    .loader-wrap {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      min-height: 22px;
     }
 
-    .progress-bar {
-      width: 0%;
-      height: 100%;
+    .loader-wrap.active {
+      display: flex;
+    }
+
+    .loader {
+      width: 18px;
+      height: 18px;
+      border: 2px solid #4a4a4a;
+      border-top-color: #f5f5f5;
       border-radius: 999px;
-      background: linear-gradient(90deg, #f5f5f5 0%, #bcbcbc 100%);
-      transition: width 0.35s ease;
+      animation: spin 0.8s linear infinite;
     }
 
     button {
@@ -153,6 +156,12 @@
       font-size: 13px;
       min-height: 18px;
     }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
   </style>
 </head>
 <body>
@@ -176,10 +185,10 @@
     </div>
 
     <div class="progress">
-      <div class="progress-track">
-        <div class="progress-bar" id="progress-bar"></div>
+      <div class="loader-wrap" id="loader-wrap">
+        <div class="loader" aria-hidden="true"></div>
+        <div class="detail" id="progress-detail"></div>
       </div>
-      <div class="detail" id="progress-detail"></div>
     </div>
   </main>
 
@@ -194,16 +203,15 @@
     const filesList = document.getElementById("files-list");
     const launchBtn = document.getElementById("launch-btn");
     const status = document.getElementById("status");
-    const progressBar = document.getElementById("progress-bar");
+    const loaderWrap = document.getElementById("loader-wrap");
     const progressDetail = document.getElementById("progress-detail");
 
     let selectedFiles = [];
     let statusTimer = null;
     let isRunning = false;
 
-    function setProgress(value) {
-      const safeValue = Math.max(0, Math.min(100, Number(value || 0)));
-      progressBar.style.width = `${safeValue}%`;
+    function setLoader(active) {
+      loaderWrap.classList.toggle("active", Boolean(active));
     }
 
     function stopPolling() {
@@ -231,19 +239,14 @@
         if (data.status === "running") {
           isRunning = true;
           launchBtn.disabled = true;
-          setProgress(data.progress_percent || 10);
+          setLoader(true);
           status.textContent = `Traitement en cours... job=${data.job_id}`;
-          progressDetail.textContent = data.current_step
-            ? `Étape: ${data.current_step} | ${data.progress_percent || 0}%`
-            : "Traitement en cours...";
-          if (data.last_log_line) {
-            progressDetail.textContent += ` | ${data.last_log_line}`;
-          }
+          progressDetail.textContent = "Traitement en cours...";
           return;
         }
         if (data.status === "completed") {
           isRunning = false;
-          setProgress(100);
+          setLoader(false);
           status.textContent = `Traitement terminé. job=${data.job_id}`;
           progressDetail.textContent = "Le traitement est fini.";
           launchBtn.disabled = selectedFiles.length === 0;
@@ -252,7 +255,7 @@
         }
         if (data.status === "failed") {
           isRunning = false;
-          setProgress(100);
+          setLoader(false);
           status.textContent = `Traitement terminé en erreur (code ${data.returncode}). job=${data.job_id}`;
           progressDetail.textContent = data.last_log_line || "Le traitement a échoué.";
           launchBtn.disabled = selectedFiles.length === 0;
@@ -260,6 +263,7 @@
         }
       } catch (error) {
         isRunning = false;
+        setLoader(false);
         status.textContent = `API locale indisponible: ${error.message}`;
         progressDetail.textContent = `Backend attendu sur ${API_BASE}`;
         launchBtn.disabled = selectedFiles.length === 0;
@@ -281,7 +285,7 @@
           : "Aucun document sélectionné.";
       }
       if (!selectedFiles.length && !isRunning) {
-        setProgress(0);
+        setLoader(false);
         progressDetail.textContent = "";
       }
     }
@@ -337,9 +341,9 @@
 
       isRunning = true;
       launchBtn.disabled = true;
-      setProgress(5);
+      setLoader(true);
       status.textContent = `Upload et lancement de ${selectedFiles.length} document(s)...`;
-      progressDetail.textContent = `Envoi vers ${API_BASE}/api/run`;
+      progressDetail.textContent = "Traitement en cours...";
 
       try {
         const response = await fetch(`${API_BASE}/api/run`, {
@@ -350,15 +354,15 @@
         if (!response.ok || !payload.ok) {
           throw new Error(payload.error || "Echec du lancement");
         }
-        setProgress(12);
+        setLoader(true);
         status.textContent = `Pipeline lancé. job=${payload.job.job_id}`;
-        progressDetail.textContent = "Traitement démarré, suivi en temps réel...";
+        progressDetail.textContent = "Traitement en cours...";
         stopPolling();
         statusTimer = setInterval(refreshJobStatus, 1500);
         refreshJobStatus();
       } catch (error) {
         isRunning = false;
-        setProgress(0);
+        setLoader(false);
         status.textContent = `Erreur: ${error.message}`;
         progressDetail.textContent = `Requête envoyée vers ${API_BASE}`;
       } finally {

@@ -1,11 +1,11 @@
 # Project Code Map (DMS Core)
 
-Date d'audit: 2026-04-01
+Date d'audit: 2026-04-02
 
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
 - Python files analyses: 41
-- Fonctions/classes indexees: 930 (voir `FUNCTION_INDEX.txt`)
+- Fonctions/classes indexees: 934 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 - Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
@@ -534,6 +534,10 @@ Reference implementation:
 
 ## 11) Changelog code
 - 2026-04-02:
+  - simplification UI/API:
+    - retrait de la publication detaillee de progression vers API externe.
+    - suppression du module runtime dedie a la progression detaillee.
+    - retour a un suivi simple via `GET /api/status` + parsing des logs locaux.
   - `README.md`:
     - ajout d'une section detaillee "index.html -> Backend API":
       - mode de lancement `local_api.py`,
@@ -542,7 +546,8 @@ Reference implementation:
       - format multipart (`files`, `files[]`, `file`),
       - codes retour (`202`, `400`, `409`),
       - commande backend reelle vers `main.py`,
-      - suivi temps reel du job depuis la page.
+      - suivi simple du job depuis la page.
+    - retrait de la documentation du webhook de progression externe.
 - 2026-04-01:
   - renommage standard:
     - la pipeline standard s'appelle maintenant `pipeline0ml` partout.
@@ -613,7 +618,7 @@ Reference implementation:
     - bouton `Lancer` branche sur `POST /api/run`.
     - utilise explicitement l'API `http://127.0.0.1:8765`.
     - polling de `GET /api/status` pour afficher l'etat du job.
-    - ajoute une barre de progression et le composant courant du traitement en temps reel.
+    - affiche maintenant seulement un loader simple pendant le traitement.
     - affiche un message final explicite quand le traitement est termine.
     - detecte maintenant un backend API trop ancien sur `8765` et affiche un message de relance au lieu de laisser un `400` opaque.
   - `pyproject.toml`:

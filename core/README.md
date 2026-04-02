@@ -51,6 +51,99 @@ python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf \
   --es-index dms_documents
 ```
 
+## `index.html` -> Backend API (detail complet)
+Le front [index.html](/home/mourad/Bureau/DMS/core/index.html) n'execute pas le pipeline directement.
+Il envoie les fichiers au backend local [local_api.py](/home/mourad/Bureau/DMS/core/local_api.py), qui lance ensuite `main.py`.
+
+### 1) Lancer le backend API
+```bash
+python local_api.py --host 0.0.0.0 --port 8765
+```
+
+Le terminal affiche les URLs de service, par exemple:
+- `http://127.0.0.1:8765` (meme machine)
+- `http://IP_DE_TA_MACHINE:8765` (autre machine du reseau local)
+
+### 2) Adresse API utilisee par `index.html`
+Dans `index.html`, `API_BASE` est calcule ainsi:
+- si la page est servie depuis `:8765`, le front utilise `window.location.origin`
+- sinon fallback explicite: `http://127.0.0.1:8765`
+
+Consequence:
+- front et backend sur la meme machine: `127.0.0.1:8765` fonctionne
+- front sur une autre machine: il faut appeler `http://IP_DU_BACKEND:8765` (pas `127.0.0.1`)
+
+### 3) Endpoints exposes par le backend
+- `GET /`
+  - sert la page `index.html`
+- `POST /api/run`
+  - recoit les fichiers uploades, les sauve en temporaire, puis lance le pipeline
+- `GET /api/status`
+  - retourne l'etat du job courant (idle/running/completed/failed) + progression
+- `OPTIONS /api/run` et `OPTIONS /api/status`
+  - preflight CORS
+
+Implementation backend: [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py)
+
+### 4) Format exact de la requete `POST /api/run`
+Content-Type requis:
+- `multipart/form-data`
+
+Champs fichier acceptes:
+- `files` (recommande)
+- `files[]`
+- `file`
+
+Si aucun fichier n'est recu:
+- reponse `400 Bad Request`
+
+Si un job tourne deja:
+- reponse `409 Conflict`
+
+Reponse normale:
+- `202 Accepted`
+- JSON avec `ok=true`, `job_id`, commande lancee et metadonnees job
+
+### 5) Commande reelle lancee par le backend
+Le backend construit et execute:
+```bash
+python main.py <fichiers_uploades_temp> --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
+```
+
+Les fichiers selectionnes dans le navigateur sont copies dans un dossier temporaire (`/tmp/...`) avant execution.
+
+### 6) Suivi temps reel dans la page
+`index.html` interroge periodiquement `GET /api/status` pour afficher:
+- etape courante (`current_step`)
+- pourcentage (`progress_percent`)
+- derniere ligne utile (`last_log_line`)
+
+Quand `status=completed`:
+- la page affiche "Traitement termine"
+
+Quand `status=failed`:
+- la page affiche le `returncode` et la derniere ligne de log
+
+### 7) Exemple cURL
+```bash
+curl -X POST \
+  -F "files=@documents/signettab.png" \
+  http://127.0.0.1:8765/api/run
+```
+
+Puis:
+```bash
+curl -s http://127.0.0.1:8765/api/status
+```
+
+### 8) CORS
+Le backend renvoie:
+- `Access-Control-Allow-Origin: *`
+- `Access-Control-Allow-Methods: GET, POST, OPTIONS`
+- `Access-Control-Allow-Headers: Content-Type, Authorization`
+
+Donc un front externe peut appeler cette API, a condition d'utiliser la bonne adresse reseau du backend.
+
 ## Téléchargements automatiques (global)
 Ce dépôt peut télécharger automatiquement des ressources au premier lancement, selon les composants exécutés.
 

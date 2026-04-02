@@ -533,6 +533,16 @@ Reference implementation:
 - Ce fichier est la reference la plus rapide pour localiser une modification precise.
 
 ## 11) Changelog code
+- 2026-04-02:
+  - `README.md`:
+    - ajout d'une section detaillee "index.html -> Backend API":
+      - mode de lancement `local_api.py`,
+      - resolution de l'adresse API (`window.location.origin` vs fallback `127.0.0.1:8765`),
+      - endpoints (`GET /`, `POST /api/run`, `GET /api/status`, `OPTIONS`),
+      - format multipart (`files`, `files[]`, `file`),
+      - codes retour (`202`, `400`, `409`),
+      - commande backend reelle vers `main.py`,
+      - suivi temps reel du job depuis la page.
 - 2026-04-01:
   - renommage standard:
     - la pipeline standard s'appelle maintenant `pipeline0ml` partout.

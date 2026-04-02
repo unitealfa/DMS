@@ -4,8 +4,8 @@ Date d'audit: 2026-04-02
 
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
-- Python files analyses: 41
-- Fonctions/classes indexees: 934 (voir `FUNCTION_INDEX.txt`)
+- Python files analyses: 42
+- Fonctions/classes indexees: 951 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 - Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
@@ -19,6 +19,7 @@ Date d'audit: 2026-04-02
   - `pipeline/orchestrator.py` (contient `Pipeline0MLOrchestrator` + `Pipeline50MLOrchestrator` + `Pipeline100MLOrchestrator`)
 - Wrappers d'execution des composants: `pipeline/components.py`
 - Serveur HTTP/API local: `pipeline/local_api.py`
+- Etat runtime exact de pipeline pour l'API locale: `pipeline/runtime_state.py`
 - Bootstrap + sync PostgreSQL: `pipeline/postgres.py`
 - Configuration connexion PostgreSQL: `component/postgres/postgres_connection.py`
 - Configuration base/tables PostgreSQL: `component/postgres/postgres_schema.py`
@@ -538,6 +539,22 @@ Reference implementation:
     - retrait de la publication detaillee de progression vers API externe.
     - suppression du module runtime dedie a la progression detaillee.
     - retour a un suivi simple via `GET /api/status` + parsing des logs locaux.
+  - suivi runtime exact backend:
+    - ajout d'un etat runtime dedie au job courant via `pipeline/runtime_state.py`.
+    - `pipeline/components.py` publie maintenant le vrai composant demarre/termine/en erreur.
+    - `pipeline/orchestrator.py` publie maintenant l'etat exact pipeline start/completed/failed.
+    - `pipeline/local_api.py` lit cet etat pour exposer dans `GET /api/status`:
+      - `pipeline_profile`
+      - `pipeline_components`
+      - `current_step`
+      - `component_name`
+      - `component_script`
+      - `component_status`
+      - `step_index`
+      - `steps_total`
+      - `completed_steps_count`
+      - `progress_percent`
+    - l'UI `index.html` reste volontairement simple avec seulement un loader, mais l'API backend expose bien le deroulement exact pour un site externe.
   - `README.md`:
     - ajout d'une section detaillee "index.html -> Backend API":
       - mode de lancement `local_api.py`,
@@ -547,6 +564,10 @@ Reference implementation:
       - codes retour (`202`, `400`, `409`),
       - commande backend reelle vers `main.py`,
       - suivi simple du job depuis la page.
+      - cycle complet d'usage de l'API pour un site externe:
+        - lancement du job,
+        - polling statut,
+        - lecture de `pipeline_profile`, `pipeline_components`, `current_step`, `component_name`, `component_script`, `progress_percent`.
     - retrait de la documentation du webhook de progression externe.
 - 2026-04-01:
   - renommage standard:

@@ -20,6 +20,7 @@ from .components import (
     FusionResultComponent,
 )
 from .settings import COMPONENT_DIR, Context, InputLike, normalize_input
+from .runtime_state import publish_pipeline_completed, publish_pipeline_failed, publish_pipeline_started
 
 
 class Pipeline0MLOrchestrator:
@@ -76,10 +77,16 @@ class Pipeline0MLOrchestrator:
         context["PIPELINE_PROFILE"] = str(context.get("PIPELINE_PROFILE") or "pipeline0ml")
         selected = self._select_components(only, upto, start)
         context["PIPELINE_STEPS"] = [c.name for c in selected]
-        for comp in selected:
-            output: Any = comp.run(context)
-            if output is None:
-                raise RuntimeError(f"{comp.name} a retourne None.")
+        publish_pipeline_started(context)
+        try:
+            for comp in selected:
+                output: Any = comp.run(context)
+                if output is None:
+                    raise RuntimeError(f"{comp.name} a retourne None.")
+        except Exception as exc:
+            publish_pipeline_failed(context, error=exc)
+            raise
+        publish_pipeline_completed(context)
         return context
 
 
@@ -143,10 +150,16 @@ class Pipeline50MLOrchestrator:
         context["PIPELINE_PROFILE"] = "pipeline50ml"
         selected = self._select_components(only, upto, start)
         context["PIPELINE_STEPS"] = [c.name for c in selected]
-        for comp in selected:
-            output: Any = comp.run(context)
-            if output is None:
-                raise RuntimeError(f"{comp.name} a retourne None.")
+        publish_pipeline_started(context)
+        try:
+            for comp in selected:
+                output: Any = comp.run(context)
+                if output is None:
+                    raise RuntimeError(f"{comp.name} a retourne None.")
+        except Exception as exc:
+            publish_pipeline_failed(context, error=exc)
+            raise
+        publish_pipeline_completed(context)
         return context
 
 
@@ -211,8 +224,14 @@ class Pipeline100MLOrchestrator:
         context["PIPELINE_PROFILE"] = "pipeline100ml"
         selected = self._select_components(only, upto, start)
         context["PIPELINE_STEPS"] = [c.name for c in selected]
-        for comp in selected:
-            output: Any = comp.run(context)
-            if output is None:
-                raise RuntimeError(f"{comp.name} a retourne None.")
+        publish_pipeline_started(context)
+        try:
+            for comp in selected:
+                output: Any = comp.run(context)
+                if output is None:
+                    raise RuntimeError(f"{comp.name} a retourne None.")
+        except Exception as exc:
+            publish_pipeline_failed(context, error=exc)
+            raise
+        publish_pipeline_completed(context)
         return context

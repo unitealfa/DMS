@@ -21,13 +21,14 @@ from typing import Any, Dict, List
 from .cli import PIPELINE_DEFAULT_CODE, _normalize_pipeline_name
 from .orchestrator import Pipeline0MLOrchestrator, Pipeline50MLOrchestrator, Pipeline100MLOrchestrator
 from .postgres import ensure_postgres_bootstrap
+from .runtime_state import RUNTIME_JOB_ENV, RUNTIME_STATE_ENV, read_runtime_state
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 INDEX_HTML_PATH = REPO_ROOT / "index.html"
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
-API_VERSION = "dms-local-api-2026-03-31-v2"
+API_VERSION = "dms-local-api-2026-04-02-v3"
 LOG_PATH_CANDIDATES = [
     REPO_ROOT / "outputgeneralterminal.runtime.txt",
     REPO_ROOT / "outputgeneralterminal.txt",
@@ -122,21 +123,76 @@ def _json_bytes(payload: Dict[str, Any]) -> bytes:
     return json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8")
 
 
-def _tail_recent_lines(path: Path, limit: int = 160) -> List[str]:
+def _tail_recent_lines(path: Path, limit: int = 160, offset: int = 0) -> List[str]:
     if not path.exists():
         return []
     try:
-        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+        file_size = path.stat().st_size
+        safe_offset = offset if 0 <= offset <= file_size else 0
+        with path.open("rb") as fh:
+            if safe_offset:
+                fh.seek(safe_offset)
+            raw = fh.read()
+        lines = raw.decode("utf-8", errors="replace").splitlines()
     except Exception:
         return []
     return lines[-limit:]
 
 
-def _current_runtime_progress(status: str) -> Dict[str, Any]:
-    metadata = _active_pipeline_metadata()
+def _metadata_from_snapshot(snapshot: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "pipeline_profile": snapshot.get("pipeline_profile"),
+        "pipeline_label": snapshot.get("pipeline_label"),
+        "pipeline_description": snapshot.get("pipeline_description"),
+        "pipeline_source": snapshot.get("pipeline_source"),
+        "pipeline_steps": list(snapshot.get("pipeline_steps") or []),
+        "pipeline_steps_count": int(snapshot.get("pipeline_steps_count") or 0),
+        "pipeline_components": list(snapshot.get("pipeline_components") or []),
+        "pipeline_component_count": int(snapshot.get("pipeline_component_count") or 0),
+    }
+
+
+def _current_runtime_progress(
+    status: str,
+    metadata: Dict[str, Any] | None = None,
+    log_offsets: Dict[str, Any] | None = None,
+) -> Dict[str, Any]:
+    metadata = metadata or _active_pipeline_metadata()
     steps = list(metadata.get("pipeline_steps") or [])
-    log_path = next((path for path in LOG_PATH_CANDIDATES if path.exists()), None)
-    lines = _tail_recent_lines(log_path) if log_path else []
+    if status == "idle":
+        return {
+            **metadata,
+            "completed_steps_count": 0,
+            "current_step": None,
+            "step_index": 0,
+            "steps_total": len(steps),
+            "progress_state": {
+                "step_index": 0,
+                "steps_total": len(steps),
+            },
+            "component_name": None,
+            "component_script": None,
+            "component_status": None,
+            "progress_percent": 0,
+            "last_log_line": None,
+            "log_path": None,
+        }
+    log_offsets = log_offsets or {}
+    log_path = None
+    lines: List[str] = []
+
+    for candidate in LOG_PATH_CANDIDATES:
+        if not candidate.exists():
+            continue
+        if log_path is None:
+            log_path = candidate
+        offset = int(log_offsets.get(str(candidate), 0) or 0)
+        candidate_lines = _tail_recent_lines(candidate, offset=offset)
+        if candidate_lines:
+            log_path = candidate
+            lines = candidate_lines
+            break
+
     current_step = None
     last_log_line = None
 
@@ -158,10 +214,37 @@ def _current_runtime_progress(status: str) -> Dict[str, Any]:
         completed_steps = step_index
         progress_percent = max(3, min(97, int(((step_index + 0.5) / max(len(steps), 1)) * 100)))
 
+    component_meta = next(
+        (item for item in metadata.get("pipeline_components") or [] if item.get("step") == current_step),
+        None,
+    )
+    step_index = steps.index(current_step) + 1 if current_step in steps else (len(steps) if status == "completed" else 0)
+    component_script = None
+    if component_meta:
+        component_script = component_meta.get("script_path") or component_meta.get("script") or None
+
+    component_status = None
+    if current_step:
+        if status == "running":
+            component_status = "running"
+        elif status == "completed":
+            component_status = "completed"
+        elif status == "failed":
+            component_status = "failed"
+
     return {
         **metadata,
         "completed_steps_count": completed_steps,
         "current_step": current_step,
+        "step_index": step_index,
+        "steps_total": len(steps),
+        "progress_state": {
+            "step_index": step_index,
+            "steps_total": len(steps),
+        },
+        "component_name": current_step,
+        "component_script": component_script,
+        "component_status": component_status,
         "progress_percent": progress_percent,
         "last_log_line": last_log_line,
         "log_path": str(log_path) if log_path else None,
@@ -303,14 +386,49 @@ class LauncherState:
             "pid": None,
             "error": None,
             "upload_dir": None,
+            "log_offsets": {},
         }
         self._process: subprocess.Popen[str] | None = None
 
     def snapshot(self) -> Dict[str, Any]:
         with self._lock:
             snap = dict(self._current)
+        base_status = str(snap.get("status") or "idle")
+        base_returncode = snap.get("returncode")
+        base_finished_at = snap.get("finished_at")
+        base_error = snap.get("error")
+        log_offsets = dict(snap.pop("log_offsets", {}) or {})
+        runtime_state_path = snap.get("runtime_state_path")
+        metadata = _metadata_from_snapshot(snap)
         snap["api_version"] = API_VERSION
-        snap.update(_current_runtime_progress(str(snap.get("status") or "")))
+        runtime_state = read_runtime_state(runtime_state_path)
+        if runtime_state:
+            runtime_status = str(runtime_state.get("status") or "")
+            resolved_status = base_status
+            if base_status in {"idle", "running"} and runtime_status in {"completed", "failed"}:
+                resolved_status = runtime_status
+            snap.update(metadata)
+            snap.update(runtime_state)
+            snap["status"] = resolved_status or runtime_status or "idle"
+            snap["returncode"] = base_returncode
+            snap["finished_at"] = base_finished_at or snap.get("finished_at") or runtime_state.get("finished_at")
+            snap["error"] = base_error or snap.get("error")
+            if snap["status"] == "completed":
+                snap["progress_percent"] = 100
+                snap["completed_steps_count"] = int(
+                    snap.get("completed_steps_count") or metadata.get("pipeline_steps_count") or 0
+                )
+                if not snap.get("current_step"):
+                    steps = list(metadata.get("pipeline_steps") or [])
+                    snap["current_step"] = steps[-1] if steps else None
+            elif snap["status"] == "idle":
+                snap["progress_percent"] = 0
+            snap["progress_state"] = {
+                "step_index": int(snap.get("step_index") or 0),
+                "steps_total": int(snap.get("steps_total") or metadata.get("pipeline_steps_count") or 0),
+            }
+        else:
+            snap.update(_current_runtime_progress(str(snap.get("status") or ""), metadata=metadata, log_offsets=log_offsets))
         return snap
 
     def start_job(
@@ -325,12 +443,18 @@ class LauncherState:
 
             job_id = job_id or uuid.uuid4().hex
             command = build_cli_command(file_paths, extra_args=extra_args)
+            metadata = _active_pipeline_metadata()
+            runtime_state_path = Path(tempfile.gettempdir()) / "dms_launcher_runtime" / f"{job_id}.json"
             print(f"[local-api] lancement job={job_id}")
             print(f"[local-api] commande: {' '.join(command)}")
 
+            env = os.environ.copy()
+            env[RUNTIME_STATE_ENV] = str(runtime_state_path)
+            env[RUNTIME_JOB_ENV] = job_id
             process = subprocess.Popen(
                 command,
                 cwd=str(REPO_ROOT),
+                env=env,
             )
             self._process = process
             self._current = {
@@ -344,8 +468,13 @@ class LauncherState:
                 "pid": process.pid,
                 "error": None,
                 "upload_dir": str(file_paths[0].parent) if file_paths else None,
+                "runtime_state_path": str(runtime_state_path),
+                "log_offsets": {
+                    str(path): path.stat().st_size if path.exists() else 0
+                    for path in LOG_PATH_CANDIDATES
+                },
             }
-            self._current.update(_active_pipeline_metadata())
+            self._current.update(metadata)
 
             watcher = threading.Thread(target=self._wait_for_process, args=(process, job_id), daemon=True)
             watcher.start()

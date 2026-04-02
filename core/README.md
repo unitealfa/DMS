@@ -126,7 +126,48 @@ Quand `status=completed`:
 Quand `status=failed`:
 - la page affiche le `returncode` et la derniere ligne de log
 
-### 7) Exemple cURL
+### 7) Champs exacts disponibles dans `GET /api/status`
+Le backend expose aussi un etat exact de la pipeline en cours pour un autre front/site externe.
+
+Champs utiles:
+- `pipeline_profile`
+  - `pipeline0ml` | `pipeline50ml` | `pipeline100ml`
+- `pipeline_source`
+  - source du profil actif (`PIPELINE_DEFAULT_CODE`, `PIPELINE_DEFAULT`, `PIPELINE_PROFILE`)
+- `pipeline_steps`
+  - liste ordonnee exacte des composants de la pipeline active
+- `pipeline_components`
+  - liste detaillee des composants avec:
+    - `step`
+    - `component_class`
+    - `script`
+    - `script_path`
+- `current_step`
+  - composant reellement en cours ou dernier composant fini
+- `component_name`
+  - meme information, format explicite
+- `component_script`
+  - script exact utilise pour ce composant
+- `component_status`
+  - `running` | `completed` | `failed`
+- `step_index`
+  - index 1-based du composant courant dans la pipeline
+- `steps_total`
+  - nombre total de composants de la pipeline active
+- `completed_steps_count`
+  - nombre de composants deja termines
+- `progress_percent`
+  - avancement calcule a partir du composant reel en cours
+- `last_log_line`
+  - derniere ligne utile du log runtime
+
+Important:
+- cet etat est maintenant alimente par un fichier runtime dedie au job courant
+- ce n'est plus seulement une deduction basee sur les logs
+- donc si la pipeline active est `pipeline100ml`, l'API renvoie les vrais composants de `pipeline100ml` et le vrai composant courant
+- meme logique pour `pipeline0ml` et `pipeline50ml`
+
+### 8) Exemple cURL
 ```bash
 curl -X POST \
   -F "files=@documents/signettab.png" \
@@ -138,7 +179,110 @@ Puis:
 curl -s http://127.0.0.1:8765/api/status
 ```
 
-### 8) CORS
+### 9) Cycle complet de l'API
+Flux reel:
+1. ton site externe envoie les documents vers `POST /api/run`
+2. le backend sauve les fichiers dans `/tmp/dms_launcher_uploads/<job_id>/`
+3. le backend lance `python main.py ...`
+4. la pipeline active est choisie selon:
+   - `PIPELINE_DEFAULT`
+   - ou `PIPELINE_PROFILE`
+   - ou sinon `PIPELINE_DEFAULT_CODE`
+5. l'orchestrateur construit la vraie liste des composants de la pipeline active
+6. a chaque demarrage/fin/erreur de composant, le backend met a jour un etat runtime du job
+7. `GET /api/status` relit cet etat runtime et le renvoie a ton autre site
+
+Donc:
+- si la pipeline active est `pipeline0ml`, l'API renvoie uniquement les composants de `pipeline0ml`
+- si la pipeline active est `pipeline50ml`, l'API renvoie uniquement les composants de `pipeline50ml`
+- si la pipeline active est `pipeline100ml`, l'API renvoie uniquement les composants de `pipeline100ml`
+
+### 10) Reponse type de `GET /api/status`
+Exemple simplifie:
+```json
+{
+  "status": "running",
+  "job_id": "abc123",
+  "pipeline_profile": "pipeline100ml",
+  "pipeline_source": "PIPELINE_DEFAULT_CODE",
+  "current_step": "table-extraction",
+  "component_name": "table-extraction",
+  "component_script": "/home/mourad/Bureau/DMS/core/component/table_extraction/table-extraction.py",
+  "component_status": "running",
+  "step_index": 7,
+  "steps_total": 14,
+  "completed_steps_count": 6,
+  "progress_percent": 46,
+  "pipeline_steps": [
+    "pretraitement-de-docs",
+    "si-image-pretraiter-sinonpass-le-doc",
+    "output-txt",
+    "clasification",
+    "tokenisation-layout",
+    "atripusion-gramatical",
+    "table-extraction"
+  ],
+  "last_log_line": "2026-04-02 ... Execution du composant table-extraction via ..."
+}
+```
+
+### 11) Recuperer ces infos depuis un autre site
+Exemple JavaScript minimal:
+```javascript
+const API = "http://IP_DU_BACKEND:8765";
+
+async function launchPipeline(files) {
+  const formData = new FormData();
+  for (const file of files) formData.append("files", file);
+
+  const res = await fetch(`${API}/api/run`, {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Erreur lancement pipeline");
+  return data;
+}
+
+async function fetchPipelineStatus() {
+  const res = await fetch(`${API}/api/status`);
+  return await res.json();
+}
+
+function watchPipeline() {
+  const timer = setInterval(async () => {
+    const status = await fetchPipelineStatus();
+
+    console.log("pipeline =", status.pipeline_profile);
+    console.log("etape =", status.current_step);
+    console.log("composant =", status.component_name);
+    console.log("script =", status.component_script);
+    console.log("progression =", status.progress_percent);
+
+    if (status.status === "completed" || status.status === "failed") {
+      clearInterval(timer);
+    }
+  }, 1000);
+}
+```
+
+Affichage conseille dans ton autre site:
+- pipeline active: `pipeline_profile`
+- composant en cours: `component_name`
+- script exact: `component_script`
+- progression: `progress_percent`
+- etape courante: `current_step`
+- log le plus recent: `last_log_line`
+
+### 12) Limite actuelle
+- `GET /api/status` suit le job courant du backend local
+- ce n'est pas un systeme multi-jobs paralleles
+- pour un affichage live simple, il faut:
+  - lancer le job avec `POST /api/run`
+  - puis poller `GET /api/status` toutes les `1s` ou `1.5s`
+
+### 13) CORS
 Le backend renvoie:
 - `Access-Control-Allow-Origin: *`
 - `Access-Control-Allow-Methods: GET, POST, OPTIONS`

@@ -27,6 +27,7 @@ from .settings import (
     normalize_input,
     safe_repr,
 )
+from .runtime_state import publish_component_completed, publish_component_failed, publish_component_started
 
 
 def _doc_has_meaningful_text(doc: Dict[str, Any]) -> bool:
@@ -92,6 +93,7 @@ class Component:
         if not self.script.exists():
             raise FileNotFoundError(f"Script introuvable: {self.script}")
         logging.info("Execution du composant %s via %s", self.name, self.script)
+        publish_component_started(context, component_name=self.name, component_script=str(self.script))
         try:
             with change_dir(self.script.parent), isolated_argv([self.script.name]):
                 result = runpy.run_path(
@@ -104,9 +106,22 @@ class Component:
                     context.update(result)
         except SystemExit as exc:
             code = exc.code if isinstance(exc.code, int) else 1
+            publish_component_failed(
+                context,
+                component_name=self.name,
+                component_script=str(self.script),
+                error=f"sys.exit({code})",
+            )
             raise RuntimeError(f"{self.name} a termine par sys.exit({code})") from exc
-        except Exception:
+        except Exception as exc:
+            publish_component_failed(
+                context,
+                component_name=self.name,
+                component_script=str(self.script),
+                error=exc,
+            )
             raise
+        publish_component_completed(context, component_name=self.name, component_script=str(self.script))
         return context
 
     def _report(self, output: Any, summary: str) -> None:

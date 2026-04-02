@@ -3,13 +3,13 @@ Type: dict
 Summary: 1 fichiers | text=1 | image=0 | unsupported=0 | missing=0
 Output: {'MISSING_FILES': [],
  'PRETRAITEMENT_RESULT': [{'content': 'text',
-                           'ext': '.docx',
-                           'label': 'Word document (DOCX)',
-                           'mime': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                           'path': 'documents/testwordvw.docx',
-                           'size': 11638}]}
+                           'ext': '.pdf',
+                           'label': 'PDF document',
+                           'mime': 'application/pdf',
+                           'path': '/tmp/dms_launcher_uploads/bc0d8fdad62a4e4982eb8ba0fb2f8d8b/epsteain22.pdf',
+                           'size': 45563}]}
 
-[skip] content='text' -> /home/mourad/Bureau/DMS/core/documents/testwordvw.docx
+[skip] content='text' -> /tmp/dms_launcher_uploads/bc0d8fdad62a4e4982eb8ba0fb2f8d8b/epsteain22.pdf
 [info] Aucun fichier à OCR (image_only). Tout ce que tu as donné est détecté comme 'text'.
 [Component: si-image-pretraiter-sinonpass-le-doc]
 Type: dict
@@ -17,107 +17,420 @@ Summary: text=1, image=0, unsupported=0, missing=0, docs_prepped=0
 Output: {'DOCS': [],
  'IMAGE_ONLY_FILES': [],
  'MISSING_FILES': [],
- 'TEXT_FILES': ['/home/mourad/Bureau/DMS/core/documents/testwordvw.docx'],
+ 'TEXT_FILES': ['/tmp/dms_launcher_uploads/bc0d8fdad62a4e4982eb8ba0fb2f8d8b/epsteain22.pdf'],
  'UNSUPPORTED_FILES': []}
 
-[doc] testwordvw.docx | content=text | extraction=native:docx:xml | pages=1
+[doc] epsteain22.pdf | content=text | extraction=native:pdf:none | pages=1
 [page 1/1]
-La marque Volkswagen est l’un des constructeurs automobiles les plus importants et les plus influents du monde. Le nom « Volkswagen » signifie littéralement « voiture du peuple » en allemand, ce qui reflète l’objectif initial de l’entreprise : produire des automobiles fiables et abordables pour le grand public. L’entreprise a été fondée en 1937 en Allemagne et est aujourd’hui au cœur du grand groupe automobile Volkswagen Group, qui possède plusieurs marques prestigieuses comme Audi, Lamborghini, Porsche, Bentley et Bugatti.
-L’un des modèles les plus célèbres de l’histoire de Volkswagen est la Volkswagen Beetle, également connue sous le nom de « Coccinelle ». Conçue dans les années 1930 avec la participation de l’ingénieur Ferdinand Porsche, cette voiture est devenue l’une des automobiles les plus vendues et les plus reconnaissables de tous les temps. Son design arrondi et sa fiabilité mécanique ont contribué à sa popularité mondiale pendant plusieurs décennies.
-Dans les années suivantes, Volkswagen a continué à se développer avec d’autres modèles devenus très populaires. Parmi eux, la Volkswagen Golf occupe une place particulière. Lancée en 1974, cette voiture compacte est devenue l’un des modèles les plus vendus en Europe et dans le monde. La Golf est connue pour son équilibre entre performance, confort et fiabilité, ce qui en fait une référence dans la catégorie des voitures compactes.
-Volkswagen s’est également distinguée par sa capacité à évoluer avec les nouvelles technologies et les exigences du marché automobile. Au fil des années, la marque a investi dans la sécurité, l’efficacité énergétique et l’innovation technologique. Aujourd’hui, elle développe activement des véhicules électriques, notamment avec la gamme ID, qui représente l’avenir de la marque dans le domaine de la mobilité durable.
-L’importance de Volkswagen ne se limite pas à ses propres modèles. En tant que cœur du Volkswagen Group, la marque joue un rôle central dans le développement technologique de nombreuses autres marques du groupe. Par exemple, certaines plateformes et technologies sont partagées entre Volkswagen, Audi et d’autres constructeurs du groupe, ce qui permet d’améliorer l’efficacité industrielle tout en maintenant des identités de marque distinctes.
-Le groupe Volkswagen possède également une présence mondiale très importante. Ses voitures sont produites dans de nombreux pays et vendues sur presque tous les continents. Cette présence internationale fait de Volkswagen l’un des acteurs majeurs de l’industrie automobile mondiale.
-Aujourd’hui, Volkswagen représente un mélange d’histoire, d’innovation et d’influence industrielle. De la mythique Coccinelle à la Golf moderne en passant par les nouvelles voitures électriques, la marque continue de jouer un rôle central dans l’évolution de l’automobile. Grâce à son réseau de marques et à sa capacité d’innovation, Volkswagen reste l’un des piliers les plus importants du monde automobile.
+
 ------------------------------------------------------------------------------------------------------------------------
 
 [Component: output-txt]
 Type: list
 Summary: 1 docs | pages=1
 Output: [{'content': 'text',
-  'doc_id': '0eed5c4f-8467-46b1-8d98-d704197d00d1',
-  'extraction': 'native:docx:xml',
-  'filename': 'testwordvw.docx',
+  'doc_id': '4c68f358-2c15-4586-84db-fbec3312ab1c',
+  'extraction': 'native:pdf:none',
+  'filename': 'epsteain22.pdf',
   'page_count_total': 1,
-  'pages_text': ['La marque Volkswagen est l’un des constructeurs automobiles les plus importants '
-                 'et les plus influents du monde. Le nom « Volkswagen » signifie littéralement « '
-                 'voiture du peuple » en allemand, ce qui reflète l’objectif initial de '
-                 'l’entreprise : produire des automobiles fiables et abordables pour le grand '
-                 'public. L’entreprise a été fondée en 1937 en Allemagne et est aujourd’hui au '
-                 'cœur du grand groupe automobile Volkswagen Group, qui possède plusieurs marques '
-                 'prestigieuses comme Audi, Lamborghini, Porsche, Bentley et Bugatti.\n'
-                 'L’un des modèles les plus célèbres de l’histoire de Volkswagen est la Volkswagen '
-                 'Beetle, également connue sous le nom de « Coccinelle ». Conçue dans les années '
-                 '1930 avec la participation de l’ingénieur Ferdinand Porsche, cette voiture est '
-                 'devenue l’une des automobiles les plus vendues et les plus reconnaissables de '
-                 'tous les temps. Son design arrondi et sa fiabilité mécanique ont contribué à sa '
-                 'popularité mondiale pendant plusieurs décennies.\n'
-                 'Dans les années suivantes, Volkswagen a continué à se développer avec d’autres '
-                 'modèles devenus très populaires. Parmi eux, la Volkswagen Golf occupe une place '
-                 'particulière. Lancée en 1974, cette voiture compacte est devenue l’un des '
-                 'modèles les plus vendus en Europe et dans le monde. La Golf est connue pour son '
-                 'équilibre entre performance, confort et fiabilité, ce qui en fait une référence '
-                 'dans la catégorie des voitures compactes.\n'
-                 'Volkswagen s’est également distinguée par sa capacité à évoluer avec les '
-                 'nouvelles technologies et les exigences du marché automobile. Au fil des années, '
-                 'la marque a investi dans la sécurité, l’efficacité énergétique et l’innovation '
-                 'technologique. Aujourd’hui, elle développe activement des véhicules électriques, '
-                 'notamment avec la gamme ID, qui représente l’avenir de la marque dans le domaine '
-                 'de la mobilité durable.\n'
-                 'L’importance de Volkswagen ne se limite pas à ses propres modèles. En tant que '
-                 'cœur du Volkswagen Group, la marque joue un rôle central dans le développement '
-                 'technologique de nombreuses autres marques du groupe. Par exemple, certaines '
-                 'plateformes et technologies sont partagées entre Volkswagen, Audi et d’autres '
-                 'constructeurs du groupe, ce qui permet d’améliorer l’efficacité industrielle '
-                 'tout en maintenant des identités de marque distinctes.\n'
-                 'Le groupe Volkswagen possède également une présence mondiale très importante. '
-                 'Ses voitures sont produites dans de nombreux pays et vendues sur presque tous '
-                 'les continents. Cette présence internationale fait de Volkswagen l’un des '
-                 'acteurs majeurs de l’industrie automobile mondiale.\n'
-                 'Aujourd’hui, Volkswagen représente un mélange d’histoire, d’innovation et '
-                 'd’influence industrielle. De la mythique Coccinelle à la Golf moderne en passant '
-                 'par les nouvelles voitures électriques, la marque continue de jouer un rôle '
-                 'central dans l’évolution de l’automobile. Grâce à son réseau de marques et à sa '
-                 'capacité d’innovation, Volkswagen reste l’un des piliers les plus importants du '
-                 'monde automobile.\n'],
-  'size': 11638,
-  'text': 'La marque Volkswagen est l’un des constructeurs automobiles les plus importants et les '
-          'plus influents du monde. Le nom « Volkswagen » signifie littéralement « voiture du '
-          'peuple » en allemand, ce qui reflète l’objectif initial de l’entreprise : produire des '
-          'automobiles fiables et abordables pour le grand public. L’entreprise a été fondée en '
-          '1937 en Allemagne et est aujourd’hui au cœur du grand groupe automobile Volkswagen '
-          'Group, qui possède plusieurs marques prestigieuses comme Audi, Lamborghini, Porsche, '
-          'Bentley et Bugatti.\n'
-          'L’un des modèles les plus célèbres de l’histoire de Volkswagen est la Volkswagen '
-          'Beetle, également connue sous le nom de « Coccinelle ». Conçue dans les années 1930 '
-          'avec la participation de l’ingénieur Ferdinand Porsche, cette voiture est devenue l’une '
-          'des automobiles les plus vendues et les plus reconnaissables de tous les temps. Son '
-          'design arrondi et sa fiabilité mécanique ont contribué à sa popularité mondiale pendant '
-          'plusieurs décennies.\n'
-          'Dans les années suivantes, Volkswagen a continué à se développer avec d’autres modèles '
-          'devenus très populaires. Parmi eux, la Volkswagen Golf occupe une place particulière. '
-          'Lancée en 1974, cette voiture compacte est devenue l’un des modèles les plus vendus en '
-          'Europe et dans le monde. La Golf est connue pour son équilibre entre performance, '
-          'confort et fiabilité, ce qui en fait une référence dans la catégorie des voitures '
-          'compactes.\n'
-          'Volkswagen s’est également distinguée par sa capacité à évoluer avec les nouvelles '
-          'technologies et les exigences du marché automobile. Au fil des années, la marque a '
-          'investi dans la sécurité, l’efficacité énergétique et l’innovation technologique. '
-          'Aujourd’hui, elle développe activement des véhicules électriques, notamment avec la '
-          'gamme ID, qui représente l’avenir de la marque dans le domaine de la mobilité durable.\n'
-          'L’importance de Volkswagen ne se limite pas à ses propres modèles. En tant que cœur du '
-          'Volkswagen Group, la marque joue un rôle central dans le développement technologique de '
-          'nombreuses autres marques du groupe. Par exemple, certaines plateformes et technologies '
-          'sont partagées entre Volkswagen, Audi et d’autres constructeurs du groupe, ce qui '
-          'permet d’améliorer l’efficacité industrielle tout en maintenant des identités de marque '
-          'distinctes.\n'
-          'Le groupe Volkswagen possède également une présence mondiale très importante. Ses '
-          'voitures sont produites dans de nombreux pays et vendues sur presque tous les '
-          'continents. Cette présence internationale fait de Volkswagen l’un des acteurs majeurs '
-          'de l’industrie automobile mondiale.\n'
-          'Aujourd’hui, Volkswagen représente un mélange d’histoire, d’innovation et d’influence '
-          'industrielle. De la mythique Coccinelle à la Golf moderne en passant par les nouvelles '
-          'voitures électriques, la marque continue de jouer un rôle central dans l’évolution de '
-          'l’automobile. Grâce à son réseau de marques et à sa capacité d’innovation, Volkswagen '
-          'reste l’un des piliers les plus importants du monde automobile.\n'}]
+  'pages_text': [''],
+  'size': 45563,
+  'text': ''}]
+
+[Component: clasification]
+Type: list
+Summary: 1 docs classes | epsteain22.pdf->UNCLASSIFIED
+Output: [{'anti_confusion_targets': [],
+  'classification_log': '[classification] epsteain22.pdf -> best=UNCLASSIFIED | status=REVIEW | '
+                        "scores: {'ARTICLE': 0, 'BON_DE_COMMANDE': 0, 'CONTRAT': 0, 'FACTURE': 0, "
+                        "'FORMULAIRE': 0}",
+  'decision_debug': {'diff': 0, 'second_score': 0, 'top_score': 0},
+  'doc_id': '4c68f358-2c15-4586-84db-fbec3312ab1c',
+  'doc_type': 'UNCLASSIFIED',
+  'filename': 'epsteain22.pdf',
+  'keyword_matches': {'anti_confusion_hits': [],
+                      'medium': [],
+                      'negative': [],
+                      'strong': [],
+                      'strong_negative': [],
+                      'weak': []},
+  'margin': 3,
+  'scores': {'ARTICLE': 0, 'BON_DE_COMMANDE': 0, 'CONTRAT': 0, 'FACTURE': 0, 'FORMULAIRE': 0},
+  'scores_audit': {},
+  'status': 'REVIEW',
+  'threshold': 6,
+  'winning_score': 0}]
+
+========================================================================================================================
+[doc] epsteain22.pdf
+  doc_id       : 4c68f358-2c15-4586-84db-fbec3312ab1c
+  content      : image_only
+  extraction   : ocr:tesseract
+  pages_total  : 1
+  chars_total  : 0
+  recompose_ok : True
+  paths:
+    - (unknown)
+------------------------------------------------------------------------------------------------------------------------
+[page 1/1] source_path=
+  lang         : en
+  chars        : 0
+------------------------------------------------------------------------------------------------------------------------
+  sentences_layout: 0 chunks total | sentences=0 | noise=0 | showing 0/0 (filter_is_sentence=True, fallback=False, min_nonspace=12)
+------------------------------------------------------------------------------------------------------------------------
+
+========================================================================================================================
+[doc] epsteain22.pdf
+  doc_id       : 4c68f358-2c15-4586-84db-fbec3312ab1c
+  content      : text
+  extraction   : native:pdf:none
+  pages_total  : 1
+  chars_total  : 0
+  recompose_ok : True
+  paths:
+    - /tmp/dms_launcher_uploads/bc0d8fdad62a4e4982eb8ba0fb2f8d8b/epsteain22.pdf
+------------------------------------------------------------------------------------------------------------------------
+[page 1/1] source_path=/tmp/dms_launcher_uploads/bc0d8fdad62a4e4982eb8ba0fb2f8d8b/epsteain22.pdf
+  lang         : en
+  chars        : 0
+------------------------------------------------------------------------------------------------------------------------
+  sentences_layout: 0 chunks total | sentences=0 | noise=0 | showing 0/0 (filter_is_sentence=True, fallback=False, min_nonspace=12)
+------------------------------------------------------------------------------------------------------------------------
+
+[tokenisation-100ml] transformer indisponible, fallback hash | reason=No module named 'torch'
+[topic-doc-100] epsteain22.pdf | document_primary_topics=[] | document_top_topics=[]
+[topic-doc-100] epsteain22.pdf | document_primary_topics=[] | document_top_topics=[]
+[tokenisation-100ml] docs=2 | chunks=0 | words=0 | topics=0 | nlp_rows=0 | vector_dim=384 | backend=hash-fallback
+[Component: tokenisation-layout]
+Type: list
+Summary: 2 docs | sentences=0
+Output: [{'chars_total': 0,
+  'content': 'image_only',
+  'doc_id': '4c68f358-2c15-4586-84db-fbec3312ab1c',
+  'extraction': 'ocr:tesseract',
+  'filename': 'epsteain22.pdf',
+  'page_count_total': 1,
+  'pages': [{'chars': 0,
+             'lang': 'en',
+             'page_index': 1,
+             'page_text': '',
+             'recompose_ok': True,
+             'sentences_layout': [],
+             'source_path': ''}],
+  'paths': [],
+  'recompose_ok': True,
+  'size': None},
+ {'chars_total': 0,
+  'content': 'text',
+  'doc_id': '4c68f358-2c15-4586-84db-fbec3312ab1c',
+  'extraction': 'native:pdf:none',
+  'filename': 'epsteain22.pdf',
+  'page_count_total': 1,
+  'pages': [{'chars': 0,
+             'lang': 'en',
+             'page_index': 1,
+             'page_text': '',
+             'recompose_ok': True,
+             'sentences_layout': [],
+             'source_path': '/tmp/dms_launcher_uploads/bc0d8fdad62a4e4982eb8ba0fb2f8d8b/epsteain22.pdf'}],
+  'paths': ['/tmp/dms_launcher_uploads/bc0d8fdad62a4e4982eb8ba0fb2f8d8b/epsteain22.pdf'],
+  'recompose_ok': True,
+  'size': 45563}]
+
+[grammar-100ml-xlmr] sentences=0 | tokens=0 | langs=[] | backend=hash-fallback | model=xlm-roberta-base | source=xlm-roberta-base
+[grammar-100ml-xlmr][warn] fallback actif: No module named 'torch'
+[grammar-100ml-xlmr][pos] method=hybrid-rules+context-v2 | refined=0/0 | top=n/a
+[Component: atripusion-gramatical]
+Type: list
+Summary: Langues executees: en, fr | docs=2 | backend=hash-fallback | component=atripusion-gramatical | pos=hybrid-rules+context-v2
+Output: [{'chars_total': 0,
+  'content': 'image_only',
+  'doc_id': '4c68f358-2c15-4586-84db-fbec3312ab1c',
+  'extraction': 'ocr:tesseract',
+  'filename': 'epsteain22.pdf',
+  'page_count_total': 1,
+  'pages': [{'chars': 0,
+             'lang': 'en',
+             'page_index': 1,
+             'page_text': '',
+             'recompose_ok': True,
+             'sentences_layout': [],
+             'source_path': ''}],
+  'paths': [],
+  'recompose_ok': True,
+  'size': None},
+ {'chars_total': 0,
+  'content': 'text',
+  'doc_id': '4c68f358-2c15-4586-84db-fbec3312ab1c',
+  'extraction': 'native:pdf:none',
+  'filename': 'epsteain22.pdf',
+  'page_count_total': 1,
+  'pages': [{'chars': 0,
+             'lang': 'en',
+             'page_index': 1,
+             'page_text': '',
+             'recompose_ok': True,
+             'sentences_layout': [],
+             'source_path': '/tmp/dms_launcher_uploads/bc0d8fdad62a4e4982eb8ba0fb2f8d8b/epsteain22.pdf'}],
+  'paths': ['/tmp/dms_launcher_uploads/bc0d8fdad62a4e4982eb8ba0fb2f8d8b/epsteain22.pdf'],
+  'recompose_ok': True,
+  'size': 45563}]
+
+[table-extraction-100ml] docs=1 | tables=0 | rows=0
+  - epsteain22.pdf | tables=0 | rows=0 | cols=[]
+[Component: table-extraction]
+Type: list
+Summary: docs=1 | tables=0 | line_items=0
+Output: [{'detected_columns': [],
+  'doc_id': '4c68f358-2c15-4586-84db-fbec3312ab1c',
+  'engine': 'table-100ml-unified-v3-anchor-geometry',
+  'filename': 'epsteain22.pdf',
+  'line_items': [],
+  'rows_total': 0,
+  'source_path': '/tmp/dms_launcher_uploads/bc0d8fdad62a4e4982eb8ba0fb2f8d8b/epsteain22.pdf',
+  'tables': [],
+  'tables_count': 0,
+  'totals': {'tax': [], 'total_ht': [], 'total_ttc': []}}]
+
+[verification-totaux] docs=1 | ok=0 | partial_ok=1 | mismatch=0 | missing=0
+  - epsteain22.pdf | status=partial_ok | rows=0/0 | subtotal=None~None | tax=None | total=None
+[Component: verification-totaux]
+Type: list
+Summary: docs=1 | ok=0 | partial_ok=1 | mismatch=0 | missing=0
+Output: [{'checks': [{'name': 'rows', 'status': 'partial'}, {'name': 'subtotal', 'status': 'missing'},
+             {'name': 'tax', 'status': 'missing'}, {'name': 'total', 'status': 'missing'}],
+  'complete': False,
+  'computed_subtotal': None,
+  'computed_tax': None,
+  'declared_subtotal': None,
+  'declared_tax': None,
+  'declared_total': None,
+  'declared_totals_raw': {'tax': [], 'total_ht': [], 'total_ttc': []},
+  'doc_id': '4c68f358-2c15-4586-84db-fbec3312ab1c',
+  'doc_key': 'id:4c68f358-2c15-4586-84db-fbec3312ab1c',
+  'engine': 'totals-verification-0ml-v1',
+  'expected_total': None,
+  'filename': 'epsteain22.pdf',
+  'issue_locations': [],
+  'passed': True,
+  'row_audit': [],
+  'row_mismatch_count': 0,
+  'row_ok_count': 0,
+  'row_partial_count': 0,
+  'rows_total': 0,
+  'rows_verified': 0,
+  'subtotal_location': {'field': 'subtotal'},
+  'subtotal_status': 'missing',
+  'table_anchor': {},
+  'tables_count': 0,
+  'tax_location': {'field': 'tax'},
+  'tax_status': 'missing',
+  'tolerance': '0.02',
+  'total_location': {'field': 'total'},
+  'total_status': 'missing',
+  'verification_status': 'partial_ok'}]
+
+[visual-detection-100ml] skipped | numpy unavailable
+[Component: detection-signature-chachet-codebarr]
+Type: list
+Summary: docs=0 | detections=0 | signature=0 | stamp=0 | barcode=0 | qrcode=0
+Output: []
+
+[interdoc-link] docs=1 | pairs=0 | links=0 | sentence_pairs_scored=0 | chunk_pairs_scored=0
+[Component: liaison-inter-docs]
+Type: dict
+Summary: docs=1 | pairs=0 | links=0 | sentence_pairs=0 | chunk_pairs=0 | vector_profile=pipeline100ml | vector_links=0
+Output: {'chunk_pairs_scored': 0,
+ 'documents_analyzed': 1,
+ 'links_count': 0,
+ 'method': 'topic-sentence-audit+vector-v2',
+ 'pairs_evaluated': 0,
+ 'sentence_pairs_scored': 0,
+ 'vector_links_count': 0,
+ 'vector_profile': 'pipeline100ml'}
+
+[elasticsearch] desactive ou indisponible -> fallback flux local.
+[Component: elasticsearch]
+Type: dict
+Summary: enabled=True | available=False | indexed=0 | cls_input=1 | cls_synced=0 | cls_docs=0 | ext_docs=0 | nlp=None docs=0 tokens=0 errors=0
+Output: {'available': False,
+ 'classification_docs': 0,
+ 'classification_input': 1,
+ 'classification_synced': 0,
+ 'doc_ids': 0,
+ 'enabled': True,
+ 'es_index': 'dms_documents',
+ 'es_url': 'http://localhost:9200',
+ 'extraction_docs': 0,
+ 'nlp_docs_synced': 0,
+ 'nlp_level': None,
+ 'nlp_token_errors': 0,
+ 'nlp_tokens_index': None,
+ 'nlp_tokens_indexed': 0,
+ 'nlp_unresolved_rows': 0}
+
+
+[extraction-yaml]
+  doc: epsteain22.pdf | type=UNCLASSIFIED | status=REVIEW
+  rulesets: common.yaml
+[extraction-regles-100ml] docs=1 | bm25_top_score=0.0
+[Component: extraction-regles]
+Type: list
+Summary: 1 docs | fields=0 | epsteain22.pdf->UNCLASSIFIED
+Output: [{'bm25': {'avg_top3_score': 0.0,
+           'b': 0.75,
+           'best_score': 0.0,
+           'chunks_total': 0,
+           'k1': 1.5,
+           'query_terms': ['unclassified'],
+           'top_chunks': []},
+  'classification_status': 'REVIEW',
+  'doc_id': '4c68f358-2c15-4586-84db-fbec3312ab1c',
+  'doc_type': 'UNCLASSIFIED',
+  'fields': {},
+  'filename': 'epsteain22.pdf',
+  'ruleset': {'applied_rulesets': ['common.yaml'],
+              'routes_config': {'default_rulesets': ['{doc_type}.yaml'],
+                                'include_common': True,
+                                'ruleset_mapping': {'BON_DE_COMMANDE': ['BON_DE_COMMANDE.yaml'],
+                                                    'CONTRAT': ['CONTRAT.yaml'],
+                                                    'FACTURE': ['FACTURE.yaml']}}}}]
+
+[ml100-topic] epsteain22.pdf | document_primary_topics=[] | document_top_topics=[] | blocked_terms=0 | topics_removed=0
+[table-100ml] epsteain22.pdf | tables=0 | rows=0 | cols=[]
+[totaux-check] epsteain22.pdf | status=partial_ok | passed=1 | rows=0/0 | subtotal=None~None | tax=None | total=None
+[Component: fusion-resultats]
+[fusion-result] source=local-context | docs=1 | es_synced=0
+[fusion-result] JSON fusionne ecrit dans /home/mourad/Bureau/DMS/core/fusion_output.json
+[fusion-resultats-100ml] docs=1 | doc_vectors=2 | bm25_docs=1
+[Component: fusion-resultats]
+Type: dict
+Summary: fusion -> /home/mourad/Bureau/DMS/core/fusion_output.json | source=local-context | docs=1 | es_synced=0
+Output: {'docs': 1,
+ 'es_synced': 0,
+ 'path': '/home/mourad/Bureau/DMS/core/fusion_output.json',
+ 'skipped': False,
+ 'source': 'local-context'}
+
+[postgres-sync] enabled=1 | ready=1 | run=run-20260402T122951587006Z | docs=1/1 | payloads=1 | nodes=354 | ids=5 | pages=1 | tokens=0 | topics=0 | extracts=0 | tables=0 | rows=0 | cells=0 | links=0 | registry=6 | skipped=no
+[Component: postgres-sync]
+Type: dict
+Summary: ready=1 | db=dms_core | run=run-20260402T122951587006Z | docs=1/1 | payloads=1 | nodes=354 | ids=5 | pages=1 | tokens=0 | topics=0 | extracts=0 | tables=0 | rows=0 | cells=0 | links=0 | registry=6
+Output: {'anti_confusion_hits_upserted': 0,
+ 'anti_confusion_targets_upserted': 0,
+ 'bm25_chunks_upserted': 0,
+ 'business_fields_upserted': 0,
+ 'chunk_embeddings_upserted': 0,
+ 'classification_keyword_matches_upserted': 0,
+ 'classification_score_audit_upserted': 0,
+ 'classification_scores_upserted': 5,
+ 'component_audit_upserted': 15,
+ 'component_metrics_upserted': 88,
+ 'config_path': '/home/mourad/Bureau/DMS/core/component/postgres/postgres_connection.py',
+ 'database': 'dms_core',
+ 'database_created': False,
+ 'document_payload_nodes_upserted': 296,
+ 'documents_total': 1,
+ 'documents_upserted': 1,
+ 'enabled': True,
+ 'entities_upserted': 0,
+ 'error': None,
+ 'extraction_details_upserted': 0,
+ 'extraction_summaries_upserted': 1,
+ 'extractions_upserted': 1,
+ 'features_upserted': 6,
+ 'fusion_audit_written': True,
+ 'fusion_path': '/home/mourad/Bureau/DMS/core/fusion_output.json',
+ 'host': '127.0.0.1',
+ 'human_review_tasks_upserted': 0,
+ 'identifiers_upserted': 5,
+ 'ingest_rows_upserted': 1,
+ 'layout_header_cells_upserted': 0,
+ 'layout_header_rows_upserted': 0,
+ 'layout_table_rows_upserted': 0,
+ 'link_chunk_matches_upserted': 0,
+ 'link_sentence_matches_upserted': 0,
+ 'link_shared_terms_upserted': 0,
+ 'link_shared_topics_upserted': 0,
+ 'links_total': 0,
+ 'links_upserted': 0,
+ 'log_entries_created': 1,
+ 'nlp_matches_upserted': 0,
+ 'pages_meta_upserted': 0,
+ 'pages_upserted': 1,
+ 'payloads_upserted': 1,
+ 'pipeline_profile': 'pipeline100ml',
+ 'port': 5432,
+ 'processing_durations_upserted': 1,
+ 'processing_logs_upserted': 0,
+ 'processing_steps_upserted': 14,
+ 'processing_warnings_upserted': 0,
+ 'quality_check_steps_upserted': 4,
+ 'quality_checks_upserted': 2,
+ 'quality_declared_locations_upserted': 3,
+ 'quality_issue_locations_upserted': 0,
+ 'quality_row_audit_upserted': 0,
+ 'ready': True,
+ 'regex_fields_upserted': 0,
+ 'regex_matches_upserted': 0,
+ 'relations_upserted': 0,
+ 'run_id': 'run-20260402T122951587006Z',
+ 'run_payload_nodes_upserted': 58,
+ 'run_upserted': 1,
+ 'schema_config_path': '/home/mourad/Bureau/DMS/core/component/postgres/postgres_schema.py',
+ 'schema_ready': True,
+ 'search_keywords_upserted': 0,
+ 'sentence_layouts_upserted': 0,
+ 'sentence_spans_upserted': 0,
+ 'sentences_upserted': 0,
+ 'skipped': None,
+ 'source': 'local-context',
+ 'stable_registry_upserted': 6,
+ 'structure_rows_upserted': 0,
+ 'sync_enabled': True,
+ 'sync_write_fusion_audit': True,
+ 'table_cells_upserted': 0,
+ 'table_rows_upserted': 0,
+ 'tables_missing': [],
+ 'tables_ready': ['dms.runs', 'dms.ingest_queue', 'dms.documents', 'dms.document_texts',
+                  'dms.document_payloads', 'dms.run_payload_nodes', 'dms.document_payload_nodes',
+                  'dms.document_identifiers', 'dms.document_classification_scores',
+                  'dms.document_classification_score_audit',
+                  'dms.document_classification_keyword_matches', 'dms.document_anti_confusion_hits',
+                  'dms.document_anti_confusion_targets', 'dms.document_extraction_summaries',
+                  'dms.document_extractions', 'dms.document_regex_fields',
+                  'dms.document_regex_matches', 'dms.document_bm25_chunks',
+                  'dms.document_relations', 'dms.document_tables', 'dms.document_table_rows',
+                  'dms.document_table_cells', 'dms.document_quality_checks',
+                  'dms.document_quality_issue_locations', 'dms.document_quality_row_audit',
+                  'dms.document_quality_declared_locations', 'dms.document_quality_check_steps',
+                  'dms.document_links', 'dms.document_link_shared_terms',
+                  'dms.document_link_shared_topics', 'dms.document_link_sentence_matches',
+                  'dms.document_link_chunk_matches', 'dms.document_pipeline_features',
+                  'dms.document_component_audit', 'dms.document_pages', 'dms.document_pages_meta',
+                  'dms.document_sections', 'dms.document_blocks', 'dms.document_lines',
+                  'dms.document_words', 'dms.document_headers', 'dms.document_footers',
+                  'dms.document_lists', 'dms.document_figures', 'dms.document_equations',
+                  'dms.document_key_value_pairs', 'dms.document_reading_order',
+                  'dms.document_non_text_regions', 'dms.document_visual_marks',
+                  'dms.document_text_normalization_items', 'dms.document_search_keywords',
+                  'dms.document_business_fields', 'dms.document_topics', 'dms.document_sentences',
+                  'dms.document_sentence_layouts', 'dms.document_sentence_spans',
+                  'dms.document_tokens', 'dms.document_nlp_matches', 'dms.document_entities',
+                  'dms.document_vectors', 'dms.document_chunk_embeddings',
+                  'dms.document_word_embeddings', 'dms.document_layout_header_rows',
+                  'dms.document_layout_header_cells', 'dms.document_layout_table_rows',
+                  'dms.document_human_review_tasks', 'dms.document_processing_warnings',
+                  'dms.document_processing_logs', 'dms.document_processing_steps',
+                  'dms.document_processing_durations', 'dms.document_component_metrics',
+                  'dms.stable_id_registry'],
+ 'tables_upserted': 0,
+ 'text_normalization_items_upserted': 0,
+ 'texts_upserted': 1,
+ 'tokens_upserted': 0,
+ 'topics_upserted': 0,
+ 'user': 'postgres',
+ 'vectors_upserted': 1,
+ 'visual_marks_upserted': 0,
+ 'word_embeddings_upserted': 0}
 

@@ -5,7 +5,7 @@ Date d'audit: 2026-04-02
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
 - Python files analyses: 42
-- Fonctions/classes indexees: 951 (voir `FUNCTION_INDEX.txt`)
+- Fonctions/classes indexees: 961 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 - Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
@@ -20,6 +20,7 @@ Date d'audit: 2026-04-02
 - Wrappers d'execution des composants: `pipeline/components.py`
 - Serveur HTTP/API local: `pipeline/local_api.py`
 - Etat runtime exact de pipeline pour l'API locale: `pipeline/runtime_state.py`
+- Stockage persistant des uploads API: `api_storage/uploads/`
 - Bootstrap + sync PostgreSQL: `pipeline/postgres.py`
 - Configuration connexion PostgreSQL: `component/postgres/postgres_connection.py`
 - Configuration base/tables PostgreSQL: `component/postgres/postgres_schema.py`
@@ -535,6 +536,26 @@ Reference implementation:
 
 ## 11) Changelog code
 - 2026-04-02:
+  - stockage documents via API:
+    - `pipeline/local_api.py` stocke maintenant les fichiers recus via API dans `api_storage/uploads/<job_id>/`.
+    - nouvelles routes:
+      - `POST /api/store`
+      - `GET /api/documents`
+      - `GET /api/documents/<job_id>`
+      - `GET /api/documents/file/<job_id>/<filename>`
+    - `component/postgres/postgres_schema.py` ajoute `dms.api_received_documents` pour tracer:
+      - nom du fichier
+      - chemin relatif
+      - chemin absolu
+      - route API
+      - URL API
+      - hash SHA-256
+      - date de reception
+    - `README.md` documente maintenant comment un site externe:
+      - envoie un document au backend,
+      - recupere l'URL du document stocke,
+      - affiche le document via API,
+      - lit le manifest d'un job ou la liste globale des jobs stockes.
   - simplification UI/API:
     - retrait de la publication detaillee de progression vers API externe.
     - suppression du module runtime dedie a la progression detaillee.

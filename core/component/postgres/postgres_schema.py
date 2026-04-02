@@ -67,6 +67,39 @@ POSTGRES_TABLES = [
         """,
     },
     {
+        "name": "dms.api_received_documents",
+        "sql": f"""
+        CREATE TABLE IF NOT EXISTS dms.api_received_documents (
+            api_document_id TEXT PRIMARY KEY,
+            job_id TEXT NOT NULL,
+            source_kind TEXT NULL,
+            source_client TEXT NULL,
+            source_ip TEXT NULL,
+            source_host TEXT NULL,
+            source_referer TEXT NULL,
+            file_name TEXT NOT NULL,
+            file_ext TEXT NULL,
+            file_mime TEXT NULL,
+            file_size BIGINT NULL,
+            file_sha256 TEXT NULL,
+            storage_root TEXT NULL,
+            stored_relative_path TEXT NOT NULL,
+            stored_absolute_path TEXT NOT NULL,
+            manifest_relative_path TEXT NULL,
+            manifest_absolute_path TEXT NULL,
+            api_route TEXT NOT NULL,
+            api_url TEXT NULL,
+            download_url TEXT NULL,
+            status TEXT NOT NULL DEFAULT 'received',
+            payload_json JSONB NULL,
+            received_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            CHECK (status IN ('received', 'processing', 'processed', 'failed')),
+            CHECK (file_size IS NULL OR file_size >= 0)
+        );
+        """,
+    },
+    {
         "name": "dms.documents",
         "sql": f"""
         CREATE TABLE IF NOT EXISTS dms.documents (
@@ -1574,6 +1607,8 @@ POSTGRES_INDEXES = [
     {"name": "idx_dms_runs_completed_at", "sql": "CREATE INDEX IF NOT EXISTS idx_dms_runs_completed_at ON dms.runs (completed_at DESC);"},
     {"name": "idx_dms_runs_profile", "sql": "CREATE INDEX IF NOT EXISTS idx_dms_runs_profile ON dms.runs (pipeline_profile);"},
     {"name": "idx_dms_ingest_queue_run", "sql": "CREATE INDEX IF NOT EXISTS idx_dms_ingest_queue_run ON dms.ingest_queue (run_id, ingest_status);"},
+    {"name": "idx_dms_api_received_documents_job", "sql": "CREATE INDEX IF NOT EXISTS idx_dms_api_received_documents_job ON dms.api_received_documents (job_id, received_at DESC);"},
+    {"name": "idx_dms_api_received_documents_path", "sql": "CREATE INDEX IF NOT EXISTS idx_dms_api_received_documents_path ON dms.api_received_documents (stored_relative_path);"},
     {"name": "idx_dms_documents_run", "sql": "CREATE INDEX IF NOT EXISTS idx_dms_documents_run ON dms.documents (run_id);"},
     {"name": "idx_dms_documents_type", "sql": "CREATE INDEX IF NOT EXISTS idx_dms_documents_type ON dms.documents (doc_type, classification_status);"},
     {"name": "idx_dms_documents_filename", "sql": "CREATE INDEX IF NOT EXISTS idx_dms_documents_filename ON dms.documents (file_name);"},

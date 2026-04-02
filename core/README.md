@@ -77,10 +77,18 @@ Consequence:
 - `GET /`
   - sert la page `index.html`
 - `POST /api/run`
-  - recoit les fichiers uploades, les sauve en temporaire, puis lance le pipeline
+  - recoit les fichiers uploades, les stocke dans le dossier dedie API, enregistre leurs chemins/references, puis lance le pipeline
+- `POST /api/store`
+  - recoit les fichiers uploades et les stocke seulement, sans lancer le pipeline
 - `GET /api/status`
   - retourne l'etat simple du job courant (`idle` / `running` / `completed` / `failed`) et la derniere information utile pour l'UI
-- `OPTIONS /api/run` et `OPTIONS /api/status`
+- `GET /api/documents`
+  - retourne la liste des jobs/documents stockes par l'API
+- `GET /api/documents/<job_id>`
+  - retourne le manifest JSON du job stocke
+- `GET /api/documents/file/<job_id>/<filename>`
+  - retourne le fichier reel stocke par l'API
+- `OPTIONS /api/run`, `OPTIONS /api/store` et `OPTIONS /api/status`
   - preflight CORS
 
 Implementation backend: [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py)
@@ -110,7 +118,12 @@ Le backend construit et execute:
 python main.py <fichiers_uploades_temp> --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
 ```
 
-Les fichiers selectionnes dans le navigateur sont copies dans un dossier temporaire (`/tmp/...`) avant execution.
+Les fichiers selectionnes dans le navigateur sont d'abord copies dans un dossier dedie persistant:
+```text
+/home/mourad/Bureau/DMS/core/api_storage/uploads/<job_id>/
+```
+
+Puis le pipeline est lance sur ces vrais chemins stockes dans le backend.
 
 ### 6) Suivi temps reel dans la page
 `index.html` interroge periodiquement `GET /api/status` pour savoir si le job est:
@@ -226,7 +239,96 @@ Exemple simplifie:
 }
 ```
 
-### 11) Recuperer ces infos depuis un autre site
+### 11) Reponse type de `POST /api/store`
+Exemple simplifie:
+```json
+{
+  "ok": true,
+  "message": "Documents stockes.",
+  "job_id": "abc123",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "manifest_route": "/api/documents/abc123",
+  "manifest_url": "http://127.0.0.1:8765/api/documents/abc123",
+  "documents": [
+    {
+      "api_document_id": "f1",
+      "file_name": "contrat.pdf",
+      "stored_relative_path": "api_storage/uploads/abc123/contrat.pdf",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/abc123/contrat.pdf",
+      "api_route": "/api/documents/file/abc123/contrat.pdf",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/abc123/contrat.pdf"
+    }
+  ],
+  "postgres": {
+    "db_ready": true
+  }
+}
+```
+
+### 12) Recuperer et afficher les documents depuis un autre site
+Cas 1: stocker sans lancer le pipeline
+- appelle `POST /api/store`
+- recupere `documents[].api_url`
+- utilise cette URL pour afficher ou telecharger le document
+
+Cas 2: stocker et lancer le pipeline
+- appelle `POST /api/run`
+- recupere `job.stored_documents[]`
+- utilise `job.stored_documents[].api_url` pour afficher les documents cote site externe
+- en parallele, poll `GET /api/status` pour suivre la pipeline
+
+Exemple JavaScript minimal:
+```javascript
+const API = "http://IP_DU_BACKEND:8765";
+
+async function storeDocuments(files) {
+  const formData = new FormData();
+  for (const file of files) formData.append("files", file);
+
+  const res = await fetch(`${API}/api/store`, {
+    method: "POST",
+    body: formData
+  });
+  return await res.json();
+}
+
+async function launchPipeline(files) {
+  const formData = new FormData();
+  for (const file of files) formData.append("files", file);
+
+  const res = await fetch(`${API}/api/run`, {
+    method: "POST",
+    body: formData
+  });
+  return await res.json();
+}
+
+function renderDocument(url, mime) {
+  if (mime === "application/pdf") {
+    return `<iframe src="${url}" style="width:100%;height:700px"></iframe>`;
+  }
+  if ((mime || "").startsWith("image/")) {
+    return `<img src="${url}" style="max-width:100%">`;
+  }
+  return `<a href="${url}" target="_blank">Ouvrir le document</a>`;
+}
+```
+
+Pour relire un job deja stocke:
+- liste globale:
+```bash
+curl -s http://127.0.0.1:8765/api/documents
+```
+- manifest d'un job:
+```bash
+curl -s http://127.0.0.1:8765/api/documents/<job_id>
+```
+- fichier reel:
+```bash
+curl -O http://127.0.0.1:8765/api/documents/file/<job_id>/<filename>
+```
+
+### 13) Recuperer ces infos depuis un autre site
 Exemple JavaScript minimal:
 ```javascript
 const API = "http://IP_DU_BACKEND:8765";
@@ -275,14 +377,33 @@ Affichage conseille dans ton autre site:
 - etape courante: `current_step`
 - log le plus recent: `last_log_line`
 
-### 12) Limite actuelle
+### 14) Enregistrement en base PostgreSQL
+Quand un document est envoye via `POST /api/store` ou `POST /api/run`, le backend tente aussi d'enregistrer sa trace dans:
+```text
+dms.api_received_documents
+```
+
+Champs utiles stockes:
+- `file_name`
+- `stored_relative_path`
+- `stored_absolute_path`
+- `api_route`
+- `api_url`
+- `download_url`
+- `file_sha256`
+- `job_id`
+- `received_at`
+
+Donc la route API et le vrai chemin disque du document recu sont visibles en base.
+
+### 15) Limite actuelle
 - `GET /api/status` suit le job courant du backend local
 - ce n'est pas un systeme multi-jobs paralleles
 - pour un affichage live simple, il faut:
   - lancer le job avec `POST /api/run`
   - puis poller `GET /api/status` toutes les `1s` ou `1.5s`
 
-### 13) CORS
+### 16) CORS
 Le backend renvoie:
 - `Access-Control-Allow-Origin: *`
 - `Access-Control-Allow-Methods: GET, POST, OPTIONS`

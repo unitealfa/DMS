@@ -3,13 +3,13 @@ from __future__ import annotations
 import argparse
 import cgi
 import json
+import mimetypes
 import os
 import signal
 import shutil
 import socket
 import subprocess
 import sys
-import tempfile
 import threading
 import uuid
 from datetime import datetime, timezone
@@ -17,15 +17,24 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Dict, List
+from urllib.parse import quote, unquote
 
 from .cli import PIPELINE_DEFAULT_CODE, _normalize_pipeline_name
 from .orchestrator import Pipeline0MLOrchestrator, Pipeline50MLOrchestrator, Pipeline100MLOrchestrator
-from .postgres import ensure_postgres_bootstrap
+from .postgres import (
+    _build_upsert_statement,
+    _run_exec_sql,
+    ensure_postgres_bootstrap,
+    load_postgres_connection_config,
+    load_postgres_schema_config,
+)
 from .runtime_state import RUNTIME_JOB_ENV, RUNTIME_STATE_ENV, read_runtime_state
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 INDEX_HTML_PATH = REPO_ROOT / "index.html"
+API_STORAGE_ROOT = REPO_ROOT / "api_storage"
+API_UPLOADS_ROOT = API_STORAGE_ROOT / "uploads"
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
 API_VERSION = "dms-local-api-2026-04-02-v3"
@@ -340,11 +349,52 @@ def _extract_uploaded_files(handler: BaseHTTPRequestHandler) -> List[Dict[str, A
     return items
 
 
-def save_uploaded_files(upload_items: List[Dict[str, Any]], job_id: str) -> List[Path]:
-    target_dir = Path(tempfile.gettempdir()) / "dms_launcher_uploads" / job_id
+def _sha256_bytes(data: bytes) -> str:
+    import hashlib
+
+    return hashlib.sha256(data).hexdigest()
+
+
+def _request_origin(handler: BaseHTTPRequestHandler) -> str:
+    proto = (handler.headers.get("X-Forwarded-Proto") or "http").strip() or "http"
+    host = (handler.headers.get("X-Forwarded-Host") or handler.headers.get("Host") or "").strip()
+    return f"{proto}://{host}" if host else ""
+
+
+def _stored_manifest_path(job_id: str) -> Path:
+    return API_UPLOADS_ROOT / job_id / "manifest.json"
+
+
+def _api_file_route(job_id: str, filename: str) -> str:
+    return f"/api/documents/file/{quote(job_id)}/{quote(filename)}"
+
+
+def _api_manifest_route(job_id: str) -> str:
+    return f"/api/documents/{quote(job_id)}"
+
+
+def _load_manifest(job_id: str) -> Dict[str, Any]:
+    path = _stored_manifest_path(job_id)
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _write_manifest(job_id: str, payload: Dict[str, Any]) -> Path:
+    path = _stored_manifest_path(job_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    return path
+
+
+def save_uploaded_files(upload_items: List[Dict[str, Any]], job_id: str, request_origin: str = "", client_ip: str = "") -> List[Dict[str, Any]]:
+    target_dir = API_UPLOADS_ROOT / job_id
     target_dir.mkdir(parents=True, exist_ok=True)
 
-    saved_paths: List[Path] = []
+    saved_items: List[Dict[str, Any]] = []
     used_names = set()
     for item in upload_items:
         filename = str(item.get("filename") or "").strip() or f"upload_{item.get('index')}"
@@ -357,10 +407,148 @@ def save_uploaded_files(upload_items: List[Dict[str, Any]], job_id: str) -> List
             candidate = f"{stem}_{counter}{suffix}"
         used_names.add(candidate.lower())
         destination = target_dir / candidate
+        content = item.get("content") or b""
         with destination.open("wb") as fh:
-            fh.write(item.get("content") or b"")
-        saved_paths.append(destination)
-    return saved_paths
+            fh.write(content)
+        mime_type = mimetypes.guess_type(destination.name)[0] or "application/octet-stream"
+        relative_path = destination.relative_to(REPO_ROOT)
+        api_route = _api_file_route(job_id, destination.name)
+        api_url = f"{request_origin}{api_route}" if request_origin else None
+        saved_items.append(
+            {
+                "api_document_id": uuid.uuid4().hex,
+                "job_id": job_id,
+                "filename": destination.name,
+                "absolute_path": str(destination.resolve()),
+                "relative_path": str(relative_path),
+                "manifest_relative_path": str(_stored_manifest_path(job_id).relative_to(REPO_ROOT)),
+                "manifest_absolute_path": str(_stored_manifest_path(job_id).resolve()),
+                "api_route": api_route,
+                "api_url": api_url,
+                "download_url": api_url,
+                "file_size": destination.stat().st_size,
+                "file_ext": destination.suffix.lower() or None,
+                "file_mime": mime_type,
+                "file_sha256": _sha256_bytes(content),
+                "source_kind": "api_upload",
+                "source_client": "external_site",
+                "source_ip": client_ip or None,
+                "stored_path": destination,
+            }
+        )
+
+    manifest = {
+        "job_id": job_id,
+        "received_at": _iso_now(),
+        "storage_root": str(API_UPLOADS_ROOT.resolve()),
+        "documents": [
+            {
+                "api_document_id": item["api_document_id"],
+                "file_name": item["filename"],
+                "file_ext": item["file_ext"],
+                "file_mime": item["file_mime"],
+                "file_size": item["file_size"],
+                "file_sha256": item["file_sha256"],
+                "stored_relative_path": item["relative_path"],
+                "stored_absolute_path": item["absolute_path"],
+                "api_route": item["api_route"],
+                "api_url": item["api_url"],
+                "download_url": item["download_url"],
+            }
+            for item in saved_items
+        ],
+    }
+    _write_manifest(job_id, manifest)
+    return saved_items
+
+
+def _register_uploaded_documents_in_db(saved_items: List[Dict[str, Any]], request_origin: str = "", referer: str = "", host: str = "") -> Dict[str, Any]:
+    if not saved_items:
+        return {"db_registered": 0, "db_ready": False}
+    bootstrap = ensure_postgres_bootstrap(REPO_ROOT, start_if_needed=False)
+    if not bootstrap.get("ready"):
+        return {"db_registered": 0, "db_ready": False, "db_error": bootstrap.get("error")}
+    try:
+        cfg = load_postgres_connection_config(REPO_ROOT)
+        schema = load_postgres_schema_config(cfg.schema_config_path)
+        statements: List[str] = []
+        for item in saved_items:
+            row = {
+                "api_document_id": item["api_document_id"],
+                "job_id": item["job_id"],
+                "source_kind": item.get("source_kind"),
+                "source_client": item.get("source_client"),
+                "source_ip": item.get("source_ip"),
+                "source_host": host or None,
+                "source_referer": referer or None,
+                "file_name": item["filename"],
+                "file_ext": item.get("file_ext"),
+                "file_mime": item.get("file_mime"),
+                "file_size": item.get("file_size"),
+                "file_sha256": item.get("file_sha256"),
+                "storage_root": str(API_UPLOADS_ROOT.resolve()),
+                "stored_relative_path": item["relative_path"],
+                "stored_absolute_path": item["absolute_path"],
+                "manifest_relative_path": item.get("manifest_relative_path"),
+                "manifest_absolute_path": item.get("manifest_absolute_path"),
+                "api_route": item["api_route"],
+                "api_url": item.get("api_url") or (f"{request_origin}{item['api_route']}" if request_origin else None),
+                "download_url": item.get("download_url") or (f"{request_origin}{item['api_route']}" if request_origin else None),
+                "status": "received",
+                "payload_json": {
+                    "job_id": item["job_id"],
+                    "file_name": item["filename"],
+                    "stored_relative_path": item["relative_path"],
+                    "api_route": item["api_route"],
+                },
+                "received_at": _iso_now(),
+                "updated_at": _iso_now(),
+            }
+            statements.append(
+                _build_upsert_statement(
+                    "dms.api_received_documents",
+                    row,
+                    conflict_columns=["api_document_id"],
+                    json_columns=["payload_json"],
+                )
+            )
+        if statements:
+            _run_exec_sql(cfg, schema.database_name, "\n".join(statements))
+        return {"db_registered": len(saved_items), "db_ready": True, "database": schema.database_name}
+    except Exception as exc:
+        return {"db_registered": 0, "db_ready": False, "db_error": str(exc)}
+
+
+def _documents_index_payload(limit: int = 100) -> Dict[str, Any]:
+    docs: List[Dict[str, Any]] = []
+    if API_UPLOADS_ROOT.exists():
+        for manifest_path in sorted(API_UPLOADS_ROOT.glob("*/manifest.json"), reverse=True)[:limit]:
+            try:
+                payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            if isinstance(payload, dict):
+                docs.append(payload)
+    return {
+        "storage_root": str(API_UPLOADS_ROOT.resolve()),
+        "jobs_count": len(docs),
+        "jobs": docs,
+    }
+
+
+def _send_file_response(handler: BaseHTTPRequestHandler, file_path: Path) -> None:
+    if not file_path.exists() or not file_path.is_file():
+        handler._send_json({"error": "Document introuvable"}, status=HTTPStatus.NOT_FOUND)
+        return
+    raw = file_path.read_bytes()
+    content_type = mimetypes.guess_type(file_path.name)[0] or "application/octet-stream"
+    handler.send_response(HTTPStatus.OK)
+    handler._send_cors_headers()
+    handler.send_header("Content-Type", content_type)
+    handler.send_header("Content-Length", str(len(raw)))
+    handler.send_header("Content-Disposition", f'inline; filename="{file_path.name}"')
+    handler.end_headers()
+    handler.wfile.write(raw)
 
 
 def build_cli_command(file_paths: List[Path], extra_args: List[str] | None = None) -> List[str]:
@@ -535,6 +723,40 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
             self._send_json(self.launcher_state.snapshot())
             return
 
+        if self.path == "/api/documents":
+            self._send_json(_documents_index_payload())
+            return
+
+        if self.path.startswith("/api/documents/file/"):
+            suffix = self.path[len("/api/documents/file/"):]
+            parts = [unquote(part) for part in suffix.split("/") if part]
+            if len(parts) < 2:
+                self._send_json({"error": "Route document invalide"}, status=HTTPStatus.BAD_REQUEST)
+                return
+            job_id = parts[0]
+            filename = parts[-1]
+            job_root = (API_UPLOADS_ROOT / job_id).resolve()
+            file_path = (job_root / filename).resolve()
+            try:
+                file_path.relative_to(job_root)
+            except Exception:
+                self._send_json({"error": "Chemin document invalide"}, status=HTTPStatus.BAD_REQUEST)
+                return
+            _send_file_response(self, file_path)
+            return
+
+        if self.path.startswith("/api/documents/"):
+            job_id = unquote(self.path[len("/api/documents/"):].strip("/"))
+            if not job_id:
+                self._send_json({"error": "job_id manquant"}, status=HTTPStatus.BAD_REQUEST)
+                return
+            manifest = _load_manifest(job_id)
+            if not manifest:
+                self._send_json({"error": "Job introuvable"}, status=HTTPStatus.NOT_FOUND)
+                return
+            self._send_json(manifest)
+            return
+
         if self.path == "/favicon.ico":
             self.send_response(HTTPStatus.NO_CONTENT)
             self.end_headers()
@@ -548,7 +770,7 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_POST(self) -> None:  # noqa: N802
-        if self.path != "/api/run":
+        if self.path not in {"/api/run", "/api/store"}:
             self._send_json({"error": "Not found"}, status=HTTPStatus.NOT_FOUND)
             return
 
@@ -557,8 +779,55 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
             if not upload_items:
                 raise ValueError("Aucun fichier exploitable recu.")
             job_id = uuid.uuid4().hex
-            saved_paths = save_uploaded_files(upload_items, job_id)
+            request_origin = _request_origin(self)
+            client_ip = str(self.client_address[0] if self.client_address else "").strip()
+            referer = str(self.headers.get("Referer") or "").strip()
+            host = str(self.headers.get("Host") or "").strip()
+            saved_items = save_uploaded_files(upload_items, job_id, request_origin=request_origin, client_ip=client_ip)
+            db_status = _register_uploaded_documents_in_db(saved_items, request_origin=request_origin, referer=referer, host=host)
+            stored_documents = [
+                {
+                    "api_document_id": item["api_document_id"],
+                    "job_id": item["job_id"],
+                    "file_name": item["filename"],
+                    "file_ext": item["file_ext"],
+                    "file_mime": item["file_mime"],
+                    "file_size": item["file_size"],
+                    "file_sha256": item["file_sha256"],
+                    "stored_relative_path": item["relative_path"],
+                    "stored_absolute_path": item["absolute_path"],
+                    "api_route": item["api_route"],
+                    "api_url": item["api_url"],
+                    "download_url": item["download_url"],
+                }
+                for item in saved_items
+            ]
+            manifest_route = _api_manifest_route(job_id)
+            manifest_url = f"{request_origin}{manifest_route}" if request_origin else None
+
+            if self.path == "/api/store":
+                self._send_json(
+                    {
+                        "ok": True,
+                        "message": "Documents stockes.",
+                        "job_id": job_id,
+                        "storage_root": str(API_UPLOADS_ROOT.resolve()),
+                        "manifest_route": manifest_route,
+                        "manifest_url": manifest_url,
+                        "documents": stored_documents,
+                        "postgres": db_status,
+                    },
+                    status=HTTPStatus.ACCEPTED,
+                )
+                return
+
+            saved_paths = [Path(item["absolute_path"]) for item in saved_items]
             current = self.launcher_state.start_job(saved_paths, job_id=job_id)
+            current["stored_documents"] = stored_documents
+            current["manifest_route"] = manifest_route
+            current["manifest_url"] = manifest_url
+            current["storage_root"] = str(API_UPLOADS_ROOT.resolve())
+            current["postgres"] = db_status
             self._send_json(
                 {
                     "ok": True,
@@ -568,12 +837,8 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
                 status=HTTPStatus.ACCEPTED,
             )
         except RuntimeError as exc:
-            if "job_id" in locals():
-                shutil.rmtree(Path(tempfile.gettempdir()) / "dms_launcher_uploads" / job_id, ignore_errors=True)
             self._send_json({"ok": False, "error": str(exc)}, status=HTTPStatus.CONFLICT)
         except Exception as exc:
-            if "job_id" in locals():
-                shutil.rmtree(Path(tempfile.gettempdir()) / "dms_launcher_uploads" / job_id, ignore_errors=True)
             self._send_json({"ok": False, "error": str(exc)}, status=HTTPStatus.BAD_REQUEST)
 
 
@@ -616,6 +881,7 @@ def serve(host: str = DEFAULT_HOST, port: int = DEFAULT_PORT) -> None:
     )
     if postgres_status.get("error"):
         print(f"[local-api] postgres_error={postgres_status.get('error')}")
+    print(f"[local-api] api_storage={API_UPLOADS_ROOT.resolve()}")
     for url in _candidate_urls(host, port):
         print(f"[local-api] url={url}")
     print("[local-api] le bouton Lancer de index.html executera main.py avec les fichiers uploades")

@@ -73,6 +73,18 @@ Consequence:
 - front et backend sur la meme machine: `127.0.0.1:8765` fonctionne
 - front sur une autre machine: il faut appeler `http://IP_DU_BACKEND:8765` (pas `127.0.0.1`)
 
+Pour les documents stockes, le backend peut aussi renvoyer des URLs absolues publiques via:
+```bash
+PUBLIC_API_BASE_URL=https://mon-backend.example.com
+```
+
+Dans ce cas, `api_url` et `download_url` renvoyes au front seront des URLs absolues du type:
+```text
+https://mon-backend.example.com/api/documents/file/<job_id>/<filename>
+```
+
+Si `PUBLIC_API_BASE_URL` n'est pas defini, le backend utilise l'origine HTTP de la requete.
+
 ### 3) Endpoints exposes par le backend
 - `GET /`
   - sert la page `index.html`
@@ -108,6 +120,9 @@ Si aucun fichier n'est recu:
 Si un job tourne deja:
 - reponse `409 Conflict`
 
+Si une erreur interne non prevue arrive apres l'upload:
+- reponse `500 Internal Server Error`
+
 Reponse normale:
 - `202 Accepted`
 - JSON avec `ok=true`, `job_id`, commande lancee et metadonnees job
@@ -124,6 +139,14 @@ Les fichiers selectionnes dans le navigateur sont d'abord copies dans un dossier
 ```
 
 Puis le pipeline est lance sur ces vrais chemins stockes dans le backend.
+
+Logs backend ajoutes pour diagnostic:
+- `Content-Type`
+- `Content-Length`
+- champs multipart vus dans `form.list`
+- nombre de fichiers extraits
+- chemins absolus reellement sauvegardes
+- fichiers reellement passes a `start_job(...)`
 
 ### 6) Suivi temps reel dans la page
 `index.html` interroge periodiquement `GET /api/status` pour savoir si le job est:
@@ -253,10 +276,12 @@ Exemple simplifie:
     {
       "api_document_id": "f1",
       "file_name": "contrat.pdf",
+      "content_type": "application/pdf",
       "stored_relative_path": "api_storage/uploads/abc123/contrat.pdf",
       "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/abc123/contrat.pdf",
       "api_route": "/api/documents/file/abc123/contrat.pdf",
-      "api_url": "http://127.0.0.1:8765/api/documents/file/abc123/contrat.pdf"
+      "api_url": "https://mon-backend.example.com/api/documents/file/abc123/contrat.pdf",
+      "download_url": "https://mon-backend.example.com/api/documents/file/abc123/contrat.pdf"
     }
   ],
   "postgres": {
@@ -376,6 +401,9 @@ Affichage conseille dans ton autre site:
 - progression: `progress_percent`
 - etape courante: `current_step`
 - log le plus recent: `last_log_line`
+- pour afficher un document stocke:
+  - utilise directement `api_url`
+  - ne reconstruis pas l'URL toi-meme a partir d'un chemin relatif
 
 ### 14) Enregistrement en base PostgreSQL
 Quand un document est envoye via `POST /api/store` ou `POST /api/run`, le backend tente aussi d'enregistrer sa trace dans:

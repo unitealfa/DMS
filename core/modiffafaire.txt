@@ -1,157 +1,52 @@
-1. Modifications à faire côté backend
-A. Ne plus faire dépendre le front d’un chemin relatif
-Où modifier
+dans /home/mourad/Bureau/DMS/core/pipeline/local_api.py:306 :
 
-Dans le backend, dans la partie qui construit les infos renvoyées au front pour un document :
+  content_type = handler.headers.get("Content-Type", "")
+  LOGGER.info(
+      "POST %s content_type=%s content_length=%s",
+      getattr(handler, "path", ""),
+      handler.headers.get("Content-Type"),
+      handler.headers.get("Content-Length"),
+  )
+  if "multipart/form-data" not in content_type:
+      raise ValueError("Content-Type multipart/form-data requis.")
 
-pipeline/local_api.py
-là où sont construits :
-api_route
-api_url
-download_url
+  form = cgi.FieldStorage(
+      fp=handler.rfile,
+      headers=handler.headers,
+      environ={
+          "REQUEST_METHOD": "POST",
+          "CONTENT_TYPE": content_type,
+          "CONTENT_LENGTH": handler.headers.get("Content-Length", "0"),
+      },
+  )
+  LOGGER.info("multipart fields=%s", [getattr(item, "name", None) for item in (form.list or [])])
 
-D’après le contexte, c’est dans la logique d’upload / enregistrement des documents.
+  raw_items = None
+  for field_name in ("files", "files[]", "file"):
+      if field_name in form:
+          raw_items = form[field_name]
+          break
 
-Ce qu’il faut faire
+  if raw_items is None:
+      fallback_items = []
+      for item in form.list or []:
+          if getattr(item, "filename", None):
+              fallback_items.append(item)
+      raw_items = fallback_items
 
-Le backend doit toujours renvoyer une URL absolue, par exemple :
+  if raw_items is None or (isinstance(raw_items, list) and not raw_items):
+      raise ValueError(
+          f"Aucun champ fichier recu. Content-Type={content_type}. "
+          f"Fields={[getattr(item, 'name', None) for item in (form.list or [])]}"
+      )
 
-https://mon-backend.example.com/api/documents/file/<job_id>/<filename>
+  Et dans /home/mourad/Bureau/DMS/core/pipeline/local_api.py:814, il faut bien ça :
 
-et non juste :
-
-/api/documents/file/<job_id>/<filename>
-Comment
-
-Ajoute une base d’URL publique configurable, par exemple via variable d’environnement :
-
-PUBLIC_API_BASE_URL = os.getenv("PUBLIC_API_BASE_URL", "").rstrip("/")
-
-Puis crée une fonction utilitaire :
-
-from urllib.parse import quote
-
-def build_public_file_url(job_id: str, filename: str) -> str:
-    safe_job_id = quote(job_id)
-    safe_filename = quote(filename)
-    return f"{PUBLIC_API_BASE_URL}/api/documents/file/{safe_job_id}/{safe_filename}"
-
-Puis, au moment où tu construis les métadonnées du document, mets :
-
-api_route = f"/api/documents/file/{job_id}/{filename}"
-api_url = build_public_file_url(job_id, filename)
-download_url = api_url
-
-Si tu as un manifest ou une API détail, elle doit renvoyer api_url directement au front.
-
-B. Le front ne doit plus reconstruire l’URL lui-même
-Où modifier backend
-
-Dans la route qui renvoie le détail/manifest document.
-
-Ce qu’il faut renvoyer
-
-Pour chaque document, renvoie au minimum :
-
-job_id
-filename
-api_url
-download_url
-éventuellement content_type
-
-Exemple de payload :
-
-{
-  "job_id": "abc123",
-  "filename": "photo.png",
-  "api_url": "https://mon-backend.example.com/api/documents/file/abc123/photo.png",
-  "download_url": "https://mon-backend.example.com/api/documents/file/abc123/photo.png"
-}
-
-Le front doit consommer cette URL telle quelle.
-
-C. Ajouter des logs précis dans la route fichier
-Où modifier
-
-Dans :
-
-pipeline/local_api.py
-dans la route /api/documents/file/<job_id>/<filename>
-et dans _send_file_response()
-Pourquoi
-
-Pour savoir exactement pourquoi tu as le 404.
-
-Comment
-
-Ajoute avant le test exists() :
-
-logger.info("Serving file: job_id=%s filename=%s", job_id, filename)
-logger.info("Resolved job_root=%s", job_root)
-logger.info("Resolved file_path=%s", file_path)
-logger.info("exists=%s is_file=%s", file_path.exists(), file_path.is_file())
-
-Comme ça, si ça casse, tu sauras immédiatement :
-
-quel chemin est utilisé
-si le fichier existe
-si le nom est faux
-si le chemin racine est mauvais
-
-Le 404 actuel vient précisément du test d’existence du fichier.
-
-D. Vérifier le stockage persistant
-Où agir
-
-Dans l’infra backend, pas dans le front.
-
-Ce qu’il faut faire
-
-Le dossier utilisé par le code pour stocker les uploads doit être persistant.
-
-Le code utilise un dossier du type :
-
-api_storage/uploads/<job_id>/...
-
-Si tu es en Docker, il faut monter ce dossier en volume.
-
-Exemple Docker Compose
-services:
-  app:
-    volumes:
-      - ./api_storage:/app/api_storage
-
-Adapte /app à ton vrai chemin dans le conteneur.
-
-Si ce n’est pas fait
-
-Après restart :
-
-le conteneur repart
-les fichiers n’existent plus
-toutes les images font 404
-E. Option de compatibilité si ton site externe utilise encore /dms_core/...
-À faire seulement si tu veux corriger vite sans tout changer côté front
-
-Si ton site externe appelle encore :
-
-/dms_core/documents/file/<document_id>
-
-alors il y a 2 solutions :
-
-Solution recommandée
-
-Modifier le front pour utiliser la vraie route :
-
-/api/documents/file/<job_id>/<filename>
-Solution de compatibilité
-
-Créer une nouvelle route backend qui accepte l’ancien format et redirige vers la vraie URL.
-
-Exemple logique :
-
-GET /dms_core/documents/file/<document_id>
--> retrouver job_id + filename
--> redirection 302 vers /api/documents/file/<job_id>/<filename>
-
-Je ne recommande ça que si tu dois garder l’ancien front temporairement.
+  except ValueError as exc:
+      LOGGER.warning("POST %s bad request: %s", self.path, exc)
+      self._send_json({"ok": False, "error": str(exc)}, status=HTTPStatus.BAD_REQUEST)
+  except RuntimeError as exc:
+      self._send_json({"ok": False, "error": str(exc)}, status=HTTPStatus.CONFLICT)
+  except Exception as exc:
+      LOGGER.exception("POST %s failed", self.path)
+      self._send_json({"ok": False, "error": str(exc)}, status=HTTPStatus.INTERNAL_SERVER_ERROR)

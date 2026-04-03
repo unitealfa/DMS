@@ -1,0 +1,46 @@
+{
+  "job_id": "92af6e214a8f43928a45cab00c806a7f",
+  "received_at": "2026-04-03T10:46:18.789446+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "82eee1722acc427582f2a4347d82f67d",
+      "file_name": "testwordaudi.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 12302,
+      "file_sha256": "490a20e99a5233513f7840d558f06a07905440f37b2bcf3295af26d53cfae412",
+      "stored_relative_path": "api_storage/uploads/92af6e214a8f43928a45cab00c806a7f/testwordaudi.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/92af6e214a8f43928a45cab00c806a7f/testwordaudi.docx",
+      "api_route": "/api/documents/file/92af6e214a8f43928a45cab00c806a7f/testwordaudi.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/92af6e214a8f43928a45cab00c806a7f/testwordaudi.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/92af6e214a8f43928a45cab00c806a7f/testwordaudi.docx"
+    },
+    {
+      "api_document_id": "5ccb4661832247f1a1fa8c15f6ee0472",
+      "file_name": "contras-14page.pdf",
+      "file_ext": ".pdf",
+      "file_mime": "application/pdf",
+      "file_size": 290939,
+      "file_sha256": "ca25d51985bc5a4ca8497f848c9ba6a80afaeddd80d67df24a10af3c1740fd46",
+      "stored_relative_path": "api_storage/uploads/92af6e214a8f43928a45cab00c806a7f/contras-14page.pdf",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/92af6e214a8f43928a45cab00c806a7f/contras-14page.pdf",
+      "api_route": "/api/documents/file/92af6e214a8f43928a45cab00c806a7f/contras-14page.pdf",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/92af6e214a8f43928a45cab00c806a7f/contras-14page.pdf",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/92af6e214a8f43928a45cab00c806a7f/contras-14page.pdf"
+    },
+    {
+      "api_document_id": "4928568a27ea43e39646091672e32a51",
+      "file_name": "bon-de-commade.png",
+      "file_ext": ".png",
+      "file_mime": "image/png",
+      "file_size": 38509,
+      "file_sha256": "b8b7ec4207625424f96103a2b505840e7985090777423cb4ea66eccf0e17ccdd",
+      "stored_relative_path": "api_storage/uploads/92af6e214a8f43928a45cab00c806a7f/bon-de-commade.png",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/92af6e214a8f43928a45cab00c806a7f/bon-de-commade.png",
+      "api_route": "/api/documents/file/92af6e214a8f43928a45cab00c806a7f/bon-de-commade.png",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/92af6e214a8f43928a45cab00c806a7f/bon-de-commade.png",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/92af6e214a8f43928a45cab00c806a7f/bon-de-commade.png"
+    }
+  ]
+}

@@ -5,7 +5,7 @@ Date d'audit: 2026-04-02
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
 - Python files analyses: 42
-- Fonctions/classes indexees: 961 (voir `FUNCTION_INDEX.txt`)
+- Fonctions/classes indexees: 964 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 - Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
@@ -538,11 +538,30 @@ Reference implementation:
 - 2026-04-02:
   - stockage documents via API:
     - `pipeline/local_api.py` stocke maintenant les fichiers recus via API dans `api_storage/uploads/<job_id>/`.
+    - `pipeline/local_api.py` supporte maintenant `PUBLIC_API_BASE_URL` pour renvoyer des URLs publiques absolues vers les documents stockes.
+    - `pipeline/local_api.py` journalise maintenant le diagnostic multipart upload:
+      - `Content-Type`
+      - `Content-Length`
+      - champs `form.list`
+      - nombre de fichiers extraits
+      - chemins sauvegardes
+      - chemins passes au lancement du job
     - nouvelles routes:
       - `POST /api/store`
       - `GET /api/documents`
       - `GET /api/documents/<job_id>`
       - `GET /api/documents/file/<job_id>/<filename>`
+    - la route fichier journalise maintenant:
+      - `job_id`
+      - `filename`
+      - `job_root`
+      - `file_path`
+      - `exists`
+      - `is_file`
+    - `do_POST` distingue maintenant correctement:
+      - `400` pour `ValueError`
+      - `409` pour `RuntimeError`
+      - `500` pour exception interne avec traceback logge
     - `component/postgres/postgres_schema.py` ajoute `dms.api_received_documents` pour tracer:
       - nom du fichier
       - chemin relatif

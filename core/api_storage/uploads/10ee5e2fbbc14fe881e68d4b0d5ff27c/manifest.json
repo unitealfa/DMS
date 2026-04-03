@@ -1,0 +1,20 @@
+{
+  "job_id": "10ee5e2fbbc14fe881e68d4b0d5ff27c",
+  "received_at": "2026-04-03T10:59:10.808890+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "ea095b660b864c71820ec5b039d500a8",
+      "file_name": "test-regex3langue.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 19123,
+      "file_sha256": "5155229eec06563a17a6c99c247819d95771382789dbcd7f17b83e4cc0472a62",
+      "stored_relative_path": "api_storage/uploads/10ee5e2fbbc14fe881e68d4b0d5ff27c/test-regex3langue.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/10ee5e2fbbc14fe881e68d4b0d5ff27c/test-regex3langue.docx",
+      "api_route": "/api/documents/file/10ee5e2fbbc14fe881e68d4b0d5ff27c/test-regex3langue.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/10ee5e2fbbc14fe881e68d4b0d5ff27c/test-regex3langue.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/10ee5e2fbbc14fe881e68d4b0d5ff27c/test-regex3langue.docx"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "job_id": "a26aaabce303409fbdca5f99e20bb5df",
+  "received_at": "2026-04-03T10:34:47.881689+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "76578e9996534aa6bc79ab69ca2690a3",
+      "file_name": "README.md",
+      "file_ext": ".md",
+      "file_mime": "text/markdown",
+      "file_size": 2313,
+      "file_sha256": "83d77fa4dbc9f5e2190c8db2abf63283594eefc4071a8016b06bbb9db5c34542",
+      "stored_relative_path": "api_storage/uploads/a26aaabce303409fbdca5f99e20bb5df/README.md",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/a26aaabce303409fbdca5f99e20bb5df/README.md",
+      "api_route": "/api/documents/file/a26aaabce303409fbdca5f99e20bb5df/README.md",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/a26aaabce303409fbdca5f99e20bb5df/README.md",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/a26aaabce303409fbdca5f99e20bb5df/README.md"
+    }
+  ]
+}

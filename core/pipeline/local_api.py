@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import cgi
 import json
+import logging
 import mimetypes
 import os
 import signal
@@ -10,6 +11,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import tempfile
 import threading
 import uuid
 from datetime import datetime, timezone
@@ -35,6 +37,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 INDEX_HTML_PATH = REPO_ROOT / "index.html"
 API_STORAGE_ROOT = REPO_ROOT / "api_storage"
 API_UPLOADS_ROOT = API_STORAGE_ROOT / "uploads"
+PUBLIC_API_BASE_URL = str(os.environ.get("PUBLIC_API_BASE_URL") or "").strip().rstrip("/")
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
 API_VERSION = "dms-local-api-2026-04-02-v3"
@@ -61,6 +64,8 @@ PIPELINE_DESCRIPTIONS = {
     "pipeline50ml": "Hybrid ML retrieval pipeline with 50ML tokenisation and extraction components plus grammar refinement.",
     "pipeline100ml": "Transformer-grade pipeline with 100ML tokenisation, XLM-R grammar and visual marks detection.",
 }
+
+LOGGER = logging.getLogger(__name__)
 
 
 def _active_pipeline_profile() -> str:
@@ -303,6 +308,12 @@ def _sanitize_filename(name: str, index: int) -> str:
 
 def _extract_uploaded_files(handler: BaseHTTPRequestHandler) -> List[Dict[str, Any]]:
     content_type = handler.headers.get("Content-Type", "")
+    LOGGER.info(
+        "POST %s content_type=%s content_length=%s",
+        getattr(handler, "path", ""),
+        handler.headers.get("Content-Type"),
+        handler.headers.get("Content-Length"),
+    )
     if "multipart/form-data" not in content_type:
         raise ValueError("Content-Type multipart/form-data requis.")
 
@@ -315,6 +326,7 @@ def _extract_uploaded_files(handler: BaseHTTPRequestHandler) -> List[Dict[str, A
             "CONTENT_LENGTH": handler.headers.get("Content-Length", "0"),
         },
     )
+    LOGGER.info("multipart fields=%s", [getattr(item, "name", None) for item in (form.list or [])])
 
     raw_items = None
     for field_name in ("files", "files[]", "file"):
@@ -329,7 +341,10 @@ def _extract_uploaded_files(handler: BaseHTTPRequestHandler) -> List[Dict[str, A
         raw_items = fallback_items
 
     if raw_items is None or (isinstance(raw_items, list) and not raw_items):
-        raise ValueError("Aucun champ fichier recu. Le backend attend 'files' ou 'files[]'.")
+        raise ValueError(
+            f"Aucun champ fichier recu. Content-Type={content_type}. "
+            f"Fields={[getattr(item, 'name', None) for item in (form.list or [])]}"
+        )
 
     if not isinstance(raw_items, list):
         raw_items = [raw_items]
@@ -346,6 +361,7 @@ def _extract_uploaded_files(handler: BaseHTTPRequestHandler) -> List[Dict[str, A
                 "content": payload,
             }
         )
+    LOGGER.info("extracted_files_count=%s", len(items))
     return items
 
 
@@ -361,6 +377,12 @@ def _request_origin(handler: BaseHTTPRequestHandler) -> str:
     return f"{proto}://{host}" if host else ""
 
 
+def _public_api_base_url(request_origin: str = "") -> str:
+    if PUBLIC_API_BASE_URL:
+        return PUBLIC_API_BASE_URL
+    return str(request_origin or "").strip().rstrip("/")
+
+
 def _stored_manifest_path(job_id: str) -> Path:
     return API_UPLOADS_ROOT / job_id / "manifest.json"
 
@@ -371,6 +393,20 @@ def _api_file_route(job_id: str, filename: str) -> str:
 
 def _api_manifest_route(job_id: str) -> str:
     return f"/api/documents/{quote(job_id)}"
+
+
+def _build_public_file_url(job_id: str, filename: str, request_origin: str = "") -> str | None:
+    base = _public_api_base_url(request_origin)
+    if not base:
+        return None
+    return f"{base}{_api_file_route(job_id, filename)}"
+
+
+def _build_public_manifest_url(job_id: str, request_origin: str = "") -> str | None:
+    base = _public_api_base_url(request_origin)
+    if not base:
+        return None
+    return f"{base}{_api_manifest_route(job_id)}"
 
 
 def _load_manifest(job_id: str) -> Dict[str, Any]:
@@ -413,7 +449,7 @@ def save_uploaded_files(upload_items: List[Dict[str, Any]], job_id: str, request
         mime_type = mimetypes.guess_type(destination.name)[0] or "application/octet-stream"
         relative_path = destination.relative_to(REPO_ROOT)
         api_route = _api_file_route(job_id, destination.name)
-        api_url = f"{request_origin}{api_route}" if request_origin else None
+        api_url = _build_public_file_url(job_id, destination.name, request_origin=request_origin)
         saved_items.append(
             {
                 "api_document_id": uuid.uuid4().hex,
@@ -492,8 +528,8 @@ def _register_uploaded_documents_in_db(saved_items: List[Dict[str, Any]], reques
                 "manifest_relative_path": item.get("manifest_relative_path"),
                 "manifest_absolute_path": item.get("manifest_absolute_path"),
                 "api_route": item["api_route"],
-                "api_url": item.get("api_url") or (f"{request_origin}{item['api_route']}" if request_origin else None),
-                "download_url": item.get("download_url") or (f"{request_origin}{item['api_route']}" if request_origin else None),
+                "api_url": item.get("api_url") or _build_public_file_url(item["job_id"], item["filename"], request_origin=request_origin),
+                "download_url": item.get("download_url") or _build_public_file_url(item["job_id"], item["filename"], request_origin=request_origin),
                 "status": "received",
                 "payload_json": {
                     "job_id": item["job_id"],
@@ -537,7 +573,10 @@ def _documents_index_payload(limit: int = 100) -> Dict[str, Any]:
 
 
 def _send_file_response(handler: BaseHTTPRequestHandler, file_path: Path) -> None:
+    LOGGER.info("Resolved file_path=%s", file_path)
+    LOGGER.info("exists=%s is_file=%s", file_path.exists(), file_path.is_file())
     if not file_path.exists() or not file_path.is_file():
+        LOGGER.warning("Document not found on disk: file_path=%s", file_path)
         handler._send_json({"error": "Document introuvable"}, status=HTTPStatus.NOT_FOUND)
         return
     raw = file_path.read_bytes()
@@ -635,6 +674,7 @@ class LauncherState:
             runtime_state_path = Path(tempfile.gettempdir()) / "dms_launcher_runtime" / f"{job_id}.json"
             print(f"[local-api] lancement job={job_id}")
             print(f"[local-api] commande: {' '.join(command)}")
+            LOGGER.info("launching job=%s files=%s", job_id, [str(p) for p in file_paths])
 
             env = os.environ.copy()
             env[RUNTIME_STATE_ENV] = str(runtime_state_path)
@@ -737,6 +777,10 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
             filename = parts[-1]
             job_root = (API_UPLOADS_ROOT / job_id).resolve()
             file_path = (job_root / filename).resolve()
+            LOGGER.info("Serving file: job_id=%s filename=%s", job_id, filename)
+            LOGGER.info("Resolved job_root=%s", job_root)
+            LOGGER.info("Resolved file_path=%s", file_path)
+            LOGGER.info("exists=%s is_file=%s", file_path.exists(), file_path.is_file())
             try:
                 file_path.relative_to(job_root)
             except Exception:
@@ -784,6 +828,7 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
             referer = str(self.headers.get("Referer") or "").strip()
             host = str(self.headers.get("Host") or "").strip()
             saved_items = save_uploaded_files(upload_items, job_id, request_origin=request_origin, client_ip=client_ip)
+            LOGGER.info("saved_items=%s", [item["absolute_path"] for item in saved_items])
             db_status = _register_uploaded_documents_in_db(saved_items, request_origin=request_origin, referer=referer, host=host)
             stored_documents = [
                 {
@@ -792,6 +837,7 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
                     "file_name": item["filename"],
                     "file_ext": item["file_ext"],
                     "file_mime": item["file_mime"],
+                    "content_type": item["file_mime"],
                     "file_size": item["file_size"],
                     "file_sha256": item["file_sha256"],
                     "stored_relative_path": item["relative_path"],
@@ -803,7 +849,7 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
                 for item in saved_items
             ]
             manifest_route = _api_manifest_route(job_id)
-            manifest_url = f"{request_origin}{manifest_route}" if request_origin else None
+            manifest_url = _build_public_manifest_url(job_id, request_origin=request_origin)
 
             if self.path == "/api/store":
                 self._send_json(
@@ -836,10 +882,14 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
                 },
                 status=HTTPStatus.ACCEPTED,
             )
+        except ValueError as exc:
+            LOGGER.warning("POST %s bad request: %s", self.path, exc)
+            self._send_json({"ok": False, "error": str(exc)}, status=HTTPStatus.BAD_REQUEST)
         except RuntimeError as exc:
             self._send_json({"ok": False, "error": str(exc)}, status=HTTPStatus.CONFLICT)
         except Exception as exc:
-            self._send_json({"ok": False, "error": str(exc)}, status=HTTPStatus.BAD_REQUEST)
+            LOGGER.exception("POST %s failed", self.path)
+            self._send_json({"ok": False, "error": str(exc)}, status=HTTPStatus.INTERNAL_SERVER_ERROR)
 
 
 class DMSLauncherServer(ThreadingHTTPServer):

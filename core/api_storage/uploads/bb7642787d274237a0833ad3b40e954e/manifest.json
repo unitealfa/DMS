@@ -1,0 +1,59 @@
+{
+  "job_id": "bb7642787d274237a0833ad3b40e954e",
+  "received_at": "2026-04-04T11:23:06.468898+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "d6c5a6ed205e4609a60a0da91d967264",
+      "file_name": "test_invoice_table_total_incorrect.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 37461,
+      "file_sha256": "7b49dc3aaff5f407631c06ab191872363a28effacd12effa0601cd97d66b72ef",
+      "stored_relative_path": "api_storage/uploads/bb7642787d274237a0833ad3b40e954e/test_invoice_table_total_incorrect.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/bb7642787d274237a0833ad3b40e954e/test_invoice_table_total_incorrect.docx",
+      "api_route": "/api/documents/file/bb7642787d274237a0833ad3b40e954e/test_invoice_table_total_incorrect.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/bb7642787d274237a0833ad3b40e954e/test_invoice_table_total_incorrect.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/bb7642787d274237a0833ad3b40e954e/test_invoice_table_total_incorrect.docx"
+    },
+    {
+      "api_document_id": "a2e71afa6edf4dafbc83996ba77f4ac6",
+      "file_name": "test_facture_tableau_total_correct.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 37503,
+      "file_sha256": "2082fcee11af96ccdf90cbd0d3bf4fda8b522dc2bfd32a53c875a70cc0be8d65",
+      "stored_relative_path": "api_storage/uploads/bb7642787d274237a0833ad3b40e954e/test_facture_tableau_total_correct.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/bb7642787d274237a0833ad3b40e954e/test_facture_tableau_total_correct.docx",
+      "api_route": "/api/documents/file/bb7642787d274237a0833ad3b40e954e/test_facture_tableau_total_correct.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/bb7642787d274237a0833ad3b40e954e/test_facture_tableau_total_correct.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/bb7642787d274237a0833ad3b40e954e/test_facture_tableau_total_correct.docx"
+    },
+    {
+      "api_document_id": "f702c8185942445d8adb4102a2c761c1",
+      "file_name": "test_invoice_table_total_incorrect.pdf",
+      "file_ext": ".pdf",
+      "file_mime": "application/pdf",
+      "file_size": 44735,
+      "file_sha256": "c6bdde6df430697cf1794a1e7c91b5f5a9c868ad3af771a6b433733f7ca270ec",
+      "stored_relative_path": "api_storage/uploads/bb7642787d274237a0833ad3b40e954e/test_invoice_table_total_incorrect.pdf",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/bb7642787d274237a0833ad3b40e954e/test_invoice_table_total_incorrect.pdf",
+      "api_route": "/api/documents/file/bb7642787d274237a0833ad3b40e954e/test_invoice_table_total_incorrect.pdf",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/bb7642787d274237a0833ad3b40e954e/test_invoice_table_total_incorrect.pdf",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/bb7642787d274237a0833ad3b40e954e/test_invoice_table_total_incorrect.pdf"
+    },
+    {
+      "api_document_id": "a6abd32327134016b11af8cc45ca459e",
+      "file_name": "test_facture_tableau_total_correct.pdf",
+      "file_ext": ".pdf",
+      "file_mime": "application/pdf",
+      "file_size": 44955,
+      "file_sha256": "9912d1344be1098c7d588ec97447cd1bf980cdc3f0994efe1372880f029ac1b3",
+      "stored_relative_path": "api_storage/uploads/bb7642787d274237a0833ad3b40e954e/test_facture_tableau_total_correct.pdf",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/bb7642787d274237a0833ad3b40e954e/test_facture_tableau_total_correct.pdf",
+      "api_route": "/api/documents/file/bb7642787d274237a0833ad3b40e954e/test_facture_tableau_total_correct.pdf",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/bb7642787d274237a0833ad3b40e954e/test_facture_tableau_total_correct.pdf",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/bb7642787d274237a0833ad3b40e954e/test_facture_tableau_total_correct.pdf"
+    }
+  ]
+}

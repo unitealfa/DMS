@@ -171,6 +171,19 @@ TOTALS_STOP_HINTS = {
     "VAT",
     "TIMBRE",
     "STAMP",
+    "NET A PAYER",
+    "NET PAYABLE",
+    "REMISE",
+    "DISCOUNT",
+    "FRAIS",
+    "FRAIS DE PORT",
+    "FRAIS DE LIVRAISON",
+    "LIVRAISON",
+    "SHIPPING",
+    "SHIPPING COST",
+    "PORT",
+    "ACOMPTE",
+    "ADVANCE",
 }
 
 FOOTER_ONLY_HINTS = {
@@ -1348,11 +1361,12 @@ def _filter_complete_line_items(extracted: Dict[str, Any]) -> Dict[str, Any]:
 
     for table in tables:
         table_type = str(table.get("table_type") or "")
+        if table_type != "line_items":
+            continue
         rows = [r for r in _safe_list(table.get("rows")) if isinstance(r, dict)]
-        if table_type in {"line_items", "codes_only"}:
-            rows = [r for r in rows if _is_complete_line_item(r)]
-            if not rows:
-                continue
+        rows = [r for r in rows if _is_complete_line_item(r)]
+        if not rows:
+            continue
         new_table = dict(table)
         new_table["rows"] = rows
         new_table["rows_count"] = len(rows)
@@ -1365,8 +1379,7 @@ def _filter_complete_line_items(extracted: Dict[str, Any]) -> Dict[str, Any]:
             row["table_index"] = new_idx
             row["row_index"] = row_idx
         table["rows"] = rows
-        if str(table.get("table_type") or "") in {"line_items", "codes_only"}:
-            rebuilt_rows.extend(rows)
+        rebuilt_rows.extend(rows)
 
     dedup: List[Dict[str, Any]] = []
     seen = set()
@@ -2302,18 +2315,10 @@ def _merge_ocr_totals_rows(
 
     line_items = _safe_list(extracted.get("line_items"))
     tables = _safe_list(extracted.get("tables"))
-    detected_columns = set(_safe_list(extracted.get("detected_columns")))
     totals = extracted.get("totals") if isinstance(extracted.get("totals"), dict) else {}
     for key in ("total_ht", "total_ttc", "tax", "total", "amount_due", "stamp"):
         if key not in totals or not isinstance(totals.get(key), list):
             totals[key] = []
-
-    next_table_index = 0
-    for t in tables:
-        if isinstance(t, dict):
-            next_table_index = max(next_table_index, int(t.get("table_index") or 0))
-
-    rows_for_table: List[Dict[str, Any]] = []
     for row in totals_rows:
         if not isinstance(row, dict):
             continue
@@ -2322,49 +2327,8 @@ def _merge_ocr_totals_rows(
         if not label or not value:
             continue
         field_key = str(row.get("field_key") or "total")
-        item = {
-            "table_index": next_table_index + 1,
-            "page_index": page_index_default,
-            "row_index": len(rows_for_table) + 1,
-            "reference": None,
-            "product": label,
-            "quantity": None,
-            "unit_price": None,
-            "total_ht": value if field_key == "total_ht" else None,
-            "total_ttc": value if field_key == "total_ttc" else None,
-            "total": value if field_key in {"total", "amount_due", "stamp"} else None,
-            "raw_cells": _safe_list(row.get("raw_cells")) or [label, value],
-            "confidence": float(row.get("confidence") or 0.65),
-            "field_key": field_key,
-        }
         if value not in totals.get(field_key, []):
             totals[field_key].append(value)
-        rows_for_table.append(item)
-        detected_columns.update({"product", "total"})
-
-    if not rows_for_table:
-        return extracted
-
-    next_table_index += 1
-    for idx, row in enumerate(rows_for_table, start=1):
-        row["table_index"] = next_table_index
-        row["row_index"] = idx
-    tables.append(
-        {
-            "table_index": next_table_index,
-            "page_index": page_index_default,
-            "table_type": "totals",
-            "header_map": {"product": 0, "total": 1},
-            "header_score": 0.0,
-            "rows_count": len(rows_for_table),
-            "shape": {
-                "source": "ocr-fallback",
-                "columns_estimated": 2,
-                "rows_estimated": int(len(rows_for_table)),
-            },
-            "rows": rows_for_table,
-        }
-    )
 
     return {
         "tables_count": len(tables),
@@ -2546,7 +2510,7 @@ def run_table_extraction(ctx: Dict[str, Any], profile: str) -> List[Dict[str, An
             {
                 "doc_id": doc_id,
                 "filename": filename,
-                "engine": f"table-{profile}-unified-v5-anchor-geometry-complete-pricing",
+                "engine": f"table-{profile}-unified-v6-anchor-geometry-line-items-only",
                 "source_path": source_path,
                 "tables_count": extracted.get("tables_count"),
                 "rows_total": extracted.get("rows_total"),

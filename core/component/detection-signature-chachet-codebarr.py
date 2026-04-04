@@ -30,6 +30,7 @@ MAX_SCAN_PAGES = 20
 MAX_SIDE = 720
 PDF_RENDER_DPI = 110
 MAX_PDF_RENDER_SECONDS = 20
+SIGNATURE_MAX_PER_PAGE = 1
 
 
 def _safe_list(value: Any) -> List[Any]:
@@ -265,6 +266,97 @@ def _transition_density(binary: "np.ndarray") -> Tuple[float, float]:
     return float(row_changes), float(col_changes)
 
 
+def _active_segments(
+    signal: "np.ndarray",
+    threshold: float,
+    *,
+    min_len: int = 1,
+    max_gap: int = 0,
+) -> List[Tuple[int, int]]:
+    if np is None:
+        return []
+    active = np.asarray(signal >= threshold, dtype=bool)
+    segments: List[Tuple[int, int]] = []
+    start = -1
+    gap = 0
+    for idx, flag in enumerate(active.tolist()):
+        if flag:
+            if start < 0:
+                start = idx
+            gap = 0
+            continue
+        if start < 0:
+            continue
+        if gap < max_gap:
+            gap += 1
+            continue
+        end = idx - gap - 1
+        if end >= start and (end - start + 1) >= min_len:
+            segments.append((start, end))
+        start = -1
+        gap = 0
+    if start >= 0:
+        end = len(active) - 1
+        if (end - start + 1) >= min_len:
+            segments.append((start, end))
+    return segments
+
+
+def _mask_components(mask: "np.ndarray", *, min_area: int = 1) -> List[Dict[str, int]]:
+    if np is None or mask.size == 0:
+        return []
+    binary = np.asarray(mask, dtype=bool)
+    h, w = binary.shape[:2]
+    visited = np.zeros((h, w), dtype=bool)
+    ys, xs = np.nonzero(binary)
+    components: List[Dict[str, int]] = []
+    for sy, sx in zip(ys.tolist(), xs.tolist()):
+        if visited[sy, sx]:
+            continue
+        visited[sy, sx] = True
+        stack = [(sy, sx)]
+        area = 0
+        y0 = y1 = sy
+        x0 = x1 = sx
+        while stack:
+            y, x = stack.pop()
+            area += 1
+            if y < y0:
+                y0 = y
+            if y > y1:
+                y1 = y
+            if x < x0:
+                x0 = x
+            if x > x1:
+                x1 = x
+            for ny in range(max(0, y - 1), min(h, y + 2)):
+                for nx in range(max(0, x - 1), min(w, x + 2)):
+                    if not visited[ny, nx] and binary[ny, nx]:
+                        visited[ny, nx] = True
+                        stack.append((ny, nx))
+        if area >= min_area:
+            components.append({"area": area, "x0": x0, "y0": y0, "x1": x1 + 1, "y1": y1 + 1})
+    components.sort(key=lambda row: int(row.get("area") or 0), reverse=True)
+    return components
+
+
+def _border_center_ratio(binary: "np.ndarray", border_frac: float = 0.18) -> Tuple[float, float]:
+    if np is None or binary.size == 0:
+        return 0.0, 0.0
+    h, w = binary.shape[:2]
+    by = max(1, int(round(h * border_frac)))
+    bx = max(1, int(round(w * border_frac)))
+    border = np.zeros_like(binary, dtype=bool)
+    border[:by, :] = True
+    border[-by:, :] = True
+    border[:, :bx] = True
+    border[:, -bx:] = True
+    center = ~border
+    border_ratio = float(np.mean(binary[border])) if np.any(border) else 0.0
+    center_ratio = float(np.mean(binary[center])) if np.any(center) else 0.0
+    return border_ratio, center_ratio
+
+
 def _score_signature(crop_rgb: "np.ndarray", crop_gray: "np.ndarray") -> float:
     if np is None:
         return 0.0
@@ -272,18 +364,72 @@ def _score_signature(crop_rgb: "np.ndarray", crop_gray: "np.ndarray") -> float:
     if h < 8 or w < 16:
         return 0.0
     aspect = float(w) / float(max(1, h))
-    dark = crop_gray < min(190, int(np.percentile(crop_gray, 62)))
+    if aspect < 2.4 or aspect > 9.5:
+        return 0.0
+    dark = crop_gray < min(180, int(np.percentile(crop_gray, 42)))
     ink_ratio = float(np.mean(dark))
     row_t, col_t = _transition_density(dark)
     contrast = float(np.std(crop_gray)) / 255.0
+    row_profile = np.mean(dark, axis=1)
+    col_profile = np.mean(dark, axis=0)
+    row_bands = _active_segments(row_profile, 0.02, min_len=max(2, h // 18), max_gap=max(1, h // 28))
+    col_bands = _active_segments(col_profile, 0.03, min_len=max(3, w // 18), max_gap=max(2, w // 30))
+    active_rows = float(np.mean(row_profile > 0.015))
+    active_cols = float(np.mean(col_profile > 0.015))
+    dense_rows = float(np.mean(row_profile > 0.22))
+    dense_cols = float(np.mean(col_profile > 0.28))
+    min_area = max(8, int(round((h * w) * 0.0025)))
+    comps = _mask_components(dark, min_area=min_area)
+    comp_count = len(comps)
+    total_dark = max(1, int(np.count_nonzero(dark)))
+    largest_ratio = (int(comps[0]["area"]) / float(total_dark)) if comps else 0.0
+    tiny_share = (
+        sum(1 for comp in comps if int(comp.get("area") or 0) <= max(min_area * 2, 20)) / float(max(1, comp_count))
+        if comps else 1.0
+    )
+    line_penalty = max(float(np.max(row_profile, initial=0.0)), float(np.max(col_profile, initial=0.0)))
+    border_ratio, center_ratio = _border_center_ratio(dark, border_frac=0.10)
+    edge_touch_count = sum(
+        1
+        for edge_ratio in (
+            float(np.mean(dark[0, :])),
+            float(np.mean(dark[-1, :])),
+            float(np.mean(dark[:, 0])),
+            float(np.mean(dark[:, -1])),
+        )
+        if edge_ratio > 0.05
+    )
     score = 0.0
-    if aspect >= 2.2:
-        score += min(0.42, (aspect - 1.8) * 0.10)
-    if 0.012 <= ink_ratio <= 0.22:
-        score += 0.22
-    score += min(0.18, row_t * 0.75)
-    score += min(0.12, contrast * 0.35)
-    score -= max(0.0, col_t - 0.40) * 0.18
+    score += min(0.18, max(0.0, (aspect - 2.2) * 0.055))
+    if 0.010 <= ink_ratio <= 0.16:
+        score += 0.15
+    elif 0.006 <= ink_ratio <= 0.22:
+        score += 0.08
+    if 1 <= len(row_bands) <= 2:
+        score += 0.12
+    if 1 <= len(col_bands) <= 3:
+        score += 0.08
+    if 1 <= comp_count <= 12:
+        score += 0.16
+    elif comp_count <= 18:
+        score += 0.06
+    if 0.08 <= largest_ratio <= 0.72:
+        score += 0.11
+    if 0.18 <= active_rows <= 0.82:
+        score += 0.08
+    if 0.20 <= active_cols <= 0.92:
+        score += 0.06
+    score += min(0.10, row_t * 0.38)
+    score += min(0.07, contrast * 0.20)
+    score -= dense_rows * 0.20
+    score -= dense_cols * 0.20
+    score -= max(0.0, line_penalty - 0.42) * 0.35
+    score -= max(0.0, border_ratio - center_ratio) * 0.45
+    score -= max(0, edge_touch_count - 1) * 0.16
+    score -= max(0, len(row_bands) - 2) * 0.12
+    score -= max(0, comp_count - 18) * 0.02
+    score -= tiny_share * 0.10
+    score -= max(0.0, col_t - 0.26) * 0.18
     return max(0.0, min(score, 1.0))
 
 
@@ -298,11 +444,27 @@ def _score_stamp(crop_rgb: "np.ndarray", crop_gray: "np.ndarray") -> float:
     b = crop_rgb[:, :, 2].astype(np.int16)
     red_mask = (r > 90) & (r > g + 18) & (r > b + 18)
     blue_mask = (b > 80) & (b > r + 14) & (b > g + 10)
-    color_ratio = float(np.mean(red_mask | blue_mask))
-    dark_ratio = float(np.mean(crop_gray < 190))
+    color_mask = red_mask | blue_mask
+    color_ratio = float(np.mean(color_mask))
+    dark = crop_gray < min(180, int(np.percentile(crop_gray, 45)))
+    dark_ratio = float(np.mean(dark))
     aspect = float(w) / float(max(1, h))
-    square_bonus = max(0.0, 1.0 - abs(aspect - 1.0))
-    score = (color_ratio * 2.2) + (dark_ratio * 0.35) + (square_bonus * 0.18)
+    if not (0.72 <= aspect <= 1.35):
+        return 0.0
+    square_bonus = max(0.0, 1.0 - abs(aspect - 1.0) * 2.2)
+    border_ratio, center_ratio = _border_center_ratio(color_mask if color_ratio >= 0.01 else dark)
+    ring_hint = max(0.0, border_ratio - center_ratio)
+    contrast = float(np.std(crop_gray)) / 255.0
+    if color_ratio < 0.018 and ring_hint < 0.10:
+        return 0.0
+    score = 0.0
+    score += min(0.46, color_ratio * 4.5)
+    score += min(0.20, ring_hint * 0.75)
+    score += square_bonus * 0.14
+    score += min(0.08, dark_ratio * 0.18)
+    score += min(0.05, contrast * 0.12)
+    if center_ratio > 0.48:
+        score -= (center_ratio - 0.48) * 0.28
     return max(0.0, min(score, 1.0))
 
 
@@ -319,8 +481,21 @@ def _score_qrcode(crop_rgb: "np.ndarray", crop_gray: "np.ndarray") -> float:
     binary = crop_gray < thresh
     black_ratio = float(np.mean(binary))
     row_t, col_t = _transition_density(binary)
+    if not (0.16 <= black_ratio <= 0.62):
+        return 0.0
+    corner = max(3, int(round(min(h, w) * 0.22)))
+    corners = [
+        binary[:corner, :corner],
+        binary[:corner, -corner:],
+        binary[-corner:, :corner],
+        binary[-corner:, -corner:],
+    ]
+    corner_scores = sorted((float(np.mean(part)) for part in corners if part.size), reverse=True)
+    finder_hint = float(sum(corner_scores[:3]) / 3.0) if len(corner_scores) >= 3 else 0.0
     balance = max(0.0, 1.0 - abs(black_ratio - 0.38) * 2.4)
-    score = (row_t * 0.42) + (col_t * 0.42) + (balance * 0.22)
+    score = (row_t * 0.34) + (col_t * 0.34) + (balance * 0.18) + (finder_hint * 0.24)
+    if finder_hint < 0.18:
+        score -= 0.16
     return max(0.0, min(score, 1.0))
 
 
@@ -337,9 +512,24 @@ def _score_barcode(crop_rgb: "np.ndarray", crop_gray: "np.ndarray") -> float:
     binary = crop_gray < thresh
     black_ratio = float(np.mean(binary))
     row_t, col_t = _transition_density(binary)
+    if not (0.15 <= black_ratio <= 0.72):
+        return 0.0
+    col_profile = np.mean(binary, axis=0)
+    row_profile = np.mean(binary, axis=1)
+    stripe_var = float(np.std(col_profile))
+    stripe_jump = float(np.mean(np.abs(np.diff(col_profile)) > 0.10)) if col_profile.size > 1 else 0.0
+    row_var = float(np.std(row_profile))
     aspect_bonus = min(0.28, (aspect - 1.8) * 0.06)
     balance = max(0.0, 1.0 - abs(black_ratio - 0.42) * 2.1)
-    score = (row_t * 0.68) + (balance * 0.18) + aspect_bonus - (col_t * 0.18)
+    score = (
+        (row_t * 0.36)
+        + min(0.20, stripe_var * 0.80)
+        + min(0.16, stripe_jump * 0.30)
+        + (balance * 0.14)
+        + aspect_bonus
+        - (col_t * 0.12)
+        - (row_var * 0.12)
+    )
     return max(0.0, min(score, 1.0))
 
 
@@ -460,25 +650,25 @@ def _scan_windows(
     sx, sy = scale_xy
 
     if kind == "signature":
-        sizes = [(0.52, 0.10), (0.42, 0.08), (0.34, 0.07)]
-        y_min, y_max = 0.48, 0.98
+        sizes = [(0.40, 0.10), (0.32, 0.08), (0.48, 0.12)]
+        y_min, y_max = 0.52, 0.92
         scorer = _score_signature
-        threshold = 0.38
+        threshold = 0.62
     elif kind == "stamp":
         sizes = [(0.18, 0.18), (0.22, 0.16), (0.14, 0.14)]
         y_min, y_max = 0.10, 0.95
         scorer = _score_stamp
-        threshold = 0.42
+        threshold = 0.58
     elif kind == "qrcode":
         sizes = [(0.14, 0.14), (0.18, 0.18), (0.24, 0.24)]
         y_min, y_max = 0.05, 0.95
         scorer = _score_qrcode
-        threshold = 0.48
+        threshold = 0.66
     else:
         sizes = [(0.34, 0.10), (0.28, 0.08), (0.42, 0.12)]
         y_min, y_max = 0.05, 0.95
         scorer = _score_barcode
-        threshold = 0.46
+        threshold = 0.68
 
     raw: List[Dict[str, Any]] = []
     for wf, hf in sizes:
@@ -495,6 +685,17 @@ def _scan_windows(
                 crop_gray = gray[y:y + win_h, x:x + win_w]
                 crop_rgb = rgb[y:y + win_h, x:x + win_w]
                 score = scorer(crop_rgb, crop_gray)
+                center_x = (x + (win_w / 2.0)) / float(max(1, width))
+                center_y = (y + (win_h / 2.0)) / float(max(1, height))
+                if kind == "signature":
+                    if center_y > 0.88:
+                        score -= 0.18
+                    if center_y < 0.54:
+                        score -= 0.10
+                    if x <= step_x or (x + win_w) >= (width - step_x):
+                        score -= 0.08
+                    if center_x < 0.12 or center_x > 0.94:
+                        score -= 0.08
                 if score < threshold:
                     continue
                 x0 = int(round(x * sx))
@@ -536,7 +737,8 @@ def _scan_windows(
         )) > 0.35 for row in kept):
             continue
         kept.append(cand)
-        if len(kept) >= 2:
+        max_keep = SIGNATURE_MAX_PER_PAGE if kind == "signature" else 2
+        if len(kept) >= max_keep:
             break
     return kept
 
@@ -592,10 +794,15 @@ def run(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
     source_map = _build_source_path_map(ctx)
     out: List[Dict[str, Any]] = []
     total_counts = {"signature": 0, "stamp": 0, "barcode": 0, "qrcode": 0}
+    seen_doc_keys: set[str] = set()
 
     for idx, doc in _iter_docs(ctx):
         doc_id = doc.get("doc_id")
         filename = str(doc.get("filename") or f"doc_{idx}")
+        doc_key = _doc_key(doc_id, filename, idx)
+        if doc_key in seen_doc_keys:
+            continue
+        seen_doc_keys.add(doc_key)
         source_path = _resolve_source_path(doc, source_map)
         pages, sampled_pages, total_pages = _load_doc_pages(
             source_path,
@@ -620,8 +827,8 @@ def run(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
             {
                 "doc_id": doc_id,
                 "filename": filename,
-                "doc_key": _doc_key(doc_id, filename, idx),
-                "engine": "visual-100ml-hybrid-heuristics-v1",
+                "doc_key": doc_key,
+                "engine": "visual-100ml-hybrid-heuristics-v2-precision",
                 "source_path": source_path or None,
                 "pages_total": int(total_pages),
                 "pages_scanned": len(pages),

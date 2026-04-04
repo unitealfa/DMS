@@ -1540,6 +1540,14 @@ def _extract_doc_tables(doc: Dict[str, Any], profile: str) -> Dict[str, Any]:
                     totals[k].append(v)
 
     table_index = _augment_code_only_rows_from_header(doc, tables, line_items, table_index)
+    table_index = _augment_text_line_items_from_header(
+        doc,
+        tables,
+        line_items,
+        table_index,
+        detected_columns,
+        profile,
+    )
 
     dedup: List[Dict[str, Any]] = []
     seen_items = set()
@@ -1660,6 +1668,174 @@ def _augment_code_only_rows_from_header(
                 "rows": page_new_rows,
             }
         )
+    return table_index
+
+
+def _augment_text_line_items_from_header(
+    doc: Dict[str, Any],
+    tables: List[Dict[str, Any]],
+    line_items: List[Dict[str, Any]],
+    table_index: int,
+    detected_columns: Any,
+    profile: str,
+) -> int:
+    existing_signatures = {
+        (
+            str(item.get("page_index")),
+            str(item.get("product")),
+            str(item.get("quantity")),
+            str(item.get("unit_price")),
+            str(item.get("total")),
+        )
+        for item in line_items
+        if isinstance(item, dict)
+    }
+
+    pages = _safe_list(doc.get("pages"))
+    for page in pages:
+        if not isinstance(page, dict):
+            continue
+
+        page_index = int(page.get("page_index") or page.get("page") or 1)
+
+        already_has_line_items = any(
+            str(t.get("table_type") or "") == "line_items"
+            and int(t.get("page_index") or 0) == page_index
+            and int(t.get("rows_count") or 0) >= 3
+            for t in tables
+            if isinstance(t, dict)
+        )
+        if already_has_line_items:
+            continue
+
+        text = str(page.get("page_text") or page.get("ocr_text") or page.get("text") or "")
+        if not text:
+            continue
+
+        lines = [_compact_spaces(ln) for ln in text.splitlines() if _compact_spaces(ln)]
+        if not lines:
+            continue
+
+        header_pos = -1
+        header_map: Dict[str, int] = {}
+        header_score = 0.0
+        header_cells: List[str] = []
+
+        for i, line in enumerate(lines):
+            cells = _split_line_cells(line)
+            if len(cells) < 3:
+                continue
+
+            hm, hs = _detect_header_map(cells, profile)
+            norm = _norm_text(line)
+
+            if len(hm) >= 3 and any(
+                hint in norm
+                for hint in (
+                    "ITEM",
+                    "ITEMS",
+                    "SERVICE",
+                    "SERVICES",
+                    "DESCRIPTION",
+                    "PRODUCT",
+                    "PRODUIT",
+                    "ARTICLE",
+                    "REFERENCE",
+                    "QTY",
+                    "QNTY",
+                    "QUANTITY",
+                    "QUANTITE",
+                    "PRICE",
+                    "PRIX",
+                )
+            ):
+                header_pos = i
+                header_map = hm
+                header_score = hs
+                header_cells = cells
+                break
+
+        if header_pos < 0:
+            continue
+
+        if len(header_map) < 2:
+            header_map = _infer_map_from_rows([_split_line_cells(ln) for ln in lines[header_pos + 1 : header_pos + 8]])
+
+        if "product" not in header_map or "quantity" not in header_map or "unit_price" not in header_map:
+            continue
+
+        page_new_rows: List[Dict[str, Any]] = []
+
+        for line in lines[header_pos + 1 :]:
+            raw = _compact_spaces(line)
+            if not raw:
+                continue
+
+            cells = _split_line_cells(raw)
+            if not cells:
+                continue
+
+            if _extract_totals_from_line(raw):
+                break
+            if _is_footer_like_line(raw, cells):
+                break
+
+            item = _row_to_item(
+                cells,
+                header_map,
+                table_index + 1,
+                page_index,
+                len(page_new_rows) + 1,
+                profile,
+            )
+            if not item:
+                continue
+
+            sig = (
+                str(item.get("page_index")),
+                str(item.get("product")),
+                str(item.get("quantity")),
+                str(item.get("unit_price")),
+                str(item.get("total")),
+            )
+            if sig in existing_signatures:
+                continue
+
+            existing_signatures.add(sig)
+            page_new_rows.append(item)
+
+        if not page_new_rows:
+            continue
+
+        table_index += 1
+
+        for idx, row in enumerate(page_new_rows, start=1):
+            row["table_index"] = table_index
+            row["row_index"] = idx
+
+        tables.append(
+            {
+                "table_index": table_index,
+                "page_index": page_index,
+                "table_type": "line_items",
+                "header_map": header_map,
+                "header_score": round(float(header_score), 4),
+                "rows_count": len(page_new_rows),
+                "shape": {
+                    "source": "text-header-fallback",
+                    "columns_estimated": max(len(header_cells), 4),
+                    "rows_estimated": len(page_new_rows),
+                },
+                "rows": page_new_rows,
+            }
+        )
+
+        line_items.extend(page_new_rows)
+
+        for field in ("product", "quantity", "unit_price", "total", "reference"):
+            if field in header_map:
+                detected_columns.add(field)
+
     return table_index
 
 

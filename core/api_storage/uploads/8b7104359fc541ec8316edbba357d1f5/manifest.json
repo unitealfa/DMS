@@ -1,0 +1,20 @@
+{
+  "job_id": "8b7104359fc541ec8316edbba357d1f5",
+  "received_at": "2026-04-04T11:52:39.717355+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "aa845a3d0bc24a1a83f1d23cc019e045",
+      "file_name": "testexcel.xlsx",
+      "file_ext": ".xlsx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "file_size": 8687,
+      "file_sha256": "0d33a6ee89e1d956fffa83039a9f1c7e340cf533513c659925fba577701b5026",
+      "stored_relative_path": "api_storage/uploads/8b7104359fc541ec8316edbba357d1f5/testexcel.xlsx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/8b7104359fc541ec8316edbba357d1f5/testexcel.xlsx",
+      "api_route": "/api/documents/file/8b7104359fc541ec8316edbba357d1f5/testexcel.xlsx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/8b7104359fc541ec8316edbba357d1f5/testexcel.xlsx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/8b7104359fc541ec8316edbba357d1f5/testexcel.xlsx"
+    }
+  ]
+}

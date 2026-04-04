@@ -336,11 +336,14 @@ def _verify_row(
     qty = _to_decimal(row.get("quantity"))
     unit_price = _to_decimal(row.get("unit_price"))
     declared_total = _row_total_candidate(row)
+    include_in_totals = qty is not None and unit_price is not None
     computed_total = None
-    if qty is not None and unit_price is not None:
+    if include_in_totals:
         computed_total = (qty * unit_price).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
-    if computed_total is not None and declared_total is not None:
+    if not include_in_totals:
+        status = "ignored_missing_qty_or_unit_price"
+    elif computed_total is not None and declared_total is not None:
         status = "ok" if _is_close(computed_total, declared_total) else "mismatch"
     elif computed_total is not None or declared_total is not None:
         status = "partial"
@@ -349,17 +352,17 @@ def _verify_row(
 
     effective_total = None
     effective_source = None
-    if computed_total is not None and declared_total is not None:
+    if include_in_totals and computed_total is not None and declared_total is not None:
         if _is_close(computed_total, declared_total):
             effective_total = declared_total
             effective_source = "declared+computed"
         else:
             effective_total = computed_total
             effective_source = "computed"
-    elif computed_total is not None:
+    elif include_in_totals and computed_total is not None:
         effective_total = computed_total
         effective_source = "computed"
-    elif declared_total is not None:
+    elif include_in_totals and declared_total is not None:
         effective_total = declared_total
         effective_source = "declared"
 
@@ -395,6 +398,7 @@ def _verify_row(
         "computed_total": _money_str(computed_total),
         "effective_total": _money_str(effective_total),
         "effective_total_source": effective_source,
+        "included_in_totals": include_in_totals,
         "status": status,
         "difference": _money_str(difference),
         "source_location": source_location,
@@ -447,7 +451,11 @@ def _verify_doc(row: Dict[str, Any], idx: int, chunk_lookup: Dict[str, List[Dict
     table_anchor = _table_anchor_location(chunk_lookup, doc_id, filename, idx, line_items)
 
     row_audit = [_verify_row(item, chunk_lookup, doc_id, filename, idx) for item in line_items]
-    rows_with_total = [r for r in row_audit if r.get("effective_total") is not None]
+    rows_with_total = [
+        r for r in row_audit
+        if bool(r.get("included_in_totals")) and r.get("effective_total") is not None
+    ]
+    ignored_incomplete_count = sum(1 for r in row_audit if str(r.get("status")) == "ignored_missing_qty_or_unit_price")
 
     computed_subtotal: Optional[Decimal] = None
     if rows_with_total:
@@ -496,6 +504,23 @@ def _verify_doc(row: Dict[str, Any], idx: int, chunk_lookup: Dict[str, List[Dict
         total_status = "ok" if _is_close(expected_total, declared_total) else "mismatch"
     elif expected_total is not None or declared_total is not None:
         total_status = "partial"
+
+    subtotal_status_raw = subtotal_status
+    tax_status_raw = tax_status
+    total_status_raw = total_status
+    suppress_aggregate_alert = (
+        ignored_incomplete_count > 0
+        and bool(rows_with_total)
+        and row_mismatch_count == 0
+        and row_partial_count == 0
+    )
+    if suppress_aggregate_alert:
+        if subtotal_status in {"mismatch", "partial"}:
+            subtotal_status = "ok"
+        if tax_status in {"mismatch", "partial"}:
+            tax_status = "ok"
+        if total_status in {"mismatch", "partial"}:
+            total_status = "ok"
 
     checks = [
         {"name": "rows", "status": "ok" if row_mismatch_count == 0 and rows_with_total else ("mismatch" if row_mismatch_count else "partial")},
@@ -609,6 +634,12 @@ def _verify_doc(row: Dict[str, Any], idx: int, chunk_lookup: Dict[str, List[Dict
             }
         )
 
+    if suppress_aggregate_alert:
+        issue_locations = [
+            item for item in issue_locations
+            if isinstance(item, dict) and str(item.get("kind") or "") == "row_mismatch"
+        ]
+
     return {
         "doc_id": doc_id,
         "filename": filename,
@@ -617,6 +648,7 @@ def _verify_doc(row: Dict[str, Any], idx: int, chunk_lookup: Dict[str, List[Dict
         "tables_count": _safe_int(row.get("tables_count"), 0),
         "rows_total": _safe_int(row.get("rows_total"), 0),
         "rows_verified": len(rows_with_total),
+        "rows_ignored_incomplete": ignored_incomplete_count,
         "row_ok_count": row_ok_count,
         "row_partial_count": row_partial_count,
         "row_mismatch_count": row_mismatch_count,
@@ -632,11 +664,15 @@ def _verify_doc(row: Dict[str, Any], idx: int, chunk_lookup: Dict[str, List[Dict
         "tax_location": tax_location,
         "total_location": total_location,
         "subtotal_status": subtotal_status,
+        "subtotal_status_raw": subtotal_status_raw,
         "tax_status": tax_status,
+        "tax_status_raw": tax_status_raw,
         "total_status": total_status,
+        "total_status_raw": total_status_raw,
         "passed": bool(passed),
         "complete": bool(complete),
         "verification_status": verification_status,
+        "aggregate_alert_suppressed": bool(suppress_aggregate_alert),
         "checks": checks,
         "issue_locations": issue_locations[:100],
         "row_audit": row_audit[:200],
@@ -673,6 +709,7 @@ def run(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
             "  - "
             f"{row.get('filename')} | status={row.get('verification_status')} | "
             f"rows={_safe_int(row.get('rows_verified'), 0)}/{_safe_int(row.get('rows_total'), 0)} | "
+            f"ignored={_safe_int(row.get('rows_ignored_incomplete'), 0)} | "
             f"subtotal={row.get('computed_subtotal')}~{row.get('declared_subtotal')} | "
             f"tax={row.get('declared_tax')} | total={row.get('declared_total')}"
         )

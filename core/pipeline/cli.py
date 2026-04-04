@@ -12,7 +12,7 @@ from .settings import configure_logging, load_dotenv, normalize_input
 
 # Pipeline par defaut configurable directement dans le code.
 # Valeurs supportees: "pipeline0ml" | "pipeline50ml" | "pipeline100ml"
-PIPELINE_DEFAULT_CODE = "pipeline100ml"
+PIPELINE_DEFAULT_CODE = "pipeline0ml"
 
 _STEP_ALIASES = {
     "atripusion-gramatical-en-utilisant-les3ficherla": "atripusion-gramatical",

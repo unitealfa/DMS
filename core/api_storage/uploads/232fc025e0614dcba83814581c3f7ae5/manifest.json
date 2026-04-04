@@ -1,0 +1,59 @@
+{
+  "job_id": "232fc025e0614dcba83814581c3f7ae5",
+  "received_at": "2026-04-03T14:02:51.389527+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "1c1996a60be641f6bb6050c80964fdc5",
+      "file_name": "arab.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 19640,
+      "file_sha256": "cd9cdcdba5aea71f21898c1b63a5c7d1a0261a28c3005858073781cd91617b54",
+      "stored_relative_path": "api_storage/uploads/232fc025e0614dcba83814581c3f7ae5/arab.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/232fc025e0614dcba83814581c3f7ae5/arab.docx",
+      "api_route": "/api/documents/file/232fc025e0614dcba83814581c3f7ae5/arab.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/232fc025e0614dcba83814581c3f7ae5/arab.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/232fc025e0614dcba83814581c3f7ae5/arab.docx"
+    },
+    {
+      "api_document_id": "bb8c2f3e2b8643408ccd1afd5518944d",
+      "file_name": "testwordaudi.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 12302,
+      "file_sha256": "490a20e99a5233513f7840d558f06a07905440f37b2bcf3295af26d53cfae412",
+      "stored_relative_path": "api_storage/uploads/232fc025e0614dcba83814581c3f7ae5/testwordaudi.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/232fc025e0614dcba83814581c3f7ae5/testwordaudi.docx",
+      "api_route": "/api/documents/file/232fc025e0614dcba83814581c3f7ae5/testwordaudi.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/232fc025e0614dcba83814581c3f7ae5/testwordaudi.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/232fc025e0614dcba83814581c3f7ae5/testwordaudi.docx"
+    },
+    {
+      "api_document_id": "d958f17259e84d4fbf3c94f6ebd29806",
+      "file_name": "testwordlambo.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 12230,
+      "file_sha256": "33a3f501e05fad769af2dffb811bd8363c7acca32940f97ca8933ef1c9938375",
+      "stored_relative_path": "api_storage/uploads/232fc025e0614dcba83814581c3f7ae5/testwordlambo.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/232fc025e0614dcba83814581c3f7ae5/testwordlambo.docx",
+      "api_route": "/api/documents/file/232fc025e0614dcba83814581c3f7ae5/testwordlambo.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/232fc025e0614dcba83814581c3f7ae5/testwordlambo.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/232fc025e0614dcba83814581c3f7ae5/testwordlambo.docx"
+    },
+    {
+      "api_document_id": "fda4ef8f6bae4eb78c1af9947761c032",
+      "file_name": "testwordvw.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 11638,
+      "file_sha256": "a5f5217acac8ceab3fef1a519bb636a366c170284b6ff3714c49fa20ae8119db",
+      "stored_relative_path": "api_storage/uploads/232fc025e0614dcba83814581c3f7ae5/testwordvw.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/232fc025e0614dcba83814581c3f7ae5/testwordvw.docx",
+      "api_route": "/api/documents/file/232fc025e0614dcba83814581c3f7ae5/testwordvw.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/232fc025e0614dcba83814581c3f7ae5/testwordvw.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/232fc025e0614dcba83814581c3f7ae5/testwordvw.docx"
+    }
+  ]
+}

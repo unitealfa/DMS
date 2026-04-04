@@ -574,6 +574,27 @@ def extract_text_native(path: str) -> dict:
             "page_count_total": 1,
         }
 
+    # HTML / XHTML natif
+    if ext in {".html", ".htm", ".xhtml"}:
+        raw = b""
+        extraction = "native:html:utf-8"
+        try:
+            raw = Path(path).read_bytes()
+        except Exception:
+            raw = b""
+        text = _html_bytes_to_text_preserve(raw)
+        return {
+            "doc_id": str(uuid.uuid4()),
+            "filename": filename,
+            "source_path": path,
+            "size": file_size,
+            "content": "text",
+            "extraction": extraction,
+            "text": text,
+            "pages_text": [text],
+            "page_count_total": 1,
+        }
+
     # PDF
     if ext == ".pdf":
         PdfReader, backend = _get_pdf_reader_with_name()

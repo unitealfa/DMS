@@ -27,13 +27,16 @@ FIELD_SYNONYMS: Dict[str, List[str]] = {
         "designation",
         "description",
         "item",
+        "items",
         "libelle",
         "service",
+        "services",
     ],
     "quantity": [
         "qty",
         "qte",
         "qt",
+        "qnty",
         "quantite",
         "quantite",
         "quantity",
@@ -48,6 +51,7 @@ FIELD_SYNONYMS: Dict[str, List[str]] = {
         "pu",
         "unit price",
         "price unit",
+        "price",
         "tarif unitaire",
         "rate",
     ],
@@ -55,8 +59,6 @@ FIELD_SYNONYMS: Dict[str, List[str]] = {
         "total ht",
         "montant ht",
         "hors taxe",
-        "subtotal",
-        "sous total",
         "net ht",
     ],
     "total_ttc": [
@@ -71,6 +73,7 @@ FIELD_SYNONYMS: Dict[str, List[str]] = {
         "total",
         "montant",
         "amount",
+        "valeur",
         "line total",
         "net",
     ],
@@ -85,9 +88,11 @@ FIELD_SYNONYMS: Dict[str, List[str]] = {
 TABLE_HINT_TERMS = {
     "QTE",
     "QTY",
+    "QNTY",
     "QUANTITE",
     "QUANTITY",
     "PRIX",
+    "PRICE",
     "UNIT",
     "UNITAIRE",
     "UNITAIRE",
@@ -105,8 +110,82 @@ TABLE_HINT_TERMS = {
     "DESCRIPTION",
     "REFERENCE",
     "REF",
+    "ITEM",
+    "ITEMS",
+    "SERVICE",
+    "SERVICES",
+    "VALEUR",
     "P.UNITAIRE",
     "P UNITAIRE",
+}
+
+HEADER_STRONG_HINTS = {
+    "REFERENCE",
+    "REF",
+    "PRODUCT",
+    "PRODUIT",
+    "ARTICLE",
+    "DESIGNATION",
+    "DESCRIPTION",
+    "ITEM",
+    "ITEMS",
+    "SERVICE",
+    "SERVICES",
+    "QTE",
+    "QTY",
+    "QNTY",
+    "QUANTITE",
+    "QUANTITY",
+    "PRIX",
+    "PRICE",
+    "UNIT",
+    "UNITAIRE",
+    "P.UNITAIRE",
+    "P UNITAIRE",
+    "VALEUR",
+}
+
+HEADER_WEAK_HINTS = {
+    "TOTAL",
+    "AMOUNT",
+    "MONTANT",
+    "HT",
+    "TTC",
+    "TVA",
+    "VAT",
+}
+
+TOTALS_STOP_HINTS = {
+    "SUBTOTAL",
+    "SOUS TOTAL",
+    "TOTAL TTC",
+    "TOTAL HT",
+    "TOTAL DUE",
+    "AMOUNT DUE",
+    "MONTANT A PAYER",
+    "MONTANT TTC",
+    "MONTANT HT",
+    "TAX",
+    "TAXES",
+    "TVA",
+    "VAT",
+    "TIMBRE",
+    "STAMP",
+}
+
+FOOTER_ONLY_HINTS = {
+    "NON ASSUJETTI",
+    "NON ASSUJETTI A LA TVA",
+    "MODE DE PAIEMENT",
+    "PAYMENT METHOD",
+    "DATE ECHEANCE",
+    "ECHEANCE",
+    "SIGNATURE",
+    "CACHET",
+    "FACTURE EN LETTRE",
+    "TERMS CONDITIONS",
+    "DATA INFO",
+    "AMOUNT DUE",
 }
 
 NON_TABLE_LEFT_HINTS = {
@@ -134,10 +213,10 @@ NON_TABLE_LEFT_HINTS = {
 
 TOTAL_FIELD_HINTS: Tuple[Tuple[Tuple[str, ...], str], ...] = (
     (("TOTAL TTC", "MONTANT A PAYER TTC", "MONTANT A PAYER TTE", "MONTANT TTC", "TOTAL A PAYER TTC"), "total_ttc"),
-    (("TOTAL HT", "MONTANT HT", "TOTAL H.T"), "total_ht"),
-    (("MONTANT A PAYER", "TOTAL A PAYER", "AMOUNT DUE"), "amount_due"),
+    (("TOTAL HT", "MONTANT HT", "TOTAL H.T", "SUBTOTAL", "SOUS TOTAL"), "total_ht"),
+    (("MONTANT A PAYER", "TOTAL A PAYER", "AMOUNT DUE", "TOTAL DUE"), "amount_due"),
     (("TIMBRE", "STAMP"), "stamp"),
-    (("TVA", "VAT", "TAX"), "tax"),
+    (("TVA", "VAT", "TAX", "TAXES"), "tax"),
     (("TOTAL", "MONTANT", "AMOUNT"), "total"),
 )
 
@@ -372,7 +451,6 @@ def _cells_from_anchors(segments: List[Dict[str, Any]], anchors: List[int]) -> L
             cells[col_idx] = f"{cells[col_idx]} {text}".strip()
         else:
             cells[col_idx] = text
-    # Trim trailing empty columns only.
     while cells and not _compact_spaces(cells[-1]):
         cells.pop()
     return cells
@@ -436,20 +514,27 @@ def _collect_blocks_anchor(lines: List[str]) -> List[List[Dict[str, Any]]]:
             if len(cells) < 2:
                 cells = _split_line_cells(raw)
             line_tabular = _line_looks_tabular(cells, raw)
+            footer_like = _is_footer_like_line(raw, cells)
             hard_stop = (
-                _line_header_hint_score(raw) == 0
-                and any(h in _norm_text(raw) for h in NON_TABLE_LEFT_HINTS)
-                and match_count == 0
-                and not line_tabular
+                footer_like
+                or (
+                    _line_header_hint_score(raw) == 0
+                    and any(h in _norm_text(raw) for h in NON_TABLE_LEFT_HINTS)
+                    and match_count == 0
+                    and not line_tabular
+                )
             )
             if hard_stop:
                 break
 
             compatible = bool(
-                (match_ratio >= 0.50)
-                or (match_count >= 2)
-                or line_tabular
-                or (match_count >= 1 and _is_probable_code(str(cells[0] if cells else "")))
+                (not footer_like)
+                and (
+                    (match_ratio >= 0.50)
+                    or (match_count >= 2)
+                    or line_tabular
+                    or (match_count >= 1 and _is_probable_code(str(cells[0] if cells else "")))
+                )
             )
 
             if compatible:
@@ -496,7 +581,6 @@ def _split_line_cells(line: str) -> List[str]:
     if not raw:
         return []
 
-    # Priorities: pipe, tabs, multi-spaces, semicolon.
     if "|" in raw:
         parts = [p.strip() for p in raw.split("|")]
     elif "\t" in str(line or ""):
@@ -510,7 +594,6 @@ def _split_line_cells(line: str) -> List[str]:
     if len(parts) >= 2:
         return parts
 
-    # OCR dense tables often collapse columns into single-space sequences.
     dense = _split_dense_numeric_tail(raw)
     if len(dense) >= 2:
         return dense
@@ -576,7 +659,6 @@ def _guess_product_number_from_reference(reference: Optional[str]) -> Optional[s
     digits = re.sub(r"\D", "", ref)
     if not digits:
         return None
-    # Common invoice-like references: c1001 -> produit 1, 1010 -> produit 10.
     tail2 = digits[-2:]
     candidate = tail2.lstrip("0")
     if not candidate:
@@ -612,7 +694,6 @@ def _merge_numeric_tokens(tokens: List[str]) -> List[str]:
         if i + 1 < len(tokens):
             nxt = str(tokens[i + 1]).strip()
             candidate = f"{cur} {nxt}".strip()
-            # Keep grouped numbers like "12 500,00" as one amount.
             if candidate and _to_amount(candidate) is not None and (
                 _to_amount(cur) is None or len(re.sub(r"\D", "", cur)) <= 2
             ):
@@ -657,7 +738,6 @@ def _split_dense_header_cells(raw: str) -> List[str]:
     if hint_hits < 2:
         return []
 
-    # Join frequent two-word headers: "prix unitaire", "unit price", "total ht", ...
     synonym_norms = {
         _norm_text(syn)
         for values in FIELD_SYNONYMS.values()
@@ -723,7 +803,6 @@ def _to_amount(value: str) -> Optional[str]:
     )
     if has_alpha and not (currency_hint or semantic_hint):
         return None
-    # Drop most date-like and phone-like sequences for row-level amounts.
     if re.search(r"\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b", raw) and not semantic_hint:
         return None
     if "/" in raw and not (currency_hint or semantic_hint):
@@ -835,7 +914,7 @@ def _detect_header_map(cells: List[str], profile: str) -> Tuple[Dict[str, int], 
     used_cols = set()
     threshold = 0.82 if profile == "50ml" else 0.70
 
-    for field in ("reference", "product", "quantity", "unit_price", "total_ht", "total_ttc", "total", "tax"):
+    for field in ("reference", "product", "quantity", "unit_price", "total", "total_ht", "total_ttc", "tax"):
         best_idx = -1
         best_score = 0.0
         for i, cell in enumerate(cells):
@@ -853,20 +932,67 @@ def _detect_header_map(cells: List[str], profile: str) -> Tuple[Dict[str, int], 
     return field_to_idx, total_score
 
 
+def _count_norm_hits(norm: str, hints: set[str]) -> int:
+    return sum(1 for hint in hints if hint and hint in norm)
+
+
 def _line_header_hint_score(line: str) -> int:
     norm = _norm_text(line)
-    return sum(1 for hint in TABLE_HINT_TERMS if hint in norm)
+    strong = _count_norm_hits(norm, HEADER_STRONG_HINTS)
+    weak = _count_norm_hits(norm, HEADER_WEAK_HINTS)
+    return (strong * 2) + min(weak, 2)
+
+
+def _line_footer_hint_score(line: str) -> int:
+    norm = _norm_text(line)
+    return _count_norm_hits(norm, TOTALS_STOP_HINTS) + _count_norm_hits(norm, FOOTER_ONLY_HINTS)
+
+
+def _is_totals_or_footer_label(value: Any) -> bool:
+    norm = _norm_text(value)
+    if not norm:
+        return False
+    if _count_norm_hits(norm, FOOTER_ONLY_HINTS) >= 1:
+        return True
+    if _count_norm_hits(norm, TOTALS_STOP_HINTS) >= 1:
+        return True
+    return False
+
+
+def _is_footer_like_line(line: str, cells: Optional[List[str]] = None) -> bool:
+    norm = _norm_text(line)
+    footer_hits = _line_footer_hint_score(line)
+    header_strong_hits = _count_norm_hits(norm, HEADER_STRONG_HINTS)
+    amountish_hits = sum(1 for hint in ("TOTAL", "MONTANT", "AMOUNT", "TAX", "TVA", "VAT", "TIMBRE", "STAMP", "HT", "TTC") if hint in norm)
+    cell_list = cells if isinstance(cells, list) else []
+
+    if footer_hits >= 2:
+        return True
+    if footer_hits >= 1 and header_strong_hits == 0:
+        return True
+    if amountish_hits >= 2 and header_strong_hits == 0 and len(cell_list) <= 2:
+        return True
+    if any(phrase in norm for phrase in ("NON ASSUJETTI", "MONTANT A PAYER", "TOTAL DUE", "AMOUNT DUE", "TERMS CONDITIONS", "DATA INFO", "FACTURE EN LETTRE", "MODE DE PAIEMENT", "SIGNATURE", "CACHET")):
+        return True
+    return False
 
 
 def _is_header_like_line(line: str, cells: List[str]) -> bool:
     score = _line_header_hint_score(line)
-    if score >= 2:
+    strong_hits = _count_norm_hits(_norm_text(line), HEADER_STRONG_HINTS)
+    if _is_footer_like_line(line, cells):
+        return False
+    if strong_hits >= 2:
         return True
-    return score >= 1 and len(cells) >= 3
+    if score >= 4:
+        return True
+    return score >= 3 and len(cells) >= 3
 
 
 def _line_looks_tabular(cells: List[str], line: str) -> bool:
     if not cells:
+        return False
+    if _is_footer_like_line(line, cells) and not _is_header_like_line(line, cells):
         return False
     if len(cells) == 1 and _is_probable_code(str(cells[0])):
         return True
@@ -875,11 +1001,11 @@ def _line_looks_tabular(cells: List[str], line: str) -> bool:
 
     numeric = sum(1 for c in cells if _to_amount(c) is not None or _to_quantity(c) is not None)
     texty = sum(1 for c in cells if not _is_numeric_like(c))
-    if numeric >= 2:
+    if numeric >= 2 and not _is_footer_like_line(line, cells):
         return True
     if _is_header_like_line(line, cells):
         return True
-    if len(cells) == 3 and numeric >= 1 and texty >= 1:
+    if len(cells) == 3 and numeric >= 1 and texty >= 1 and not _is_footer_like_line(line, cells):
         return True
     if len(cells) == 2 and numeric >= 1:
         left, right = cells[0], cells[1]
@@ -887,12 +1013,12 @@ def _line_looks_tabular(cells: List[str], line: str) -> bool:
             return True
         right_amount = _to_amount(right) is not None
         left_norm = _norm_text(left)
-        left_forbidden = any(hint in left_norm for hint in NON_TABLE_LEFT_HINTS)
+        left_forbidden = any(hint in left_norm for hint in NON_TABLE_LEFT_HINTS) or _is_totals_or_footer_label(left)
         if right_amount and texty >= 1 and ":" not in left and not left_forbidden:
             return True
         return False
     n = _norm_text(line)
-    return any(k in n for k in ("TOTAL", "QTE", "QTY", "PRIX", "AMOUNT", "MONTANT", "TTC", "HT", "PRODUIT", "ARTICLE"))
+    return (not _is_footer_like_line(line, cells)) and any(k in n for k in ("QTE", "QTY", "QNTY", "PRIX", "PRICE", "PRODUIT", "PRODUCT", "ARTICLE", "ITEM", "ITEMS"))
 
 
 def _is_strong_single_row(row: Dict[str, Any]) -> bool:
@@ -916,7 +1042,15 @@ def _collect_blocks(lines: List[str]) -> List[List[Dict[str, Any]]]:
     for line in lines:
         cells = _split_line_cells(line)
         header_like = _is_header_like_line(line, cells)
+        footer_like = _is_footer_like_line(line, cells)
         is_tab = _line_looks_tabular(cells, line)
+        if footer_like and current:
+            if len(current) >= 2 or (len(current) == 1 and _is_strong_single_row(current[0])):
+                blocks.append(current)
+            current = []
+            pending_header = None
+            idle = 0
+            continue
         if is_tab:
             if not current and pending_header and pending_header.get("line") != line:
                 current.append(pending_header)
@@ -1099,12 +1233,17 @@ def _row_to_item(
         if _normalize_reference_code(product) == reference:
             product = ""
 
-    # Skip obvious header/text rows from line-items output.
-    if _is_header_like_line(" ".join(str(c) for c in cells), cells):
+    joined_line = " | ".join(str(c) for c in cells)
+
+    if _is_header_like_line(joined_line, cells):
+        return None
+    if _is_footer_like_line(joined_line, cells):
+        return None
+    if len(cells) <= 2 and any(_is_totals_or_footer_label(c) for c in cells):
         return None
     if product:
         product_norm = _norm_text(product)
-        if any(hint in product_norm for hint in NON_TABLE_LEFT_HINTS):
+        if any(hint in product_norm for hint in NON_TABLE_LEFT_HINTS) or _is_totals_or_footer_label(product):
             return None
 
     if profile == "100ml" and not unit_price and not total and len(cells) >= 3:
@@ -1121,11 +1260,19 @@ def _row_to_item(
     has_any = bool(reference or product or quantity or unit_price or total_ht or total_ttc or total)
     if not has_any:
         return None
+    has_product_identity = bool(reference or product)
+    has_complete_pricing = quantity is not None and unit_price is not None
+    if not has_product_identity:
+        return None
+    if not has_complete_pricing:
+        return None
     has_numeric_value = bool(quantity or unit_price or total_ht or total_ttc or total)
     if not has_numeric_value:
         first_cell = str(cells[0]) if cells else ""
         if not _is_probable_code(first_cell):
             return None
+    if not reference and len(cells) <= 2 and any(_to_amount(c) is not None for c in cells) and any(_is_totals_or_footer_label(c) for c in cells):
+        return None
 
     score = 0.0
     if reference:
@@ -1157,6 +1304,77 @@ def _row_to_item(
     }
 
 
+def _is_complete_line_item(row: Dict[str, Any]) -> bool:
+    if not isinstance(row, dict):
+        return False
+    reference = _normalize_reference_code(row.get("reference"))
+    product = _compact_spaces(row.get("product"))
+    label = product or reference or ""
+    if not label:
+        return False
+    if _is_totals_or_footer_label(label):
+        return False
+    quantity = _to_quantity(row.get("quantity"))
+    unit_price = _to_amount(row.get("unit_price"))
+    return quantity is not None and unit_price is not None
+
+
+def _filter_complete_line_items(extracted: Dict[str, Any]) -> Dict[str, Any]:
+    tables = [t for t in _safe_list(extracted.get("tables")) if isinstance(t, dict)]
+    totals = extracted.get("totals") if isinstance(extracted.get("totals"), dict) else {}
+    kept_tables: List[Dict[str, Any]] = []
+    rebuilt_rows: List[Dict[str, Any]] = []
+
+    for table in tables:
+        table_type = str(table.get("table_type") or "")
+        rows = [r for r in _safe_list(table.get("rows")) if isinstance(r, dict)]
+        if table_type in {"line_items", "codes_only"}:
+            rows = [r for r in rows if _is_complete_line_item(r)]
+            if not rows:
+                continue
+        new_table = dict(table)
+        new_table["rows"] = rows
+        new_table["rows_count"] = len(rows)
+        kept_tables.append(new_table)
+
+    for new_idx, table in enumerate(kept_tables, start=1):
+        table["table_index"] = new_idx
+        rows = [r for r in _safe_list(table.get("rows")) if isinstance(r, dict)]
+        for row_idx, row in enumerate(rows, start=1):
+            row["table_index"] = new_idx
+            row["row_index"] = row_idx
+        table["rows"] = rows
+        if str(table.get("table_type") or "") in {"line_items", "codes_only"}:
+            rebuilt_rows.extend(rows)
+
+    dedup: List[Dict[str, Any]] = []
+    seen = set()
+    for row in rebuilt_rows:
+        sig = (
+            str(row.get("page_index") or ""),
+            str(row.get("reference") or ""),
+            _compact_spaces(row.get("product")).upper(),
+            str(row.get("quantity") or ""),
+            str(row.get("unit_price") or ""),
+            str(row.get("total_ht") or ""),
+            str(row.get("total_ttc") or ""),
+            str(row.get("total") or ""),
+        )
+        if sig in seen:
+            continue
+        seen.add(sig)
+        dedup.append(row)
+
+    return {
+        "tables_count": len(kept_tables),
+        "rows_total": len(dedup),
+        "detected_columns": _infer_detected_columns_from_rows(dedup),
+        "totals": totals,
+        "tables": kept_tables,
+        "line_items": dedup,
+    }
+
+
 def _extract_doc_tables(doc: Dict[str, Any], profile: str) -> Dict[str, Any]:
     tables: List[Dict[str, Any]] = []
     line_items: List[Dict[str, Any]] = []
@@ -1174,10 +1392,8 @@ def _extract_doc_tables(doc: Dict[str, Any], profile: str) -> Dict[str, Any]:
 
         page_text = str(page.get("page_text") or page.get("ocr_text") or page.get("text") or "")
         if page_text:
-            # Keep original spacing for geometric text-table reconstruction.
             lines.extend([str(ln).replace("\r", "") for ln in page_text.splitlines()])
 
-        # Add lines from structured layout when available.
         for sent in _safe_list(page.get("sentences_layout")):
             if not isinstance(sent, dict):
                 continue
@@ -1215,7 +1431,6 @@ def _extract_doc_tables(doc: Dict[str, Any], profile: str) -> Dict[str, Any]:
         if not lines:
             continue
 
-        # Keep order, dedupe.
         seen = set()
         unique_lines: List[str] = []
         for line in lines:
@@ -1296,7 +1511,6 @@ def _extract_doc_tables(doc: Dict[str, Any], profile: str) -> Dict[str, Any]:
 
     table_index = _augment_code_only_rows_from_header(doc, tables, line_items, table_index)
 
-    # Dedupe line items by business signature.
     dedup: List[Dict[str, Any]] = []
     seen_items = set()
     for item in line_items:
@@ -1363,7 +1577,7 @@ def _augment_code_only_rows_from_header(
         row_idx = 0
         for line in lines[header_pos + 1 :]:
             norm = _norm_text(line)
-            if any(stop in norm for stop in ("TOTAL", "TVA", "TTC", "HT", "CACHET", "SIGNATURE")):
+            if any(stop in norm for stop in ("TOTAL", "TVA", "TTC", "HT", "CACHET", "SIGNATURE", "SUBTOTAL", "TAX", "TAXES", "MONTANT A PAYER", "AMOUNT DUE", "TIMBRE")):
                 break
             codes = re.findall(r"\b[A-Za-z]{0,4}\d{3,}\b", line)
             if not codes:
@@ -1462,11 +1676,9 @@ def _should_run_ocr_fallback(extracted: Dict[str, Any], source_path: Optional[st
         if row.get("unit_price") or row.get("total") or row.get("total_ht") or row.get("total_ttc"):
             numeric_rows += 1
 
-    # Already good enough: keep current extraction.
     if numeric_rows >= 4:
         return False
 
-    # If we only have sparse/code-only rows, force OCR fallback.
     tables = [t for t in _safe_list(extracted.get("tables")) if isinstance(t, dict)]
     has_rich_line_items = any(
         str(t.get("table_type") or "") == "line_items" and int(t.get("rows_count") or 0) >= 5
@@ -1482,13 +1694,14 @@ def _parse_ocr_row_line(line: str) -> Optional[Dict[str, Any]]:
     raw = _compact_spaces(line)
     if not raw:
         return None
+    if _is_footer_like_line(raw, _split_line_cells(raw)):
+        return None
 
     reference = _extract_reference_code(raw)
     if not reference:
         return None
 
     product = str(reference)
-    # Prefer explicit "produit/product/article/designation X".
     prod_match = re.search(
         r"(?i)\b(?:PRODUIT|PRODUCT|ARTICLE|DESIGNATION)\b\s*[:\-]?\s*([A-Za-z0-9#]+)",
         raw,
@@ -1526,7 +1739,6 @@ def _parse_ocr_row_line(line: str) -> Optional[Dict[str, Any]]:
             quantity = _to_quantity(qty_candidate)
 
     if not prod_match:
-        # Remove code and numeric tail to isolate product cell.
         work = raw
         work = re.sub(rf"(?i)\b{re.escape(reference)}\b", " ", work, count=1)
         work = re.sub(r"(?:[+\-]?\d[\d.,]*\s*){2,}$", " ", work)
@@ -1601,8 +1813,15 @@ def _parse_ocr_table_rows(text: str) -> List[Dict[str, Any]]:
                 "CACHET",
                 "SIGNATURE",
                 "FACTURE EN LETTRE",
+                "SUBTOTAL",
+                "SOUS TOTAL",
+                "TAX",
+                "TAXES",
+                "AMOUNT DUE",
+                "TOTAL DUE",
+                "TIMBRE",
             )
-        ):
+        ) or _is_footer_like_line(line, _split_line_cells(line)):
             in_table = False
             continue
         row = _parse_ocr_row_line(line)
@@ -1636,13 +1855,18 @@ def _parse_ocr_totals_rows(text: str) -> List[Dict[str, Any]]:
             hint in norm
             for hint in (
                 "TOTAL",
+                "SUBTOTAL",
+                "SOUS TOTAL",
                 "MONTANT",
                 "TVA",
                 "VAT",
                 "TAX",
+                "TAXES",
                 "TIMBRE",
                 "STAMP",
                 "A PAYER",
+                "AMOUNT DUE",
+                "TOTAL DUE",
             )
         ):
             continue
@@ -1695,7 +1919,6 @@ def _ocr_fallback_tables_from_image(source_path: str) -> Dict[str, Any]:
             enhanced = ImageOps.autocontrast(gray)
             if min(enhanced.size) < 1200:
                 enhanced = enhanced.resize((enhanced.size[0] * 2, enhanced.size[1] * 2))
-            # Mild thresholding helps dense bordered tables.
             bw = enhanced.point(lambda p: 255 if p > 168 else 0)
             sharp = enhanced.filter(ImageFilter.SHARPEN)
             variants.extend([enhanced, bw, sharp])
@@ -1920,7 +2143,6 @@ def _merge_ocr_totals_rows(
     for idx, row in enumerate(rows_for_table, start=1):
         row["table_index"] = next_table_index
         row["row_index"] = idx
-    line_items.extend(rows_for_table)
     tables.append(
         {
             "table_index": next_table_index,
@@ -1941,7 +2163,7 @@ def _merge_ocr_totals_rows(
     return {
         "tables_count": len(tables),
         "rows_total": len(line_items),
-        "detected_columns": sorted(detected_columns),
+        "detected_columns": _infer_detected_columns_from_rows(line_items),
         "totals": totals,
         "tables": tables,
         "line_items": line_items,
@@ -2024,7 +2246,6 @@ def _prune_redundant_tables(extracted: Dict[str, Any]) -> Dict[str, Any]:
         weak = (m["rows_count"] <= 4 and m["numeric_rows"] <= 1) or (m["table_type"] == "codes_only")
         if not weak:
             continue
-        # Strong rich table present: remove sparse leading/code-only snapshots.
         if any(metrics[r]["numeric_rows"] >= 4 and metrics[r]["rows_count"] >= 6 for r in rich_idxs):
             drop_idxs.add(idx)
             continue
@@ -2108,7 +2329,9 @@ def run_table_extraction(ctx: Dict[str, Any], profile: str) -> List[Dict[str, An
             extracted = _merge_ocr_fallback_rows(extracted, fallback_rows, page_index_default)
             extracted = _merge_ocr_totals_rows(extracted, fallback_totals_rows, page_index_default)
 
+        extracted = _filter_complete_line_items(extracted)
         extracted = _prune_redundant_tables(extracted)
+        extracted = _filter_complete_line_items(extracted)
 
         total_rows += int(extracted.get("rows_total") or 0)
         total_tables += int(extracted.get("tables_count") or 0)
@@ -2117,7 +2340,7 @@ def run_table_extraction(ctx: Dict[str, Any], profile: str) -> List[Dict[str, An
             {
                 "doc_id": doc_id,
                 "filename": filename,
-                "engine": f"table-{profile}-unified-v3-anchor-geometry",
+                "engine": f"table-{profile}-unified-v5-anchor-geometry-complete-pricing",
                 "source_path": source_path,
                 "tables_count": extracted.get("tables_count"),
                 "rows_total": extracted.get("rows_total"),

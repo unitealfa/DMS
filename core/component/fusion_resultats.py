@@ -2258,11 +2258,16 @@ def _append_totals_quality_check(doc: Dict[str, Any], verify_row: Dict[str, Any]
         for item in quality_checks
         if not (isinstance(item, dict) and str(item.get("check") or "") == "totals_verification")
     ]
+    status = str(verify_row.get("verification_status") or "").strip()
+    issue_locations = _safe_list(verify_row.get("issue_locations"))
+    if not issue_locations and status in {"ok", "partial_ok"}:
+        doc["quality_checks"] = quality_checks
+        return
     quality_checks.append(
         {
             "check": "totals_verification",
             "engine": verify_row.get("engine"),
-            "status": verify_row.get("verification_status"),
+            "status": status,
             "passed": bool(verify_row.get("passed")),
             "complete": bool(verify_row.get("complete")),
             "row_mismatch_count": _safe_int(verify_row.get("row_mismatch_count"), 0),
@@ -2271,7 +2276,8 @@ def _append_totals_quality_check(doc: Dict[str, Any], verify_row: Dict[str, Any]
             "declared_subtotal": verify_row.get("declared_subtotal"),
             "declared_tax": verify_row.get("declared_tax"),
             "declared_total": verify_row.get("declared_total"),
-            "issue_locations": _safe_list(verify_row.get("issue_locations")),
+            "issue_locations": issue_locations,
+            "aggregate_alert_suppressed": bool(verify_row.get("aggregate_alert_suppressed")),
         }
     )
     doc["quality_checks"] = quality_checks
@@ -2334,8 +2340,11 @@ def _augment_payload_with_totals_verification(ctx: Dict[str, Any], payload: Dict
             "declared_total": verify_row.get("declared_total"),
             "expected_total": verify_row.get("expected_total"),
             "subtotal_status": verify_row.get("subtotal_status"),
+            "subtotal_status_raw": verify_row.get("subtotal_status_raw"),
             "tax_status": verify_row.get("tax_status"),
+            "tax_status_raw": verify_row.get("tax_status_raw"),
             "total_status": verify_row.get("total_status"),
+            "total_status_raw": verify_row.get("total_status_raw"),
             "checks": _safe_list(verify_row.get("checks")),
             "table_anchor": verify_row.get("table_anchor") if isinstance(verify_row.get("table_anchor"), dict) else {},
             "subtotal_location": verify_row.get("subtotal_location") if isinstance(verify_row.get("subtotal_location"), dict) else {},
@@ -2345,6 +2354,7 @@ def _augment_payload_with_totals_verification(ctx: Dict[str, Any], payload: Dict
             "row_audit": _safe_list(verify_row.get("row_audit")),
             "declared_totals_raw": verify_row.get("declared_totals_raw") if isinstance(verify_row.get("declared_totals_raw"), dict) else {},
             "tolerance": verify_row.get("tolerance"),
+            "aggregate_alert_suppressed": bool(verify_row.get("aggregate_alert_suppressed")),
         }
         doc["extraction"] = extraction
 
@@ -2362,6 +2372,7 @@ def _augment_payload_with_totals_verification(ctx: Dict[str, Any], payload: Dict
             "declared_subtotal": verify_row.get("declared_subtotal"),
             "declared_tax": verify_row.get("declared_tax"),
             "declared_total": verify_row.get("declared_total"),
+            "aggregate_alert_suppressed": bool(verify_row.get("aggregate_alert_suppressed")),
         }
         doc["components"] = components
 

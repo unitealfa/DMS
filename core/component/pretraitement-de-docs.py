@@ -339,8 +339,8 @@ def content_kind_two_states(path: str, ftype: FileType) -> str:
     if ext in {".docx", ".xlsx", ".pptx", ".odt", ".ods", ".odp", ".epub"}:
         return "text" if _zip_has_text(path, ext) else "image_only"
 
-    # Texte brut
-    if ext == ".txt":
+    # Texte brut / HTML natif
+    if ext in {".txt", ".html", ".htm", ".xhtml"}:
         return "text"
 
     # Tout le reste => unsupported (evite d'envoyer un binaire/texte arbitraire dans OCR)

@@ -1,0 +1,20 @@
+{
+  "job_id": "3f3673e0e08040dbb3cc8365861e69f2",
+  "received_at": "2026-04-04T10:10:04.273530+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "6b38216f5b844260b80bfe23dc1d7363",
+      "file_name": "image2tab.webp",
+      "file_ext": ".webp",
+      "file_mime": "application/octet-stream",
+      "file_size": 47454,
+      "file_sha256": "448bae19240ca6556c8c722e472c23898b82fe8d627e0cad7ed5536cbf3fd968",
+      "stored_relative_path": "api_storage/uploads/3f3673e0e08040dbb3cc8365861e69f2/image2tab.webp",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/3f3673e0e08040dbb3cc8365861e69f2/image2tab.webp",
+      "api_route": "/api/documents/file/3f3673e0e08040dbb3cc8365861e69f2/image2tab.webp",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/3f3673e0e08040dbb3cc8365861e69f2/image2tab.webp",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/3f3673e0e08040dbb3cc8365861e69f2/image2tab.webp"
+    }
+  ]
+}

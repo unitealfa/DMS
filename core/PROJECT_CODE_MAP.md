@@ -1,11 +1,11 @@
 # Project Code Map (DMS Core)
 
-Date d'audit: 2026-04-02
+Date d'audit: 2026-04-04
 
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
 - Python files analyses: 42
-- Fonctions/classes indexees: 964 (voir `FUNCTION_INDEX.txt`)
+- Fonctions/classes indexees: 970 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 - Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
@@ -535,6 +535,41 @@ Reference implementation:
 - Ce fichier est la reference la plus rapide pour localiser une modification precise.
 
 ## 11) Changelog code
+- 2026-04-04:
+  - fiabilisation tableaux / totaux:
+    - `component/table_extraction/table_extraction_lib.py` filtre maintenant les `line_items` incomplets:
+      - si une ligne produit n'a pas `quantity`
+      - ou n'a pas `unit_price`
+      - elle n'est plus affichee dans les tableaux extraits
+      - elle n'est plus conservee dans `line_items`
+    - le moteur tableau applique ce filtre apres extraction et apres les merges OCR/fallback, puis renumerote proprement les tables/lignes conservees.
+    - le moteur tableau versionne maintenant sa sortie en `table-<profile>-unified-v5-anchor-geometry-complete-pricing`.
+    - `component/verification-totaux.py` ignore explicitement les lignes sans `quantity` ou `unit_price` dans le calcul du sous-total.
+    - audit ajoute:
+      - `included_in_totals`
+      - `rows_ignored_incomplete`
+      - statut ligne `ignored_missing_qty_or_unit_price`
+    - `component/verification-totaux.py` supprime maintenant les faux signaux d'alerte agreges quand:
+      - des lignes incompletes ont ete ignorees,
+      - et que toutes les lignes produit restantes sont `ok`,
+      - afin de ne plus alimenter une UI externe avec un faux `Arithmetic Mismatch`.
+    - dans ce cas, l'audit conserve les statuts bruts via:
+      - `subtotal_status_raw`
+      - `tax_status_raw`
+      - `total_status_raw`
+      - `aggregate_alert_suppressed`
+    - `component/fusion_resultats.py` n'ajoute plus de `quality_checks` documentaires `totals_verification` quand il n'y a plus aucune `issue_locations` exploitable et que le statut final est `ok` ou `partial_ok`.
+    - effet attendu:
+      - les pseudo-produits sans `Qty` et/ou `Unit Price` ne polluent plus le calcul des `Total` / `Total TTC`
+      - reduction des faux messages de mismatch du type `The extracted line items sum to ...`
+      - suppression des faux blocs UI du type `Validation Alert: Arithmetic Mismatch` quand l'ecart provenait seulement de lignes incompletes deja exclues des `Line Items`
+  - correction support HTML natif:
+    - `component/pretraitement-de-docs.py` reconnait maintenant `.html`, `.htm` et `.xhtml` comme documents `text` au lieu de `unsupported`.
+    - `component/si-image-pretraiter-sinonpass-le-doc.py` route maintenant `.html`, `.htm` et `.xhtml` vers `TEXT_FILES` au lieu de les rejeter.
+    - `component/output-txt.py` extrait maintenant le texte natif des fichiers HTML/XHTML via suppression simple des balises avec preservation des retours de ligne principaux.
+  - effet runtime:
+    - un upload API de fichier `.html` ne casse plus la pipeline sur `si-image-pretraiter-sinonpass-le-doc`.
+    - validation reelle executee sur `api_storage/uploads/a8c37620d22647e8ba965e456db7980b/imagetestdetableau.html` jusqu'a `output-txt`: `EXIT:0`.
 - 2026-04-02:
   - stockage documents via API:
     - `pipeline/local_api.py` stocke maintenant les fichiers recus via API dans `api_storage/uploads/<job_id>/`.

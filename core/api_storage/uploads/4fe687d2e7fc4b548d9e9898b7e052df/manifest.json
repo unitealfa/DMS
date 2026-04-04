@@ -1,0 +1,33 @@
+{
+  "job_id": "4fe687d2e7fc4b548d9e9898b7e052df",
+  "received_at": "2026-04-04T10:00:38.100225+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "0040f03842e6441e92b2c69a46ef0d26",
+      "file_name": "invoice_total_incorrect.pdf",
+      "file_ext": ".pdf",
+      "file_mime": "application/pdf",
+      "file_size": 3567,
+      "file_sha256": "55322e03e79ada99a6e27e407cd8b647d414345808bee9086332380ca2c6194d",
+      "stored_relative_path": "api_storage/uploads/4fe687d2e7fc4b548d9e9898b7e052df/invoice_total_incorrect.pdf",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/4fe687d2e7fc4b548d9e9898b7e052df/invoice_total_incorrect.pdf",
+      "api_route": "/api/documents/file/4fe687d2e7fc4b548d9e9898b7e052df/invoice_total_incorrect.pdf",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/4fe687d2e7fc4b548d9e9898b7e052df/invoice_total_incorrect.pdf",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/4fe687d2e7fc4b548d9e9898b7e052df/invoice_total_incorrect.pdf"
+    },
+    {
+      "api_document_id": "ab8069e29fd2472bb84b8faf560093b7",
+      "file_name": "facture_total_correct.pdf",
+      "file_ext": ".pdf",
+      "file_mime": "application/pdf",
+      "file_size": 3839,
+      "file_sha256": "76b2b6722716999291c940231d88a8d9c004c1bde07ab14abde1fb62918b4fda",
+      "stored_relative_path": "api_storage/uploads/4fe687d2e7fc4b548d9e9898b7e052df/facture_total_correct.pdf",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/4fe687d2e7fc4b548d9e9898b7e052df/facture_total_correct.pdf",
+      "api_route": "/api/documents/file/4fe687d2e7fc4b548d9e9898b7e052df/facture_total_correct.pdf",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/4fe687d2e7fc4b548d9e9898b7e052df/facture_total_correct.pdf",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/4fe687d2e7fc4b548d9e9898b7e052df/facture_total_correct.pdf"
+    }
+  ]
+}

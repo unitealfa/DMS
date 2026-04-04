@@ -1,0 +1,33 @@
+{
+  "job_id": "74f36e58f3b149248182540aeeb05dc1",
+  "received_at": "2026-04-04T09:34:05.929574+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "469a4240468c49ed89275ce6c1ff8980",
+      "file_name": "signettab.png",
+      "file_ext": ".png",
+      "file_mime": "image/png",
+      "file_size": 24142,
+      "file_sha256": "4b5ffebea3d840a606cf791cacb77dbefde71d3fb6008e142c79835e90aef73d",
+      "stored_relative_path": "api_storage/uploads/74f36e58f3b149248182540aeeb05dc1/signettab.png",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/74f36e58f3b149248182540aeeb05dc1/signettab.png",
+      "api_route": "/api/documents/file/74f36e58f3b149248182540aeeb05dc1/signettab.png",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/74f36e58f3b149248182540aeeb05dc1/signettab.png",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/74f36e58f3b149248182540aeeb05dc1/signettab.png"
+    },
+    {
+      "api_document_id": "5e7a8dd82e1f4cd9b8e5b2e5c9a2ece0",
+      "file_name": "image2tab.webp",
+      "file_ext": ".webp",
+      "file_mime": "application/octet-stream",
+      "file_size": 47454,
+      "file_sha256": "448bae19240ca6556c8c722e472c23898b82fe8d627e0cad7ed5536cbf3fd968",
+      "stored_relative_path": "api_storage/uploads/74f36e58f3b149248182540aeeb05dc1/image2tab.webp",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/74f36e58f3b149248182540aeeb05dc1/image2tab.webp",
+      "api_route": "/api/documents/file/74f36e58f3b149248182540aeeb05dc1/image2tab.webp",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/74f36e58f3b149248182540aeeb05dc1/image2tab.webp",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/74f36e58f3b149248182540aeeb05dc1/image2tab.webp"
+    }
+  ]
+}

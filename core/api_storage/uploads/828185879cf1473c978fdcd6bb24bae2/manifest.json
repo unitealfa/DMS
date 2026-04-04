@@ -1,0 +1,59 @@
+{
+  "job_id": "828185879cf1473c978fdcd6bb24bae2",
+  "received_at": "2026-04-03T11:05:29.840693+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "c076ad5b65554fc2a7b60c99315ef097",
+      "file_name": "arab.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 19640,
+      "file_sha256": "cd9cdcdba5aea71f21898c1b63a5c7d1a0261a28c3005858073781cd91617b54",
+      "stored_relative_path": "api_storage/uploads/828185879cf1473c978fdcd6bb24bae2/arab.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/828185879cf1473c978fdcd6bb24bae2/arab.docx",
+      "api_route": "/api/documents/file/828185879cf1473c978fdcd6bb24bae2/arab.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/828185879cf1473c978fdcd6bb24bae2/arab.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/828185879cf1473c978fdcd6bb24bae2/arab.docx"
+    },
+    {
+      "api_document_id": "f1ea8a66d1fe45b087875eeb49d3dfcc",
+      "file_name": "facture_regex_test_corpus_fr_en_ar.pdf",
+      "file_ext": ".pdf",
+      "file_mime": "application/pdf",
+      "file_size": 101917,
+      "file_sha256": "d7b477715d5bb50b99bb6ac27fb70ef2ed7814b8ec29f084a50c164a59deaaaa",
+      "stored_relative_path": "api_storage/uploads/828185879cf1473c978fdcd6bb24bae2/facture_regex_test_corpus_fr_en_ar.pdf",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/828185879cf1473c978fdcd6bb24bae2/facture_regex_test_corpus_fr_en_ar.pdf",
+      "api_route": "/api/documents/file/828185879cf1473c978fdcd6bb24bae2/facture_regex_test_corpus_fr_en_ar.pdf",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/828185879cf1473c978fdcd6bb24bae2/facture_regex_test_corpus_fr_en_ar.pdf",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/828185879cf1473c978fdcd6bb24bae2/facture_regex_test_corpus_fr_en_ar.pdf"
+    },
+    {
+      "api_document_id": "eab796e3baeb4ef18d6a737e47846bf1",
+      "file_name": "facture_test_totaux.pdf",
+      "file_ext": ".pdf",
+      "file_mime": "application/pdf",
+      "file_size": 3114,
+      "file_sha256": "f04df9fc8a195c431dbff7b488e1e5ce30b06c046cdef6a77c02d4efd54f8bdb",
+      "stored_relative_path": "api_storage/uploads/828185879cf1473c978fdcd6bb24bae2/facture_test_totaux.pdf",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/828185879cf1473c978fdcd6bb24bae2/facture_test_totaux.pdf",
+      "api_route": "/api/documents/file/828185879cf1473c978fdcd6bb24bae2/facture_test_totaux.pdf",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/828185879cf1473c978fdcd6bb24bae2/facture_test_totaux.pdf",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/828185879cf1473c978fdcd6bb24bae2/facture_test_totaux.pdf"
+    },
+    {
+      "api_document_id": "05eb24f11dcb44909b76e09796d94895",
+      "file_name": "signettab.png",
+      "file_ext": ".png",
+      "file_mime": "image/png",
+      "file_size": 24142,
+      "file_sha256": "4b5ffebea3d840a606cf791cacb77dbefde71d3fb6008e142c79835e90aef73d",
+      "stored_relative_path": "api_storage/uploads/828185879cf1473c978fdcd6bb24bae2/signettab.png",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/828185879cf1473c978fdcd6bb24bae2/signettab.png",
+      "api_route": "/api/documents/file/828185879cf1473c978fdcd6bb24bae2/signettab.png",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/828185879cf1473c978fdcd6bb24bae2/signettab.png",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/828185879cf1473c978fdcd6bb24bae2/signettab.png"
+    }
+  ]
+}

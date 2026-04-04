@@ -1,0 +1,20 @@
+{
+  "job_id": "1a0bc5a9cb444e9280ba1afc8905dfe7",
+  "received_at": "2026-04-03T11:11:34.864057+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "9fd722cac52a49e492a53a16f79db825",
+      "file_name": "facture_test_totaux.pdf",
+      "file_ext": ".pdf",
+      "file_mime": "application/pdf",
+      "file_size": 3114,
+      "file_sha256": "f04df9fc8a195c431dbff7b488e1e5ce30b06c046cdef6a77c02d4efd54f8bdb",
+      "stored_relative_path": "api_storage/uploads/1a0bc5a9cb444e9280ba1afc8905dfe7/facture_test_totaux.pdf",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/1a0bc5a9cb444e9280ba1afc8905dfe7/facture_test_totaux.pdf",
+      "api_route": "/api/documents/file/1a0bc5a9cb444e9280ba1afc8905dfe7/facture_test_totaux.pdf",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/1a0bc5a9cb444e9280ba1afc8905dfe7/facture_test_totaux.pdf",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/1a0bc5a9cb444e9280ba1afc8905dfe7/facture_test_totaux.pdf"
+    }
+  ]
+}

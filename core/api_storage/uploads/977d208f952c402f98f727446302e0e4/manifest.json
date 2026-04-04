@@ -1,0 +1,20 @@
+{
+  "job_id": "977d208f952c402f98f727446302e0e4",
+  "received_at": "2026-04-04T09:50:31.665494+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "4c4313b247ec42b8acbcc05672174312",
+      "file_name": "imagetestdetableau.jpg",
+      "file_ext": ".jpg",
+      "file_mime": "image/jpeg",
+      "file_size": 352277,
+      "file_sha256": "fa71c6140760c7a416196cc70b76d66a5258cd5f82478dfe080f4d4379564f72",
+      "stored_relative_path": "api_storage/uploads/977d208f952c402f98f727446302e0e4/imagetestdetableau.jpg",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/977d208f952c402f98f727446302e0e4/imagetestdetableau.jpg",
+      "api_route": "/api/documents/file/977d208f952c402f98f727446302e0e4/imagetestdetableau.jpg",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/977d208f952c402f98f727446302e0e4/imagetestdetableau.jpg",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/977d208f952c402f98f727446302e0e4/imagetestdetableau.jpg"
+    }
+  ]
+}

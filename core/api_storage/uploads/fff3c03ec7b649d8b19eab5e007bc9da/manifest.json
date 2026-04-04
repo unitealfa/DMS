@@ -1,0 +1,46 @@
+{
+  "job_id": "fff3c03ec7b649d8b19eab5e007bc9da",
+  "received_at": "2026-04-04T11:17:43.316440+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "e5f8844a043549b8af0e0ba389d42c49",
+      "file_name": "image2tab.webp",
+      "file_ext": ".webp",
+      "file_mime": "application/octet-stream",
+      "file_size": 47454,
+      "file_sha256": "448bae19240ca6556c8c722e472c23898b82fe8d627e0cad7ed5536cbf3fd968",
+      "stored_relative_path": "api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/image2tab.webp",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/image2tab.webp",
+      "api_route": "/api/documents/file/fff3c03ec7b649d8b19eab5e007bc9da/image2tab.webp",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/fff3c03ec7b649d8b19eab5e007bc9da/image2tab.webp",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/fff3c03ec7b649d8b19eab5e007bc9da/image2tab.webp"
+    },
+    {
+      "api_document_id": "fc82d89446d74dd2bf0672bfcb7d666d",
+      "file_name": "invoice_total_incorrect.pdf",
+      "file_ext": ".pdf",
+      "file_mime": "application/pdf",
+      "file_size": 3567,
+      "file_sha256": "55322e03e79ada99a6e27e407cd8b647d414345808bee9086332380ca2c6194d",
+      "stored_relative_path": "api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf",
+      "api_route": "/api/documents/file/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf"
+    },
+    {
+      "api_document_id": "31d22db580c84631a46da513d1b3cde9",
+      "file_name": "facture_total_correct.pdf",
+      "file_ext": ".pdf",
+      "file_mime": "application/pdf",
+      "file_size": 3839,
+      "file_sha256": "76b2b6722716999291c940231d88a8d9c004c1bde07ab14abde1fb62918b4fda",
+      "stored_relative_path": "api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf",
+      "api_route": "/api/documents/file/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf"
+    }
+  ]
+}

@@ -1,11 +1,422 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-04-04T10:10:44.558549+00:00",
+  "generated_at": "2026-04-04T11:18:10.935425+00:00",
   "source": "local-context",
-  "documents_count": 1,
+  "documents_count": 3,
   "documents": [
     {
-      "document_id": "ad9e6ec4-e8fb-4b41-902f-982a486c44c6",
+      "document_id": "3cab1794-d780-40eb-b4f8-629832a735d5",
+      "file": {
+        "name": "facture_total_correct.pdf",
+        "paths": [
+          "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf"
+        ],
+        "size": 3839,
+        "page_count": 1
+      },
+      "classification": {
+        "doc_id": "3cab1794-d780-40eb-b4f8-629832a735d5",
+        "filename": "facture_total_correct.pdf",
+        "doc_type": "UNCLASSIFIED",
+        "status": "REVIEW",
+        "scores": {
+          "ARTICLE": 0,
+          "BON_DE_COMMANDE": 0,
+          "CONTRAT": 0,
+          "FACTURE": 0,
+          "FORMULAIRE": 0
+        },
+        "winning_score": 0,
+        "threshold": 6,
+        "margin": 3,
+        "classification_log": "[classification] facture_total_correct.pdf -> best=UNCLASSIFIED | status=REVIEW | scores: {'ARTICLE': 0, 'BON_DE_COMMANDE': 0, 'CONTRAT': 0, 'FACTURE': 0, 'FORMULAIRE': 0}",
+        "scores_audit": {},
+        "keyword_matches": {
+          "strong": [],
+          "medium": [],
+          "weak": [],
+          "negative": [],
+          "strong_negative": [],
+          "anti_confusion_hits": []
+        },
+        "anti_confusion_targets": [],
+        "decision_debug": {
+          "top_score": 0,
+          "second_score": 0,
+          "diff": 0
+        }
+      },
+      "doc_type": "UNCLASSIFIED",
+      "cross_document": {
+        "linked_documents_count": 1,
+        "link_ids": [
+          "link-1"
+        ]
+      },
+      "components": {
+        "pretraitement_de_docs": {
+          "matched_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf",
+          "detected_ext": ".pdf",
+          "detected_mime": "application/pdf",
+          "detected_label": "PDF document",
+          "detected_content": "text",
+          "total_files_detected": 3
+        },
+        "si_image_pretraiter_sinonpass_le_doc": {
+          "is_text_file": true,
+          "is_image_only_file": false,
+          "text_files_count": 2,
+          "image_only_files_count": 1,
+          "docs_prepared_count": 1
+        },
+        "output_txt": {
+          "content": "text",
+          "extraction": "native:pdf:none",
+          "pages_count": 1,
+          "has_text": false,
+          "text_length": 0
+        },
+        "tokenisation_layout": {
+          "pages_count": 1,
+          "sentences_count": 0,
+          "detected_languages": []
+        },
+        "attribution_grammaticale": {
+          "component": "atripusion-gramatical",
+          "script": "/home/mourad/Bureau/DMS/core/component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py",
+          "backend": "legacy-3files",
+          "model": null,
+          "model_source": null,
+          "model_install": null,
+          "pos_method": null,
+          "pos_refined_count": 0,
+          "pos_total": 0,
+          "pos_refined_rate": 0.0,
+          "pos_top_tags": [],
+          "level": null,
+          "language": "fr",
+          "languages": [],
+          "sentences_count": 0,
+          "tokens_count": 0,
+          "entities_count": 0
+        },
+        "liaison_inter_docs": {
+          "method": "topic-sentence-audit+vector-v2",
+          "links_count_total": 1,
+          "linked_documents_count": 1
+        },
+        "elasticsearch": {
+          "enabled": true,
+          "available": false,
+          "es_url": "http://localhost:9200",
+          "es_index": "dms_documents",
+          "doc_id": "3cab1794-d780-40eb-b4f8-629832a735d5",
+          "nlp_level": "full",
+          "nlp_tokens_index": "dms_nlp_tokens",
+          "nlp_docs_synced": 0,
+          "nlp_tokens_synced": 0,
+          "nlp_token_errors": 0
+        },
+        "classification": {
+          "doc_type": "UNCLASSIFIED",
+          "status": "REVIEW",
+          "winning_score": 0
+        },
+        "detection_signature_chachet_codebarr": {
+          "engine": null,
+          "pages_scanned": 0,
+          "detections_count": 0,
+          "has_signature": false,
+          "has_stamp": false,
+          "has_barcode": false,
+          "has_qrcode": false
+        },
+        "verification_totaux": {
+          "engine": "totals-verification-0ml-v1",
+          "verification_status": "partial_ok",
+          "passed": true,
+          "complete": false,
+          "row_mismatch_count": 0,
+          "issue_locations_count": 0,
+          "computed_subtotal": null,
+          "declared_subtotal": null,
+          "declared_tax": null,
+          "declared_total": null,
+          "aggregate_alert_suppressed": false
+        },
+        "extraction_regles": {
+          "documents_count": 1,
+          "fields_count": 4
+        },
+        "fusion_resultats": {
+          "source": null,
+          "output_path": "/home/mourad/Bureau/DMS/core/fusion_output.json",
+          "es_synced": 0
+        },
+        "table_extraction_0ml": {
+          "engine": "table-0ml-unified-v5-anchor-geometry-complete-pricing",
+          "tables_count": 0,
+          "rows_total": 0,
+          "detected_columns": []
+        }
+      },
+      "text": {
+        "text_raw": "",
+        "text_normalized": "",
+        "normalization": [],
+        "search": {
+          "full_text": "",
+          "title": "facture_total_correct.pdf",
+          "keywords": []
+        }
+      },
+      "document_structure": {
+        "pages_meta": [],
+        "pages": [
+          {
+            "page_index": 1,
+            "source_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf",
+            "lang": "en",
+            "chars": 0,
+            "recompose_ok": true,
+            "sentences_layout": [],
+            "page_text": "",
+            "text": ""
+          }
+        ],
+        "sections": [],
+        "blocks": [],
+        "lines": [],
+        "words": [],
+        "headers": [],
+        "footers": [],
+        "lists": [],
+        "tables": [],
+        "figures": [],
+        "equations": [],
+        "key_value_pairs": [],
+        "reading_order": [],
+        "detected_columns": [],
+        "non_text_regions": []
+      },
+      "ocr": {
+        "orientation": null,
+        "confidence": null,
+        "engine": null
+      },
+      "extraction": {
+        "image_preprocessing": [
+          {
+            "path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/image2tab.webp",
+            "ext": ".webp",
+            "mime": "image/webp",
+            "label": "WEBP image",
+            "size": 47454,
+            "content": "image_only"
+          },
+          {
+            "path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf",
+            "ext": ".pdf",
+            "mime": "application/pdf",
+            "label": "PDF document",
+            "size": 3567,
+            "content": "text"
+          },
+          {
+            "path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf",
+            "ext": ".pdf",
+            "mime": "application/pdf",
+            "label": "PDF document",
+            "size": 3839,
+            "content": "text"
+          }
+        ],
+        "method": "native:pdf:none",
+        "native": null,
+        "tesseract": [
+          "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/image2tab.webp"
+        ],
+        "regex_extractions": [
+          {
+            "doc_id": "3cab1794-d780-40eb-b4f8-629832a735d5",
+            "filename": "facture_total_correct.pdf",
+            "doc_type": "UNCLASSIFIED",
+            "classification_status": "REVIEW",
+            "ruleset": {
+              "routes_config": {
+                "include_common": true,
+                "default_rulesets": [
+                  "{doc_type}.json"
+                ],
+                "ruleset_mapping": {
+                  "CONTRAT": [
+                    "CONTRAT.json"
+                  ],
+                  "BON_DE_COMMANDE": [
+                    "BON_DE_COMMANDE.json"
+                  ],
+                  "FACTURE": [
+                    "FACTURE.json"
+                  ]
+                }
+              },
+              "applied_rulesets": [
+                "common.json"
+              ]
+            },
+            "fields": {
+              "doc_date": {
+                "rule_id": "CMN_DATE_01",
+                "type": "date",
+                "many": true,
+                "matches": []
+              },
+              "email": {
+                "rule_id": "CMN_EMAIL_01",
+                "type": "email",
+                "many": true,
+                "matches": []
+              },
+              "telephone": {
+                "rule_id": "CMN_PHONE_01",
+                "type": "phone",
+                "many": true,
+                "matches": []
+              },
+              "site": {
+                "rule_id": "CMN_URL_01",
+                "type": "url",
+                "many": true,
+                "matches": []
+              }
+            }
+          }
+        ],
+        "business": {},
+        "relations": [],
+        "quality_checks": [],
+        "table_extraction": {
+          "engine": "table-0ml-unified-v5-anchor-geometry-complete-pricing",
+          "tables_count": 0,
+          "rows_total": 0,
+          "detected_columns": [],
+          "totals": {
+            "total_ht": [],
+            "total_ttc": [],
+            "tax": [],
+            "total": [],
+            "amount_due": [],
+            "stamp": []
+          },
+          "line_items": [],
+          "tables": []
+        },
+        "totals_verification": {
+          "engine": "totals-verification-0ml-v1",
+          "verification_status": "partial_ok",
+          "passed": true,
+          "complete": false,
+          "tables_count": 0,
+          "rows_total": 0,
+          "rows_verified": 0,
+          "row_ok_count": 0,
+          "row_partial_count": 0,
+          "row_mismatch_count": 0,
+          "computed_subtotal": null,
+          "declared_subtotal": null,
+          "declared_tax": null,
+          "computed_tax": null,
+          "declared_total": null,
+          "expected_total": null,
+          "subtotal_status": "missing",
+          "subtotal_status_raw": "missing",
+          "tax_status": "missing",
+          "tax_status_raw": "missing",
+          "total_status": "missing",
+          "total_status_raw": "missing",
+          "checks": [
+            {
+              "name": "rows",
+              "status": "partial"
+            },
+            {
+              "name": "subtotal",
+              "status": "missing"
+            },
+            {
+              "name": "tax",
+              "status": "missing"
+            },
+            {
+              "name": "total",
+              "status": "missing"
+            }
+          ],
+          "table_anchor": {},
+          "subtotal_location": {
+            "field": "subtotal"
+          },
+          "tax_location": {
+            "field": "tax"
+          },
+          "total_location": {
+            "field": "total"
+          },
+          "issue_locations": [],
+          "row_audit": [],
+          "declared_totals_raw": {
+            "total_ht": [],
+            "total_ttc": [],
+            "tax": [],
+            "total": [],
+            "amount_due": [],
+            "stamp": []
+          },
+          "tolerance": "0.02",
+          "aggregate_alert_suppressed": false
+        }
+      },
+      "nlp": {
+        "language": "fr",
+        "sentences": [],
+        "entities": [],
+        "matches": [],
+        "tokens": []
+      },
+      "quality_checks": [],
+      "human_review": {
+        "required": false,
+        "tasks": []
+      },
+      "processing": {
+        "warnings": [],
+        "logs": [],
+        "pipeline": [
+          "pretraitement-de-docs",
+          "si-image-pretraiter-sinonpass-le-doc",
+          "output-txt",
+          "clasification",
+          "tokenisation-layout",
+          "atripusion-gramatical",
+          "table-extraction",
+          "verification-totaux",
+          "liaison-inter-docs",
+          "elasticsearch",
+          "extraction-regles",
+          "fusion-resultats",
+          "postgres-sync"
+        ],
+        "durations": {},
+        "timestamp": null
+      },
+      "meta": {
+        "generated_at": "2026-04-04T11:18:10.935262+00:00",
+        "schema_version": "2.0",
+        "source": "local-context"
+      }
+    },
+    {
+      "document_id": "6513fa77-bf21-4d0b-adc4-ba52e33762c1",
       "file": {
         "name": "image2tab.webp",
         "paths": [],
@@ -13,7 +424,7 @@
         "page_count": 1
       },
       "classification": {
-        "doc_id": "ad9e6ec4-e8fb-4b41-902f-982a486c44c6",
+        "doc_id": "6513fa77-bf21-4d0b-adc4-ba52e33762c1",
         "filename": "image2tab.webp",
         "doc_type": "FACTURE",
         "status": "OK",
@@ -234,17 +645,17 @@
       },
       "components": {
         "pretraitement_de_docs": {
-          "matched_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/3f3673e0e08040dbb3cc8365861e69f2/image2tab.webp",
+          "matched_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/image2tab.webp",
           "detected_ext": ".webp",
           "detected_mime": "image/webp",
           "detected_label": "WEBP image",
           "detected_content": "image_only",
-          "total_files_detected": 1
+          "total_files_detected": 3
         },
         "si_image_pretraiter_sinonpass_le_doc": {
           "is_text_file": false,
           "is_image_only_file": true,
-          "text_files_count": 0,
+          "text_files_count": 2,
           "image_only_files_count": 1,
           "docs_prepared_count": 1
         },
@@ -281,7 +692,7 @@
         },
         "liaison_inter_docs": {
           "method": "topic-sentence-audit+vector-v2",
-          "links_count_total": 0,
+          "links_count_total": 1,
           "linked_documents_count": 0
         },
         "elasticsearch": {
@@ -289,7 +700,7 @@
           "available": false,
           "es_url": "http://localhost:9200",
           "es_index": "dms_documents",
-          "doc_id": "ad9e6ec4-e8fb-4b41-902f-982a486c44c6",
+          "doc_id": "6513fa77-bf21-4d0b-adc4-ba52e33762c1",
           "nlp_level": "full",
           "nlp_tokens_index": "dms_nlp_tokens",
           "nlp_docs_synced": 0,
@@ -1902,22 +2313,38 @@
       "extraction": {
         "image_preprocessing": [
           {
-            "path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/3f3673e0e08040dbb3cc8365861e69f2/image2tab.webp",
+            "path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/image2tab.webp",
             "ext": ".webp",
             "mime": "image/webp",
             "label": "WEBP image",
             "size": 47454,
             "content": "image_only"
+          },
+          {
+            "path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf",
+            "ext": ".pdf",
+            "mime": "application/pdf",
+            "label": "PDF document",
+            "size": 3567,
+            "content": "text"
+          },
+          {
+            "path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf",
+            "ext": ".pdf",
+            "mime": "application/pdf",
+            "label": "PDF document",
+            "size": 3839,
+            "content": "text"
           }
         ],
         "method": "ocr:tesseract",
         "native": null,
         "tesseract": [
-          "/home/mourad/Bureau/DMS/core/api_storage/uploads/3f3673e0e08040dbb3cc8365861e69f2/image2tab.webp"
+          "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/image2tab.webp"
         ],
         "regex_extractions": [
           {
-            "doc_id": "ad9e6ec4-e8fb-4b41-902f-982a486c44c6",
+            "doc_id": "6513fa77-bf21-4d0b-adc4-ba52e33762c1",
             "filename": "image2tab.webp",
             "doc_type": "FACTURE",
             "classification_status": "OK",
@@ -3918,7 +4345,418 @@
         "timestamp": null
       },
       "meta": {
-        "generated_at": "2026-04-04T10:10:44.558533+00:00",
+        "generated_at": "2026-04-04T11:18:10.935348+00:00",
+        "schema_version": "2.0",
+        "source": "local-context"
+      }
+    },
+    {
+      "document_id": "ca523c1c-7cd4-4377-a03c-55a007b3a321",
+      "file": {
+        "name": "invoice_total_incorrect.pdf",
+        "paths": [
+          "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf"
+        ],
+        "size": 3567,
+        "page_count": 1
+      },
+      "classification": {
+        "doc_id": "ca523c1c-7cd4-4377-a03c-55a007b3a321",
+        "filename": "invoice_total_incorrect.pdf",
+        "doc_type": "UNCLASSIFIED",
+        "status": "REVIEW",
+        "scores": {
+          "ARTICLE": 0,
+          "BON_DE_COMMANDE": 0,
+          "CONTRAT": 0,
+          "FACTURE": 0,
+          "FORMULAIRE": 0
+        },
+        "winning_score": 0,
+        "threshold": 6,
+        "margin": 3,
+        "classification_log": "[classification] invoice_total_incorrect.pdf -> best=UNCLASSIFIED | status=REVIEW | scores: {'ARTICLE': 0, 'BON_DE_COMMANDE': 0, 'CONTRAT': 0, 'FACTURE': 0, 'FORMULAIRE': 0}",
+        "scores_audit": {},
+        "keyword_matches": {
+          "strong": [],
+          "medium": [],
+          "weak": [],
+          "negative": [],
+          "strong_negative": [],
+          "anti_confusion_hits": []
+        },
+        "anti_confusion_targets": [],
+        "decision_debug": {
+          "top_score": 0,
+          "second_score": 0,
+          "diff": 0
+        }
+      },
+      "doc_type": "UNCLASSIFIED",
+      "cross_document": {
+        "linked_documents_count": 1,
+        "link_ids": [
+          "link-1"
+        ]
+      },
+      "components": {
+        "pretraitement_de_docs": {
+          "matched_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf",
+          "detected_ext": ".pdf",
+          "detected_mime": "application/pdf",
+          "detected_label": "PDF document",
+          "detected_content": "text",
+          "total_files_detected": 3
+        },
+        "si_image_pretraiter_sinonpass_le_doc": {
+          "is_text_file": true,
+          "is_image_only_file": false,
+          "text_files_count": 2,
+          "image_only_files_count": 1,
+          "docs_prepared_count": 1
+        },
+        "output_txt": {
+          "content": "text",
+          "extraction": "native:pdf:none",
+          "pages_count": 1,
+          "has_text": false,
+          "text_length": 0
+        },
+        "tokenisation_layout": {
+          "pages_count": 1,
+          "sentences_count": 0,
+          "detected_languages": []
+        },
+        "attribution_grammaticale": {
+          "component": "atripusion-gramatical",
+          "script": "/home/mourad/Bureau/DMS/core/component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py",
+          "backend": "legacy-3files",
+          "model": null,
+          "model_source": null,
+          "model_install": null,
+          "pos_method": null,
+          "pos_refined_count": 0,
+          "pos_total": 0,
+          "pos_refined_rate": 0.0,
+          "pos_top_tags": [],
+          "level": null,
+          "language": "fr",
+          "languages": [],
+          "sentences_count": 0,
+          "tokens_count": 0,
+          "entities_count": 0
+        },
+        "liaison_inter_docs": {
+          "method": "topic-sentence-audit+vector-v2",
+          "links_count_total": 1,
+          "linked_documents_count": 1
+        },
+        "elasticsearch": {
+          "enabled": true,
+          "available": false,
+          "es_url": "http://localhost:9200",
+          "es_index": "dms_documents",
+          "doc_id": "ca523c1c-7cd4-4377-a03c-55a007b3a321",
+          "nlp_level": "full",
+          "nlp_tokens_index": "dms_nlp_tokens",
+          "nlp_docs_synced": 0,
+          "nlp_tokens_synced": 0,
+          "nlp_token_errors": 0
+        },
+        "classification": {
+          "doc_type": "UNCLASSIFIED",
+          "status": "REVIEW",
+          "winning_score": 0
+        },
+        "detection_signature_chachet_codebarr": {
+          "engine": null,
+          "pages_scanned": 0,
+          "detections_count": 0,
+          "has_signature": false,
+          "has_stamp": false,
+          "has_barcode": false,
+          "has_qrcode": false
+        },
+        "verification_totaux": {
+          "engine": "totals-verification-0ml-v1",
+          "verification_status": "partial_ok",
+          "passed": true,
+          "complete": false,
+          "row_mismatch_count": 0,
+          "issue_locations_count": 0,
+          "computed_subtotal": null,
+          "declared_subtotal": null,
+          "declared_tax": null,
+          "declared_total": null,
+          "aggregate_alert_suppressed": false
+        },
+        "extraction_regles": {
+          "documents_count": 1,
+          "fields_count": 4
+        },
+        "fusion_resultats": {
+          "source": null,
+          "output_path": "/home/mourad/Bureau/DMS/core/fusion_output.json",
+          "es_synced": 0
+        },
+        "table_extraction_0ml": {
+          "engine": "table-0ml-unified-v5-anchor-geometry-complete-pricing",
+          "tables_count": 0,
+          "rows_total": 0,
+          "detected_columns": []
+        }
+      },
+      "text": {
+        "text_raw": "",
+        "text_normalized": "",
+        "normalization": [],
+        "search": {
+          "full_text": "",
+          "title": "invoice_total_incorrect.pdf",
+          "keywords": []
+        }
+      },
+      "document_structure": {
+        "pages_meta": [],
+        "pages": [
+          {
+            "page_index": 1,
+            "source_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf",
+            "lang": "en",
+            "chars": 0,
+            "recompose_ok": true,
+            "sentences_layout": [],
+            "page_text": "",
+            "text": ""
+          }
+        ],
+        "sections": [],
+        "blocks": [],
+        "lines": [],
+        "words": [],
+        "headers": [],
+        "footers": [],
+        "lists": [],
+        "tables": [],
+        "figures": [],
+        "equations": [],
+        "key_value_pairs": [],
+        "reading_order": [],
+        "detected_columns": [],
+        "non_text_regions": []
+      },
+      "ocr": {
+        "orientation": null,
+        "confidence": null,
+        "engine": null
+      },
+      "extraction": {
+        "image_preprocessing": [
+          {
+            "path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/image2tab.webp",
+            "ext": ".webp",
+            "mime": "image/webp",
+            "label": "WEBP image",
+            "size": 47454,
+            "content": "image_only"
+          },
+          {
+            "path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf",
+            "ext": ".pdf",
+            "mime": "application/pdf",
+            "label": "PDF document",
+            "size": 3567,
+            "content": "text"
+          },
+          {
+            "path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf",
+            "ext": ".pdf",
+            "mime": "application/pdf",
+            "label": "PDF document",
+            "size": 3839,
+            "content": "text"
+          }
+        ],
+        "method": "native:pdf:none",
+        "native": null,
+        "tesseract": [
+          "/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/image2tab.webp"
+        ],
+        "regex_extractions": [
+          {
+            "doc_id": "ca523c1c-7cd4-4377-a03c-55a007b3a321",
+            "filename": "invoice_total_incorrect.pdf",
+            "doc_type": "UNCLASSIFIED",
+            "classification_status": "REVIEW",
+            "ruleset": {
+              "routes_config": {
+                "include_common": true,
+                "default_rulesets": [
+                  "{doc_type}.json"
+                ],
+                "ruleset_mapping": {
+                  "CONTRAT": [
+                    "CONTRAT.json"
+                  ],
+                  "BON_DE_COMMANDE": [
+                    "BON_DE_COMMANDE.json"
+                  ],
+                  "FACTURE": [
+                    "FACTURE.json"
+                  ]
+                }
+              },
+              "applied_rulesets": [
+                "common.json"
+              ]
+            },
+            "fields": {
+              "doc_date": {
+                "rule_id": "CMN_DATE_01",
+                "type": "date",
+                "many": true,
+                "matches": []
+              },
+              "email": {
+                "rule_id": "CMN_EMAIL_01",
+                "type": "email",
+                "many": true,
+                "matches": []
+              },
+              "telephone": {
+                "rule_id": "CMN_PHONE_01",
+                "type": "phone",
+                "many": true,
+                "matches": []
+              },
+              "site": {
+                "rule_id": "CMN_URL_01",
+                "type": "url",
+                "many": true,
+                "matches": []
+              }
+            }
+          }
+        ],
+        "business": {},
+        "relations": [],
+        "quality_checks": [],
+        "table_extraction": {
+          "engine": "table-0ml-unified-v5-anchor-geometry-complete-pricing",
+          "tables_count": 0,
+          "rows_total": 0,
+          "detected_columns": [],
+          "totals": {
+            "total_ht": [],
+            "total_ttc": [],
+            "tax": [],
+            "total": [],
+            "amount_due": [],
+            "stamp": []
+          },
+          "line_items": [],
+          "tables": []
+        },
+        "totals_verification": {
+          "engine": "totals-verification-0ml-v1",
+          "verification_status": "partial_ok",
+          "passed": true,
+          "complete": false,
+          "tables_count": 0,
+          "rows_total": 0,
+          "rows_verified": 0,
+          "row_ok_count": 0,
+          "row_partial_count": 0,
+          "row_mismatch_count": 0,
+          "computed_subtotal": null,
+          "declared_subtotal": null,
+          "declared_tax": null,
+          "computed_tax": null,
+          "declared_total": null,
+          "expected_total": null,
+          "subtotal_status": "missing",
+          "subtotal_status_raw": "missing",
+          "tax_status": "missing",
+          "tax_status_raw": "missing",
+          "total_status": "missing",
+          "total_status_raw": "missing",
+          "checks": [
+            {
+              "name": "rows",
+              "status": "partial"
+            },
+            {
+              "name": "subtotal",
+              "status": "missing"
+            },
+            {
+              "name": "tax",
+              "status": "missing"
+            },
+            {
+              "name": "total",
+              "status": "missing"
+            }
+          ],
+          "table_anchor": {},
+          "subtotal_location": {
+            "field": "subtotal"
+          },
+          "tax_location": {
+            "field": "tax"
+          },
+          "total_location": {
+            "field": "total"
+          },
+          "issue_locations": [],
+          "row_audit": [],
+          "declared_totals_raw": {
+            "total_ht": [],
+            "total_ttc": [],
+            "tax": [],
+            "total": [],
+            "amount_due": [],
+            "stamp": []
+          },
+          "tolerance": "0.02",
+          "aggregate_alert_suppressed": false
+        }
+      },
+      "nlp": {
+        "language": "fr",
+        "sentences": [],
+        "entities": [],
+        "matches": [],
+        "tokens": []
+      },
+      "quality_checks": [],
+      "human_review": {
+        "required": false,
+        "tasks": []
+      },
+      "processing": {
+        "warnings": [],
+        "logs": [],
+        "pipeline": [
+          "pretraitement-de-docs",
+          "si-image-pretraiter-sinonpass-le-doc",
+          "output-txt",
+          "clasification",
+          "tokenisation-layout",
+          "atripusion-gramatical",
+          "table-extraction",
+          "verification-totaux",
+          "liaison-inter-docs",
+          "elasticsearch",
+          "extraction-regles",
+          "fusion-resultats",
+          "postgres-sync"
+        ],
+        "durations": {},
+        "timestamp": null
+      },
+      "meta": {
+        "generated_at": "2026-04-04T11:18:10.935421+00:00",
         "schema_version": "2.0",
         "source": "local-context"
       }
@@ -3926,18 +4764,44 @@
   ],
   "cross_document_analysis": {
     "method": "topic-sentence-audit+vector-v2",
-    "documents_analyzed": 1,
-    "pairs_evaluated": 0,
+    "documents_analyzed": 3,
+    "pairs_evaluated": 3,
     "sentence_pairs_scored": 0,
     "chunk_pairs_scored": 0,
-    "links_count": 0,
+    "links_count": 1,
     "vector_profile": "pipeline0ml",
     "embedding_method": null,
     "embedding_backend": null,
     "vector_dim": 0,
     "vector_links_count": 0,
-    "links": [],
-    "generated_at": "2026-04-04T10:10:44.517392+00:00"
+    "links": [
+      {
+        "score": 0.2,
+        "doc_a": {
+          "document_id": "3cab1794-d780-40eb-b4f8-629832a735d5",
+          "filename": "facture_total_correct.pdf"
+        },
+        "doc_b": {
+          "document_id": "ca523c1c-7cd4-4377-a03c-55a007b3a321",
+          "filename": "invoice_total_incorrect.pdf"
+        },
+        "shared_topics": [],
+        "score_breakdown": {
+          "topic_overlap": 0.0,
+          "best_sentence_score": 0.0,
+          "signal_overlap": 1.0,
+          "doc_vector_similarity": null,
+          "best_chunk_vector_score": null,
+          "best_chunk_cosine": null
+        },
+        "audit": {
+          "sentence_matches_count": 0,
+          "matches": []
+        },
+        "link_id": "link-1"
+      }
+    ],
+    "generated_at": "2026-04-04T11:18:10.893562+00:00"
   },
   "pipeline": {
     "es_enabled": true,
@@ -3965,10 +4829,10 @@
     "durations": {},
     "profile": "pipeline0ml",
     "0ml": {
-      "tables_docs_count": 1,
-      "totals_verification_docs_count": 1,
+      "tables_docs_count": 3,
+      "totals_verification_docs_count": 3,
       "totals_verification_ok_docs_count": 0,
-      "totals_verification_partial_ok_docs_count": 1,
+      "totals_verification_partial_ok_docs_count": 3,
       "totals_verification_mismatch_docs_count": 0,
       "totals_verification_missing_docs_count": 0
     }
@@ -3982,17 +4846,17 @@
     "host": "127.0.0.1",
     "port": 5432,
     "database": "dms_core",
-    "run_id": "run-20260404T101056734697Z",
+    "run_id": "run-20260404T111819406866Z",
     "pipeline_profile": "pipeline0ml",
     "source": "local-context",
-    "log_entries_created": 1,
+    "log_entries_created": 3,
     "run_upserted": 1,
     "run_payload_nodes_upserted": 51,
-    "documents_total": 1,
-    "documents_upserted": 1,
-    "document_payload_nodes_upserted": 739,
-    "identifiers_upserted": 5,
-    "classification_scores_upserted": 5,
+    "documents_total": 3,
+    "documents_upserted": 3,
+    "document_payload_nodes_upserted": 1331,
+    "identifiers_upserted": 15,
+    "classification_scores_upserted": 15,
     "classification_score_audit_upserted": 22,
     "classification_keyword_matches_upserted": 5,
     "anti_confusion_hits_upserted": 0,
@@ -4009,13 +4873,13 @@
     "human_review_tasks_upserted": 0,
     "processing_warnings_upserted": 0,
     "processing_logs_upserted": 0,
-    "processing_steps_upserted": 13,
-    "processing_durations_upserted": 1,
-    "component_metrics_upserted": 83,
-    "links_total": 0,
-    "links_upserted": 0,
+    "processing_steps_upserted": 39,
+    "processing_durations_upserted": 3,
+    "component_metrics_upserted": 241,
+    "links_total": 1,
+    "links_upserted": 1,
     "link_shared_terms_upserted": 0,
-    "stable_registry_upserted": 15,
+    "stable_registry_upserted": 28,
     "database_created": false,
     "schema_ready": true,
     "tables_ready": [

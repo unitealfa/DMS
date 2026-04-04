@@ -1176,12 +1176,30 @@ def _extract_totals_from_line(line: str) -> Dict[str, str]:
     amount = _to_amount(line)
     if not amount:
         return out
-    if "TOTAL TTC" in norm or ("TTC" in norm and "TOTAL" in norm):
+
+    if "TOTAL TTC" in norm or "MONTANT A PAYER TTC" in norm or ("TTC" in norm and "TOTAL" in norm):
         out["total_ttc"] = amount
-    elif "TOTAL HT" in norm or ("HT" in norm and "TOTAL" in norm):
+        return out
+
+    if "TOTAL HT" in norm or "MONTANT HT" in norm or "SUBTOTAL" in norm or "SOUS TOTAL" in norm or ("HT" in norm and "TOTAL" in norm):
         out["total_ht"] = amount
-    elif "TVA" in norm or "VAT" in norm or "TAX" in norm:
+        return out
+
+    if "TIMBRE" in norm or "STAMP" in norm:
+        out["stamp"] = amount
+        return out
+
+    if "MONTANT A PAYER" in norm or "TOTAL A PAYER" in norm or "AMOUNT DUE" in norm or "TOTAL DUE" in norm:
+        out["amount_due"] = amount
+        return out
+
+    if "TVA" in norm or "VAT" in norm or "TAX" in norm or "TAXES" in norm:
         out["tax"] = amount
+        return out
+
+    if "TOTAL" in norm or "MONTANT" in norm or "AMOUNT" in norm:
+        out["total"] = amount
+
     return out
 
 
@@ -1233,14 +1251,17 @@ def _row_to_item(
         if _normalize_reference_code(product) == reference:
             product = ""
 
-    joined_line = " | ".join(str(c) for c in cells)
+    joined_line = " | ".join(str(c) for c in cells if _compact_spaces(c))
 
+    if _is_totals_or_footer_label(joined_line):
+        return None
     if _is_header_like_line(joined_line, cells):
         return None
     if _is_footer_like_line(joined_line, cells):
         return None
-    if len(cells) <= 2 and any(_is_totals_or_footer_label(c) for c in cells):
-        return None
+    if any(_is_totals_or_footer_label(c) for c in cells):
+        if len(cells) <= 3:
+            return None
     if product:
         product_norm = _norm_text(product)
         if any(hint in product_norm for hint in NON_TABLE_LEFT_HINTS) or _is_totals_or_footer_label(product):
@@ -1379,7 +1400,14 @@ def _extract_doc_tables(doc: Dict[str, Any], profile: str) -> Dict[str, Any]:
     tables: List[Dict[str, Any]] = []
     line_items: List[Dict[str, Any]] = []
     detected_columns = set()
-    totals: Dict[str, List[str]] = {"total_ht": [], "total_ttc": [], "tax": []}
+    totals: Dict[str, List[str]] = {
+    "total_ht": [],
+    "total_ttc": [],
+    "tax": [],
+    "total": [],
+    "amount_due": [],
+    "stamp": [],
+}
 
     pages = _safe_list(doc.get("pages"))
     table_index = 0
@@ -1506,6 +1534,8 @@ def _extract_doc_tables(doc: Dict[str, Any], profile: str) -> Dict[str, Any]:
         for line in unique_lines:
             t = _extract_totals_from_line(line)
             for k, v in t.items():
+                if k not in totals or not isinstance(totals.get(k), list):
+                    totals[k] = []
                 if v and v not in totals[k]:
                     totals[k].append(v)
 

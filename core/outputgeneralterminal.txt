@@ -1,24 +1,39 @@
 [Component: pretraitement-de-docs]
 Type: dict
-Summary: 1 fichiers | text=0 | image=1 | unsupported=0 | missing=0
+Summary: 3 fichiers | text=2 | image=1 | unsupported=0 | missing=0
 Output: {'MISSING_FILES': [],
  'PRETRAITEMENT_RESULT': [{'content': 'image_only',
                            'ext': '.webp',
                            'label': 'WEBP image',
                            'mime': 'image/webp',
-                           'path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/3f3673e0e08040dbb3cc8365861e69f2/image2tab.webp',
-                           'size': 47454}]}
+                           'path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/image2tab.webp',
+                           'size': 47454},
+                          {'content': 'text',
+                           'ext': '.pdf',
+                           'label': 'PDF document',
+                           'mime': 'application/pdf',
+                           'path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf',
+                           'size': 3567},
+                          {'content': 'text',
+                           'ext': '.pdf',
+                           'label': 'PDF document',
+                           'mime': 'application/pdf',
+                           'path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf',
+                           'size': 3839}]}
 
-[info] Using INPUT_FILE=/home/mourad/Bureau/DMS/core/api_storage/uploads/3f3673e0e08040dbb3cc8365861e69f2/image2tab.webp
+[skip] content='text' -> /home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf
+[skip] content='text' -> /home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf
+[info] Using INPUT_FILE=/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/image2tab.webp
 [Component: si-image-pretraiter-sinonpass-le-doc]
 Type: dict
-Summary: text=0, image=1, unsupported=0, missing=0, docs_prepped=1
-Output: {'DOCS': [{'original': <PIL.WebPImagePlugin.WebPImageFile image mode=RGB size=768x1024 at 0x736B624D3CD0>,
-           'path': PosixPath('/home/mourad/Bureau/DMS/core/api_storage/uploads/3f3673e0e08040dbb3cc8365861e69f2/image2tab.webp'),
-           'prepped': <PIL.Image.Image image mode=L size=1152x1536 at 0x736B6254D090>}],
- 'IMAGE_ONLY_FILES': ['/home/mourad/Bureau/DMS/core/api_storage/uploads/3f3673e0e08040dbb3cc8365861e69f2/image2tab.webp'],
+Summary: text=2, image=1, unsupported=0, missing=0, docs_prepped=1
+Output: {'DOCS': [{'original': <PIL.WebPImagePlugin.WebPImageFile image mode=RGB size=768x1024 at 0x7D5684C33CD0>,
+           'path': PosixPath('/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/image2tab.webp'),
+           'prepped': <PIL.Image.Image image mode=L size=1152x1536 at 0x7D5684CB0310>}],
+ 'IMAGE_ONLY_FILES': ['/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/image2tab.webp'],
  'MISSING_FILES': [],
- 'TEXT_FILES': [],
+ 'TEXT_FILES': ['/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf',
+                '/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf'],
  'UNSUPPORTED_FILES': []}
 
 [doc] image2tab.webp | content=image_only | extraction=ocr:tesseract | pages=1
@@ -98,11 +113,21 @@ Output: {'DOCS': [{'original': <PIL.WebPImagePlugin.WebPImageFile image mode=RGB
                                                                   Cachet & Signature
 ------------------------------------------------------------------------------------------------------------------------
 
+[doc] invoice_total_incorrect.pdf | content=text | extraction=native:pdf:none | pages=1
+[page 1/1]
+
+------------------------------------------------------------------------------------------------------------------------
+
+[doc] facture_total_correct.pdf | content=text | extraction=native:pdf:none | pages=1
+[page 1/1]
+
+------------------------------------------------------------------------------------------------------------------------
+
 [Component: output-txt]
 Type: list
-Summary: 1 docs | pages=1
+Summary: 3 docs | pages=3
 Output: [{'content': 'image_only',
-  'doc_id': 'ad9e6ec4-e8fb-4b41-902f-982a486c44c6',
+  'doc_id': '6513fa77-bf21-4d0b-adc4-ba52e33762c1',
   'extraction': 'ocr:tesseract',
   'filename': 'image2tab.webp',
   'page_count_total': 1,
@@ -257,7 +282,23 @@ Output: [{'content': 'image_only',
           '\n'
           '\n'
           '\n'
-          '                                                                  Cachet & Signature'}]
+          '                                                                  Cachet & Signature'},
+ {'content': 'text',
+  'doc_id': 'ca523c1c-7cd4-4377-a03c-55a007b3a321',
+  'extraction': 'native:pdf:none',
+  'filename': 'invoice_total_incorrect.pdf',
+  'page_count_total': 1,
+  'pages_text': [''],
+  'size': 3567,
+  'text': ''},
+ {'content': 'text',
+  'doc_id': '3cab1794-d780-40eb-b4f8-629832a735d5',
+  'extraction': 'native:pdf:none',
+  'filename': 'facture_total_correct.pdf',
+  'page_count_total': 1,
+  'pages_text': [''],
+  'size': 3839,
+  'text': ''}]
 
 [classification] image2tab.webp -> best=FACTURE | status=OK | scores: {'ARTICLE': 2, 'BON_DE_COMMANDE': -21, 'CONTRAT': -18, 'FACTURE': 20, 'FORMULAIRE': 4}
   score_audit: ARTICLE=2 -> [REFERENCE(x1,+2,medium)] | BON_DE_COMMANDE=-21 -> [FACTURE(x2,-12,anti_confusion), FACTURE(x2,-4,negative), ECHEANCE(x1,-2,negative), MODE DE PAIEMENT(x1,-2,negative)] | CONTRAT=-18 -> [FACTURE(x2,-12,anti_confusion), FACTURE(x2,-4,negative), TVA(x1,-2,negative)] | FACTURE=20 -> [FACTURE(x2,+12,strong), CLIENT(x1,+2,medium), ECHEANCE(x1,+2,medium), MODE DE PAIEMENT(x1,+2,medium)] | FORMULAIRE=4 -> [DATE(x1,+2,medium), SIGNATURE(x1,+2,medium)]
@@ -265,13 +306,13 @@ Output: [{'content': 'image_only',
   anti_confusion_targets: BON_DE_COMMANDE, CONTRAT, DEVIS, BON_DE_LIVRAISON, AVOIR
 [Component: clasification]
 Type: list
-Summary: 1 docs classes | image2tab.webp->FACTURE
+Summary: 3 docs classes | image2tab.webp->FACTURE, invoice_total_incorrect.pdf->UNCLASSIFIED, facture_total_correct.pdf->UNCLASSIFIED
 Output: [{'anti_confusion_targets': ['BON_DE_COMMANDE', 'CONTRAT', 'DEVIS', 'BON_DE_LIVRAISON', 'AVOIR'],
   'classification_log': '[classification] image2tab.webp -> best=FACTURE | status=OK | scores: '
                         "{'ARTICLE': 2, 'BON_DE_COMMANDE': -21, 'CONTRAT': -18, 'FACTURE': 20, "
                         "'FORMULAIRE': 4}",
   'decision_debug': {'diff': 16, 'second_score': 4, 'top_score': 20},
-  'doc_id': 'ad9e6ec4-e8fb-4b41-902f-982a486c44c6',
+  'doc_id': '6513fa77-bf21-4d0b-adc4-ba52e33762c1',
   'doc_type': 'FACTURE',
   'filename': 'image2tab.webp',
   'keyword_matches': {'anti_confusion_hits': [],
@@ -378,11 +419,87 @@ Output: [{'anti_confusion_targets': ['BON_DE_COMMANDE', 'CONTRAT', 'DEVIS', 'BON
                                   'score_total': 4}},
   'status': 'OK',
   'threshold': 6,
-  'winning_score': 20}]
+  'winning_score': 20},
+ {'anti_confusion_targets': [],
+  'classification_log': '[classification] invoice_total_incorrect.pdf -> best=UNCLASSIFIED | '
+                        "status=REVIEW | scores: {'ARTICLE': 0, 'BON_DE_COMMANDE': 0, 'CONTRAT': "
+                        "0, 'FACTURE': 0, 'FORMULAIRE': 0}",
+  'decision_debug': {'diff': 0, 'second_score': 0, 'top_score': 0},
+  'doc_id': 'ca523c1c-7cd4-4377-a03c-55a007b3a321',
+  'doc_type': 'UNCLASSIFIED',
+  'filename': 'invoice_total_incorrect.pdf',
+  'keyword_matches': {'anti_confusion_hits': [],
+                      'medium': [],
+                      'negative': [],
+                      'strong': [],
+                      'strong_negative': [],
+                      'weak': []},
+  'margin': 3,
+  'scores': {'ARTICLE': 0, 'BON_DE_COMMANDE': 0, 'CONTRAT': 0, 'FACTURE': 0, 'FORMULAIRE': 0},
+  'scores_audit': {},
+  'status': 'REVIEW',
+  'threshold': 6,
+  'winning_score': 0},
+ {'anti_confusion_targets': [],
+  'classification_log': '[classification] facture_total_correct.pdf -> best=UNCLASSIFIED | '
+                        "status=REVIEW | scores: {'ARTICLE': 0, 'BON_DE_COMMANDE': 0, 'CONTRAT': "
+                        "0, 'FACTURE': 0, 'FORMULAIRE': 0}",
+  'decision_debug': {'diff': 0, 'second_score': 0, 'top_score': 0},
+  'doc_id': '3cab1794-d780-40eb-b4f8-629832a735d5',
+  'doc_type': 'UNCLASSIFIED',
+  'filename': 'facture_total_correct.pdf',
+  'keyword_matches': {'anti_confusion_hits': [],
+                      'medium': [],
+                      'negative': [],
+                      'strong': [],
+                      'strong_negative': [],
+                      'weak': []},
+  'margin': 3,
+  'scores': {'ARTICLE': 0, 'BON_DE_COMMANDE': 0, 'CONTRAT': 0, 'FACTURE': 0, 'FORMULAIRE': 0},
+  'scores_audit': {},
+  'status': 'REVIEW',
+  'threshold': 6,
+  'winning_score': 0}]
+
+========================================================================================================================
+[doc] facture_total_correct.pdf
+  doc_id       : 3cab1794-d780-40eb-b4f8-629832a735d5
+  content      : image_only
+  extraction   : ocr:tesseract
+  pages_total  : 1
+  chars_total  : 0
+  recompose_ok : True
+  paths:
+    - (unknown)
+------------------------------------------------------------------------------------------------------------------------
+[page 1/1] source_path=
+  lang         : en
+  chars        : 0
+------------------------------------------------------------------------------------------------------------------------
+  sentences_layout: 0 chunks total | sentences=0 | noise=0 | showing 0/0 (filter_is_sentence=True, fallback=False, min_nonspace=12)
+------------------------------------------------------------------------------------------------------------------------
+
+========================================================================================================================
+[doc] facture_total_correct.pdf
+  doc_id       : 3cab1794-d780-40eb-b4f8-629832a735d5
+  content      : text
+  extraction   : native:pdf:none
+  pages_total  : 1
+  chars_total  : 0
+  recompose_ok : True
+  paths:
+    - /home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf
+------------------------------------------------------------------------------------------------------------------------
+[page 1/1] source_path=/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf
+  lang         : en
+  chars        : 0
+------------------------------------------------------------------------------------------------------------------------
+  sentences_layout: 0 chunks total | sentences=0 | noise=0 | showing 0/0 (filter_is_sentence=True, fallback=False, min_nonspace=12)
+------------------------------------------------------------------------------------------------------------------------
 
 ========================================================================================================================
 [doc] image2tab.webp
-  doc_id       : ad9e6ec4-e8fb-4b41-902f-982a486c44c6
+  doc_id       : 6513fa77-bf21-4d0b-adc4-ba52e33762c1
   content      : image_only
   extraction   : ocr:tesseract
   pages_total  : 1
@@ -447,12 +564,80 @@ Monatnt  Facture en Lettre   Cinq mille huit cent quatre vingt huit Dinars Algé
 Cachet & Signature
 --------------------------------------------------------------------------------
 
+========================================================================================================================
+[doc] invoice_total_incorrect.pdf
+  doc_id       : ca523c1c-7cd4-4377-a03c-55a007b3a321
+  content      : image_only
+  extraction   : ocr:tesseract
+  pages_total  : 1
+  chars_total  : 0
+  recompose_ok : True
+  paths:
+    - (unknown)
+------------------------------------------------------------------------------------------------------------------------
+[page 1/1] source_path=
+  lang         : en
+  chars        : 0
+------------------------------------------------------------------------------------------------------------------------
+  sentences_layout: 0 chunks total | sentences=0 | noise=0 | showing 0/0 (filter_is_sentence=True, fallback=False, min_nonspace=12)
+------------------------------------------------------------------------------------------------------------------------
+
+========================================================================================================================
+[doc] invoice_total_incorrect.pdf
+  doc_id       : ca523c1c-7cd4-4377-a03c-55a007b3a321
+  content      : text
+  extraction   : native:pdf:none
+  pages_total  : 1
+  chars_total  : 0
+  recompose_ok : True
+  paths:
+    - /home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf
+------------------------------------------------------------------------------------------------------------------------
+[page 1/1] source_path=/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf
+  lang         : en
+  chars        : 0
+------------------------------------------------------------------------------------------------------------------------
+  sentences_layout: 0 chunks total | sentences=0 | noise=0 | showing 0/0 (filter_is_sentence=True, fallback=False, min_nonspace=12)
+------------------------------------------------------------------------------------------------------------------------
+
 [Component: tokenisation-layout]
 Type: list
-Summary: 1 docs | sentences=12
-Output: [{'chars_total': 960,
+Summary: 5 docs | sentences=12
+Output: [{'chars_total': 0,
   'content': 'image_only',
-  'doc_id': 'ad9e6ec4-e8fb-4b41-902f-982a486c44c6',
+  'doc_id': '3cab1794-d780-40eb-b4f8-629832a735d5',
+  'extraction': 'ocr:tesseract',
+  'filename': 'facture_total_correct.pdf',
+  'page_count_total': 1,
+  'pages': [{'chars': 0,
+             'lang': 'en',
+             'page_index': 1,
+             'page_text': '',
+             'recompose_ok': True,
+             'sentences_layout': [],
+             'source_path': ''}],
+  'paths': [],
+  'recompose_ok': True,
+  'size': None},
+ {'chars_total': 0,
+  'content': 'text',
+  'doc_id': '3cab1794-d780-40eb-b4f8-629832a735d5',
+  'extraction': 'native:pdf:none',
+  'filename': 'facture_total_correct.pdf',
+  'page_count_total': 1,
+  'pages': [{'chars': 0,
+             'lang': 'en',
+             'page_index': 1,
+             'page_text': '',
+             'recompose_ok': True,
+             'sentences_layout': [],
+             'source_path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf'}],
+  'paths': ['/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf'],
+  'recompose_ok': True,
+  'size': 3839},
+ {'chars_total': 960,
+  'content': 'image_only',
+  'doc_id': '6513fa77-bf21-4d0b-adc4-ba52e33762c1',
   'extraction': 'ocr:tesseract',
   'filename': 'image2tab.webp',
   'page_count_total': 1,
@@ -978,7 +1163,39 @@ Output: [{'chars_total': 960,
              'source_path': ''}],
   'paths': [],
   'recompose_ok': False,
-  'size': None}]
+  'size': None},
+ {'chars_total': 0,
+  'content': 'image_only',
+  'doc_id': 'ca523c1c-7cd4-4377-a03c-55a007b3a321',
+  'extraction': 'ocr:tesseract',
+  'filename': 'invoice_total_incorrect.pdf',
+  'page_count_total': 1,
+  'pages': [{'chars': 0,
+             'lang': 'en',
+             'page_index': 1,
+             'page_text': '',
+             'recompose_ok': True,
+             'sentences_layout': [],
+             'source_path': ''}],
+  'paths': [],
+  'recompose_ok': True,
+  'size': None},
+ {'chars_total': 0,
+  'content': 'text',
+  'doc_id': 'ca523c1c-7cd4-4377-a03c-55a007b3a321',
+  'extraction': 'native:pdf:none',
+  'filename': 'invoice_total_incorrect.pdf',
+  'page_count_total': 1,
+  'pages': [{'chars': 0,
+             'lang': 'en',
+             'page_index': 1,
+             'page_text': '',
+             'recompose_ok': True,
+             'sentences_layout': [],
+             'source_path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf'}],
+  'paths': ['/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf'],
+  'recompose_ok': True,
+  'size': 3567}]
 
 
 [error] camel_tools not available: No module named 'camel_tools'
@@ -1163,10 +1380,42 @@ NER (fallback (règles)) (token, label):
 Entities:
 [Component: atripusion-gramatical]
 Type: list
-Summary: Langues executees: en, fr | docs=1 | backend=legacy-3files | component=atripusion-gramatical
-Output: [{'chars_total': 960,
+Summary: Langues executees: en, fr | docs=5 | backend=legacy-3files | component=atripusion-gramatical
+Output: [{'chars_total': 0,
   'content': 'image_only',
-  'doc_id': 'ad9e6ec4-e8fb-4b41-902f-982a486c44c6',
+  'doc_id': '3cab1794-d780-40eb-b4f8-629832a735d5',
+  'extraction': 'ocr:tesseract',
+  'filename': 'facture_total_correct.pdf',
+  'page_count_total': 1,
+  'pages': [{'chars': 0,
+             'lang': 'en',
+             'page_index': 1,
+             'page_text': '',
+             'recompose_ok': True,
+             'sentences_layout': [],
+             'source_path': ''}],
+  'paths': [],
+  'recompose_ok': True,
+  'size': None},
+ {'chars_total': 0,
+  'content': 'text',
+  'doc_id': '3cab1794-d780-40eb-b4f8-629832a735d5',
+  'extraction': 'native:pdf:none',
+  'filename': 'facture_total_correct.pdf',
+  'page_count_total': 1,
+  'pages': [{'chars': 0,
+             'lang': 'en',
+             'page_index': 1,
+             'page_text': '',
+             'recompose_ok': True,
+             'sentences_layout': [],
+             'source_path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf'}],
+  'paths': ['/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf'],
+  'recompose_ok': True,
+  'size': 3839},
+ {'chars_total': 960,
+  'content': 'image_only',
+  'doc_id': '6513fa77-bf21-4d0b-adc4-ba52e33762c1',
   'extraction': 'ocr:tesseract',
   'filename': 'image2tab.webp',
   'page_count_total': 1,
@@ -1692,15 +1941,64 @@ Output: [{'chars_total': 960,
              'source_path': ''}],
   'paths': [],
   'recompose_ok': False,
-  'size': None}]
+  'size': None},
+ {'chars_total': 0,
+  'content': 'image_only',
+  'doc_id': 'ca523c1c-7cd4-4377-a03c-55a007b3a321',
+  'extraction': 'ocr:tesseract',
+  'filename': 'invoice_total_incorrect.pdf',
+  'page_count_total': 1,
+  'pages': [{'chars': 0,
+             'lang': 'en',
+             'page_index': 1,
+             'page_text': '',
+             'recompose_ok': True,
+             'sentences_layout': [],
+             'source_path': ''}],
+  'paths': [],
+  'recompose_ok': True,
+  'size': None},
+ {'chars_total': 0,
+  'content': 'text',
+  'doc_id': 'ca523c1c-7cd4-4377-a03c-55a007b3a321',
+  'extraction': 'native:pdf:none',
+  'filename': 'invoice_total_incorrect.pdf',
+  'page_count_total': 1,
+  'pages': [{'chars': 0,
+             'lang': 'en',
+             'page_index': 1,
+             'page_text': '',
+             'recompose_ok': True,
+             'sentences_layout': [],
+             'source_path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf'}],
+  'paths': ['/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf'],
+  'recompose_ok': True,
+  'size': 3567}]
 
-[table-extraction-0ml] docs=1 | tables=2 | rows=10
+[table-extraction-0ml] docs=3 | tables=2 | rows=10
+  - facture_total_correct.pdf | tables=0 | rows=0 | cols=[]
   - image2tab.webp | tables=2 | rows=10 | cols=['product', 'quantity', 'reference', 'total', 'unit_price']
+  - invoice_total_incorrect.pdf | tables=0 | rows=0 | cols=[]
 [Component: table-extraction]
 Type: list
-Summary: docs=1 | tables=2 | line_items=10
-Output: [{'detected_columns': ['product', 'quantity', 'reference', 'total', 'unit_price'],
-  'doc_id': 'ad9e6ec4-e8fb-4b41-902f-982a486c44c6',
+Summary: docs=3 | tables=2 | line_items=10
+Output: [{'detected_columns': [],
+  'doc_id': '3cab1794-d780-40eb-b4f8-629832a735d5',
+  'engine': 'table-0ml-unified-v5-anchor-geometry-complete-pricing',
+  'filename': 'facture_total_correct.pdf',
+  'line_items': [],
+  'rows_total': 0,
+  'source_path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/facture_total_correct.pdf',
+  'tables': [],
+  'tables_count': 0,
+  'totals': {'amount_due': [],
+             'stamp': [],
+             'tax': [],
+             'total': [],
+             'total_ht': [],
+             'total_ttc': []}},
+ {'detected_columns': ['product', 'quantity', 'reference', 'total', 'unit_price'],
+  'doc_id': '6513fa77-bf21-4d0b-adc4-ba52e33762c1',
   'engine': 'table-0ml-unified-v5-anchor-geometry-complete-pricing',
   'filename': 'image2tab.webp',
   'line_items': [{'confidence': 0.62,
@@ -1824,7 +2122,7 @@ Output: [{'detected_columns': ['product', 'quantity', 'reference', 'total', 'uni
                   'total_ttc': None,
                   'unit_price': '10.00'}],
   'rows_total': 10,
-  'source_path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/3f3673e0e08040dbb3cc8365861e69f2/image2tab.webp',
+  'source_path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/image2tab.webp',
   'tables': [{'header_map': {'product': 1,
                              'quantity': 2,
                              'reference': 0,
@@ -2008,15 +2306,74 @@ Output: [{'detected_columns': ['product', 'quantity', 'reference', 'total', 'uni
              'tax': [],
              'total': [],
              'total_ht': [],
-             'total_ttc': ['182006.00']}}]
+             'total_ttc': ['182006.00']}},
+ {'detected_columns': [],
+  'doc_id': 'ca523c1c-7cd4-4377-a03c-55a007b3a321',
+  'engine': 'table-0ml-unified-v5-anchor-geometry-complete-pricing',
+  'filename': 'invoice_total_incorrect.pdf',
+  'line_items': [],
+  'rows_total': 0,
+  'source_path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/fff3c03ec7b649d8b19eab5e007bc9da/invoice_total_incorrect.pdf',
+  'tables': [],
+  'tables_count': 0,
+  'totals': {'amount_due': [],
+             'stamp': [],
+             'tax': [],
+             'total': [],
+             'total_ht': [],
+             'total_ttc': []}}]
 
-[verification-totaux] docs=1 | ok=0 | partial_ok=1 | mismatch=0 | missing=0
+[verification-totaux] docs=3 | ok=0 | partial_ok=3 | mismatch=0 | missing=0
+  - facture_total_correct.pdf | status=partial_ok | rows=0/0 | ignored=0 | subtotal=None~None | tax=None | total=None
   - image2tab.webp | status=partial_ok | rows=10/10 | ignored=0 | subtotal=180204.00~None | tax=None | total=180204.00
     -> issue=subtotal_partial | table=1 | page=1 | chunk=4 | line=30 | start=453 | end=531
+  - invoice_total_incorrect.pdf | status=partial_ok | rows=0/0 | ignored=0 | subtotal=None~None | tax=None | total=None
 [Component: verification-totaux]
 Type: list
-Summary: docs=1 | ok=0 | partial_ok=1 | mismatch=0 | missing=0
+Summary: docs=3 | ok=0 | partial_ok=3 | mismatch=0 | missing=0
 Output: [{'aggregate_alert_suppressed': False,
+  'checks': [{'name': 'rows', 'status': 'partial'}, {'name': 'subtotal', 'status': 'missing'},
+             {'name': 'tax', 'status': 'missing'}, {'name': 'total', 'status': 'missing'}],
+  'complete': False,
+  'computed_subtotal': None,
+  'computed_tax': None,
+  'declared_subtotal': None,
+  'declared_tax': None,
+  'declared_total': None,
+  'declared_totals_raw': {'amount_due': [],
+                          'stamp': [],
+                          'tax': [],
+                          'total': [],
+                          'total_ht': [],
+                          'total_ttc': []},
+  'doc_id': '3cab1794-d780-40eb-b4f8-629832a735d5',
+  'doc_key': 'id:3cab1794-d780-40eb-b4f8-629832a735d5',
+  'engine': 'totals-verification-0ml-v1',
+  'expected_total': None,
+  'filename': 'facture_total_correct.pdf',
+  'issue_locations': [],
+  'passed': True,
+  'row_audit': [],
+  'row_mismatch_count': 0,
+  'row_ok_count': 0,
+  'row_partial_count': 0,
+  'rows_ignored_incomplete': 0,
+  'rows_total': 0,
+  'rows_verified': 0,
+  'subtotal_location': {'field': 'subtotal'},
+  'subtotal_status': 'missing',
+  'subtotal_status_raw': 'missing',
+  'table_anchor': {},
+  'tables_count': 0,
+  'tax_location': {'field': 'tax'},
+  'tax_status': 'missing',
+  'tax_status_raw': 'missing',
+  'tolerance': '0.02',
+  'total_location': {'field': 'total'},
+  'total_status': 'missing',
+  'total_status_raw': 'missing',
+  'verification_status': 'partial_ok'},
+ {'aggregate_alert_suppressed': False,
   'checks': [{'name': 'rows', 'status': 'ok'}, {'name': 'subtotal', 'status': 'partial'},
              {'name': 'tax', 'status': 'missing'}, {'name': 'total', 'status': 'partial'}],
   'complete': False,
@@ -2031,8 +2388,8 @@ Output: [{'aggregate_alert_suppressed': False,
                           'total': [],
                           'total_ht': [],
                           'total_ttc': ['182006.00']},
-  'doc_id': 'ad9e6ec4-e8fb-4b41-902f-982a486c44c6',
-  'doc_key': 'id:ad9e6ec4-e8fb-4b41-902f-982a486c44c6',
+  'doc_id': '6513fa77-bf21-4d0b-adc4-ba52e33762c1',
+  'doc_key': 'id:6513fa77-bf21-4d0b-adc4-ba52e33762c1',
   'engine': 'totals-verification-0ml-v1',
   'expected_total': None,
   'filename': 'image2tab.webp',
@@ -2385,17 +2742,60 @@ Output: [{'aggregate_alert_suppressed': False,
                      'table_index': 1},
   'total_status': 'partial',
   'total_status_raw': 'partial',
+  'verification_status': 'partial_ok'},
+ {'aggregate_alert_suppressed': False,
+  'checks': [{'name': 'rows', 'status': 'partial'}, {'name': 'subtotal', 'status': 'missing'},
+             {'name': 'tax', 'status': 'missing'}, {'name': 'total', 'status': 'missing'}],
+  'complete': False,
+  'computed_subtotal': None,
+  'computed_tax': None,
+  'declared_subtotal': None,
+  'declared_tax': None,
+  'declared_total': None,
+  'declared_totals_raw': {'amount_due': [],
+                          'stamp': [],
+                          'tax': [],
+                          'total': [],
+                          'total_ht': [],
+                          'total_ttc': []},
+  'doc_id': 'ca523c1c-7cd4-4377-a03c-55a007b3a321',
+  'doc_key': 'id:ca523c1c-7cd4-4377-a03c-55a007b3a321',
+  'engine': 'totals-verification-0ml-v1',
+  'expected_total': None,
+  'filename': 'invoice_total_incorrect.pdf',
+  'issue_locations': [],
+  'passed': True,
+  'row_audit': [],
+  'row_mismatch_count': 0,
+  'row_ok_count': 0,
+  'row_partial_count': 0,
+  'rows_ignored_incomplete': 0,
+  'rows_total': 0,
+  'rows_verified': 0,
+  'subtotal_location': {'field': 'subtotal'},
+  'subtotal_status': 'missing',
+  'subtotal_status_raw': 'missing',
+  'table_anchor': {},
+  'tables_count': 0,
+  'tax_location': {'field': 'tax'},
+  'tax_status': 'missing',
+  'tax_status_raw': 'missing',
+  'tolerance': '0.02',
+  'total_location': {'field': 'total'},
+  'total_status': 'missing',
+  'total_status_raw': 'missing',
   'verification_status': 'partial_ok'}]
 
-[interdoc-link] docs=1 | pairs=0 | links=0 | sentence_pairs_scored=0 | chunk_pairs_scored=0
+[interdoc-link] docs=3 | pairs=3 | links=1 | sentence_pairs_scored=0 | chunk_pairs_scored=0
+[interdoc-link] facture_total_correct.pdf <-> invoice_total_incorrect.pdf | score=0.2 | shared_topics=[] | sentence_matches=0 | doc_vector=None | chunk_matches=0
 [Component: liaison-inter-docs]
 Type: dict
-Summary: docs=1 | pairs=0 | links=0 | sentence_pairs=0 | chunk_pairs=0 | vector_profile=pipeline0ml | vector_links=0
+Summary: docs=3 | pairs=3 | links=1 | sentence_pairs=0 | chunk_pairs=0 | vector_profile=pipeline0ml | vector_links=0
 Output: {'chunk_pairs_scored': 0,
- 'documents_analyzed': 1,
- 'links_count': 0,
+ 'documents_analyzed': 3,
+ 'links_count': 1,
  'method': 'topic-sentence-audit+vector-v2',
- 'pairs_evaluated': 0,
+ 'pairs_evaluated': 3,
  'sentence_pairs_scored': 0,
  'vector_links_count': 0,
  'vector_profile': 'pipeline0ml'}
@@ -2403,10 +2803,10 @@ Output: {'chunk_pairs_scored': 0,
 [elasticsearch] desactive ou indisponible -> fallback flux local.
 [Component: elasticsearch]
 Type: dict
-Summary: enabled=True | available=False | indexed=0 | cls_input=1 | cls_synced=0 | cls_docs=0 | ext_docs=0 | nlp=None docs=0 tokens=0 errors=0
+Summary: enabled=True | available=False | indexed=0 | cls_input=3 | cls_synced=0 | cls_docs=0 | ext_docs=0 | nlp=None docs=0 tokens=0 errors=0
 Output: {'available': False,
  'classification_docs': 0,
- 'classification_input': 1,
+ 'classification_input': 3,
  'classification_synced': 0,
  'doc_ids': 0,
  'enabled': True,
@@ -2420,6 +2820,14 @@ Output: {'available': False,
  'nlp_tokens_indexed': 0,
  'nlp_unresolved_rows': 0}
 
+
+[extraction]
+  doc: facture_total_correct.pdf | type=UNCLASSIFIED | status=REVIEW
+  rulesets: common.json
+    - doc_date (rule_id=CMN_DATE_01)  x0
+    - email (rule_id=CMN_EMAIL_01)  x0
+    - telephone (rule_id=CMN_PHONE_01)  x0
+    - site (rule_id=CMN_URL_01)  x0
 [extraction-regles] regex invalide pour 'numero_facture': missing ), unterminated subpattern at position 21 | pattern=(?xim)\b(?:facture\s*(?:n(?:o|°|º)?|num(?:e|é)?ro|number|no\.?|#)|(?:n(?:o|°|º)?|num(?:e|é)?ro)\s*de\s*facture|invoice\s*(?:number|no\.?|#)|رقم\s*الفاتورة|فاتورة\s*(?:رقم|#)?|الفاتورة\s*(?:رقم|#)?)\b[\s\t:;=\-–—#]*([A-Za-z0-9٠-٩ء-ي][A-Za-z0-9٠-٩ء-ي._\/-]{0,30}(?:[ \t][A-Za-z0-9٠-٩ء-ي._\/-]{1,30}){0,2})
 
 [extraction]
@@ -2436,11 +2844,36 @@ Output: {'available': False,
     - montant_tva (rule_id=INV_AMOUNT_TVA_02)  x0
     - montant_ttc (rule_id=INV_AMOUNT_TTC_02)  x0
     - devise (rule_id=INV_CURRENCY_03)  x0
+
+[extraction]
+  doc: invoice_total_incorrect.pdf | type=UNCLASSIFIED | status=REVIEW
+  rulesets: common.json
+    - doc_date (rule_id=CMN_DATE_01)  x0
+    - email (rule_id=CMN_EMAIL_01)  x0
+    - telephone (rule_id=CMN_PHONE_01)  x0
+    - site (rule_id=CMN_URL_01)  x0
 [Component: extraction-regles]
 Type: list
-Summary: 1 docs | fields=11 | image2tab.webp->FACTURE
-Output: [{'classification_status': 'OK',
-  'doc_id': 'ad9e6ec4-e8fb-4b41-902f-982a486c44c6',
+Summary: 3 docs | fields=19 | facture_total_correct.pdf->UNCLASSIFIED, image2tab.webp->FACTURE, invoice_total_incorrect.pdf->UNCLASSIFIED
+Output: [{'classification_status': 'REVIEW',
+  'doc_id': '3cab1794-d780-40eb-b4f8-629832a735d5',
+  'doc_type': 'UNCLASSIFIED',
+  'fields': {'doc_date': {'many': True, 'matches': [], 'rule_id': 'CMN_DATE_01', 'type': 'date'},
+             'email': {'many': True, 'matches': [], 'rule_id': 'CMN_EMAIL_01', 'type': 'email'},
+             'site': {'many': True, 'matches': [], 'rule_id': 'CMN_URL_01', 'type': 'url'},
+             'telephone': {'many': True,
+                           'matches': [],
+                           'rule_id': 'CMN_PHONE_01',
+                           'type': 'phone'}},
+  'filename': 'facture_total_correct.pdf',
+  'ruleset': {'applied_rulesets': ['common.json'],
+              'routes_config': {'default_rulesets': ['{doc_type}.json'],
+                                'include_common': True,
+                                'ruleset_mapping': {'BON_DE_COMMANDE': ['BON_DE_COMMANDE.json'],
+                                                    'CONTRAT': ['CONTRAT.json'],
+                                                    'FACTURE': ['FACTURE.json']}}}},
+ {'classification_status': 'OK',
+  'doc_id': '6513fa77-bf21-4d0b-adc4-ba52e33762c1',
   'doc_type': 'FACTURE',
   'fields': {'date_echeance': {'many': True,
                                'matches': [],
@@ -2483,27 +2916,48 @@ Output: [{'classification_status': 'OK',
                                 'include_common': True,
                                 'ruleset_mapping': {'BON_DE_COMMANDE': ['BON_DE_COMMANDE.json'],
                                                     'CONTRAT': ['CONTRAT.json'],
+                                                    'FACTURE': ['FACTURE.json']}}}},
+ {'classification_status': 'REVIEW',
+  'doc_id': 'ca523c1c-7cd4-4377-a03c-55a007b3a321',
+  'doc_type': 'UNCLASSIFIED',
+  'fields': {'doc_date': {'many': True, 'matches': [], 'rule_id': 'CMN_DATE_01', 'type': 'date'},
+             'email': {'many': True, 'matches': [], 'rule_id': 'CMN_EMAIL_01', 'type': 'email'},
+             'site': {'many': True, 'matches': [], 'rule_id': 'CMN_URL_01', 'type': 'url'},
+             'telephone': {'many': True,
+                           'matches': [],
+                           'rule_id': 'CMN_PHONE_01',
+                           'type': 'phone'}},
+  'filename': 'invoice_total_incorrect.pdf',
+  'ruleset': {'applied_rulesets': ['common.json'],
+              'routes_config': {'default_rulesets': ['{doc_type}.json'],
+                                'include_common': True,
+                                'ruleset_mapping': {'BON_DE_COMMANDE': ['BON_DE_COMMANDE.json'],
+                                                    'CONTRAT': ['CONTRAT.json'],
                                                     'FACTURE': ['FACTURE.json']}}}}]
 
+[table-0ml] facture_total_correct.pdf | tables=0 | rows=0 | cols=[]
 [table-0ml] image2tab.webp | tables=2 | rows=10 | cols=['product', 'quantity', 'reference', 'total', 'unit_price']
-[fusion-resultats-0ml] docs=1 | table_docs=1
+[table-0ml] invoice_total_incorrect.pdf | tables=0 | rows=0 | cols=[]
+[fusion-resultats-0ml] docs=3 | table_docs=3
+[totaux-check] facture_total_correct.pdf | status=partial_ok | passed=1 | rows=0/0 | subtotal=None~None | tax=None | total=None
 [totaux-check] image2tab.webp | status=partial_ok | passed=1 | rows=10/10 | subtotal=180204.00~None | tax=None | total=180204.00
+[totaux-check] invoice_total_incorrect.pdf | status=partial_ok | passed=1 | rows=0/0 | subtotal=None~None | tax=None | total=None
 [Component: fusion-resultats]
-[fusion-result] source=local-context | docs=1 | es_synced=0
+[fusion-result] source=local-context | docs=3 | es_synced=0
 [fusion-result] JSON fusionne ecrit dans /home/mourad/Bureau/DMS/core/fusion_output.json
 [Component: fusion-resultats]
 Type: dict
-Summary: fusion -> /home/mourad/Bureau/DMS/core/fusion_output.json | source=local-context | docs=1 | es_synced=0
-Output: {'docs': 1,
+Summary: fusion -> /home/mourad/Bureau/DMS/core/fusion_output.json | source=local-context | docs=3 | es_synced=0
+Output: {'docs': 3,
  'es_synced': 0,
  'path': '/home/mourad/Bureau/DMS/core/fusion_output.json',
  'skipped': False,
  'source': 'local-context'}
 
-[postgres-sync] enabled=1 | ready=1 | run=run-20260404T101056734697Z | docs=1/1 | payloads=1 | nodes=790 | ids=5 | pages=1 | tokens=76 | topics=0 | extracts=11 | tables=4 | rows=36 | cells=42 | links=0 | registry=15 | skipped=no
+[postgres-sync] enabled=1 | ready=1 | run=run-20260404T111819406866Z | docs=3/3 | payloads=3 | nodes=1382 | ids=15 | pages=3 | tokens=76 | topics=0 | extracts=19 | tables=4 | rows=36 | cells=42 | links=1 | registry=28 | skipped=no
 [Component: postgres-sync]
 Type: dict
-Summary: ready=1 | db=dms_core | run=run-20260404T101056734697Z | docs=1/1 | payloads=1 | nodes=790 | ids=5 | pages=1 | tokens=76 | topics=0 | extracts=11 | tables=4 | rows=36 | cells=42 | links=0 | registry=15
+Summary: ready=1 | db=dms_core | run=run-20260404T111819406866Z | docs=3/3 | payloads=3 | nodes=1382 | ids=15 | pages=3 | tokens=76 | topics=0 | extracts=19 | tables=4 | rows=36 | cells=42 | links=1 | registry=28
 Output: {'anti_confusion_hits_upserted': 0,
  'anti_confusion_targets_upserted': 5,
  'bm25_chunks_upserted': 0,
@@ -2511,28 +2965,28 @@ Output: {'anti_confusion_hits_upserted': 0,
  'chunk_embeddings_upserted': 0,
  'classification_keyword_matches_upserted': 5,
  'classification_score_audit_upserted': 22,
- 'classification_scores_upserted': 5,
- 'component_audit_upserted': 13,
- 'component_metrics_upserted': 83,
+ 'classification_scores_upserted': 15,
+ 'component_audit_upserted': 39,
+ 'component_metrics_upserted': 241,
  'config_path': '/home/mourad/Bureau/DMS/core/component/postgres/postgres_connection.py',
  'database': 'dms_core',
  'database_created': False,
- 'document_payload_nodes_upserted': 739,
- 'documents_total': 1,
- 'documents_upserted': 1,
+ 'document_payload_nodes_upserted': 1331,
+ 'documents_total': 3,
+ 'documents_upserted': 3,
  'enabled': True,
  'entities_upserted': 5,
  'error': None,
- 'extraction_details_upserted': 11,
- 'extraction_summaries_upserted': 1,
- 'extractions_upserted': 1,
- 'features_upserted': 5,
+ 'extraction_details_upserted': 19,
+ 'extraction_summaries_upserted': 3,
+ 'extractions_upserted': 3,
+ 'features_upserted': 15,
  'fusion_audit_written': True,
  'fusion_path': '/home/mourad/Bureau/DMS/core/fusion_output.json',
  'host': '127.0.0.1',
  'human_review_tasks_upserted': 0,
- 'identifiers_upserted': 5,
- 'ingest_rows_upserted': 1,
+ 'identifiers_upserted': 15,
+ 'ingest_rows_upserted': 3,
  'layout_header_cells_upserted': 0,
  'layout_header_rows_upserted': 24,
  'layout_table_rows_upserted': 24,
@@ -2540,29 +2994,29 @@ Output: {'anti_confusion_hits_upserted': 0,
  'link_sentence_matches_upserted': 0,
  'link_shared_terms_upserted': 0,
  'link_shared_topics_upserted': 0,
- 'links_total': 0,
- 'links_upserted': 0,
- 'log_entries_created': 1,
+ 'links_total': 1,
+ 'links_upserted': 1,
+ 'log_entries_created': 3,
  'nlp_matches_upserted': 0,
  'pages_meta_upserted': 0,
- 'pages_upserted': 1,
- 'payloads_upserted': 1,
+ 'pages_upserted': 3,
+ 'payloads_upserted': 3,
  'pipeline_profile': 'pipeline0ml',
  'port': 5432,
- 'processing_durations_upserted': 1,
+ 'processing_durations_upserted': 3,
  'processing_logs_upserted': 0,
- 'processing_steps_upserted': 13,
+ 'processing_steps_upserted': 39,
  'processing_warnings_upserted': 0,
- 'quality_check_steps_upserted': 4,
- 'quality_checks_upserted': 2,
- 'quality_declared_locations_upserted': 4,
+ 'quality_check_steps_upserted': 12,
+ 'quality_checks_upserted': 4,
+ 'quality_declared_locations_upserted': 10,
  'quality_issue_locations_upserted': 4,
  'quality_row_audit_upserted': 10,
  'ready': True,
- 'regex_fields_upserted': 11,
+ 'regex_fields_upserted': 19,
  'regex_matches_upserted': 0,
  'relations_upserted': 0,
- 'run_id': 'run-20260404T101056734697Z',
+ 'run_id': 'run-20260404T111819406866Z',
  'run_payload_nodes_upserted': 51,
  'run_upserted': 1,
  'schema_config_path': '/home/mourad/Bureau/DMS/core/component/postgres/postgres_schema.py',
@@ -2573,7 +3027,7 @@ Output: {'anti_confusion_hits_upserted': 0,
  'sentences_upserted': 6,
  'skipped': None,
  'source': 'local-context',
- 'stable_registry_upserted': 15,
+ 'stable_registry_upserted': 28,
  'structure_rows_upserted': 0,
  'sync_enabled': True,
  'sync_write_fusion_audit': True,
@@ -2614,7 +3068,7 @@ Output: {'anti_confusion_hits_upserted': 0,
                   'dms.stable_id_registry'],
  'tables_upserted': 4,
  'text_normalization_items_upserted': 0,
- 'texts_upserted': 1,
+ 'texts_upserted': 3,
  'tokens_upserted': 76,
  'topics_upserted': 0,
  'user': 'postgres',

@@ -14,6 +14,7 @@
 
 import uuid
 import re
+import subprocess
 import zipfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -393,22 +394,93 @@ def _pdf_extract_text_preserve_layout(page) -> str:
 
 
 def _docx_xml_to_text(xml_bytes: bytes) -> str:
+    return "\n\n".join(_docx_xml_to_pages(xml_bytes))
+
+
+def _docx_xml_to_pages(xml_bytes: bytes) -> List[str]:
     ns = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
     root = ET.fromstring(xml_bytes)
 
-    out_lines = []
+    pages: List[List[str]] = [[]]
     for p in root.findall(".//w:p", ns):
-        line_parts = []
+        line_parts: List[str] = []
+
+        def _flush_page_break() -> None:
+            current_line = "".join(line_parts)
+            pages[-1].append(current_line)
+            line_parts.clear()
+            pages.append([])
+
         for node in p.iter():
             tag = node.tag
             if tag.endswith("}t"):
                 line_parts.append(node.text if node.text is not None else "")
             elif tag.endswith("}tab"):
                 line_parts.append("\t")
-            elif tag.endswith("}br") or tag.endswith("}cr"):
+            elif tag.endswith("}br"):
+                br_type = node.attrib.get(f"{{{ns['w']}}}type") or node.attrib.get("type")
+                if str(br_type or "").strip().lower() == "page":
+                    _flush_page_break()
+                else:
+                    line_parts.append("\n")
+            elif tag.endswith("}lastRenderedPageBreak"):
+                _flush_page_break()
+            elif tag.endswith("}cr"):
                 line_parts.append("\n")
-        out_lines.append("".join(line_parts))
-    return "\n".join(out_lines)
+        pages[-1].append("".join(line_parts))
+
+    out = ["\n".join(lines) for lines in pages]
+    while len(out) > 1 and not str(out[-1] or "").strip():
+        out.pop()
+    return out or [""]
+
+
+def _docx_app_page_count(docx_zip: zipfile.ZipFile) -> Optional[int]:
+    try:
+        if "docProps/app.xml" not in docx_zip.namelist():
+            return None
+        raw = docx_zip.read("docProps/app.xml").decode("utf-8", errors="ignore")
+        match = re.search(r"<Pages>(\d+)</Pages>", raw)
+        if not match:
+            return None
+        value = int(match.group(1))
+        return value if value > 0 else None
+    except Exception:
+        return None
+
+
+def _pdf_page_count(path: str) -> Optional[int]:
+    try:
+        proc = subprocess.run(
+            ["pdfinfo", str(path)],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=5,
+        )
+        text = proc.stdout.decode("utf-8", errors="ignore")
+        for line in text.splitlines():
+            if line.lower().startswith("pages:"):
+                value = int(line.split(":", 1)[1].strip())
+                return value if value > 0 else None
+    except Exception:
+        pass
+    return None
+
+
+def _pad_pages_text(pages_text: List[str], total: Optional[int]) -> List[str]:
+    rows = list(pages_text or [])
+    if not rows:
+        rows = [""]
+    try:
+        expected = int(total) if total is not None else len(rows)
+    except Exception:
+        expected = len(rows)
+    if expected <= 0:
+        expected = len(rows) or 1
+    if len(rows) >= expected:
+        return rows
+    return rows + [""] * (expected - len(rows))
 
 
 def _pptx_slide_xml_to_text(xml_bytes: bytes) -> str:
@@ -597,41 +669,49 @@ def extract_text_native(path: str) -> dict:
 
     # PDF
     if ext == ".pdf":
+        detected_total = _pdf_page_count(path)
         PdfReader, backend = _get_pdf_reader_with_name()
         if PdfReader is not None:
-            reader = PdfReader(path)
-            pages = reader.pages
-            pages_text = []
-            total = len(pages)
+            try:
+                reader = PdfReader(path)
+                pages = reader.pages
+                pages_text = []
+                total = detected_total or len(pages)
 
-            for i, page in enumerate(pages, start=1):
-                txt = _pdf_extract_text_preserve_layout(page)
-                pages_text.append(txt)
-                if PRINT_DURING_EXTRACTION:
-                    print(f"[native:{backend}] {filename} page {i}/{total}")
-                    print(txt)
-                    print("-" * 120)
+                for i, page in enumerate(pages, start=1):
+                    txt = _pdf_extract_text_preserve_layout(page)
+                    pages_text.append(txt)
+                    if PRINT_DURING_EXTRACTION:
+                        print(f"[native:{backend}] {filename} page {i}/{total}")
+                        print(txt)
+                        print("-" * 120)
 
-            full = "\n\n".join(pages_text)
-            return {
-                "doc_id": str(uuid.uuid4()),
-                "filename": filename,
-                "source_path": path,
-                "size": file_size,
-                "content": "text",
-                "extraction": f"native:pdf:{backend}",
-                "text": full,
-                "pages_text": pages_text,
-                "page_count_total": total,
-            }
+                pages_text = _pad_pages_text(pages_text, total)
+                full = "\n\n".join(pages_text)
+                return {
+                    "doc_id": str(uuid.uuid4()),
+                    "filename": filename,
+                    "source_path": path,
+                    "size": file_size,
+                    "content": "text",
+                    "extraction": f"native:pdf:{backend}",
+                    "text": full,
+                    "pages_text": pages_text,
+                    "page_count_total": total,
+                }
+            except Exception:
+                pass
 
         # Fallback pdfminer
         try:
             from pdfminer.high_level import extract_text  # type: ignore
             full = extract_text(path) or ""
             pages = full.split("\f")
+            if len(pages) > 1 and not str(pages[-1] or "").strip():
+                pages.pop()
             pages_text = [p for p in pages]  # garder brut, sans strip
-            total = len(pages_text)
+            total = detected_total or len(pages_text) or 1
+            pages_text = _pad_pages_text(pages_text, total)
 
             if PRINT_DURING_EXTRACTION:
                 for i, txt in enumerate(pages_text, start=1):
@@ -652,6 +732,7 @@ def extract_text_native(path: str) -> dict:
                 "page_count_total": total,
             }
         except Exception:
+            total = detected_total or 1
             return {
                 "doc_id": str(uuid.uuid4()),
                 "filename": filename,
@@ -660,8 +741,8 @@ def extract_text_native(path: str) -> dict:
                 "content": "text",
                 "extraction": "native:pdf:none",
                 "text": "",
-                "pages_text": [""],
-                "page_count_total": 1,
+                "pages_text": _pad_pages_text([""], total),
+                "page_count_total": total,
             }
 
     # Office/OpenDocument/EPUB
@@ -672,14 +753,18 @@ def extract_text_native(path: str) -> dict:
 
                 if ext == ".docx":
                     parts = []
+                    main_pages: List[str] = [""]
                     if "word/document.xml" in names:
-                        parts.append(_docx_xml_to_text(z.read("word/document.xml")))
+                        main_pages = _docx_xml_to_pages(z.read("word/document.xml"))
+                        parts.append("\n\n".join(main_pages))
                     for nm in names:
                         if nm.startswith("word/header") and nm.endswith(".xml"):
                             parts.append(_docx_xml_to_text(z.read(nm)))
                         if nm.startswith("word/footer") and nm.endswith(".xml"):
                             parts.append(_docx_xml_to_text(z.read(nm)))
                     text = "\n\n".join(parts)
+                    declared_pages = _docx_app_page_count(z)
+                    page_count_total = declared_pages or len(main_pages) or 1
                     return {
                         "doc_id": str(uuid.uuid4()),
                         "filename": filename,
@@ -688,8 +773,8 @@ def extract_text_native(path: str) -> dict:
                         "content": "text",
                         "extraction": "native:docx:xml",
                         "text": text,
-                        "pages_text": [text],
-                        "page_count_total": 1,
+                        "pages_text": _pad_pages_text(main_pages or [text], page_count_total),
+                        "page_count_total": page_count_total,
                     }
 
                 if ext == ".xlsx":

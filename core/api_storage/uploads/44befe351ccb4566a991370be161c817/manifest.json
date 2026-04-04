@@ -1,0 +1,20 @@
+{
+  "job_id": "44befe351ccb4566a991370be161c817",
+  "received_at": "2026-04-04T20:24:27.452603+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "a87f0dc2b6564bb29abdad872ca44e1c",
+      "file_name": "testwordlambo.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 11823,
+      "file_sha256": "39fe625dd5320bfecb56dccf774dead5238d7eb3ca01b0dda9d92acc9f6cefe9",
+      "stored_relative_path": "api_storage/uploads/44befe351ccb4566a991370be161c817/testwordlambo.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/44befe351ccb4566a991370be161c817/testwordlambo.docx",
+      "api_route": "/api/documents/file/44befe351ccb4566a991370be161c817/testwordlambo.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/44befe351ccb4566a991370be161c817/testwordlambo.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/44befe351ccb4566a991370be161c817/testwordlambo.docx"
+    }
+  ]
+}

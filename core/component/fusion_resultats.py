@@ -11,7 +11,7 @@ ou  runpy.run_path("component/fusion_resultats.py", init_globals=ctx)
 
 from __future__ import annotations
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 import json
 import sys
 import unicodedata
@@ -48,6 +48,10 @@ def merge_list(*args: Optional[List[Any]]) -> List[Any]:
 
 def _safe_list(value: Any) -> List[Any]:
     return value if isinstance(value, list) else []
+
+
+def _safe_dict(value: Any) -> Dict[str, Any]:
+    return value if isinstance(value, dict) else {}
 
 
 def _safe_load_json(value: Any) -> Any:
@@ -355,6 +359,33 @@ def _normalize_pages_from_doc(row: Dict[str, Any]) -> List[Dict[str, Any]]:
     return out
 
 
+def _derive_doc_page_count(
+    file_obj: Optional[Dict[str, Any]] = None,
+    structure_obj: Optional[Dict[str, Any]] = None,
+    final_doc: Optional[Dict[str, Any]] = None,
+    tok_doc: Optional[Dict[str, Any]] = None,
+) -> int:
+    file_obj = file_obj if isinstance(file_obj, dict) else {}
+    structure_obj = structure_obj if isinstance(structure_obj, dict) else {}
+    final_doc = final_doc if isinstance(final_doc, dict) else {}
+    tok_doc = tok_doc if isinstance(tok_doc, dict) else {}
+
+    for raw in (
+        file_obj.get("page_count"),
+        file_obj.get("page_count_total"),
+        final_doc.get("page_count_total"),
+        tok_doc.get("page_count_total"),
+    ):
+        value = _safe_int(raw, 0)
+        if value > 0:
+            return value
+
+    pages = _safe_list(structure_obj.get("pages"))
+    if pages:
+        return len(pages)
+    return 0
+
+
 def _filter_and_dedupe_extractions(
     rows: Any,
     doc_id: Optional[str],
@@ -631,7 +662,7 @@ def _nlp_from_es_and_ctx(
     out: Dict[str, Any] = {
         "source": "elasticsearch",
         "level": level,
-        "language": ctx.get("NLP_LANGUAGE"),
+        "language": None,
         "summary": {
             "languages": _safe_list(es_nlp.get("languages")) or _safe_list(src.get("detected_languages")),
             "language_stats": es_nlp.get("language_stats") if isinstance(es_nlp, dict) else {},
@@ -649,6 +680,20 @@ def _nlp_from_es_and_ctx(
         "matches": _filter_rows_for_doc(ctx.get("NLP_MATCHES"), doc_id, filename),
         "tokens": tokens_rows,
     }
+    doc_langs, primary_lang, lang_stats = _derive_doc_languages(
+        pages=_es_pages(src),
+        nlp_sentences=sentences,
+        nlp_entities=entities,
+        nlp_matches=out.get("matches"),
+        nlp_tokens=tokens_rows,
+        nlp_obj=out,
+        fallback=_safe_list(src.get("detected_languages")) or extract_detected_languages(ctx),
+    )
+    out["language"] = primary_lang or ctx.get("NLP_LANGUAGE")
+    out_summary = _safe_dict(out.get("summary"))
+    out_summary["languages"] = doc_langs or _safe_list(out_summary.get("languages"))
+    out_summary["language_stats"] = lang_stats or _safe_dict(out_summary.get("language_stats"))
+    out["summary"] = out_summary
 
     if level == "full":
         tokens_index = _default_nlp_tokens_index(ctx)
@@ -791,7 +836,7 @@ def _extract_component_views(
     is_text_file = any(_same_doc_hint(p, filename, first_path) for p in text_files)
     is_image_file = any(_same_doc_hint(p, filename, first_path) for p in image_files)
 
-    final_rows = _safe_list(ctx.get("FINAL_DOCS"))
+    final_rows = _dedupe_docs(_safe_list(ctx.get("FINAL_DOCS")))
     final_doc = {}
     for row in final_rows:
         if not isinstance(row, dict):
@@ -800,7 +845,7 @@ def _extract_component_views(
             final_doc = row
             break
 
-    tok_rows = _safe_list(ctx.get("TOK_DOCS") or ctx.get("selected"))
+    tok_rows = _dedupe_docs(_safe_list(ctx.get("TOK_DOCS") or ctx.get("selected")))
     tok_doc = {}
     for row in tok_rows:
         if not isinstance(row, dict):
@@ -890,7 +935,7 @@ def _extract_component_views(
             "text_length": len(str((doc_payload.get("text") or {}).get("text_raw") or "")),
         },
         "tokenisation_layout": {
-            "pages_count": len(tok_pages),
+            "pages_count": _safe_int(tok_doc.get("page_count_total"), 0) or len(tok_pages),
             "sentences_count": tok_sentences,
             "detected_languages": _safe_list(tok_doc.get("detected_languages")),
         },
@@ -984,7 +1029,7 @@ def _to_document_output(
     interdoc_link_ids = _interdoc_link_ids_for_doc(ctx, document_id, filename)
 
     components = _extract_component_views(ctx, doc_payload)
-    page_count = len(_safe_list(structure_obj.get("pages")))
+    page_count = _derive_doc_page_count(file_obj, structure_obj)
 
     return {
         "document_id": document_id or doc_payload.get("document_id"),
@@ -1124,6 +1169,101 @@ def extract_extractions(ctx: Dict[str, Any]) -> Any:
 
 def extract_detected_languages(ctx: Dict[str, Any]) -> List[str]:
     return ctx.get("DETECTED_LANGUAGES") or []
+
+
+def _split_lang_values(raw: Any) -> List[str]:
+    text = str(raw or "").strip().lower()
+    if not text:
+        return []
+    for sep in ("|", ";", "/"):
+        text = text.replace(sep, ",")
+    parts = [part.strip() for part in text.split(",")] if "," in text else [text]
+    out: List[str] = []
+    for part in parts:
+        if not part or part in {"unknown", "und", "none", "null", "non_specified", "n/a"}:
+            continue
+        out.append(part)
+    return out
+
+
+def _add_lang_counts(counter: Counter, order: Dict[str, int], raw: Any, weight: int = 1) -> None:
+    if raw is None:
+        return
+    if isinstance(raw, str):
+        for lang in _split_lang_values(raw):
+            if lang not in order:
+                order[lang] = len(order)
+            counter[lang] += max(1, int(weight or 1))
+        return
+    if isinstance(raw, list):
+        for item in raw:
+            _add_lang_counts(counter, order, item, weight=weight)
+        return
+    if isinstance(raw, dict):
+        for key in ("language", "lang", "code"):
+            if raw.get(key):
+                _add_lang_counts(counter, order, raw.get(key), weight=weight)
+                return
+        numeric_found = False
+        for key, value in raw.items():
+            if isinstance(value, (int, float)) and str(key).strip():
+                numeric_found = True
+                try:
+                    item_weight = max(1, int(value))
+                except Exception:
+                    item_weight = 1
+                _add_lang_counts(counter, order, str(key), weight=item_weight)
+        if numeric_found:
+            return
+
+
+def _derive_doc_languages(
+    *,
+    tok_doc: Optional[Dict[str, Any]] = None,
+    pages: Any = None,
+    nlp_sentences: Any = None,
+    nlp_entities: Any = None,
+    nlp_matches: Any = None,
+    nlp_tokens: Any = None,
+    nlp_obj: Optional[Dict[str, Any]] = None,
+    fallback: Any = None,
+) -> Tuple[List[str], Optional[str], Dict[str, int]]:
+    counter: Counter = Counter()
+    order: Dict[str, int] = {}
+
+    if isinstance(tok_doc, dict):
+        _add_lang_counts(counter, order, tok_doc.get("detected_languages"))
+        _add_lang_counts(counter, order, tok_doc.get("language_stats"))
+
+    for page in _safe_list(pages):
+        if not isinstance(page, dict):
+            continue
+        _add_lang_counts(counter, order, page.get("lang"))
+        _add_lang_counts(counter, order, page.get("detected_languages"))
+        for item in _safe_list(page.get("sentences_layout")):
+            if not isinstance(item, dict):
+                continue
+            _add_lang_counts(counter, order, item.get("lang"))
+
+    for rows in (nlp_sentences, nlp_entities, nlp_matches, nlp_tokens):
+        for row in _safe_list(rows):
+            if not isinstance(row, dict):
+                continue
+            _add_lang_counts(counter, order, row.get("lang") or row.get("language"))
+
+    nlp_obj = _safe_dict(nlp_obj)
+    summary = _safe_dict(nlp_obj.get("summary"))
+    _add_lang_counts(counter, order, summary.get("language_stats"))
+    _add_lang_counts(counter, order, summary.get("languages"))
+    if not counter:
+        _add_lang_counts(counter, order, nlp_obj.get("languages"))
+        _add_lang_counts(counter, order, nlp_obj.get("language"))
+
+    if not counter:
+        _add_lang_counts(counter, order, fallback)
+
+    langs = sorted(counter.keys(), key=lambda lang: (-counter[lang], order.get(lang, 10**9), lang))
+    return langs, (langs[0] if langs else None), {lang: int(counter[lang]) for lang in langs}
 
 
 def _text_from_tok_pages(pages: List[Dict[str, Any]]) -> str:
@@ -1275,13 +1415,20 @@ def _build_local_payload_for_doc(
     )
 
     doc_type = str(classification.get("doc_type") or ns())
-    detected_langs = _safe_list(tok_doc.get("detected_languages")) or extract_detected_languages(ctx)
     extraction_rows = _filter_and_dedupe_extractions(ctx.get("EXTRACTIONS"), doc_id, filename)
 
     nlp_sentences = _filter_rows_for_doc(ctx.get("NLP_SENTENCES"), doc_id, filename)
     nlp_entities = _filter_rows_for_doc(ctx.get("NLP_ENTITIES"), doc_id, filename)
     nlp_matches = _filter_rows_for_doc(ctx.get("NLP_MATCHES"), doc_id, filename)
     nlp_tokens = _collect_local_tokens_for_doc(ctx, doc_id, filename)
+    detected_langs, primary_lang, language_stats = _derive_doc_languages(
+        tok_doc=tok_doc,
+        pages=pages,
+        nlp_sentences=nlp_sentences,
+        nlp_entities=nlp_entities,
+        nlp_matches=nlp_matches,
+        nlp_tokens=nlp_tokens,
+    )
 
     payload: Dict[str, Any] = {
         "document_id": doc_id,
@@ -1289,6 +1436,11 @@ def _build_local_payload_for_doc(
             "path": paths,
             "name": filename,
             "size": file_size,
+            "page_count": _derive_doc_page_count(
+                final_doc=final_doc,
+                tok_doc=tok_doc,
+                structure_obj={"pages": pages},
+            ),
         },
         "content": {
             "content_type": doc_type,
@@ -1340,7 +1492,12 @@ def _build_local_payload_for_doc(
             "quality_checks": ctx.get("QUALITY_CHECKS") or [],
         },
         "nlp": {
-            "language": ctx.get("NLP_LANGUAGE"),
+            "language": primary_lang,
+            "languages": detected_langs,
+            "summary": {
+                "languages": detected_langs,
+                "language_stats": language_stats,
+            },
             "sentences": nlp_sentences,
             "entities": nlp_entities,
             "matches": nlp_matches,
@@ -1401,10 +1558,12 @@ def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
     text_raw = extract_text_raw(ctx)
     pages_meta = extract_pages_meta(ctx)
     pages = extract_pages(ctx)
-    detected_langs = extract_detected_languages(ctx)
     tok_docs = _dedupe_docs(_safe_list(ctx.get("TOK_DOCS") or ctx.get("selected")))
     first_doc = first(tok_docs) if tok_docs else {}
     first_doc = first_doc if isinstance(first_doc, dict) else {}
+    final_docs = [d for d in _safe_list(ctx.get("FINAL_DOCS")) if isinstance(d, dict)]
+    first_final_doc = first(final_docs) if final_docs else {}
+    first_final_doc = first_final_doc if isinstance(first_final_doc, dict) else {}
     file_paths = _safe_list(ctx.get("INPUT_FILE")) or _safe_list(first_doc.get("paths"))
     file_name = (
         _basename(file_paths[0])
@@ -1488,12 +1647,30 @@ def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
             ),
         )
 
+    nlp_sentences = _safe_list(ctx.get("NLP_SENTENCES") or [])
+    nlp_entities = _safe_list(ctx.get("NLP_ENTITIES") or [])
+    nlp_matches = _safe_list(ctx.get("NLP_MATCHES") or [])
+    detected_langs, primary_lang, language_stats = _derive_doc_languages(
+        tok_doc=first_doc,
+        pages=pages,
+        nlp_sentences=nlp_sentences,
+        nlp_entities=nlp_entities,
+        nlp_matches=nlp_matches,
+        nlp_tokens=nlp_tokens,
+        fallback=extract_detected_languages(ctx),
+    )
+
     payload: Dict[str, Any] = {
         "document_id": ctx.get("DOC_ID") or ns(),
         "file": {
             "path": file_paths,
             "name": file_name,
             "size": file_size,
+            "page_count": _derive_doc_page_count(
+                final_doc=first_final_doc,
+                tok_doc=first_doc,
+                structure_obj={"pages": pages},
+            ),
         },
         "content": {
             "content_type": doc_type,
@@ -1545,10 +1722,15 @@ def build_payload_from_context(ctx: Dict[str, Any]) -> Dict[str, Any]:
             "quality_checks": ctx.get("QUALITY_CHECKS") or [],
         },
         "nlp": {
-            "language": ctx.get("NLP_LANGUAGE"),
-            "sentences": ctx.get("NLP_SENTENCES") or [],
-            "entities": ctx.get("NLP_ENTITIES") or [],
-            "matches": ctx.get("NLP_MATCHES") or [],
+            "language": primary_lang or ctx.get("NLP_LANGUAGE"),
+            "languages": detected_langs,
+            "summary": {
+                "languages": detected_langs,
+                "language_stats": language_stats,
+            },
+            "sentences": nlp_sentences,
+            "entities": nlp_entities,
+            "matches": nlp_matches,
             "tokens": nlp_tokens,
         },
         "processing": {
@@ -1624,8 +1806,22 @@ def build_payload_from_es_source(
     text_raw = str(src.get("full_text") or "") or _es_text_from_pages(src)
     pages = _es_pages(src)
     words = _safe_list(src.get("words"))
-    detected_langs = _safe_list(src.get("detected_languages"))
     file_size = _resolve_file_size(ctx, paths, filename, src.get("size"))
+    nlp_obj = _nlp_from_es_and_ctx(ctx, src, store, doc_id, filename)
+    detected_langs, primary_lang, language_stats = _derive_doc_languages(
+        pages=pages,
+        nlp_sentences=_safe_list(nlp_obj.get("sentences")),
+        nlp_entities=_safe_list(nlp_obj.get("entities")),
+        nlp_matches=_safe_list(nlp_obj.get("matches")),
+        nlp_tokens=_safe_list(nlp_obj.get("tokens")),
+        nlp_obj=nlp_obj,
+        fallback=_safe_list(src.get("detected_languages")),
+    )
+    nlp_obj["language"] = primary_lang or nlp_obj.get("language")
+    nlp_summary = _safe_dict(nlp_obj.get("summary"))
+    nlp_summary["languages"] = detected_langs
+    nlp_summary["language_stats"] = language_stats
+    nlp_obj["summary"] = nlp_summary
 
     payload: Dict[str, Any] = {
         "document_id": doc_id,
@@ -1633,6 +1829,7 @@ def build_payload_from_es_source(
             "path": paths,
             "name": filename,
             "size": file_size,
+            "page_count": _safe_int(src.get("page_count_total"), 0) or len(pages),
         },
         "content": {
             "content_type": doc_type,
@@ -1683,7 +1880,7 @@ def build_payload_from_es_source(
             "relations": ctx.get("RELATIONS") or [],
             "quality_checks": ctx.get("QUALITY_CHECKS") or [],
         },
-        "nlp": _nlp_from_es_and_ctx(ctx, src, store, doc_id, filename),
+        "nlp": nlp_obj,
         "processing": {
             "warnings": ctx.get("PROCESS_WARNINGS") or [],
             "logs": ctx.get("PROCESS_LOGS") or [],

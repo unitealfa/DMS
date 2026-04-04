@@ -1,11 +1,11 @@
 # Project Code Map (DMS Core)
 
-Date d'audit: 2026-04-04
+Date d'audit: 2026-04-05
 
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
 - Python files analyses: 42
-- Fonctions/classes indexees: 970 (voir `FUNCTION_INDEX.txt`)
+- Fonctions/classes indexees: 977 (voir `FUNCTION_INDEX.txt`)
 - Regles metier JSON/YAML: `rules/*.json` + `rules/*.yaml` + `classification/*.json` + `config/ruleset_routes.json` + `config/ruleset_routes.yaml`
 - Note historique: les entrees de changelog anterieures au `2026-03-19` peuvent citer les anciens chemins plats sous `component/` avant le refactoring en sous-dossiers.
 
@@ -535,6 +535,27 @@ Reference implementation:
 - Ce fichier est la reference la plus rapide pour localiser une modification precise.
 
 ## 11) Changelog code
+- 2026-04-05:
+  - correction langues document -> fusion -> PostgreSQL:
+    - `component/tokenisation_layout/tokenisation-layout.py` stocke maintenant aussi `lang` sur chaque chunk `sentences_layout` et renseigne `detected_languages` + `language_stats` au niveau `TOK_DOCS`.
+    - `component/fusion_resultats.py` recalcule maintenant les langues documentaires a partir de l'union reelle des signaux locaux du document:
+      - `pages[].lang`
+      - `pages[].sentences_layout[].lang`
+      - `nlp.sentences[].lang`
+      - `nlp.entities[].lang`
+      - `nlp.matches[].lang`
+      - `nlp.tokens[].lang`
+    - `component/fusion_resultats.py` ne reutilise plus un `NLP_LANGUAGE` global partage comme source principale pour chaque document.
+    - `component/fusion_resultats.py` renseigne maintenant `content.detected_languages`, `nlp.language`, `nlp.languages` et `nlp.summary.language_stats` avec des valeurs documentaires reellement locales.
+    - `pipeline/postgres.py` recalcule maintenant `languages_json` et `language_primary` a partir des champs documentaires locaux (`content`, `document_structure.pages`, `nlp.*`) avant de tomber en fallback sur des champs globaux ou historiques.
+  - validation:
+    - verification directe sur le `fusion_output.json` courant via `pipeline.postgres._extract_languages(...)`:
+      - `arab.docx -> ['ar']`
+      - `englais.docx -> ['en']`
+      - `francais.docx -> ['fr']`
+    - test synthetique multilingue valide:
+      - union correcte des langues de chunks
+      - langue primaire = langue la plus representee
 - 2026-04-04:
   - fiabilisation tableaux / totaux:
     - `component/table_extraction/table_extraction_lib.py` filtre maintenant les `line_items` incomplets:

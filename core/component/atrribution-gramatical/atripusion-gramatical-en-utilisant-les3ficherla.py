@@ -58,17 +58,41 @@ def _normalize_token_fields(token: object, pos_value: object, lemma_value: objec
     return tok, pos_txt, lemma_txt
 
 def detect_lang(text: str) -> str:
-    t = text or ""
+    t = (text or "").strip()
+    if not t:
+        return "en"
+
     if _AR_RE.search(t):
         return "ar"
+
     words = [w.lower() for w in _WORD_RE.findall(t[:8000])]
     if not words:
         return "en"
-    fr_score = sum(1 for w in words if w in _FR_HINT)
-    en_score = sum(1 for w in words if w in _EN_HINT)
+
+    # listes un peu plus riches pour éviter les égalités débiles
+    fr_hint = _FR_HINT | {
+        "de", "du", "au", "aux", "et", "ou", "mais",
+        "ce", "cet", "cette", "ces",
+        "il", "elle", "nous", "vous", "ils", "elles",
+        "son", "sa", "ses", "dans", "sur", "avec", "pour"
+    }
+    en_hint = _EN_HINT | {
+        "a", "an", "this", "that", "these", "those",
+        "it", "its", "he", "she", "we", "they",
+        "as", "also", "from", "on", "by", "into", "over", "under"
+    }
+
+    fr_score = sum(1 for w in words if w in fr_hint)
+    en_score = sum(1 for w in words if w in en_hint)
+
+    # accent = gros indice FR
     if re.search(r"[éèêàùçôîï]", t.lower()):
-        fr_score += 1
-    return "fr" if fr_score >= en_score else "en"
+        fr_score += 2
+
+    # égalité => ne plus favoriser le FR
+    if fr_score > en_score:
+        return "fr"
+    return "en"
 
 def get_previous_cell_input():
     g = globals()
@@ -171,19 +195,33 @@ if data is None:
 
 MAX_SENTENCES_PER_LANG = None  # ex: 30 pour debug, ou None pour tout
 
-print("\n" + "="*120)
-print("RUN EN (engcode.py)")
-print("="*120)
-EN_RESULTS = engcode.run_from_previous_cell(data=data, max_sentences=MAX_SENTENCES_PER_LANG) or []
+all_sentences = []
+for doc_name, page_idx, sent_idx, sent in iter_sentences_from_input(data):
+    sent = (sent or "").strip()
+    if sent:
+        all_sentences.append((doc_name, page_idx, sent_idx, sent, detect_lang(sent)))
 
-print("\n" + "="*120)
-print("RUN FR (frcode.py)")
-print("="*120)
-FR_RESULTS = frcode.run_from_previous_cell(data=data, max_sentences=MAX_SENTENCES_PER_LANG) or []
+has_en = any(lang == "en" for _, _, _, _, lang in all_sentences)
+has_fr = any(lang == "fr" for _, _, _, _, lang in all_sentences)
+has_ar = any(lang == "ar" for _, _, _, _, lang in all_sentences)
 
+EN_RESULTS = []
+FR_RESULTS = []
 AR_RESULTS = []
 
-if HAVE_AR:
+if has_en:
+    print("\n" + "="*120)
+    print("RUN EN (engcode.py)")
+    print("="*120)
+    EN_RESULTS = engcode.run_from_previous_cell(data=data, max_sentences=MAX_SENTENCES_PER_LANG) or []
+
+if has_fr:
+    print("\n" + "="*120)
+    print("RUN FR (frcode.py)")
+    print("="*120)
+    FR_RESULTS = frcode.run_from_previous_cell(data=data, max_sentences=MAX_SENTENCES_PER_LANG) or []
+
+if HAVE_AR and has_ar:
     print("\n" + "="*120)
     print("RUN AR (arabcode.py)")
     print("="*120)

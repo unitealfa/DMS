@@ -11,6 +11,7 @@ import shlex
 import shutil
 import subprocess
 import time
+from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -491,6 +492,14 @@ def _extract_page_count(doc: Dict[str, Any]) -> Optional[int]:
                 return value
         except Exception:
             continue
+    components = _safe_dict(doc.get("components"))
+    output_txt = _safe_dict(components.get("output_txt"))
+    try:
+        value = int(output_txt.get("pages_count"))
+        if value >= 0:
+            return value
+    except Exception:
+        pass
     structure = _safe_dict(doc.get("document_structure"))
     pages = _safe_list(structure.get("pages"))
     if pages:
@@ -559,14 +568,25 @@ def _flatten_languages(*values: Any) -> List[str]:
     langs: List[str] = []
     seen = set()
 
+    def add_text(raw: Any, weight: int = 1) -> None:
+        text = str(raw or "").strip().lower()
+        if not text:
+            return
+        for sep in ("|", ";", "/"):
+            text = text.replace(sep, ",")
+        parts = [part.strip() for part in text.split(",")] if "," in text else [text]
+        for part in parts:
+            if not part or part in {"unknown", "und", "none", "null", "non_specified", "n/a"}:
+                continue
+            if part not in seen:
+                seen.add(part)
+                langs.append(part)
+
     def add(raw: Any) -> None:
         if raw is None:
             return
         if isinstance(raw, str):
-            text = raw.strip()
-            if text and text.lower() not in seen:
-                seen.add(text.lower())
-                langs.append(text)
+            add_text(raw)
             return
         if isinstance(raw, dict):
             for key in ("language", "lang", "code"):
@@ -575,7 +595,7 @@ def _flatten_languages(*values: Any) -> List[str]:
                     return
             for key, value in raw.items():
                 if isinstance(value, (int, float)) and str(key).strip():
-                    add(str(key))
+                    add_text(str(key), int(value) if value else 1)
             return
         if isinstance(raw, list):
             for item in raw:
@@ -593,14 +613,75 @@ def _extract_languages(doc: Dict[str, Any]) -> List[str]:
     token_layout = _safe_dict(components.get("tokenisation_layout"))
     grammar = _safe_dict(components.get("attribution_grammaticale"))
     summary = _safe_dict(_safe_dict(nlp.get("summary")))
-    return _flatten_languages(
-        nlp.get("language"),
-        content.get("detected_languages"),
-        token_layout.get("detected_languages"),
-        grammar.get("language"),
-        grammar.get("languages"),
-        summary.get("language_stats"),
-    )
+    structure = _safe_dict(doc.get("document_structure"))
+    counter: Counter = Counter()
+    order: Dict[str, int] = {}
+
+    def add(raw: Any, weight: int = 1) -> None:
+        if raw is None:
+            return
+        if isinstance(raw, str):
+            for lang in _flatten_languages(raw):
+                if lang not in order:
+                    order[lang] = len(order)
+                counter[lang] += max(1, int(weight or 1))
+            return
+        if isinstance(raw, list):
+            for item in raw:
+                add(item, weight=weight)
+            return
+        if isinstance(raw, dict):
+            for key in ("language", "lang", "code"):
+                if raw.get(key):
+                    add(raw.get(key), weight=weight)
+                    return
+            numeric_found = False
+            for key, value in raw.items():
+                if isinstance(value, (int, float)) and str(key).strip():
+                    numeric_found = True
+                    try:
+                        item_weight = max(1, int(value))
+                    except Exception:
+                        item_weight = 1
+                    add(str(key), weight=item_weight)
+            if numeric_found:
+                return
+
+    add(content.get("detected_languages"))
+    add(token_layout.get("detected_languages"))
+
+    for page in _safe_list(structure.get("pages")):
+        if not isinstance(page, dict):
+            continue
+        add(page.get("lang"))
+        add(page.get("detected_languages"))
+        for item in _safe_list(page.get("sentences_layout")):
+            if not isinstance(item, dict):
+                continue
+            add(item.get("lang"))
+
+    for rows in (
+        _safe_list(nlp.get("sentences")),
+        _safe_list(nlp.get("entities")),
+        _safe_list(nlp.get("matches")),
+        _safe_list(nlp.get("tokens")),
+    ):
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            add(row.get("lang") or row.get("language"))
+
+    add(summary.get("language_stats"))
+    add(summary.get("languages"))
+
+    if not counter:
+        add(grammar.get("languages"))
+        add(grammar.get("language"))
+        add(nlp.get("languages"))
+        add(nlp.get("language"))
+
+    langs = sorted(counter.keys(), key=lambda lang: (-counter[lang], order.get(lang, 10**9), lang))
+    return langs
 
 
 def _extract_language_primary(doc: Dict[str, Any]) -> Optional[str]:

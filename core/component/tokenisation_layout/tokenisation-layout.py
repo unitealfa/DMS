@@ -1,6 +1,7 @@
 import re
 import pickle
 import math
+from collections import Counter
 from pathlib import Path
 try:
     import nltk
@@ -1383,6 +1384,7 @@ for doc in DOC_PACK:
     pages_tok = []
     doc_chars_total = 0
     recompose_ok_doc = True
+    doc_lang_counter = Counter()
 
     for pg in (doc.get("pages") or []):
         page_index = int(pg.get("page_index") or 1)
@@ -1390,6 +1392,7 @@ for doc in DOC_PACK:
         doc_chars_total += len(page_text)
 
         lang = detect_lang(page_text)
+        doc_lang_counter[lang] += 1
 
         items = layout_items(page_text, lang, extraction=extraction)
         recompose_ok = False if any(it.get("layout_kind") in ("multicol_col", "multicol_grid", "table", "header") for it in items) else True
@@ -1401,6 +1404,8 @@ for doc in DOC_PACK:
             chunk = it["text"]
             start = int(it.get("start", 0))
             end = int(it.get("end", start + len(chunk)))
+            chunk_lang = detect_lang(chunk) if str(chunk or "").strip() else lang
+            doc_lang_counter[chunk_lang] += 1
 
             line, col = _line_col_from_offset(page_text, start)
             nonspace = _nonspace_len(chunk)
@@ -1422,6 +1427,7 @@ for doc in DOC_PACK:
                 "nonspace": nonspace,
                 "is_noise": is_noise,
                 "is_sentence": is_sentence,
+                "lang": chunk_lang,
                 "spans": it.get("spans", []),
                 "layout_kind": it.get("layout_kind", "plain"),
                 "col_index": it.get("col_index", None),
@@ -1455,6 +1461,8 @@ for doc in DOC_PACK:
         "pages": pages_tok,
         "chars_total": doc_chars_total,
         "recompose_ok": recompose_ok_doc,
+        "detected_languages": [code for code, _ in doc_lang_counter.most_common()],
+        "language_stats": {code: int(count) for code, count in doc_lang_counter.items()},
     })
 
 def _sort_key(x):
@@ -1581,6 +1589,5 @@ if not selected:
 else:
     for doc in selected:
         print_one_doc(doc)
-
 
 

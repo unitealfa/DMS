@@ -1,0 +1,46 @@
+{
+  "job_id": "1f00eb823e2f4e0e8be3015beeda06c2",
+  "received_at": "2026-04-04T20:25:46.556992+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "c1a692ea8b8d4305a93661415e8a5def",
+      "file_name": "francais.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 14573,
+      "file_sha256": "a9296fb49910362ffdf7ca462f302adcffe5111c439e650f8083e4420a3bec9f",
+      "stored_relative_path": "api_storage/uploads/1f00eb823e2f4e0e8be3015beeda06c2/francais.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/1f00eb823e2f4e0e8be3015beeda06c2/francais.docx",
+      "api_route": "/api/documents/file/1f00eb823e2f4e0e8be3015beeda06c2/francais.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/1f00eb823e2f4e0e8be3015beeda06c2/francais.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/1f00eb823e2f4e0e8be3015beeda06c2/francais.docx"
+    },
+    {
+      "api_document_id": "6145c09bd23245bc9958e39e1568ef65",
+      "file_name": "englais.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 14385,
+      "file_sha256": "40f86b46c803ca789f4b0a617529d26d965a68e8f1b3e6c10f30457f27a12bf3",
+      "stored_relative_path": "api_storage/uploads/1f00eb823e2f4e0e8be3015beeda06c2/englais.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/1f00eb823e2f4e0e8be3015beeda06c2/englais.docx",
+      "api_route": "/api/documents/file/1f00eb823e2f4e0e8be3015beeda06c2/englais.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/1f00eb823e2f4e0e8be3015beeda06c2/englais.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/1f00eb823e2f4e0e8be3015beeda06c2/englais.docx"
+    },
+    {
+      "api_document_id": "8356f884980249fe8ef407a11c0254ca",
+      "file_name": "arab.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 19640,
+      "file_sha256": "cd9cdcdba5aea71f21898c1b63a5c7d1a0261a28c3005858073781cd91617b54",
+      "stored_relative_path": "api_storage/uploads/1f00eb823e2f4e0e8be3015beeda06c2/arab.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/1f00eb823e2f4e0e8be3015beeda06c2/arab.docx",
+      "api_route": "/api/documents/file/1f00eb823e2f4e0e8be3015beeda06c2/arab.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/1f00eb823e2f4e0e8be3015beeda06c2/arab.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/1f00eb823e2f4e0e8be3015beeda06c2/arab.docx"
+    }
+  ]
+}

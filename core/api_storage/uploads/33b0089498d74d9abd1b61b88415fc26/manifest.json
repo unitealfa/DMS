@@ -1,0 +1,33 @@
+{
+  "job_id": "33b0089498d74d9abd1b61b88415fc26",
+  "received_at": "2026-04-04T19:58:20.131985+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "942f63becd40470e879495dbbcaf62fc",
+      "file_name": "test-regex3langue.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 19123,
+      "file_sha256": "5155229eec06563a17a6c99c247819d95771382789dbcd7f17b83e4cc0472a62",
+      "stored_relative_path": "api_storage/uploads/33b0089498d74d9abd1b61b88415fc26/test-regex3langue.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/33b0089498d74d9abd1b61b88415fc26/test-regex3langue.docx",
+      "api_route": "/api/documents/file/33b0089498d74d9abd1b61b88415fc26/test-regex3langue.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/33b0089498d74d9abd1b61b88415fc26/test-regex3langue.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/33b0089498d74d9abd1b61b88415fc26/test-regex3langue.docx"
+    },
+    {
+      "api_document_id": "8370777a59714184963ef32d32c4a641",
+      "file_name": "contras-14page.pdf",
+      "file_ext": ".pdf",
+      "file_mime": "application/pdf",
+      "file_size": 290939,
+      "file_sha256": "ca25d51985bc5a4ca8497f848c9ba6a80afaeddd80d67df24a10af3c1740fd46",
+      "stored_relative_path": "api_storage/uploads/33b0089498d74d9abd1b61b88415fc26/contras-14page.pdf",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/33b0089498d74d9abd1b61b88415fc26/contras-14page.pdf",
+      "api_route": "/api/documents/file/33b0089498d74d9abd1b61b88415fc26/contras-14page.pdf",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/33b0089498d74d9abd1b61b88415fc26/contras-14page.pdf",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/33b0089498d74d9abd1b61b88415fc26/contras-14page.pdf"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "job_id": "f1fc3f9e56214574b7602dc08802303d",
+  "received_at": "2026-04-04T12:07:54.894362+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "0c1fd89f555e4756ad741fa93ae32857",
+      "file_name": "avenant_contrat_it_services.pdf",
+      "file_ext": ".pdf",
+      "file_mime": "application/pdf",
+      "file_size": 5032,
+      "file_sha256": "acd5eb45341a30a91c07c22440420a15c8732374dd06b72d4a6005b2778537d1",
+      "stored_relative_path": "api_storage/uploads/f1fc3f9e56214574b7602dc08802303d/avenant_contrat_it_services.pdf",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/f1fc3f9e56214574b7602dc08802303d/avenant_contrat_it_services.pdf",
+      "api_route": "/api/documents/file/f1fc3f9e56214574b7602dc08802303d/avenant_contrat_it_services.pdf",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/f1fc3f9e56214574b7602dc08802303d/avenant_contrat_it_services.pdf",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/f1fc3f9e56214574b7602dc08802303d/avenant_contrat_it_services.pdf"
+    },
+    {
+      "api_document_id": "28451b632c014bda99ecd71f573040bf",
+      "file_name": "contrat_principal_it_services.pdf",
+      "file_ext": ".pdf",
+      "file_mime": "application/pdf",
+      "file_size": 4887,
+      "file_sha256": "607c7e0dba9f8cffe0313ce13068627d63f2bc70872bba389d5f15c69de24d1c",
+      "stored_relative_path": "api_storage/uploads/f1fc3f9e56214574b7602dc08802303d/contrat_principal_it_services.pdf",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/f1fc3f9e56214574b7602dc08802303d/contrat_principal_it_services.pdf",
+      "api_route": "/api/documents/file/f1fc3f9e56214574b7602dc08802303d/contrat_principal_it_services.pdf",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/f1fc3f9e56214574b7602dc08802303d/contrat_principal_it_services.pdf",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/f1fc3f9e56214574b7602dc08802303d/contrat_principal_it_services.pdf"
+    }
+  ]
+}

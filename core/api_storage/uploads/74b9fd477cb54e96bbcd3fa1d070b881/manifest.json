@@ -1,0 +1,111 @@
+{
+  "job_id": "74b9fd477cb54e96bbcd3fa1d070b881",
+  "received_at": "2026-04-04T12:32:46.964271+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "111f223cbf4b4fe498d9f41ae1088887",
+      "file_name": "testwordvw.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 11638,
+      "file_sha256": "a5f5217acac8ceab3fef1a519bb636a366c170284b6ff3714c49fa20ae8119db",
+      "stored_relative_path": "api_storage/uploads/74b9fd477cb54e96bbcd3fa1d070b881/testwordvw.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/74b9fd477cb54e96bbcd3fa1d070b881/testwordvw.docx",
+      "api_route": "/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/testwordvw.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/testwordvw.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/testwordvw.docx"
+    },
+    {
+      "api_document_id": "905d5186fcc343a09af4782f91784ec3",
+      "file_name": "testwordlambo.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 12230,
+      "file_sha256": "33a3f501e05fad769af2dffb811bd8363c7acca32940f97ca8933ef1c9938375",
+      "stored_relative_path": "api_storage/uploads/74b9fd477cb54e96bbcd3fa1d070b881/testwordlambo.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/74b9fd477cb54e96bbcd3fa1d070b881/testwordlambo.docx",
+      "api_route": "/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/testwordlambo.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/testwordlambo.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/testwordlambo.docx"
+    },
+    {
+      "api_document_id": "9b7abdfb61b64fdf99e23da1d9fe1d98",
+      "file_name": "testwordaudi.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 12302,
+      "file_sha256": "490a20e99a5233513f7840d558f06a07905440f37b2bcf3295af26d53cfae412",
+      "stored_relative_path": "api_storage/uploads/74b9fd477cb54e96bbcd3fa1d070b881/testwordaudi.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/74b9fd477cb54e96bbcd3fa1d070b881/testwordaudi.docx",
+      "api_route": "/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/testwordaudi.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/testwordaudi.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/testwordaudi.docx"
+    },
+    {
+      "api_document_id": "b09daaeb8ed44a81a776ea1b161e483e",
+      "file_name": "test-regex2langue.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 19123,
+      "file_sha256": "5155229eec06563a17a6c99c247819d95771382789dbcd7f17b83e4cc0472a62",
+      "stored_relative_path": "api_storage/uploads/74b9fd477cb54e96bbcd3fa1d070b881/test-regex2langue.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/74b9fd477cb54e96bbcd3fa1d070b881/test-regex2langue.docx",
+      "api_route": "/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/test-regex2langue.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/test-regex2langue.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/test-regex2langue.docx"
+    },
+    {
+      "api_document_id": "010399e4b1a042c69de2dc1dbc14f3f7",
+      "file_name": "test_facture.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 37503,
+      "file_sha256": "2082fcee11af96ccdf90cbd0d3bf4fda8b522dc2bfd32a53c875a70cc0be8d65",
+      "stored_relative_path": "api_storage/uploads/74b9fd477cb54e96bbcd3fa1d070b881/test_facture.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/74b9fd477cb54e96bbcd3fa1d070b881/test_facture.docx",
+      "api_route": "/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/test_facture.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/test_facture.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/test_facture.docx"
+    },
+    {
+      "api_document_id": "086b11270b5e4357b15534e1d9840026",
+      "file_name": "testexcel.xlsx",
+      "file_ext": ".xlsx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "file_size": 8687,
+      "file_sha256": "0d33a6ee89e1d956fffa83039a9f1c7e340cf533513c659925fba577701b5026",
+      "stored_relative_path": "api_storage/uploads/74b9fd477cb54e96bbcd3fa1d070b881/testexcel.xlsx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/74b9fd477cb54e96bbcd3fa1d070b881/testexcel.xlsx",
+      "api_route": "/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/testexcel.xlsx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/testexcel.xlsx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/testexcel.xlsx"
+    },
+    {
+      "api_document_id": "52664044671543a4950b0c1ede47b12a",
+      "file_name": "signettab.png",
+      "file_ext": ".png",
+      "file_mime": "image/png",
+      "file_size": 24142,
+      "file_sha256": "4b5ffebea3d840a606cf791cacb77dbefde71d3fb6008e142c79835e90aef73d",
+      "stored_relative_path": "api_storage/uploads/74b9fd477cb54e96bbcd3fa1d070b881/signettab.png",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/74b9fd477cb54e96bbcd3fa1d070b881/signettab.png",
+      "api_route": "/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/signettab.png",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/signettab.png",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/signettab.png"
+    },
+    {
+      "api_document_id": "4591fb85a7604bf78748792871425db1",
+      "file_name": "imagetestdetableau (1).jpg",
+      "file_ext": ".jpg",
+      "file_mime": "image/jpeg",
+      "file_size": 352277,
+      "file_sha256": "fa71c6140760c7a416196cc70b76d66a5258cd5f82478dfe080f4d4379564f72",
+      "stored_relative_path": "api_storage/uploads/74b9fd477cb54e96bbcd3fa1d070b881/imagetestdetableau (1).jpg",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/74b9fd477cb54e96bbcd3fa1d070b881/imagetestdetableau (1).jpg",
+      "api_route": "/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/imagetestdetableau%20%281%29.jpg",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/imagetestdetableau%20%281%29.jpg",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/74b9fd477cb54e96bbcd3fa1d070b881/imagetestdetableau%20%281%29.jpg"
+    }
+  ]
+}

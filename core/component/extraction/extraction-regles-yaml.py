@@ -8,6 +8,7 @@ Extraction des champs metier via regles YAML (sans regex de champs).
 
 from __future__ import annotations
 
+import json
 import re
 import unicodedata
 from pathlib import Path
@@ -121,6 +122,14 @@ def _load_yaml(path: Path) -> Dict[str, Any]:
     return data if isinstance(data, dict) else {}
 
 
+def _load_json(path: Path) -> Dict[str, Any]:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
 def _load_json_like_yaml(path: Path) -> Dict[str, Any]:
     # JSON est un sous-ensemble YAML: permet de lire aussi l'ancien fichier .json si necessaire.
     return _load_yaml(path)
@@ -161,17 +170,36 @@ def _resolve_rulesets(doc_type: str, routes: Dict[str, Any]) -> List[str]:
     return out
 
 
+def _normalize_doc_type(doc_type: Any) -> str:
+    value = str(doc_type or "").strip().upper()
+    if value in {"", "UNDEFINED", "UNKNOWN", "NONE", "NULL", "N/A", "NA"}:
+        return "UNCLASSIFIED"
+    return value
+
+
+def _is_common_fallback_doc_type(doc_type: Any) -> bool:
+    return _normalize_doc_type(doc_type) == "UNCLASSIFIED"
+
+
 def load_extractors_for(doc_type: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    doc_type = _normalize_doc_type(doc_type)
     routes = _load_routes()
     merged: Dict[str, Any] = {}
     used_rulesets: List[str] = []
+    force_common_fallback = _is_common_fallback_doc_type(doc_type)
 
-    if routes.get("include_common", True):
+    if routes.get("include_common", True) or force_common_fallback:
         common_path = RULES_DIR / "common.yaml"
         if common_path.exists():
             d = _load_yaml(common_path)
             merged.update(d.get("extractors") or {})
             used_rulesets.append(common_path.name)
+        if force_common_fallback:
+            common_json_path = RULES_DIR / "common.json"
+            if common_json_path.exists():
+                d = _load_json(common_json_path)
+                merged.update(d.get("extractors") or {})
+                used_rulesets.append(common_json_path.name)
 
     for name in _resolve_rulesets(doc_type, routes):
         path = RULES_DIR / str(name)
@@ -181,7 +209,11 @@ def load_extractors_for(doc_type: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         merged.update(d.get("extractors") or {})
         used_rulesets.append(path.name)
 
-    meta = {"routes_config": routes, "applied_rulesets": used_rulesets}
+    meta = {
+        "routes_config": routes,
+        "applied_rulesets": used_rulesets,
+        "forced_common_fallback": force_common_fallback,
+    }
     return merged, meta
 
 
@@ -473,6 +505,21 @@ def _normalize_value_by_type(value_type: str, raw_value: str) -> str:
     return v
 
 
+def _compile_regex(pattern: str, flags_list: Optional[List[str]]) -> re.Pattern:
+    flags = 0
+    for f in flags_list or []:
+        f2 = str(f or "").upper()
+        if f2 == "IGNORECASE":
+            flags |= re.IGNORECASE
+        elif f2 == "MULTILINE":
+            flags |= re.MULTILINE
+        elif f2 == "DOTALL":
+            flags |= re.DOTALL
+        elif f2 == "VERBOSE":
+            flags |= re.VERBOSE
+    return re.compile(pattern, flags)
+
+
 def _make_match(page_text: str, value: str, page_index: Any, fallback_snippet: str) -> Dict[str, Any]:
     start = page_text.find(value) if value else -1
     if start >= 0:
@@ -496,6 +543,56 @@ def _apply_extractor_to_page(page_text: str, page_index: Any, cfg: Dict[str, Any
 
     value_type = str(cfg.get("type") or "text")
     many = bool(cfg.get("many", False))
+    pattern = str(cfg.get("pattern") or "").strip()
+    if pattern:
+        try:
+            regex = _compile_regex(pattern, cfg.get("flags") if isinstance(cfg.get("flags"), list) else [])
+        except re.error as exc:
+            print(f"[extraction-yaml] regex invalide: {exc} | pattern={pattern}")
+            return []
+        group_idx = int(cfg.get("group", 0) or 0)
+        surface = str(cfg.get("surface") or "text").strip().lower()
+        matches: List[Dict[str, Any]] = []
+
+        def _record(match: re.Match, offset: int = 0) -> None:
+            try:
+                raw_value = match.group(group_idx)
+            except Exception:
+                raw_value = match.group(0)
+            value = _normalize_value_by_type(value_type, str(raw_value or "")) or _clean_value(str(raw_value or ""))
+            if not value:
+                return
+            try:
+                start = match.start(group_idx) + offset
+                end = match.end(group_idx) + offset
+            except Exception:
+                start = match.start() + offset
+                end = match.end() + offset
+            matches.append(
+                {
+                    "value": value,
+                    "start": int(start),
+                    "end": int(end),
+                    "snippet": page_text[max(0, int(start) - 40): min(len(page_text), int(end) + 40)],
+                    "page_index": page_index,
+                }
+            )
+
+        if surface == "lines":
+            offset = 0
+            for line in page_text.splitlines(True):
+                for match in regex.finditer(line):
+                    _record(match, offset)
+                    if matches and not many:
+                        return matches[:1]
+                offset += len(line)
+        else:
+            for match in regex.finditer(page_text):
+                _record(match, 0)
+                if matches and not many:
+                    return matches[:1]
+        return matches if many else matches[:1]
+
     strategy = str(cfg.get("strategy") or "label_value").strip().lower()
     labels = [str(x) for x in (cfg.get("labels") or []) if str(x).strip()]
     lookahead = int(cfg.get("lookahead_lines") or 1)
@@ -629,7 +726,7 @@ def run() -> List[Dict[str, Any]]:
 
     for doc in docs:
         cls = _classification_for(doc, cls_map)
-        doc_type = (cls.get("doc_type") or "UNCLASSIFIED").upper()
+        doc_type = _normalize_doc_type(cls.get("doc_type"))
         cls_status = cls.get("status", "REVIEW")
 
         extractors, meta = load_extractors_for(doc_type)

@@ -77,12 +77,25 @@ def _resolve_rulesets(doc_type: str, routes: Dict[str, Any]) -> List[str]:
     return out
 
 
+def _normalize_doc_type(doc_type: Any) -> str:
+    value = str(doc_type or "").strip().upper()
+    if value in {"", "UNDEFINED", "UNKNOWN", "NONE", "NULL", "N/A", "NA"}:
+        return "UNCLASSIFIED"
+    return value
+
+
+def _is_common_fallback_doc_type(doc_type: Any) -> bool:
+    return _normalize_doc_type(doc_type) == "UNCLASSIFIED"
+
+
 def load_extractors_for(doc_type: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    doc_type = _normalize_doc_type(doc_type)
     routes = _load_routes()
     merged: Dict[str, Any] = {}
     used_rulesets: List[str] = []
+    force_common_fallback = _is_common_fallback_doc_type(doc_type)
 
-    if routes.get("include_common", True):
+    if routes.get("include_common", True) or force_common_fallback:
         common_path = RULES_DIR / "common.json"
         if common_path.exists():
             d = _load_json(common_path)
@@ -97,7 +110,11 @@ def load_extractors_for(doc_type: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         merged.update(d.get("extractors") or {})
         used_rulesets.append(path.name)
 
-    meta = {"routes_config": routes, "applied_rulesets": used_rulesets}
+    meta = {
+        "routes_config": routes,
+        "applied_rulesets": used_rulesets,
+        "forced_common_fallback": force_common_fallback,
+    }
     return merged, meta
 
 
@@ -250,7 +267,7 @@ def run() -> List[Dict[str, Any]]:
 
     for doc in docs:
         cls = _classification_for(doc, cls_map)
-        doc_type = (cls.get("doc_type") or "UNCLASSIFIED").upper()
+        doc_type = _normalize_doc_type(cls.get("doc_type"))
         cls_status = cls.get("status", "REVIEW")
 
         extractors, meta = load_extractors_for(doc_type)

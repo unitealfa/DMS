@@ -77,6 +77,81 @@
       ]
     },
 
+    "numero_commande": {
+      "rule_id": "INV_PO_NUM_01",
+      "pattern": "(?xim)\\b(?:bon\\s*de\\s*commande|commande\\s*d['’]?achat|purchase\\s*order|p\\.?\\s*o\\.?|po|order\\s*(?:number|no\\.?|#)|num(?:e|é)?ro\\s*de\\s*commande|n(?:o|°|º)?\\s*commande|r[ée]f[ée]rence\\s*commande|رقم\\s*(?:الطلب|طلب\\s*الشراء|أمر\\s*الشراء|امر\\s*الشراء)|(?:طلب|أمر|امر)\\s*شراء\\s*(?:رقم|#)?)\\b[\\s\\t:;=\\-–—#]*([A-Za-z0-9٠-٩ء-ي][A-Za-z0-9٠-٩ء-ي._\\/-]{0,32}(?:[ \\t][A-Za-z0-9٠-٩ء-ي._\\/-]{1,24}){0,2})",
+      "group": 1,
+      "type": "string",
+      "flags": ["IGNORECASE", "MULTILINE"],
+      "many": true,
+      "nlp": {
+        "use_pos": false,
+        "pos_patterns": [],
+        "use_ner": false,
+        "ner_labels": [],
+        "confidence_threshold": 0.0
+      },
+      "min_confidence": 0.0,
+      "apply_post_filters": true,
+      "post_filters": [
+        "trim_spaces",
+        "strip_trailing_punct",
+        "normalize_arabic_indic_digits",
+        "reject_pure_date_like",
+        "reject_common_labels_as_value",
+        "normalize_reference_number"
+      ]
+    },
+
+    "date_commande": {
+      "rule_id": "INV_PO_DATE_01",
+      "pattern": "(?xim)\\b(?:date\\s*de\\s*commande|date\\s*commande|order\\s*date|purchase\\s*order\\s*date|date\\s*d['’]?achat|تاريخ\\s*(?:الطلب|طلب\\s*الشراء|أمر\\s*الشراء|امر\\s*الشراء))\\b[\\s\\t:;=\\-–—]*((?:(?:[0-3]?[0-9٠-٩])[\\/\\-.](?:[0-1]?[0-9٠-٩])[\\/\\-.](?:[12١٢][0-9٠-٩]{3}))|(?:(?:[12١٢][0-9٠-٩]{3})[\\/\\-.](?:[0-1]?[0-9٠-٩])[\\/\\-.](?:[0-3]?[0-9٠-٩])))",
+      "group": 1,
+      "type": "date",
+      "flags": ["IGNORECASE", "MULTILINE"],
+      "many": true,
+      "nlp": {
+        "use_pos": false,
+        "pos_patterns": [],
+        "use_ner": true,
+        "ner_labels": ["DATE"],
+        "confidence_threshold": 0.0
+      },
+      "min_confidence": 0.0,
+      "apply_post_filters": true,
+      "post_filters": [
+        "strip_trailing_punct",
+        "normalize_arabic_indic_digits",
+        "normalize_date_separators",
+        "normalize_date_iso",
+        "validate_calendar_date"
+      ]
+    },
+
+    "iban": {
+      "rule_id": "INV_IBAN_01",
+      "pattern": "(?xim)\\b(?:iban|compte\\s*iban|account\\s*iban|bank\\s*account|coordonn(?:e|é)es?\\s*bancaires?|رقم\\s*(?:ال)?(?:ايبان|الحساب)|(?:ال)?ايبان|الإيبان)\\b[^\\r\\n]{0,80}?([A-Z]{2}[0-9٠-٩]{2}(?:[ \\t-]?[A-Z0-9٠-٩]{3,5}){2,8})",
+      "group": 1,
+      "type": "string",
+      "flags": ["IGNORECASE", "MULTILINE"],
+      "many": true,
+      "nlp": {
+        "use_pos": false,
+        "pos_patterns": [],
+        "use_ner": false,
+        "ner_labels": [],
+        "confidence_threshold": 0.0
+      },
+      "min_confidence": 0.0,
+      "apply_post_filters": true,
+      "post_filters": [
+        "trim_spaces",
+        "strip_trailing_punct",
+        "normalize_arabic_indic_digits",
+        "reject_zero_length"
+      ]
+    },
+
     "montant_ht": {
       "rule_id": "INV_AMOUNT_HT_02",
       "pattern": "(?xim)^\\s*(?:montant\\s*ht|total\\s*ht|total\\s*hors\\s*taxe|montant\\s*hors\\s*taxe|sous[- ]?total|subtotal|sub-total|amount\\s*before\\s*tax|total\\s*excl(?:\\.?|uding)?\\s*tax|المبلغ\\s*(?:دون|قبل)\\s*الضريبة|ال(?:إ|ا)جمالي\\s*(?:دون|قبل)\\s*الضريبة|المجموع\\s*(?:دون|قبل)\\s*الضريبة|المبلغ\\s*خارج\\s*الرسم)\\b[^\\r\\n]{0,80}?(?:[:=]|\\.{2,}|\\s)\\s*(?:[A-Z]{3}|[€$£¥]|د\\.ج\\.?|دج)?\\s*([+-]?(?:[0-9٠-٩]{1,3}(?:[ \\u00A0\\u202F.,'٬][0-9٠-٩]{3})+|[0-9٠-٩]+)(?:[.,٫][0-9٠-٩]{2,4})?)(?!\\s*%)\\s*(?:[A-Z]{3}|[€$£¥]|د\\.ج\\.?|دج)?",
@@ -179,11 +254,14 @@
     }
   },
 
-  "implementation_notes": "V3: devise rendue plus stricte pour reduire la sur-extraction. La regex devise ne cherche plus la monnaie partout dans le document : elle cible d'abord les lignes labelisees (Devise/Currency/Monnaie/العملة) puis les lignes de total TTC / montant du. Support FR/EN/AR pour codes ISO, symboles, noms complets et formes locales DZ (DA, دج, د.ج). Les autres extracteurs restent compatibles FR/EN/AR (dates, montants, numero facture).",
+  "implementation_notes": "V3: devise rendue plus stricte pour reduire la sur-extraction. La regex devise ne cherche plus la monnaie partout dans le document : elle cible d'abord les lignes labelisees (Devise/Currency/Monnaie/العملة) puis les lignes de total TTC / montant du. Support FR/EN/AR pour codes ISO, symboles, noms complets et formes locales DZ (DA, دج, د.ج). Les extracteurs facture couvrent aussi numero facture, date facture, reference commande, date commande et IBAN quand ces champs sont presents.",
   "selection_hints": {
     "numero_facture": "prefer_first_non_date_like; prefer_alnum_mixed; reject_values_near_purchase_order_labels",
     "date_facture": "prefer_label_invoice_date_or_تاريخ_الفاتورة; prefer_earliest_if_multiple_same_label",
     "date_echeance": "prefer_label_due_date_or_تاريخ_الاستحقاق; prefer_after_doc_date_if_available",
+    "numero_commande": "prefer_values_near_PO_labels; prefer_alnum_mixed; reject_if_near_invoice_labels",
+    "date_commande": "prefer_order_date_labels; prefer_first_valid_date_after_numero_commande",
+    "iban": "prefer_labeled_iban_line; keep_structured_country_prefix_value",
     "montant_ht": "prefer_total_or_subtotal_labels; reject_lines_with_percent_only",
     "montant_tva": "prefer_vat_amount_or_tax_amount_or_ضريبة_القيمة_المضافة; reject_percent_values",
     "montant_ttc": "prefer_total_due_or_total_ttc_or_grand_total_or_المبلغ_الإجمالي",

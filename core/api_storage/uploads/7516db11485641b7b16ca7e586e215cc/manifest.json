@@ -1,0 +1,20 @@
+{
+  "job_id": "7516db11485641b7b16ca7e586e215cc",
+  "received_at": "2026-04-05T00:36:02.594509+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "dc93aad0e1954ff3bfc548e43a6f76e0",
+      "file_name": "signettab.png",
+      "file_ext": ".png",
+      "file_mime": "image/png",
+      "file_size": 24142,
+      "file_sha256": "4b5ffebea3d840a606cf791cacb77dbefde71d3fb6008e142c79835e90aef73d",
+      "stored_relative_path": "api_storage/uploads/7516db11485641b7b16ca7e586e215cc/signettab.png",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/7516db11485641b7b16ca7e586e215cc/signettab.png",
+      "api_route": "/api/documents/file/7516db11485641b7b16ca7e586e215cc/signettab.png",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/7516db11485641b7b16ca7e586e215cc/signettab.png",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/7516db11485641b7b16ca7e586e215cc/signettab.png"
+    }
+  ]
+}

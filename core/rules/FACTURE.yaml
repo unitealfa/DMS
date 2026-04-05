@@ -48,6 +48,61 @@ extractors:
       - "تاريخ الاستحقاق"
       - "تاريخ الدفع"
 
+  numero_commande:
+    rule_id: INV_PO_NUM_YAML_01
+    type: string
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    min_chars: 2
+    max_chars: 80
+    labels:
+      - "numero de commande"
+      - "numéro de commande"
+      - "n° commande"
+      - "reference commande"
+      - "référence commande"
+      - "purchase order"
+      - "order number"
+      - "رقم الطلب"
+      - "رقم أمر الشراء"
+      - "رقم امر الشراء"
+
+  date_commande:
+    rule_id: INV_PO_DATE_YAML_01
+    type: date
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    labels:
+      - "date de commande"
+      - "date commande"
+      - "purchase order date"
+      - "order date"
+      - "تاريخ الطلب"
+      - "تاريخ أمر الشراء"
+      - "تاريخ امر الشراء"
+
+  iban:
+    rule_id: INV_IBAN_YAML_01
+    type: string
+    strategy: label_value
+    many: true
+    lookahead_lines: 1
+    min_chars: 10
+    max_chars: 80
+    labels:
+      - "iban"
+      - "compte iban"
+      - "account iban"
+      - "bank account"
+      - "coordonnees bancaires"
+      - "coordonnées bancaires"
+      - "رقم الايبان"
+      - "رقم الإيبان"
+      - "الايبان"
+      - "الإيبان"
+
   montant_ht:
     rule_id: INV_AMOUNT_HT_YAML_01
     type: amount
@@ -114,4 +169,3 @@ extractors:
       - "total ttc"
       - "amount due"
       - "total due"
-

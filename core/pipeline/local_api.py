@@ -22,6 +22,7 @@ from typing import Any, Dict, List
 from urllib.parse import quote, unquote
 
 from .cli import PIPELINE_DEFAULT_CODE, _normalize_pipeline_name
+from .file_resolution import materialize_uploaded_content_from_lfs_pointer
 from .orchestrator import Pipeline0MLOrchestrator, Pipeline50MLOrchestrator, Pipeline100MLOrchestrator
 from .postgres import (
     _build_upsert_statement,
@@ -444,6 +445,17 @@ def save_uploaded_files(upload_items: List[Dict[str, Any]], job_id: str, request
         used_names.add(candidate.lower())
         destination = target_dir / candidate
         content = item.get("content") or b""
+        resolved_upload = materialize_uploaded_content_from_lfs_pointer(
+            content,
+            repo_root=REPO_ROOT,
+            preferred_name=candidate,
+        )
+        if resolved_upload.get("is_lfs_pointer") and not resolved_upload.get("resolved"):
+            raise ValueError(
+                f"Le fichier uploade {candidate} est un pointeur Git LFS sans binaire local resolvable. "
+                "Envoie le vrai fichier, pas le pointeur texte."
+            )
+        content = resolved_upload.get("content") or content
         with destination.open("wb") as fh:
             fh.write(content)
         mime_type = mimetypes.guess_type(destination.name)[0] or "application/octet-stream"
@@ -469,6 +481,8 @@ def save_uploaded_files(upload_items: List[Dict[str, Any]], job_id: str, request
                 "source_kind": "api_upload",
                 "source_client": "external_site",
                 "source_ip": client_ip or None,
+                "resolved_from_lfs_pointer": bool(resolved_upload.get("resolved")),
+                "resolved_source_path": resolved_upload.get("resolved_source_path"),
                 "stored_path": destination,
             }
         )
@@ -485,6 +499,8 @@ def save_uploaded_files(upload_items: List[Dict[str, Any]], job_id: str, request
                 "file_mime": item["file_mime"],
                 "file_size": item["file_size"],
                 "file_sha256": item["file_sha256"],
+                "resolved_from_lfs_pointer": item["resolved_from_lfs_pointer"],
+                "resolved_source_path": item["resolved_source_path"],
                 "stored_relative_path": item["relative_path"],
                 "stored_absolute_path": item["absolute_path"],
                 "api_route": item["api_route"],

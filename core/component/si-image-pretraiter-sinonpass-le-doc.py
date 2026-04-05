@@ -9,12 +9,23 @@ from dataclasses import dataclass
 from typing import Optional, Sequence, Union, List
 
 import argparse
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import Iterable, List, Optional, Tuple
 
 import pytesseract
 from PIL import Image, ImageEnhance, ImageFilter, ImageOps
+
+try:
+    from pipeline.file_resolution import parse_git_lfs_pointer_path, resolve_runtime_input_path
+except Exception:
+    def resolve_runtime_input_path(path: Path, repo_root: Path) -> Path:
+        return path
+
+    def parse_git_lfs_pointer_path(path: Path):
+        return None
 
 
 try:
@@ -27,6 +38,7 @@ try:
 except NameError:
     # In notebooks __file__ is undefined; fall back to current working directory.
     SCRIPT_DIR = Path.cwd()
+REPO_ROOT = SCRIPT_DIR.parent
 
 DEFAULT_LANG = "fra"
 DEFAULT_CONTRAST = 1.5
@@ -50,7 +62,8 @@ class FileType:
 
 
 def _read_head(path: str, n: int = 16384) -> bytes:
-    with open(path, "rb") as f:
+    resolved = resolve_runtime_input_path(Path(path), REPO_ROOT)
+    with open(resolved, "rb") as f:
         return f.read(n)
 
 
@@ -272,7 +285,11 @@ def content_kind_two_states(path: str, ftype: FileType) -> str:
     if ext == ".pdf":
         return "text" if _pdf_has_text(path) else "image_only"
 
-    if ext in {".docx", ".xlsx", ".pptx", ".odt", ".ods", ".odp", ".epub"}:
+    # Tableurs: toujours en natif, jamais en OCR.
+    if ext in {".xlsx", ".ods"}:
+        return "text"
+
+    if ext in {".docx", ".pptx", ".odt", ".odp", ".epub"}:
         return "text" if _zip_has_text(path, ext) else "image_only"
 
     if ext in {".txt", ".html", ".htm", ".xhtml"}:
@@ -603,17 +620,53 @@ INPUT_FILE = globals().get("INPUT_FILE", None)
 
 
 def _load_images_from_path(path: Path, dpi: int):
+    path = resolve_runtime_input_path(path, REPO_ROOT)
+    pointer_info = parse_git_lfs_pointer_path(path)
+    if pointer_info:
+        raise RuntimeError(
+            f"{path} est un pointeur Git LFS sans binaire local resolvable "
+            f"(oid={pointer_info.get('oid')})."
+        )
     if path.suffix.lower() == ".pdf":
         try:
             from pdf2image import convert_from_path
         except Exception:
-            sys.exit(
-                "pdf2image is not available. Install it and Poppler to read PDF files."
-            )
+            convert_from_path = None
+
+        if convert_from_path is not None:
+            try:
+                return convert_from_path(str(path), dpi=dpi)
+            except Exception:
+                pass
+
+        # Fallback systeme: Poppler via pdftoppm, deja present sur la machine.
         try:
-            return convert_from_path(str(path), dpi=dpi)
+            with tempfile.TemporaryDirectory(prefix="dms_pdf_ocr_") as tmpdir:
+                prefix = Path(tmpdir) / "page"
+                subprocess.run(
+                    [
+                        "pdftoppm",
+                        "-png",
+                        "-r",
+                        str(int(dpi or DEFAULT_DPI)),
+                        str(path),
+                        str(prefix),
+                    ],
+                    check=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                )
+                image_paths = sorted(Path(tmpdir).glob("page-*.png"))
+                images = []
+                for img_path in image_paths:
+                    with Image.open(img_path) as img:
+                        images.append(img.copy())
+                if images:
+                    return images
         except Exception as exc:
             sys.exit(f"PDF conversion failed for {path}: {exc}")
+
+        sys.exit(f"PDF conversion failed for {path}: no pages rendered")
     # default: image file (supports multi-page TIFF)
     img = Image.open(path)
     n_frames = getattr(img, "n_frames", 1)

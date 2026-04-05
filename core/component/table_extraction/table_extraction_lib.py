@@ -6,6 +6,12 @@ from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+try:
+    from pipeline.file_resolution import resolve_runtime_input_path
+except Exception:
+    def resolve_runtime_input_path(path: Path, repo_root: Path) -> Path:
+        return path
+
 
 ARABIC_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
 
@@ -1863,6 +1869,7 @@ def _build_source_path_map(ctx: Dict[str, Any]) -> Dict[str, str]:
         p = Path(path)
         if not p.is_absolute():
             p = (repo_root / p).resolve()
+        p = resolve_runtime_input_path(p, repo_root)
         name = p.name.lower()
         if name and name not in out:
             out[name] = str(p)
@@ -2122,7 +2129,8 @@ def _ocr_fallback_tables_from_image(source_path: str) -> Dict[str, Any]:
     except Exception:
         return {"line_rows": [], "totals_rows": []}
 
-    path = Path(source_path)
+    repo_root = Path(__file__).resolve().parents[2]
+    path = resolve_runtime_input_path(Path(source_path), repo_root)
     if not path.exists():
         return {"line_rows": [], "totals_rows": []}
 

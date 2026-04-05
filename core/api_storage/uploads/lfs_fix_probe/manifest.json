@@ -1,0 +1,22 @@
+{
+  "job_id": "lfs_fix_probe",
+  "received_at": "2026-04-05T01:28:31.122164+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "05c6ca11227044ba92de7c34dc7a34e6",
+      "file_name": "signettab.png",
+      "file_ext": ".png",
+      "file_mime": "image/png",
+      "file_size": 24142,
+      "file_sha256": "4b5ffebea3d840a606cf791cacb77dbefde71d3fb6008e142c79835e90aef73d",
+      "resolved_from_lfs_pointer": true,
+      "resolved_source_path": "/home/mourad/Bureau/DMS/core/documents/signettab.png",
+      "stored_relative_path": "api_storage/uploads/lfs_fix_probe/signettab.png",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/lfs_fix_probe/signettab.png",
+      "api_route": "/api/documents/file/lfs_fix_probe/signettab.png",
+      "api_url": null,
+      "download_url": null
+    }
+  ]
+}

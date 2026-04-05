@@ -24,6 +24,18 @@ from typing import List, Optional, Tuple
 import pytesseract
 from pytesseract import Output
 
+try:
+    from pipeline.file_resolution import parse_git_lfs_pointer_path, resolve_runtime_input_path
+except Exception:
+    def resolve_runtime_input_path(path: Path, repo_root: Path) -> Path:
+        return path
+
+    def parse_git_lfs_pointer_path(path: Path):
+        return None
+
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+
 
 # ==================== Réglage PRINT ====================
 # False => aucune sortie pendant OCR/native
@@ -616,9 +628,18 @@ def _html_bytes_to_text_preserve(b: bytes) -> str:
 
 
 def extract_text_native(path: str) -> dict:
+    original_path = str(path)
+    resolved_path = resolve_runtime_input_path(Path(path), REPO_ROOT)
+    pointer_info = parse_git_lfs_pointer_path(resolved_path)
+    if pointer_info:
+        raise RuntimeError(
+            f"{original_path} est un pointeur Git LFS sans binaire local resolvable "
+            f"(oid={pointer_info.get('oid')})."
+        )
+    path = str(resolved_path)
     ft = detect_path_type(path)
     ext = (ft.ext or Path(path).suffix or "").lower()
-    filename = Path(path).name
+    filename = Path(original_path).name or Path(path).name
     file_size = _safe_file_size(path)
 
     # Texte brut

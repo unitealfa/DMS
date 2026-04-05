@@ -22,6 +22,12 @@ except Exception:
 
 from PIL import Image, ImageSequence
 
+try:
+    from pipeline.file_resolution import resolve_runtime_input_path
+except Exception:
+    def resolve_runtime_input_path(path: Path, repo_root: Path) -> Path:
+        return path
+
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tif", ".tiff"}
@@ -72,6 +78,7 @@ def _build_source_path_map(ctx: Dict[str, Any]) -> Dict[str, str]:
         p = Path(path)
         if not p.is_absolute():
             p = (repo_root / p).resolve()
+        p = resolve_runtime_input_path(p, repo_root)
         normalized = str(p)
         out[normalized.lower()] = normalized
         out[p.name.lower()] = normalized
@@ -117,6 +124,7 @@ def _pil_to_cv_bgr(img: Image.Image) -> Any:
 
 def _open_image_frames(path: Path, max_pages: int) -> List[Image.Image]:
     out: List[Image.Image] = []
+    path = resolve_runtime_input_path(path, REPO_ROOT)
     with Image.open(path) as img:
         for frame in ImageSequence.Iterator(img):
             out.append(frame.convert("RGB"))
@@ -225,7 +233,7 @@ def _render_pdf_pages(path: Path, max_pages: int) -> Tuple[List[Image.Image], Li
 
 
 def _load_doc_pages(source_path: str, max_pages: int = MAX_SCAN_PAGES) -> Tuple[List[Image.Image], List[int], int]:
-    path = Path(source_path)
+    path = resolve_runtime_input_path(Path(source_path), REPO_ROOT)
     if not path.exists():
         return [], [], 0
     ext = path.suffix.lower()

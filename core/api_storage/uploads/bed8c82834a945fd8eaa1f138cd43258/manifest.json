@@ -1,0 +1,22 @@
+{
+  "job_id": "bed8c82834a945fd8eaa1f138cd43258",
+  "received_at": "2026-04-05T01:50:32.753959+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "documents": [
+    {
+      "api_document_id": "92c4aa20357e4690a0ad37e6a343eaba",
+      "file_name": "test-regex.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 19123,
+      "file_sha256": "5155229eec06563a17a6c99c247819d95771382789dbcd7f17b83e4cc0472a62",
+      "resolved_from_lfs_pointer": false,
+      "resolved_source_path": null,
+      "stored_relative_path": "api_storage/uploads/bed8c82834a945fd8eaa1f138cd43258/test-regex.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/bed8c82834a945fd8eaa1f138cd43258/test-regex.docx",
+      "api_route": "/api/documents/file/bed8c82834a945fd8eaa1f138cd43258/test-regex.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/bed8c82834a945fd8eaa1f138cd43258/test-regex.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/bed8c82834a945fd8eaa1f138cd43258/test-regex.docx"
+    }
+  ]
+}

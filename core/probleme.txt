@@ -1,0 +1,160 @@
+2026-04-05 03:29:45,580 [INFO] [postgres] ready=True | host=127.0.0.1 | port=5432 | db=dms_core | created=False | tables=73/73
+2026-04-05 03:29:45,581 [INFO] Pipeline selection: pipeline50ml
+2026-04-05 03:29:45,582 [INFO] Execution du composant pretraitement-de-docs via /home/mourad/Bureau/DMS/core/component/pretraitement-de-docs.py
+[Component: pretraitement-de-docs]
+Type: dict
+Summary: 12 fichiers | text=4 | image=8 | unsupported=0 | missing=0
+Output: {'MISSING_FILES': [],
+ 'PRETRAITEMENT_RESULT': [{'content': 'text',
+                           'ext': '.pdf',
+                           'label': 'PDF document',
+                           'mime': 'application/pdf',
+                           'path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/33da5ef0b59d476b8e0e66b23d3f2925/tessstfulllang.pdf',
+                           'size': 61130},
+                          {'content': 'image_only',
+                           'ext': '.png',
+                           'label': 'PNG image',
+                           'mime': 'image/png',
+                           'path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/33da5ef0b59d476b8e0e66b23d3f2925/signettab.png',
+                           'size': 130},
+                          {'content': 'image_only',
+                           'ext': '.pdf',
+                           'label': 'PDF document',
+                           'mime': 'application/pdf',
+                           'path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/33da5ef0b59d476b8e0e66b23d3f2925/nlp_test_document_professional.pdf',
+                           'size': 130},
+                          {'content': 'text',
+                           'ext': '.docx',
+                           'label': 'Word document (DOCX)',
+                           'mime': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                           'path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/33da5ef0b59d476b8e0e66b23d3f2925/francais.docx',
+                           'size': 14573},
+                          {'content': 'image_only',
+                           'ext': '.pdf',
+                           'label': 'PDF document',
+                           'mime': 'application/pdf',
+                           'path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/33da5ef0b59d476b8e0e66b23d3f2925/epsteanpdf.pdf',
+                           'size': 130},
+                          {'content': 'image_only',
+                           'ext': '.pdf',
+                           'label': 'PDF document',
+                           'mime': 'application/pdf',
+                           'path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/33da5ef0b59d476b8e0e66b23d3f2925/epsteain22.pdf',
+                           'size': 130},
+                          {'content': 'text',
+                           'ext': '.docx',
+                           'label': 'Word document (DOCX)',
+                           'mime': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                           'path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/33da5ef0b59d476b8e0e66b23d3f2925/englais.docx',
+                           'size': 14385},
+                          {'content': 'image_only',
+                           'ext': '.pdf',
+                           'label': 'PDF document',
+                           'mime': 'application/pdf',
+                           'path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/33da5ef0b59d476b8e0e66b23d3f2925/contras-de-200page.pdf',
+                           'size': 132},
+                          {'content': 'image_only',
+                           'ext': '.pdf',
+                           'label': 'PDF document',
+                           'mime': 'application/pdf',
+                           'path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/33da5ef0b59d476b8e0e66b23d3f2925/contras-14page.pdf',
+                           'size': 131},
+                          {'content': 'image_only',
+                           'ext': '.png',
+                           'label': 'PNG image',
+                           'mime': 'image/png',
+                           'path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/33da5ef0b59d476b8e0e66b23d3f2925/bon-de-commade.png',
+                           'size': 130},
+                          {'content': 'image_only',
+                           'ext': '.pdf',
+                           'label': 'PDF document',
+                           'mime': 'application/pdf',
+                           'path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/33da5ef0b59d476b8e0e66b23d3f2925/article_en_arabe_2__pdf.pdf',
+                           'size': 133},
+                          {'content': 'text',
+                           'ext': '.docx',
+                           'label': 'Word document (DOCX)',
+                           'mime': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                           'path': '/home/mourad/Bureau/DMS/core/api_storage/uploads/33da5ef0b59d476b8e0e66b23d3f2925/arab.docx',
+                           'size': 19640}]}
+
+2026-04-05 03:29:45,616 [INFO] Execution du composant si-image-pretraiter-sinonpass-le-doc via /home/mourad/Bureau/DMS/core/component/si-image-pretraiter-sinonpass-le-doc.py
+[skip] content='text' -> /home/mourad/Bureau/DMS/core/api_storage/uploads/33da5ef0b59d476b8e0e66b23d3f2925/tessstfulllang.pdf
+[skip] content='text' -> /home/mourad/Bureau/DMS/core/api_storage/uploads/33da5ef0b59d476b8e0e66b23d3f2925/francais.docx
+[skip] content='text' -> /home/mourad/Bureau/DMS/core/api_storage/uploads/33da5ef0b59d476b8e0e66b23d3f2925/englais.docx
+[skip] content='text' -> /home/mourad/Bureau/DMS/core/api_storage/uploads/33da5ef0b59d476b8e0e66b23d3f2925/arab.docx
+[info] Using INPUT_FILE=/home/mourad/Bureau/DMS/core/api_storage/uploads/33da5ef0b59d476b8e0e66b23d3f2925/signettab.png
+[info] Using INPUT_FILE=/home/mourad/Bureau/DMS/core/api_storage/uploads/33da5ef0b59d476b8e0e66b23d3f2925/nlp_test_document_professional.pdf
+2026-04-05 03:29:45,748 [ERROR] Echec du pipeline: si-image-pretraiter-sinonpass-le-doc a termine par sys.exit(1)
+Traceback (most recent call last):
+  File "/home/mourad/Bureau/DMS/core/component/si-image-pretraiter-sinonpass-le-doc.py", line 630, in _load_images_from_path
+    from pdf2image import convert_from_path
+ModuleNotFoundError: No module named 'pdf2image'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/mourad/Bureau/DMS/core/pipeline/components.py", line 99, in _execute_script
+    result = runpy.run_path(
+  File "/usr/lib/python3.10/runpy.py", line 289, in run_path
+    return _run_module_code(code, init_globals, run_name,
+  File "/usr/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/mourad/Bureau/DMS/core/component/si-image-pretraiter-sinonpass-le-doc.py", line 671, in <module>
+    images = _load_images_from_path(path, dpi=dpi_val)
+  File "/home/mourad/Bureau/DMS/core/component/si-image-pretraiter-sinonpass-le-doc.py", line 632, in _load_images_from_path
+    sys.exit(
+SystemExit: pdf2image is not available. Install it and Poppler to read PDF files.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/mourad/Bureau/DMS/core/pipeline/cli.py", line 242, in main
+    orchestrator.run(
+  File "/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py", line 156, in run
+    output: Any = comp.run(context)
+  File "/home/mourad/Bureau/DMS/core/pipeline/components.py", line 203, in run
+    ctx = self._execute_script(context)
+  File "/home/mourad/Bureau/DMS/core/pipeline/components.py", line 115, in _execute_script
+    raise RuntimeError(f"{self.name} a termine par sys.exit({code})") from exc
+RuntimeError: si-image-pretraiter-sinonpass-le-doc a termine par sys.exit(1)
+Traceback (most recent call last):
+  File "/home/mourad/Bureau/DMS/core/component/si-image-pretraiter-sinonpass-le-doc.py", line 630, in _load_images_from_path
+    from pdf2image import convert_from_path
+ModuleNotFoundError: No module named 'pdf2image'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/mourad/Bureau/DMS/core/pipeline/components.py", line 99, in _execute_script
+    result = runpy.run_path(
+  File "/usr/lib/python3.10/runpy.py", line 289, in run_path
+    return _run_module_code(code, init_globals, run_name,
+  File "/usr/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/mourad/Bureau/DMS/core/component/si-image-pretraiter-sinonpass-le-doc.py", line 671, in <module>
+    images = _load_images_from_path(path, dpi=dpi_val)
+  File "/home/mourad/Bureau/DMS/core/component/si-image-pretraiter-sinonpass-le-doc.py", line 632, in _load_images_from_path
+    sys.exit(
+SystemExit: pdf2image is not available. Install it and Poppler to read PDF files.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/mourad/Bureau/DMS/core/main.py", line 5, in <module>
+    main()
+  File "/home/mourad/Bureau/DMS/core/pipeline/cli.py", line 242, in main
+    orchestrator.run(
+  File "/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py", line 156, in run
+    output: Any = comp.run(context)
+  File "/home/mourad/Bureau/DMS/core/pipeline/components.py", line 203, in run
+    ctx = self._execute_script(context)
+  File "/home/mourad/Bureau/DMS/core/pipeline/components.py", line 115, in _execute_script
+    raise RuntimeError(f"{self.name} a termine par sys.exit({code})") from exc
+RuntimeError: si-image-pretraiter-sinonpass-le-doc a termine par sys.exit(1)
+[local-api] job=33da5ef0b59d476b8e0e66b23d3f2925 termine rc=1
+[local-api] "GET /api/status HTTP/1.1" 200 -

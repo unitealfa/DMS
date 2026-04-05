@@ -9,6 +9,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional, Sequence, Union, List, Dict, Any
 
+try:
+    from pipeline.file_resolution import resolve_runtime_input_path
+except Exception:
+    def resolve_runtime_input_path(path: Path, repo_root: Path) -> Path:
+        return path
+
 
 # Saisie possible:
 # INPUT_FILE = "a.pdf, b.docx, c.png"
@@ -30,6 +36,7 @@ SEARCH_DIRS = [
     "/mnt/data",  # utile dans l'environnement ChatGPT
 ]
 MISSING_FILES: List[str] = []
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 @dataclass(frozen=True)
@@ -86,7 +93,8 @@ def _safe_file_size(path: str) -> Optional[int]:
 # ----------------- format detection -----------------
 
 def _read_head(path: str, n: int = 16384) -> bytes:
-    with open(path, "rb") as f:
+    resolved = resolve_runtime_input_path(Path(path), REPO_ROOT)
+    with open(resolved, "rb") as f:
         return f.read(n)
 
 
@@ -335,8 +343,13 @@ def content_kind_two_states(path: str, ftype: FileType) -> str:
     if ext == ".pdf":
         return "text" if _pdf_has_text(path) else "image_only"
 
+    # Tableurs: toujours en traitement natif, meme si le XML contient peu ou pas de texte.
+    # Les feuilles numeriques ne doivent jamais partir dans OCR.
+    if ext in {".xlsx", ".ods"}:
+        return "text"
+
     # Formats texte compressés (Office/ODF/EPUB)
-    if ext in {".docx", ".xlsx", ".pptx", ".odt", ".ods", ".odp", ".epub"}:
+    if ext in {".docx", ".pptx", ".odt", ".odp", ".epub"}:
         return "text" if _zip_has_text(path, ext) else "image_only"
 
     # Texte brut / HTML natif

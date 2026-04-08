@@ -1,0 +1,40 @@
+{
+  "job_id": "693fa63754de436aabffc7ed4d6d63d6",
+  "received_at": "2026-04-08T21:09:53.406214+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "request_origin": "http://127.0.0.1:8765",
+  "client_ip": "127.0.0.1",
+  "result": {
+    "ready": true,
+    "generated_at": "2026-04-08T21:10:16.687750+00:00",
+    "path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/693fa63754de436aabffc7ed4d6d63d6/result.json",
+    "route": "/api/result/693fa63754de436aabffc7ed4d6d63d6",
+    "url": "http://127.0.0.1:8765/api/result/693fa63754de436aabffc7ed4d6d63d6",
+    "documents_count": 1,
+    "pipeline_profile": "pipeline50ml"
+  },
+  "callback": {
+    "url": null,
+    "attempted": false,
+    "ok": null,
+    "status_code": null,
+    "error": null
+  },
+  "documents": [
+    {
+      "api_document_id": "9b26d7b6ec4c4119bd972682830e86d9",
+      "file_name": "tessstfulllang.pdf",
+      "file_ext": ".pdf",
+      "file_mime": "application/pdf",
+      "file_size": 61130,
+      "file_sha256": "6c8c928f750d5d3172f65768cde1ce7ff4bd431d26510b638a211faa14f2b595",
+      "resolved_from_lfs_pointer": false,
+      "resolved_source_path": null,
+      "stored_relative_path": "api_storage/uploads/693fa63754de436aabffc7ed4d6d63d6/tessstfulllang.pdf",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/693fa63754de436aabffc7ed4d6d63d6/tessstfulllang.pdf",
+      "api_route": "/api/documents/file/693fa63754de436aabffc7ed4d6d63d6/tessstfulllang.pdf",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/693fa63754de436aabffc7ed4d6d63d6/tessstfulllang.pdf",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/693fa63754de436aabffc7ed4d6d63d6/tessstfulllang.pdf"
+    }
+  ]
+}

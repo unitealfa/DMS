@@ -862,7 +862,11 @@ Important:
 - les fichiers envoyes a `POST /api/run` ne sont plus stockes de facon persistante dans le depot
 - le mode actuel est `temporary-no-persistence`
 - le backend utilise un dossier runtime temporaire, puis nettoie ce dossier apres la fin du job
-- le resultat JSON final reste toutefois disponible via le cache memoire du backend tant que le processus `local_api.py` reste vivant
+- les fichiers d'entree sont supprimes du disque a la fin du job
+- le resultat JSON final n'est garde qu'en memoire le temps de la livraison
+- si `callback_url` est fourni et que le callback reussit, le resultat est purge de la memoire juste apres envoi
+- si aucun callback n'est fourni, le resultat est purge de la memoire juste apres le premier `GET /api/result/<job_id>`
+- donc `GET /api/result/<job_id>` doit etre considere comme une lecture de livraison, pas comme un stockage permanent
 
 Implementation backend: [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py)
 
@@ -1030,6 +1034,8 @@ Important:
 - si la pipeline active est une pipeline custom enregistree dans `pipeline/orchestrator.py`, l'API renvoie aussi ses vrais composants et son vrai composant courant
 - meme logique pour les pipelines deja presentes dans le depot
 - le champ `result_available` passe a `true` seulement apres execution du composant final `api-output`
+- une fois le resultat livre, `result_available` repasse a `false`
+- les champs `result_delivered`, `result_delivery_mode`, `result_delivered_at` et `artifacts_purged` permettent de savoir si le payload a deja ete remis puis purge
 
 ### 8) Exemple cURL
 ```bash
@@ -1083,6 +1089,8 @@ Flux reel:
 10. `GET /api/status` suit l'avancement live
 11. `GET /api/result/<job_id>` renvoie le JSON final complet deja pret
 12. le runtime disque du job est nettoye automatiquement
+13. si le callback reussit, le resultat en memoire est purge juste apres livraison
+14. sinon, le resultat en memoire est purge apres le premier `GET /api/result/<job_id>`
 
 Donc:
 - si la pipeline active est `pipeline0ml`, l'API renvoie uniquement les composants de `pipeline0ml`
@@ -1109,6 +1117,10 @@ Exemple simplifie:
   "result_route": "/api/result/abc123",
   "result_url": "http://127.0.0.1:8765/api/result/abc123",
   "result_available": false,
+  "result_delivered": false,
+  "result_delivery_mode": null,
+  "result_delivered_at": null,
+  "artifacts_purged": false,
   "pipeline_steps": [
     "pretraitement-de-docs",
     "si-image-pretraiter-sinonpass-le-doc",
@@ -1272,6 +1284,8 @@ Important:
 - si un composant touche des cles du `context`, ces cles remontent automatiquement dans `context_values`
 - si un nouveau composant standard est ajoute a une pipeline, son `reported_output`, ses `context_values` et sa trace terminal remontent automatiquement sans modifier `local_api.py`
 - quand `index.html` recoit ce resultat final, elle le telecharge directement en `.json`
+- apres livraison du resultat, le backend ne conserve plus le payload complet en memoire
+- donc si le client veut archiver le JSON, c'est au client externe de le stocker
 
 ### 13) Recuperer et afficher les documents depuis un autre site
 Cas pratique:
@@ -1280,6 +1294,8 @@ Cas pratique:
 - si le job est encore en cours, `job.stored_documents[].api_url` peut servir pour afficher le document temporaire cote site externe
 - une fois le job termine, le runtime disque est nettoye, donc cette URL de fichier temporaire n'est plus garantie
 - la vraie source stable a consommer cote site externe est `GET /api/result/<job_id>` ou le callback JSON final
+- si `callback_url` est configure et reussit, il faut consommer le resultat dans ce callback, pas attendre un `GET /api/result/<job_id>`
+- si aucun callback n'est configure, le client externe doit lire `GET /api/result/<job_id>` une seule fois puis stocker lui-meme le JSON s'il en a besoin
 - en parallele, poll `GET /api/status` pour suivre la pipeline
 - quand `result_available=true`, appelle `GET /api/result/<job_id>` pour recuperer le JSON final complet normalise sur le template
 - si `callback_url` a ete envoye, le backend poussera aussi ce JSON au site externe

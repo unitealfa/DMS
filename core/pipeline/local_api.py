@@ -149,6 +149,50 @@ def _cleanup_job_runtime(job_id: str) -> None:
     shutil.rmtree(runtime_dir, ignore_errors=True)
 
 
+def _compact_manifest_for_cache(manifest: Dict[str, Any] | None) -> Dict[str, Any]:
+    if not isinstance(manifest, dict):
+        return {}
+    compact = json.loads(json.dumps(manifest, ensure_ascii=False))
+    compact["storage_root"] = None
+    compact["runtime_root"] = None
+    compact["storage_mode"] = "temporary-no-persistence"
+    compact["artifacts_purged"] = True
+    for row in compact.get("documents") or []:
+        if not isinstance(row, dict):
+            continue
+        row["temporary_storage"] = True
+        row["file_available"] = False
+        row["stored_relative_path"] = None
+        row["stored_absolute_path"] = None
+        row["api_route"] = None
+        row["api_url"] = None
+        row["download_url"] = None
+    return compact
+
+
+def _mark_job_result_delivered(job_id: str, *, mode: str, reason: str) -> Dict[str, Any]:
+    now = _iso_now()
+    cached = _cache_get(job_id)
+    manifest = _compact_manifest_for_cache(cached.get("manifest"))
+    if manifest:
+        manifest["result_delivery"] = {
+            "delivered": True,
+            "mode": mode,
+            "reason": reason,
+            "delivered_at": now,
+        }
+    updates = {
+        "manifest": manifest or cached.get("manifest") or {},
+        "result": None,
+        "documents": [],
+        "result_delivered": True,
+        "result_delivery_mode": mode,
+        "result_delivered_at": now,
+        "artifacts_purged": True,
+    }
+    return _cache_merge(job_id, **updates)
+
+
 def _tail_recent_lines(path: Path, limit: int = 160, offset: int = 0) -> List[str]:
     if not path.exists():
         return []
@@ -508,6 +552,7 @@ def _load_result(job_id: str) -> Dict[str, Any]:
 
 
 def _result_info(job_id: str, request_origin: str = "") -> Dict[str, Any]:
+    cache_row = _cache_get(job_id)
     result_path = _stored_result_path(job_id)
     manifest = _load_manifest(job_id)
     result_payload = _load_result(job_id)
@@ -518,6 +563,10 @@ def _result_info(job_id: str, request_origin: str = "") -> Dict[str, Any]:
         "result_url": result_url,
         "result_path": str(result_path.resolve()) if result_path.exists() else result_meta.get("path"),
         "result_available": bool(result_payload) or bool(result_path.exists()),
+        "result_delivered": bool(cache_row.get("result_delivered")),
+        "result_delivery_mode": cache_row.get("result_delivery_mode"),
+        "result_delivered_at": cache_row.get("result_delivered_at"),
+        "artifacts_purged": bool(cache_row.get("artifacts_purged")),
     }
 
 
@@ -817,16 +866,18 @@ class LauncherState:
         returncode = process.wait()
         manifest = _load_manifest(job_id)
         result = _load_result(job_id)
-        if isinstance(manifest, dict):
-            manifest["storage_root"] = None
-            manifest["storage_mode"] = "temporary-no-persistence"
-            for row in manifest.get("documents") or []:
-                if not isinstance(row, dict):
-                    continue
-                row["temporary_storage"] = True
-                row["file_available"] = False
-        _cache_merge(job_id, manifest=manifest or None, result=result or None)
+        callback_meta = manifest.get("callback") if isinstance(manifest.get("callback"), dict) else {}
+        callback_ok = bool(callback_meta.get("ok"))
+        compact_manifest = _compact_manifest_for_cache(manifest)
+        _cache_merge(
+            job_id,
+            manifest=compact_manifest or None,
+            result=result or None,
+            artifacts_purged=True,
+        )
         _cleanup_job_runtime(job_id)
+        if callback_ok and returncode == 0:
+            _mark_job_result_delivered(job_id, mode="callback", reason="callback_ok")
         with self._lock:
             if self._current.get("job_id") != job_id:
                 return
@@ -890,6 +941,7 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
                 self._send_json({"error": "Resultat introuvable"}, status=HTTPStatus.NOT_FOUND)
                 return
             self._send_json(result)
+            _mark_job_result_delivered(job_id, mode="pull", reason="api_result_read")
             return
 
         if self.path == "/api/documents":

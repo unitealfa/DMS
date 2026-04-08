@@ -8,6 +8,8 @@ from typing import Any, Dict, List
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+from pipeline.component_trace import component_trace_public_rows, sanitize_component_key
+
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_OUTPUT_PATH = REPO_ROOT / "dms-unified-output-template.json"
@@ -64,6 +66,31 @@ def _materialize_raw(value: Any) -> Any:
     if isinstance(value, list):
         return [_materialize_raw(v) for v in value]
     return value
+
+
+def _same_filename(a: Any, b: Any) -> bool:
+    try:
+        return Path(str(a or "")).name.strip().lower() == Path(str(b or "")).name.strip().lower()
+    except Exception:
+        return False
+
+
+def _row_belongs_to_doc(row: Any, doc_id: str | None, filename: str | None) -> bool:
+    if not isinstance(row, dict):
+        return False
+    row_doc_id = str(row.get("doc_id") or row.get("document_id") or "").strip()
+    row_filename = str(row.get("filename") or row.get("doc") or "").strip()
+    if doc_id and row_doc_id and row_doc_id == doc_id:
+        return True
+    if filename and row_filename and (row_filename == filename or _same_filename(row_filename, filename)):
+        return True
+    return False
+
+
+def _filter_rows_for_doc(rows: Any, doc_id: str | None, filename: str | None) -> List[Dict[str, Any]]:
+    if not isinstance(rows, list):
+        return []
+    return [row for row in rows if _row_belongs_to_doc(row, doc_id, filename)]
 
 
 def _pick_dynamic_template(template: Dict[str, Any]) -> Any:
@@ -231,6 +258,91 @@ def _normalize_for_api(
     return normalized
 
 
+def _component_trace_context_values(globals_dict: Dict[str, Any], trace: Dict[str, Any]) -> Dict[str, Any]:
+    out: Dict[str, Any] = {}
+    for key in trace.get("context_keys_touched") or []:
+        if key in globals_dict:
+            out[str(key)] = globals_dict.get(key)
+    return out
+
+
+def _extract_doc_value_from_any(value: Any, doc_id: str | None, filename: str | None, docs_total: int) -> Any:
+    if isinstance(value, dict):
+        if _row_belongs_to_doc(value, doc_id, filename):
+            return value
+        if docs_total == 1:
+            return value
+        return None
+    if isinstance(value, list):
+        matched = _filter_rows_for_doc(value, doc_id, filename)
+        if matched:
+            return matched if len(matched) != 1 else matched[0]
+        if docs_total == 1 and value and not any(isinstance(item, dict) for item in value):
+            return value
+        return None
+    if docs_total == 1:
+        return value
+    return None
+
+
+def _overlay_component_traces(
+    globals_dict: Dict[str, Any],
+    normalized_payload: Dict[str, Any],
+) -> Dict[str, Any]:
+    traces = [row for row in component_trace_public_rows(globals_dict) if isinstance(row, dict)]
+    if not traces:
+        return normalized_payload
+
+    pipeline_obj = _safe_dict(normalized_payload.get("pipeline"))
+    existing_runs = _safe_list(pipeline_obj.get("component_runs"))
+    if not existing_runs:
+        pipeline_obj["component_runs"] = traces
+    else:
+        seen = {(str(row.get("component_key") or ""), str(row.get("step_index") or "")) for row in existing_runs if isinstance(row, dict)}
+        for trace in traces:
+            ident = (str(trace.get("component_key") or ""), str(trace.get("step_index") or ""))
+            if ident in seen:
+                continue
+            existing_runs.append(trace)
+        pipeline_obj["component_runs"] = existing_runs
+    normalized_payload["pipeline"] = pipeline_obj
+
+    docs = _safe_list(normalized_payload.get("documents"))
+    docs_total = len(docs)
+    for doc in docs:
+        if not isinstance(doc, dict):
+            continue
+        components = _safe_dict(doc.get("components"))
+        doc_id = str(doc.get("document_id") or "").strip() or None
+        file_obj = _safe_dict(doc.get("file"))
+        filename = str(file_obj.get("name") or "").strip() or None
+        for trace in traces:
+            comp_key = sanitize_component_key(trace.get("component_name"))
+            if comp_key in components:
+                continue
+            data: Dict[str, Any] = {}
+            for key, value in _component_trace_context_values(globals_dict, trace).items():
+                extracted = _extract_doc_value_from_any(value, doc_id, filename, docs_total)
+                if extracted is not None:
+                    data[key] = extracted
+            if not data and docs_total == 1 and trace.get("reported_output") is not None:
+                data["reported_output"] = trace.get("reported_output")
+            if not data:
+                continue
+            components[comp_key] = {
+                "component_name": trace.get("component_name"),
+                "script": trace.get("component_script"),
+                "status": trace.get("status"),
+                "summary": trace.get("summary"),
+                "context_keys": trace.get("context_keys_touched") or [],
+                "output_type": trace.get("reported_output_type"),
+                "data": _materialize_raw(data),
+            }
+        doc["components"] = components
+    normalized_payload["documents"] = docs
+    return normalized_payload
+
+
 API_JOB_ID = str(globals().get("API_JOB_ID") or os.environ.get("DMS_API_JOB_ID") or "").strip()
 API_MANIFEST_PATH = str(globals().get("API_MANIFEST_PATH") or os.environ.get("DMS_API_MANIFEST_PATH") or "").strip()
 API_RESULT_PATH = str(globals().get("API_RESULT_PATH") or os.environ.get("DMS_API_RESULT_PATH") or "").strip()
@@ -253,6 +365,7 @@ api_result_payload = _normalize_for_api(
     pipeline_profile=PIPELINE_PROFILE,
     manifest=manifest,
 )
+api_result_payload = _overlay_component_traces(globals(), api_result_payload)
 
 callback_report = {
     "attempted": False,

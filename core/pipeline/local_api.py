@@ -21,9 +21,9 @@ from pathlib import Path
 from typing import Any, Dict, List
 from urllib.parse import quote, unquote
 
-from .cli import PIPELINE_DEFAULT_CODE, _normalize_pipeline_name
+from .cli import PIPELINE_DEFAULT_CODE
 from .file_resolution import materialize_uploaded_content_from_lfs_pointer
-from .orchestrator import Pipeline0MLOrchestrator, Pipeline50MLOrchestrator, Pipeline100MLOrchestrator
+from .orchestrator import create_pipeline_orchestrator, normalize_pipeline_name, pipeline_definition
 from .runtime_state import RUNTIME_JOB_ENV, RUNTIME_STATE_ENV, read_runtime_state
 
 
@@ -47,24 +47,12 @@ DEFAULT_PIPELINE_ARGS = [
     "dms_nlp_tokens",
 ]
 
-PIPELINE_LABELS = {
-    "pipeline0ml": "Pipeline 0ML",
-    "pipeline50ml": "Pipeline 50ML",
-    "pipeline100ml": "Pipeline 100ML",
-}
-
-PIPELINE_DESCRIPTIONS = {
-    "pipeline0ml": "Baseline non-ML routing with classic tokenisation, grammar, rule extraction and totals verification.",
-    "pipeline50ml": "Hybrid ML retrieval pipeline with 50ML tokenisation and extraction components plus grammar refinement.",
-    "pipeline100ml": "Transformer-grade pipeline with 100ML tokenisation, XLM-R grammar and visual marks detection.",
-}
-
 LOGGER = logging.getLogger(__name__)
 
 
 def _active_pipeline_profile() -> str:
     raw = os.environ.get("PIPELINE_DEFAULT") or os.environ.get("PIPELINE_PROFILE") or PIPELINE_DEFAULT_CODE
-    return _normalize_pipeline_name(raw, "pipeline0ml")
+    return normalize_pipeline_name(raw, PIPELINE_DEFAULT_CODE)
 
 
 def _active_pipeline_source() -> str:
@@ -75,22 +63,15 @@ def _active_pipeline_source() -> str:
     return "PIPELINE_DEFAULT_CODE"
 
 
-def _pipeline_orchestrator(profile: str):
-    if profile == "pipeline50ml":
-        return Pipeline50MLOrchestrator(REPO_ROOT)
-    if profile == "pipeline100ml":
-        return Pipeline100MLOrchestrator(REPO_ROOT)
-    return Pipeline0MLOrchestrator(REPO_ROOT)
-
-
 def _active_pipeline_steps(profile: str | None = None) -> List[str]:
-    profile = _normalize_pipeline_name(profile, _active_pipeline_profile())
-    return _pipeline_orchestrator(profile).list_steps()
+    profile = normalize_pipeline_name(profile, _active_pipeline_profile())
+    return create_pipeline_orchestrator(profile, REPO_ROOT, default=PIPELINE_DEFAULT_CODE).list_steps()
 
 
 def _active_pipeline_metadata(profile: str | None = None) -> Dict[str, Any]:
-    profile = _normalize_pipeline_name(profile, _active_pipeline_profile())
-    orchestrator = _pipeline_orchestrator(profile)
+    profile = normalize_pipeline_name(profile, _active_pipeline_profile())
+    definition = pipeline_definition(profile, default=PIPELINE_DEFAULT_CODE)
+    orchestrator = create_pipeline_orchestrator(profile, REPO_ROOT, default=PIPELINE_DEFAULT_CODE)
     components = []
     for component in getattr(orchestrator, "components", []):
         script_path = getattr(component, "script", None)
@@ -113,8 +94,8 @@ def _active_pipeline_metadata(profile: str | None = None) -> Dict[str, Any]:
 
     return {
         "pipeline_profile": profile,
-        "pipeline_label": PIPELINE_LABELS.get(profile, profile),
-        "pipeline_description": PIPELINE_DESCRIPTIONS.get(profile, ""),
+        "pipeline_label": definition.get("label") or profile,
+        "pipeline_description": definition.get("description") or "",
         "pipeline_source": _active_pipeline_source(),
         "pipeline_steps": [item["step"] for item in components],
         "pipeline_steps_count": len(components),
@@ -720,7 +701,7 @@ class LauncherState:
 
             job_id = job_id or uuid.uuid4().hex
             command = build_cli_command(file_paths, extra_args=extra_args)
-            requested_profile = _normalize_pipeline_name(pipeline_profile, _active_pipeline_profile())
+            requested_profile = normalize_pipeline_name(pipeline_profile, _active_pipeline_profile())
             metadata = _active_pipeline_metadata(requested_profile)
             runtime_state_path = Path(tempfile.gettempdir()) / "dms_launcher_runtime" / f"{job_id}.json"
             print(f"[local-api] lancement job={job_id}")
@@ -904,7 +885,7 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
             job_id = uuid.uuid4().hex
             request_origin = _request_origin(self)
             client_ip = str(self.client_address[0] if self.client_address else "").strip()
-            requested_pipeline = _normalize_pipeline_name(
+            requested_pipeline = normalize_pipeline_name(
                 _first_text_field(request_fields.get("pipeline")) or self.headers.get("X-Pipeline-Profile") or None,
                 _active_pipeline_profile(),
             )

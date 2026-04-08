@@ -14,6 +14,175 @@ Ce dépôt regroupe des scripts de traitement documentaire (prétraitement, OCR,
   - `cli.py` : parsing CLI et point d'entrée
 - `main.py` : shim pour lancer le CLI (`python main.py ...` ou `orchestre ...` via console_script).
 
+## Documentation Interne
+- [EXPLICATION_PIPELINES.txt](/home/mourad/Bureau/DMS/core/EXPLICATION_PIPELINES.txt)
+  - vue rapide des pipelines, de leur ordre et des grandes cles de contexte
+- [PROJECT_CODE_MAP.md](/home/mourad/Bureau/DMS/core/PROJECT_CODE_MAP.md)
+  - cartographie technique resumee du depot
+- [FUNCTION_INDEX.txt](/home/mourad/Bureau/DMS/core/FUNCTION_INDEX.txt)
+  - index exhaustif des fonctions/classes Python
+
+## Ajout d'un nouveau composant sans retoucher tout le code
+Le pipeline est maintenant prepare pour qu'un nouveau composant s'integre sans devoir modifier:
+- le schema de sortie final
+- les listes de steps CLI
+- le resultat API final
+
+### Regle pratique
+Pour ajouter un nouveau composant simple:
+1. creer le script Python du composant dans `component/`
+2. ajouter ce composant dans la pipeline voulue dans [orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
+3. utiliser directement le wrapper generique `Component(...)` si aucune logique speciale n'est necessaire
+
+Exemple:
+```python
+Component("mon-nouveau-composant", COMPONENT_DIR / "mon-nouveau-composant.py")
+```
+
+Le wrapper generique execute le script, trace automatiquement:
+- les nouvelles cles ajoutees au `context`
+- les cles modifiees
+- le script utilise
+- le statut du composant
+
+### Ce qui s'adapte automatiquement
+- `main.py --list-steps`
+  - les steps sont maintenant calcules dynamiquement depuis les orchestrateurs
+- `--only`, `--upto`, `--start`
+  - les nouvelles etapes deviennent disponibles automatiquement
+- `fusion_resultats.py`
+  - les sorties de composants non explicitement mappes sont exposees automatiquement dans `documents[].components.<nom_du_composant>`
+- `api-output.py`
+  - le resultat API final reprend aussi automatiquement les traces des nouveaux composants
+- `GET /api/status`
+  - la liste exacte des composants de la pipeline active est reconstruite depuis l'orchestrateur reel
+
+### Ce que le composant doit faire pour etre auto-pris en charge
+Le script du composant doit simplement ecrire ses donnees dans le dictionnaire global partage (`context` / `init_globals`).
+
+Exemple minimal:
+```python
+MY_NEW_RESULT = [
+  {"filename": "document.pdf", "doc_id": "doc-1", "value": "ok"}
+]
+```
+
+Le wrapper detecte automatiquement les cles touchees et les rend visibles dans:
+- `pipeline.component_runs`
+- `documents[].components.<nom_du_composant>`
+
+### Correspondance document automatique
+Pour qu'une sortie soit rattachee automatiquement au bon document dans le resultat final, la valeur produite par le composant doit idealement contenir:
+- `doc_id`
+ou
+- `filename`
+
+Si la pipeline ne traite qu'un seul document, le systeme peut aussi rattacher automatiquement certaines sorties simples sans `doc_id`.
+
+### Quand utiliser un wrapper specifique
+Les wrappers specialises existants (`PretraitementComponent`, `OutputTxtComponent`, `FusionResultComponent`, etc.) restent utiles quand il faut:
+- valider une sortie obligatoire
+- enrichir le resume terminal
+- convertir/reconcilier des cles amont/aval
+
+Mais pour un composant standard, il n'est plus necessaire de creer une nouvelle classe dans `pipeline/components.py`.
+
+### Limite precise
+Si un nouveau composant est ajoute avant `fusion-resultats`, alors:
+- `fusion_output.json` peut l'exposer automatiquement via `documents[].components`
+- `result.json` de l'API l'expose aussi
+
+Si un nouveau composant est ajoute apres `fusion-resultats`, alors:
+- `fusion_output.json` ne peut pas etre retro-injecte dans ce run
+- mais `api-output.py` recompose quand meme le resultat API final avec les traces runtime du composant
+
+### Fichiers qui portent ce mecanisme
+- [pipeline/component_trace.py](/home/mourad/Bureau/DMS/core/pipeline/component_trace.py)
+- [pipeline/components.py](/home/mourad/Bureau/DMS/core/pipeline/components.py)
+- [pipeline/cli.py](/home/mourad/Bureau/DMS/core/pipeline/cli.py)
+- [component/fusion_resultats.py](/home/mourad/Bureau/DMS/core/component/fusion_resultats.py)
+- [component/api-output.py](/home/mourad/Bureau/DMS/core/component/api-output.py)
+
+## Ajout d'une nouvelle pipeline sans retoucher le reste
+Le systeme est maintenant aussi prepare pour qu'une nouvelle pipeline soit detectee automatiquement par:
+- la CLI
+- `--list-steps`
+- `--only`, `--upto`, `--start`
+- l'API locale
+- `GET /api/status`
+- le champ `pipeline` de `POST /api/run`
+
+### Regle pratique
+Pour ajouter une nouvelle pipeline:
+1. ouvrir [orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
+2. creer une nouvelle classe qui herite de `BasePipelineOrchestrator`
+3. definir au minimum:
+   - `code`
+   - `aliases` si necessaire
+   - `label`
+   - `description`
+   - `build_components()`
+4. mettre les composants voulus dans `build_components()`
+5. si tu veux que `default` pointe dessus, mettre ce code dans `PIPELINE_DEFAULT_CODE` de [cli.py](/home/mourad/Bureau/DMS/core/pipeline/cli.py)
+
+Exemple minimal:
+```python
+class Pipeline200MLOrchestrator(BasePipelineOrchestrator):
+    code = "pipeline200ml"
+    aliases = ("200ml",)
+    label = "Pipeline 200ML"
+    description = "Pipeline custom."
+
+    def build_components(self):
+        return [
+            PretraitementComponent("pretraitement-de-docs", COMPONENT_DIR / "pretraitement-de-docs.py"),
+            Component("mon-composant", COMPONENT_DIR / "mon-composant.py"),
+            APIOutputComponent("api-output", COMPONENT_DIR / "api-output.py"),
+        ]
+```
+
+### Ce qui s'adapte automatiquement
+- la liste des pipelines disponibles est reconstruite dynamiquement depuis les sous-classes de `BasePipelineOrchestrator`
+- la normalisation des noms/alias de pipeline est dynamique
+- `default` pointe automatiquement vers la valeur actuelle de `PIPELINE_DEFAULT_CODE`
+- `python main.py --pipeline <nouveau_code>` marche sans ajouter de `if/elif`
+- `python main.py --list-steps` voit la nouvelle pipeline
+- `_step_choices()` de la CLI voit aussi ses composants
+- `local_api.py` expose automatiquement:
+  - `pipeline_profile`
+  - `pipeline_label`
+  - `pipeline_description`
+  - `pipeline_steps`
+  - `pipeline_components`
+
+### Fichiers qui portent ce mecanisme pipeline
+- [pipeline/orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
+- [pipeline/cli.py](/home/mourad/Bureau/DMS/core/pipeline/cli.py)
+- [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py)
+
+### Valeurs acceptees par `POST /api/run`
+Le champ `pipeline` accepte maintenant:
+- n'importe quel `code` de pipeline enregistre
+- ou un `alias` defini sur cette pipeline
+- ou `default`
+
+Exemple:
+```bash
+curl -X POST \
+  -F "files=@documents/signettab.png" \
+  -F "pipeline=pipeline200ml" \
+  http://127.0.0.1:8765/api/run
+```
+
+### Limite precise
+La nouvelle pipeline doit quand meme:
+- etre importable au demarrage du process
+- etre definie avant que la CLI ou l'API locale ne demarre
+
+En pratique:
+- si tu ajoutes la classe dans `pipeline/orchestrator.py`, c'est bon
+- ensuite tu peux juste relancer `main.py` ou `local_api.py`
+
 ## Exécution
 ```bash
 python main.py documents/englais.docx
@@ -118,7 +287,10 @@ Champs fichier acceptes:
 
 Champs texte optionnels:
 - `pipeline`
-  - valeurs supportees: `pipeline0ml` | `pipeline50ml` | `pipeline100ml`
+  - accepte tout `code` de pipeline enregistre
+  - accepte aussi les `aliases` declares par la pipeline
+  - accepte aussi `default`
+  - pipelines actuellement presentes dans le depot: `pipeline0ml`, `pipeline50ml`, `pipeline100ml`
 - `callback_url`
   - URL HTTP distante a laquelle renvoyer le resultat final complet en `POST`
 - `callback_token`
@@ -150,16 +322,13 @@ python main.py <fichiers_uploades_stockes> --use-elasticsearch --es-nlp-level fu
 
 Si `pipeline` est envoye dans la requete, il ajoute aussi:
 ```bash
---pipeline pipeline0ml
+--pipeline <code_pipeline>
 ```
-ou:
-```bash
---pipeline pipeline50ml
-```
-ou:
-```bash
---pipeline pipeline100ml
-```
+
+Exemples actuels:
+- `--pipeline pipeline0ml`
+- `--pipeline pipeline50ml`
+- `--pipeline pipeline100ml`
 
 Les fichiers selectionnes dans le navigateur sont d'abord copies dans un dossier dedie persistant:
 ```text
@@ -200,7 +369,7 @@ Le backend expose l'etat exact de la pipeline en cours pour un autre front/site 
 
 Champs utiles:
 - `pipeline_profile`
-  - `pipeline0ml` | `pipeline50ml` | `pipeline100ml`
+  - code exact de la pipeline active
 - `pipeline_source`
   - source du profil actif (`PIPELINE_DEFAULT_CODE`, `PIPELINE_DEFAULT`, `PIPELINE_PROFILE`)
 - `pipeline_steps`
@@ -237,8 +406,8 @@ Champs utiles:
   - `true` si `result.json` est deja pret
 
 Important:
-- si la pipeline active est `pipeline100ml`, l'API renvoie les vrais composants de `pipeline100ml` et le vrai composant courant
-- meme logique pour `pipeline0ml` et `pipeline50ml`
+- si la pipeline active est une pipeline custom enregistree dans `pipeline/orchestrator.py`, l'API renvoie aussi ses vrais composants et son vrai composant courant
+- meme logique pour les pipelines deja presentes dans le depot
 - le champ `result_available` passe a `true` seulement apres execution du composant final `api-output`
 
 ### 8) Exemple cURL
@@ -277,6 +446,7 @@ Donc:
 - si la pipeline active est `pipeline0ml`, l'API renvoie uniquement les composants de `pipeline0ml`
 - si la pipeline active est `pipeline50ml`, l'API renvoie uniquement les composants de `pipeline50ml`
 - si la pipeline active est `pipeline100ml`, l'API renvoie uniquement les composants de `pipeline100ml`
+- si tu ajoutes une nouvelle pipeline enregistree, l'API renvoie aussi automatiquement uniquement les composants de cette nouvelle pipeline
 
 ### 10) Reponse type de `GET /api/status`
 Exemple simplifie:

@@ -6,13 +6,17 @@ import builtins
 import os
 from pathlib import Path
 
-from .orchestrator import Pipeline0MLOrchestrator, Pipeline50MLOrchestrator, Pipeline100MLOrchestrator
+from .orchestrator import (
+    available_pipeline_choices,
+    available_pipeline_codes,
+    create_pipeline_orchestrator,
+    normalize_pipeline_name as _normalize_pipeline_name_dynamic,
+)
 from .settings import configure_logging, load_dotenv, normalize_input
 
 # Pipeline par defaut configurable directement dans le code.
-# Valeurs supportees: "pipeline0ml" | "pipeline50ml" | "pipeline100ml"
+# Valeur attendue: un `code` de pipeline enregistre dans `pipeline/orchestrator.py`.
 PIPELINE_DEFAULT_CODE = "pipeline50ml"
-
 
 
 
@@ -32,23 +36,21 @@ _STEP_ALIASES = {
     "atripusion-gramatical-en-utilisant-les3ficherla": "atripusion-gramatical",
 }
 
-_STEP_CHOICES = [
-    "pretraitement-de-docs",
-    "si-image-pretraiter-sinonpass-le-doc",
-    "output-txt",
-    "clasification",
-    "tokenisation-layout",
-    "atripusion-gramatical",
-    "atripusion-gramatical-en-utilisant-les3ficherla",
-    "table-extraction",
-    "verification-totaux",
-    "detection-signature-chachet-codebarr",
-    "liaison-inter-docs",
-    "elasticsearch",
-    "extraction-regles",
-    "fusion-resultats",
-    "api-output",
-]
+def _step_choices(repo_root: Path) -> list[str]:
+    steps: list[str] = []
+    seen = set()
+    for code in available_pipeline_codes():
+        for step in create_pipeline_orchestrator(code, repo_root, default=PIPELINE_DEFAULT_CODE).list_steps():
+            name = str(step)
+            if name in seen:
+                continue
+            seen.add(name)
+            steps.append(name)
+    for alias, target in _STEP_ALIASES.items():
+        if alias not in seen and target in seen:
+            steps.append(alias)
+            seen.add(alias)
+    return steps
 
 
 def _env_bool(name: str, default: bool = False) -> bool:
@@ -76,24 +78,12 @@ def _env_optional(name: str) -> str | None:
     return raw or None
 
 
-def _normalize_pipeline_name(raw: str | None, default: str = "pipeline0ml") -> str:
-    aliases = {
-        "default": "pipeline0ml",
-        "pipeline0ml": "pipeline0ml",
-        "0ml": "pipeline0ml",
-        "pipeline50ml": "pipeline50ml",
-        "50ml": "pipeline50ml",
-        "pipeline100ml": "pipeline100ml",
-        "100ml": "pipeline100ml",
-    }
-    if raw is None:
-        return default
-    value = str(raw).strip().lower()
-    return aliases.get(value, default)
+def _normalize_pipeline_name(raw: str | None, default: str | None = None) -> str:
+    return _normalize_pipeline_name_dynamic(raw, default or PIPELINE_DEFAULT_CODE)
 
 
 def _env_pipeline(default: str | None = None) -> str:
-    base_default = _normalize_pipeline_name(default or PIPELINE_DEFAULT_CODE, "pipeline0ml")
+    base_default = _normalize_pipeline_name(default or PIPELINE_DEFAULT_CODE, PIPELINE_DEFAULT_CODE)
     raw = os.environ.get("PIPELINE_DEFAULT")
     if raw is None:
         raw = os.environ.get("PIPELINE_PROFILE")
@@ -112,6 +102,11 @@ def _normalize_step_name(raw: str | None) -> str | None:
 def parse_cli() -> argparse.Namespace:
     repo_root = Path(__file__).resolve().parent.parent
     load_dotenv(repo_root / ".env", override=False)
+    step_choices = _step_choices(repo_root)
+    pipeline_choices = available_pipeline_choices(PIPELINE_DEFAULT_CODE)
+    pipeline_codes = available_pipeline_codes()
+    default_pipeline = _normalize_pipeline_name(PIPELINE_DEFAULT_CODE, pipeline_codes[0] if pipeline_codes else "pipeline0ml")
+    dynamic_help = " | ".join(pipeline_codes) if pipeline_codes else "aucun pipeline enregistre"
 
     parser = argparse.ArgumentParser(description="Orchestrateur du pipeline documentaire.")
     parser.add_argument(
@@ -121,18 +116,17 @@ def parse_cli() -> argparse.Namespace:
     )
     parser.add_argument(
         "--pipeline",
-        choices=["default", "pipeline0ml", "pipeline50ml", "pipeline100ml"],
+        choices=pipeline_choices,
         default=_env_pipeline(),
         help=(
-            "Pipeline a executer: default/pipeline0ml (pipeline actuelle) ou pipeline50ml "
-            "(tokenisation/extraction/fusion enrichies ML FastText-like + grammaire EN/FR/AR) ou "
-            "pipeline100ml (embeddings Transformer BERT/XLM-R + pooling + grammaire XLM-R EN/FR/AR)."
+            f"Pipeline a executer. 'default' pointe vers {default_pipeline}. "
+            f"Pipelines enregistrees: {dynamic_help}."
         ),
     )
     parser.add_argument("--log-level", default="INFO", help="Niveau de log (DEBUG, INFO, WARNING, ERROR).")
-    parser.add_argument("--only", choices=_STEP_CHOICES, help="N'executer qu'une seule etape (par nom).")
-    parser.add_argument("--upto", choices=_STEP_CHOICES, help="Executer jusqu'a et incluant cette etape.")
-    parser.add_argument("--start", choices=_STEP_CHOICES, help="Commencer a partir de cette etape.")
+    parser.add_argument("--only", choices=step_choices, help="N'executer qu'une seule etape (par nom).")
+    parser.add_argument("--upto", choices=step_choices, help="Executer jusqu'a et incluant cette etape.")
+    parser.add_argument("--start", choices=step_choices, help="Commencer a partir de cette etape.")
     parser.add_argument("--list-steps", action="store_true", help="Lister les etapes sans executer.")
     parser.add_argument(
         "--use-elasticsearch",
@@ -192,13 +186,8 @@ def main() -> None:
 
     inputs = normalize_input(args.inputs) if args.inputs else []
     repo_root = Path(__file__).resolve().parent.parent
-    pipeline_name = _normalize_pipeline_name(args.pipeline, "pipeline0ml")
-    if pipeline_name == "pipeline100ml":
-        orchestrator = Pipeline100MLOrchestrator(repo_root)
-    elif pipeline_name == "pipeline50ml":
-        orchestrator = Pipeline50MLOrchestrator(repo_root)
-    else:
-        orchestrator = Pipeline0MLOrchestrator(repo_root)
+    pipeline_name = _normalize_pipeline_name(args.pipeline, PIPELINE_DEFAULT_CODE)
+    orchestrator = create_pipeline_orchestrator(pipeline_name, repo_root, default=PIPELINE_DEFAULT_CODE)
     logging.info("Pipeline selection: %s", pipeline_name)
 
     # Tee all prints to file + console

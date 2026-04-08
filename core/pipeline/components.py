@@ -16,6 +16,12 @@ from .elasticsearch import (
     update_classification_results,
     update_extraction_results,
 )
+from .component_trace import (
+    capture_context_fingerprints,
+    finish_component_trace,
+    report_component_trace,
+    start_component_trace,
+)
 from .settings import (
     COMPONENT_DIR,
     REPO_ROOT,
@@ -85,15 +91,40 @@ def _drop_empty_duplicate_docs(docs: List[Dict[str, Any]]) -> List[Dict[str, Any
 class Component:
     name: str
     script: Path
+    _last_context: Context | None = None
+    _last_trace: Dict[str, Any] | None = None
 
     def run(self, context: Context) -> Any:
-        raise NotImplementedError
+        ctx = self._execute_script(context)
+        trace = self._last_trace if isinstance(self._last_trace, dict) else {}
+        touched_keys = [str(key) for key in (trace.get("context_keys_touched") or []) if str(key)]
+        reportable_keys = [key for key in touched_keys if key not in {"COMPONENT_TRACES"}]
+        output = {
+            "component_name": self.name,
+            "status": trace.get("status") or "completed",
+            "context_keys_touched": reportable_keys,
+            "new_context_keys": list(trace.get("new_context_keys") or []),
+            "changed_context_keys": list(trace.get("changed_context_keys") or []),
+        }
+        if reportable_keys:
+            output["data"] = {key: ctx.get(key) for key in reportable_keys if key in ctx}
+        summary = f"generic component | touched_keys={len(reportable_keys)}"
+        if reportable_keys:
+            summary += f" | {', '.join(reportable_keys[:5])}"
+            if len(reportable_keys) > 5:
+                summary += " ..."
+        self._report(output, summary)
+        return output
 
     def _execute_script(self, context: Context) -> Context:
         if not self.script.exists():
             raise FileNotFoundError(f"Script introuvable: {self.script}")
         logging.info("Execution du composant %s via %s", self.name, self.script)
         publish_component_started(context, component_name=self.name, component_script=str(self.script))
+        self._last_context = context
+        before_fingerprints = capture_context_fingerprints(context)
+        trace = start_component_trace(context, self.name, str(self.script))
+        self._last_trace = trace
         try:
             with change_dir(self.script.parent), isolated_argv([self.script.name]):
                 result = runpy.run_path(
@@ -106,6 +137,7 @@ class Component:
                     context.update(result)
         except SystemExit as exc:
             code = exc.code if isinstance(exc.code, int) else 1
+            finish_component_trace(trace, before_fingerprints, context, status="failed", error=f"sys.exit({code})")
             publish_component_failed(
                 context,
                 component_name=self.name,
@@ -114,6 +146,7 @@ class Component:
             )
             raise RuntimeError(f"{self.name} a termine par sys.exit({code})") from exc
         except Exception as exc:
+            finish_component_trace(trace, before_fingerprints, context, status="failed", error=exc)
             publish_component_failed(
                 context,
                 component_name=self.name,
@@ -121,10 +154,14 @@ class Component:
                 error=exc,
             )
             raise
+        finish_component_trace(trace, before_fingerprints, context, status="executed")
         publish_component_completed(context, component_name=self.name, component_script=str(self.script))
+        self._last_context = context
         return context
 
     def _report(self, output: Any, summary: str) -> None:
+        if isinstance(self._last_trace, dict):
+            report_component_trace(self._last_trace, output=output, summary=summary)
         print(f"[Component: {self.name}]")
         print(f"Type: {type(output).__name__}")
         print(f"Summary: {summary}")

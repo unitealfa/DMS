@@ -27,6 +27,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from pipeline.elasticsearch import fetch_sources_for_ids, maybe_build_store  # noqa: E402
+from pipeline.component_trace import component_trace_public_rows  # noqa: E402
 
 
 # ---------- Helpers ----------
@@ -272,6 +273,111 @@ def _filter_rows_for_doc(rows: Any, doc_id: Optional[str], filename: Optional[st
     for row in rows:
         if _row_belongs_to_doc(row, doc_id, filename):
             out.append(row)
+    return out
+
+
+def _component_traces(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
+    return [row for row in component_trace_public_rows(ctx) if isinstance(row, dict)]
+
+
+def _extract_doc_value_from_any(value: Any, doc_id: Optional[str], filename: Optional[str], docs_total: int) -> Any:
+    if isinstance(value, dict):
+        if _row_belongs_to_doc(value, doc_id, filename):
+            return value
+        if docs_total == 1:
+            return value
+        return None
+    if isinstance(value, list):
+        matched = _filter_rows_for_doc(value, doc_id, filename)
+        if matched:
+            return matched if len(matched) != 1 else matched[0]
+        if docs_total == 1 and value and not any(isinstance(item, dict) for item in value):
+            return value
+        return None
+    if docs_total == 1:
+        return value
+    return None
+
+
+def _component_trace_context_values(ctx: Dict[str, Any], trace: Dict[str, Any]) -> Dict[str, Any]:
+    out: Dict[str, Any] = {}
+    for key in trace.get("context_keys_touched") or []:
+        if key in ctx:
+            out[str(key)] = ctx.get(key)
+    return out
+
+
+def _component_trace_doc_view(
+    ctx: Dict[str, Any],
+    trace: Dict[str, Any],
+    doc_id: Optional[str],
+    filename: Optional[str],
+    docs_total: int,
+) -> Optional[Dict[str, Any]]:
+    data: Dict[str, Any] = {}
+    for key, value in _component_trace_context_values(ctx, trace).items():
+        extracted = _extract_doc_value_from_any(value, doc_id, filename, docs_total)
+        if extracted is not None:
+            data[key] = extracted
+
+    if not data and docs_total == 1 and trace.get("reported_output") is not None:
+        data["reported_output"] = trace.get("reported_output")
+
+    if not data:
+        return None
+
+    return {
+        "component_name": trace.get("component_name"),
+        "script": trace.get("component_script"),
+        "status": trace.get("status"),
+        "summary": trace.get("summary"),
+        "context_keys": trace.get("context_keys_touched") or [],
+        "output_type": trace.get("reported_output_type"),
+        "data": data,
+    }
+
+
+def _pipeline_component_runs(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
+    rows: List[Dict[str, Any]] = []
+    for trace in _component_traces(ctx):
+        rows.append(
+            {
+                "component_name": trace.get("component_name"),
+                "component_key": trace.get("component_key"),
+                "component_script": trace.get("component_script"),
+                "step_index": _safe_int(trace.get("step_index"), 0),
+                "status": trace.get("status"),
+                "summary": trace.get("summary"),
+                "new_context_keys": trace.get("new_context_keys") or [],
+                "changed_context_keys": trace.get("changed_context_keys") or [],
+                "context_keys_touched": trace.get("context_keys_touched") or [],
+                "reported_output_type": trace.get("reported_output_type"),
+                "error": trace.get("error"),
+            }
+        )
+    return rows
+
+
+def _auto_component_views(
+    ctx: Dict[str, Any],
+    doc_payload: Dict[str, Any],
+    existing_keys: Optional[Set[str]] = None,
+    docs_total: int = 0,
+) -> Dict[str, Any]:
+    document_id = str(doc_payload.get("document_id") or "").strip() or None
+    file_obj = doc_payload.get("file") if isinstance(doc_payload.get("file"), dict) else {}
+    filename = str(file_obj.get("name") or "").strip() or None
+    seen = set(existing_keys or set())
+    out: Dict[str, Any] = {}
+    for trace in _component_traces(ctx):
+        key = str(trace.get("component_key") or "").strip()
+        if not key or key in seen:
+            continue
+        view = _component_trace_doc_view(ctx, trace, document_id, filename, docs_total)
+        if view is None:
+            continue
+        out[key] = view
+        seen.add(key)
     return out
 
 
@@ -1017,6 +1123,7 @@ def _to_document_output(
     ctx: Dict[str, Any],
     doc_payload: Dict[str, Any],
     source: str,
+    docs_total: int = 0,
 ) -> Dict[str, Any]:
     file_obj = doc_payload.get("file") if isinstance(doc_payload.get("file"), dict) else {}
     content_obj = doc_payload.get("content") if isinstance(doc_payload.get("content"), dict) else {}
@@ -1029,6 +1136,7 @@ def _to_document_output(
     interdoc_link_ids = _interdoc_link_ids_for_doc(ctx, document_id, filename)
 
     components = _extract_component_views(ctx, doc_payload)
+    components.update(_auto_component_views(ctx, doc_payload, existing_keys=set(components.keys()), docs_total=docs_total))
     page_count = _derive_doc_page_count(file_obj, structure_obj)
 
     return {
@@ -1067,7 +1175,9 @@ def _final_output(
     payloads: List[Dict[str, Any]],
     source: str,
 ) -> Dict[str, Any]:
-    docs = [_to_document_output(ctx, p, source) for p in payloads if isinstance(p, dict)]
+    normalized_payloads = [p for p in payloads if isinstance(p, dict)]
+    docs_total = len(normalized_payloads)
+    docs = [_to_document_output(ctx, p, source, docs_total=docs_total) for p in normalized_payloads]
     interdoc = _interdoc_output(ctx)
     out: Dict[str, Any] = {
         "schema_version": "2.0",
@@ -1086,6 +1196,7 @@ def _final_output(
             "es_doc_ids": _safe_list(ctx.get("ES_DOC_IDS")),
             "steps": _safe_list(ctx.get("PIPELINE_STEPS")),
             "durations": ctx.get("PROCESS_DURATIONS") or {},
+            "component_runs": _pipeline_component_runs(ctx),
         },
     }
     return out

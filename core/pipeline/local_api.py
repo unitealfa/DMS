@@ -24,13 +24,6 @@ from urllib.parse import quote, unquote
 from .cli import PIPELINE_DEFAULT_CODE, _normalize_pipeline_name
 from .file_resolution import materialize_uploaded_content_from_lfs_pointer
 from .orchestrator import Pipeline0MLOrchestrator, Pipeline50MLOrchestrator, Pipeline100MLOrchestrator
-from .postgres import (
-    _build_upsert_statement,
-    _run_exec_sql,
-    ensure_postgres_bootstrap,
-    load_postgres_connection_config,
-    load_postgres_schema_config,
-)
 from .runtime_state import RUNTIME_JOB_ENV, RUNTIME_STATE_ENV, read_runtime_state
 
 
@@ -514,63 +507,6 @@ def save_uploaded_files(upload_items: List[Dict[str, Any]], job_id: str, request
     return saved_items
 
 
-def _register_uploaded_documents_in_db(saved_items: List[Dict[str, Any]], request_origin: str = "", referer: str = "", host: str = "") -> Dict[str, Any]:
-    if not saved_items:
-        return {"db_registered": 0, "db_ready": False}
-    bootstrap = ensure_postgres_bootstrap(REPO_ROOT, start_if_needed=False)
-    if not bootstrap.get("ready"):
-        return {"db_registered": 0, "db_ready": False, "db_error": bootstrap.get("error")}
-    try:
-        cfg = load_postgres_connection_config(REPO_ROOT)
-        schema = load_postgres_schema_config(cfg.schema_config_path)
-        statements: List[str] = []
-        for item in saved_items:
-            row = {
-                "api_document_id": item["api_document_id"],
-                "job_id": item["job_id"],
-                "source_kind": item.get("source_kind"),
-                "source_client": item.get("source_client"),
-                "source_ip": item.get("source_ip"),
-                "source_host": host or None,
-                "source_referer": referer or None,
-                "file_name": item["filename"],
-                "file_ext": item.get("file_ext"),
-                "file_mime": item.get("file_mime"),
-                "file_size": item.get("file_size"),
-                "file_sha256": item.get("file_sha256"),
-                "storage_root": str(API_UPLOADS_ROOT.resolve()),
-                "stored_relative_path": item["relative_path"],
-                "stored_absolute_path": item["absolute_path"],
-                "manifest_relative_path": item.get("manifest_relative_path"),
-                "manifest_absolute_path": item.get("manifest_absolute_path"),
-                "api_route": item["api_route"],
-                "api_url": item.get("api_url") or _build_public_file_url(item["job_id"], item["filename"], request_origin=request_origin),
-                "download_url": item.get("download_url") or _build_public_file_url(item["job_id"], item["filename"], request_origin=request_origin),
-                "status": "received",
-                "payload_json": {
-                    "job_id": item["job_id"],
-                    "file_name": item["filename"],
-                    "stored_relative_path": item["relative_path"],
-                    "api_route": item["api_route"],
-                },
-                "received_at": _iso_now(),
-                "updated_at": _iso_now(),
-            }
-            statements.append(
-                _build_upsert_statement(
-                    "dms.api_received_documents",
-                    row,
-                    conflict_columns=["api_document_id"],
-                    json_columns=["payload_json"],
-                )
-            )
-        if statements:
-            _run_exec_sql(cfg, schema.database_name, "\n".join(statements))
-        return {"db_registered": len(saved_items), "db_ready": True, "database": schema.database_name}
-    except Exception as exc:
-        return {"db_registered": 0, "db_ready": False, "db_error": str(exc)}
-
-
 def _documents_index_payload(limit: int = 100) -> Dict[str, Any]:
     docs: List[Dict[str, Any]] = []
     if API_UPLOADS_ROOT.exists():
@@ -841,11 +777,8 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
             job_id = uuid.uuid4().hex
             request_origin = _request_origin(self)
             client_ip = str(self.client_address[0] if self.client_address else "").strip()
-            referer = str(self.headers.get("Referer") or "").strip()
-            host = str(self.headers.get("Host") or "").strip()
             saved_items = save_uploaded_files(upload_items, job_id, request_origin=request_origin, client_ip=client_ip)
             LOGGER.info("saved_items=%s", [item["absolute_path"] for item in saved_items])
-            db_status = _register_uploaded_documents_in_db(saved_items, request_origin=request_origin, referer=referer, host=host)
             stored_documents = [
                 {
                     "api_document_id": item["api_document_id"],
@@ -877,7 +810,6 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
                         "manifest_route": manifest_route,
                         "manifest_url": manifest_url,
                         "documents": stored_documents,
-                        "postgres": db_status,
                     },
                     status=HTTPStatus.ACCEPTED,
                 )
@@ -889,7 +821,6 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
             current["manifest_route"] = manifest_route
             current["manifest_url"] = manifest_url
             current["storage_root"] = str(API_UPLOADS_ROOT.resolve())
-            current["postgres"] = db_status
             self._send_json(
                 {
                     "ok": True,
@@ -924,7 +855,6 @@ def parse_args(argv: List[str] | None = None) -> argparse.Namespace:
 
 
 def serve(host: str = DEFAULT_HOST, port: int = DEFAULT_PORT) -> None:
-    postgres_status = ensure_postgres_bootstrap(REPO_ROOT, start_if_needed=False)
     try:
         server = DMSLauncherServer((host, port), DMSLauncherHandler)
     except OSError as exc:
@@ -937,16 +867,6 @@ def serve(host: str = DEFAULT_HOST, port: int = DEFAULT_PORT) -> None:
     print(f"[local-api] pid={os.getpid()}")
     print(f"[local-api] api_version={API_VERSION}")
     print(f"[local-api] host bind={host}:{port}")
-    print(
-        "[local-api] postgres "
-        f"enabled={1 if postgres_status.get('enabled') else 0} | "
-        f"ready={1 if postgres_status.get('ready') else 0} | "
-        f"db={postgres_status.get('database')} | "
-        f"created={1 if postgres_status.get('database_created') else 0} | "
-        f"tables={len(postgres_status.get('tables_ready') or [])}/{len(postgres_status.get('tables_expected') or [])}"
-    )
-    if postgres_status.get("error"):
-        print(f"[local-api] postgres_error={postgres_status.get('error')}")
     print(f"[local-api] api_storage={API_UPLOADS_ROOT.resolve()}")
     for url in _candidate_urls(host, port):
         print(f"[local-api] url={url}")

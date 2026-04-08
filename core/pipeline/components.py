@@ -620,37 +620,3 @@ class FusionResultComponent(Component):
         self._report(output, summary)
         return output
 
-
-class PostgresSyncComponent(Component):
-    """Synchronise le `fusion_output.json` final vers PostgreSQL."""
-
-    def run(self, context: Context) -> Any:
-        ctx = self._execute_script(context)
-        output = ctx.get("POSTGRES_SYNC")
-        if not isinstance(output, dict):
-            raise ValueError("postgres-sync n'a retourne aucun POSTGRES_SYNC exploitable.")
-
-        summary = (
-            f"ready={1 if output.get('ready') else 0} | "
-            f"db={output.get('database')} | "
-            f"run={output.get('run_id')} | "
-            f"docs={int(output.get('documents_upserted') or 0)}/{int(output.get('documents_total') or 0)} | "
-            f"payloads={int(output.get('payloads_upserted') or 0)} | "
-            f"nodes={int(output.get('run_payload_nodes_upserted') or 0) + int(output.get('document_payload_nodes_upserted') or 0)} | "
-            f"ids={int(output.get('identifiers_upserted') or 0)} | "
-            f"pages={int(output.get('pages_upserted') or 0)} | "
-            f"tokens={int(output.get('tokens_upserted') or 0)} | "
-            f"topics={int(output.get('topics_upserted') or 0)} | "
-            f"extracts={int(output.get('extraction_details_upserted') or 0)} | "
-            f"tables={int(output.get('tables_upserted') or 0)} | "
-            f"rows={int(output.get('table_rows_upserted') or 0)} | "
-            f"cells={int(output.get('table_cells_upserted') or 0)} | "
-            f"links={int(output.get('links_upserted') or 0)} | "
-            f"registry={int(output.get('stable_registry_upserted') or 0)}"
-        )
-        if output.get("skipped"):
-            summary += f" | skipped={output.get('skipped')}"
-        if output.get("error"):
-            summary += f" | error={output.get('error')}"
-        self._report(output, summary)
-        return output

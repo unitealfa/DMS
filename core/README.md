@@ -283,10 +283,7 @@ Exemple simplifie:
       "api_url": "https://mon-backend.example.com/api/documents/file/abc123/contrat.pdf",
       "download_url": "https://mon-backend.example.com/api/documents/file/abc123/contrat.pdf"
     }
-  ],
-  "postgres": {
-    "db_ready": true
-  }
+  ]
 }
 ```
 
@@ -405,26 +402,7 @@ Affichage conseille dans ton autre site:
   - utilise directement `api_url`
   - ne reconstruis pas l'URL toi-meme a partir d'un chemin relatif
 
-### 14) Enregistrement en base PostgreSQL
-Quand un document est envoye via `POST /api/store` ou `POST /api/run`, le backend tente aussi d'enregistrer sa trace dans:
-```text
-dms.api_received_documents
-```
-
-Champs utiles stockes:
-- `file_name`
-- `stored_relative_path`
-- `stored_absolute_path`
-- `api_route`
-- `api_url`
-- `download_url`
-- `file_sha256`
-- `job_id`
-- `received_at`
-
-Donc la route API et le vrai chemin disque du document recu sont visibles en base.
-
-### 15) Limite actuelle
+### 14) Limite actuelle
 - `GET /api/status` suit le job courant du backend local
 - ce n'est pas un systeme multi-jobs paralleles
 - pour un affichage live simple, il faut:

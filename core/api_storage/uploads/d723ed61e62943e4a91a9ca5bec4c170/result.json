@@ -1,0 +1,3742 @@
+{
+  "schema_version": "dms-unified-final-template-1.0",
+  "generated_at": "2026-04-08T20:28:26.623620+00:00",
+  "source": null,
+  "profile": "pipeline50ml",
+  "null_policy": {
+    "scalars": null,
+    "arrays": [],
+    "objects": "fully materialized with null leaves or {} when intentionally open-ended"
+  },
+  "documents_count": 0,
+  "documents": [],
+  "cross_document_analysis": {
+    "method": null,
+    "documents_analyzed": null,
+    "pairs_evaluated": null,
+    "sentence_pairs_scored": null,
+    "chunk_pairs_scored": null,
+    "links_count": null,
+    "vector_profile": null,
+    "embedding_method": null,
+    "embedding_backend": null,
+    "vector_dim": null,
+    "vector_links_count": null,
+    "links": [],
+    "generated_at": null
+  },
+  "pipeline": {
+    "es_enabled": null,
+    "es_available": null,
+    "es_url": null,
+    "es_index": null,
+    "es_nlp_level": null,
+    "es_nlp_index": null,
+    "es_doc_ids": [],
+    "steps": [],
+    "durations": {
+      "all": null,
+      "_dynamic_duration_template": null
+    },
+    "profile": "pipeline50ml",
+    "0ml": {
+      "tables_docs_count": null,
+      "totals_verification_docs_count": null,
+      "totals_verification_ok_docs_count": null,
+      "totals_verification_partial_ok_docs_count": null,
+      "totals_verification_mismatch_docs_count": null,
+      "totals_verification_missing_docs_count": null,
+      "profile_name": "default"
+    },
+    "ml50": {
+      "embedding_method": null,
+      "vector_dim": null,
+      "doc_vectors_count": null,
+      "chunk_vectors_count": null,
+      "word_vectors_count": null,
+      "topics_docs_count": null,
+      "tables_docs_count": null,
+      "totals_verification_docs_count": null,
+      "totals_verification_ok_docs_count": null,
+      "totals_verification_partial_ok_docs_count": null,
+      "totals_verification_mismatch_docs_count": null,
+      "totals_verification_missing_docs_count": null,
+      "profile_name": "pipeline50ml"
+    },
+    "ml100": {
+      "embedding_method": null,
+      "vector_dim": null,
+      "doc_vectors_count": null,
+      "chunk_vectors_count": null,
+      "word_vectors_count": null,
+      "topics_docs_count": null,
+      "tables_docs_count": null,
+      "totals_verification_docs_count": null,
+      "totals_verification_ok_docs_count": null,
+      "totals_verification_partial_ok_docs_count": null,
+      "totals_verification_mismatch_docs_count": null,
+      "totals_verification_missing_docs_count": null,
+      "visual_detection_docs_count": null,
+      "visual_signature_docs_count": null,
+      "visual_stamp_docs_count": null,
+      "visual_barcode_docs_count": null,
+      "visual_qrcode_docs_count": null,
+      "profile_name": "pipeline100ml"
+    },
+    "component_runs": [
+      {
+        "component_name": "pretraitement-de-docs",
+        "component_key": "pretraitement_de_docs",
+        "component_script": "/home/mourad/Bureau/DMS/core/component/pretraitement-de-docs.py",
+        "step_index": 1,
+        "status": "executed",
+        "started_at": "2026-04-08T20:28:09.496637+00:00",
+        "finished_at": "2026-04-08T20:28:09.501592+00:00",
+        "summary": "1 fichiers | text=1 | image=0 | unsupported=0 | missing=0",
+        "new_context_keys": [
+          "Any",
+          "COMPONENT_TRACES",
+          "Dict",
+          "ET",
+          "FileType",
+          "List",
+          "MIN_CHARS_OFFICE",
+          "MIN_CHARS_PDF",
+          "MISSING_FILES",
+          "Optional",
+          "PDF_MAX_PAGES",
+          "Path",
+          "REPO_ROOT",
+          "SEARCH_DIRS",
+          "Sequence",
+          "Union",
+          "_get_pdf_reader",
+          "_pdf_has_text",
+          "_read_head",
+          "_safe_file_size",
+          "_xml_text_len",
+          "_zip_has_text",
+          "analyze_many_two_states",
+          "annotations",
+          "content_kind_two_states",
+          "csv",
+          "dataclass",
+          "detect_path_type",
+          "normalize_input_files",
+          "os",
+          "re",
+          "resolve_path",
+          "resolve_runtime_input_path",
+          "zipfile"
+        ],
+        "changed_context_keys": [
+          "INPUT_FILE"
+        ],
+        "context_keys_touched": [
+          "Any",
+          "COMPONENT_TRACES",
+          "Dict",
+          "ET",
+          "FileType",
+          "INPUT_FILE",
+          "List",
+          "MIN_CHARS_OFFICE",
+          "MIN_CHARS_PDF",
+          "MISSING_FILES",
+          "Optional",
+          "PDF_MAX_PAGES",
+          "Path",
+          "REPO_ROOT",
+          "SEARCH_DIRS",
+          "Sequence",
+          "Union",
+          "_get_pdf_reader",
+          "_pdf_has_text",
+          "_read_head",
+          "_safe_file_size",
+          "_xml_text_len",
+          "_zip_has_text",
+          "analyze_many_two_states",
+          "annotations",
+          "content_kind_two_states",
+          "csv",
+          "dataclass",
+          "detect_path_type",
+          "normalize_input_files",
+          "os",
+          "re",
+          "resolve_path",
+          "resolve_runtime_input_path",
+          "zipfile"
+        ],
+        "reported_output_type": "dict",
+        "reported_output": {
+          "PRETRAITEMENT_RESULT": [
+            {
+              "path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/d723ed61e62943e4a91a9ca5bec4c170/epsteain22.pdf",
+              "ext": ".pdf",
+              "mime": "application/pdf",
+              "label": "PDF document",
+              "size": 45563,
+              "content": "text"
+            }
+          ],
+          "MISSING_FILES": []
+        },
+        "error": null
+      },
+      {
+        "component_name": "si-image-pretraiter-sinonpass-le-doc",
+        "component_key": "si_image_pretraiter_sinonpass_le_doc",
+        "component_script": "/home/mourad/Bureau/DMS/core/component/si-image-pretraiter-sinonpass-le-doc.py",
+        "step_index": 2,
+        "status": "executed",
+        "started_at": "2026-04-08T20:28:09.572091+00:00",
+        "finished_at": "2026-04-08T20:28:09.870298+00:00",
+        "summary": "text=1, image=0, unsupported=0, missing=0, docs_prepped=0",
+        "new_context_keys": [
+          "DEFAULT_BRIGHTNESS",
+          "DEFAULT_CONTRAST",
+          "DEFAULT_DPI",
+          "DEFAULT_LANG",
+          "DEFAULT_SHARPNESS",
+          "DEFAULT_UPSCALE",
+          "DOCS",
+          "EnhanceOptions",
+          "IMAGE_ONLY_FILES",
+          "Image",
+          "ImageEnhance",
+          "ImageFilter",
+          "ImageOps",
+          "Iterable",
+          "ORIGINAL_INPUT_FILE",
+          "SCRIPT_DIR",
+          "SHOW_PREPROCESSED",
+          "TEXT_FILES",
+          "Tuple",
+          "UNSUPPORTED_FILES",
+          "_ipython_display",
+          "_load_images_from_path",
+          "_normalize_input_file",
+          "_normalize_input_files",
+          "_raw_items",
+          "argparse",
+          "args",
+          "auto_rotate_if_needed",
+          "build_config",
+          "config_flags",
+          "enhance",
+          "ensure_environment",
+          "ft",
+          "input_items",
+          "item",
+          "kind",
+          "np",
+          "p",
+          "parse_args",
+          "parse_git_lfs_pointer_path",
+          "preprocess_image",
+          "pytesseract",
+          "subprocess",
+          "sys",
+          "tempfile"
+        ],
+        "changed_context_keys": [
+          "COMPONENT_TRACES",
+          "FileType",
+          "INPUT_FILE",
+          "REPO_ROOT",
+          "_get_pdf_reader",
+          "_pdf_has_text",
+          "_read_head",
+          "_xml_text_len",
+          "_zip_has_text",
+          "content_kind_two_states",
+          "detect_path_type",
+          "normalize_input_files",
+          "resolve_path"
+        ],
+        "context_keys_touched": [
+          "COMPONENT_TRACES",
+          "DEFAULT_BRIGHTNESS",
+          "DEFAULT_CONTRAST",
+          "DEFAULT_DPI",
+          "DEFAULT_LANG",
+          "DEFAULT_SHARPNESS",
+          "DEFAULT_UPSCALE",
+          "DOCS",
+          "EnhanceOptions",
+          "FileType",
+          "IMAGE_ONLY_FILES",
+          "INPUT_FILE",
+          "Image",
+          "ImageEnhance",
+          "ImageFilter",
+          "ImageOps",
+          "Iterable",
+          "ORIGINAL_INPUT_FILE",
+          "REPO_ROOT",
+          "SCRIPT_DIR",
+          "SHOW_PREPROCESSED",
+          "TEXT_FILES",
+          "Tuple",
+          "UNSUPPORTED_FILES",
+          "_get_pdf_reader",
+          "_ipython_display",
+          "_load_images_from_path",
+          "_normalize_input_file",
+          "_normalize_input_files",
+          "_pdf_has_text",
+          "_raw_items",
+          "_read_head",
+          "_xml_text_len",
+          "_zip_has_text",
+          "argparse",
+          "args",
+          "auto_rotate_if_needed",
+          "build_config",
+          "config_flags",
+          "content_kind_two_states",
+          "detect_path_type",
+          "enhance",
+          "ensure_environment",
+          "ft",
+          "input_items",
+          "item",
+          "kind",
+          "normalize_input_files",
+          "np",
+          "p",
+          "parse_args",
+          "parse_git_lfs_pointer_path",
+          "preprocess_image",
+          "pytesseract",
+          "resolve_path",
+          "subprocess",
+          "sys",
+          "tempfile"
+        ],
+        "reported_output_type": "dict",
+        "reported_output": {
+          "TEXT_FILES": [
+            "/home/mourad/Bureau/DMS/core/api_storage/uploads/d723ed61e62943e4a91a9ca5bec4c170/epsteain22.pdf"
+          ],
+          "IMAGE_ONLY_FILES": [],
+          "UNSUPPORTED_FILES": [],
+          "MISSING_FILES": [],
+          "DOCS": []
+        },
+        "error": null
+      },
+      {
+        "component_name": "output-txt",
+        "component_key": "output_txt",
+        "component_script": "/home/mourad/Bureau/DMS/core/component/output-txt.py",
+        "step_index": 3,
+        "status": "executed",
+        "started_at": "2026-04-08T20:28:09.871153+00:00",
+        "finished_at": "2026-04-08T20:28:09.891492+00:00",
+        "summary": "1 docs | pages=1",
+        "new_context_keys": [
+          "FINAL_DOCS",
+          "Output",
+          "PRINT_DURING_EXTRACTION",
+          "SimpleNamespace",
+          "TEXT_DOCS",
+          "_basename",
+          "_doc_size_from_sources",
+          "_docx_app_page_count",
+          "_docx_xml_to_pages",
+          "_docx_xml_to_text",
+          "_estimate_char_metrics",
+          "_get_pdf_reader_with_name",
+          "_html_bytes_to_text_preserve",
+          "_median",
+          "_odf_content_to_text",
+          "_pad_pages_text",
+          "_pdf_extract_text_preserve_layout",
+          "_pdf_page_count",
+          "_pptx_slide_xml_to_text",
+          "_render_layout_from_data",
+          "_xlsx_col_to_index",
+          "_xlsx_shared_strings",
+          "_xlsx_sheet_to_text",
+          "config",
+          "content",
+          "d",
+          "extract_text_native",
+          "extraction",
+          "filename",
+          "i",
+          "page_count_total",
+          "pages_text",
+          "total",
+          "txt",
+          "uuid"
+        ],
+        "changed_context_keys": [
+          "COMPONENT_TRACES",
+          "REPO_ROOT",
+          "_safe_file_size",
+          "config_flags"
+        ],
+        "context_keys_touched": [
+          "COMPONENT_TRACES",
+          "FINAL_DOCS",
+          "Output",
+          "PRINT_DURING_EXTRACTION",
+          "REPO_ROOT",
+          "SimpleNamespace",
+          "TEXT_DOCS",
+          "_basename",
+          "_doc_size_from_sources",
+          "_docx_app_page_count",
+          "_docx_xml_to_pages",
+          "_docx_xml_to_text",
+          "_estimate_char_metrics",
+          "_get_pdf_reader_with_name",
+          "_html_bytes_to_text_preserve",
+          "_median",
+          "_odf_content_to_text",
+          "_pad_pages_text",
+          "_pdf_extract_text_preserve_layout",
+          "_pdf_page_count",
+          "_pptx_slide_xml_to_text",
+          "_render_layout_from_data",
+          "_safe_file_size",
+          "_xlsx_col_to_index",
+          "_xlsx_shared_strings",
+          "_xlsx_sheet_to_text",
+          "config",
+          "config_flags",
+          "content",
+          "d",
+          "extract_text_native",
+          "extraction",
+          "filename",
+          "i",
+          "page_count_total",
+          "pages_text",
+          "total",
+          "txt",
+          "uuid"
+        ],
+        "reported_output_type": "list",
+        "reported_output": [
+          {
+            "doc_id": "72a61fd0-ce5a-443b-9767-a2d6db63313e",
+            "filename": "epsteain22.pdf",
+            "size": 45563,
+            "content": "text",
+            "extraction": "native:pdf:pypdf",
+            "text": "From:                 Jeanne M. Christensen\nSent:                 Friday. July 21, 2023 9:55 PM\nTo:\nSubject:              [EXTERNAL] Leon Black follow up\n\n\n\nIn case you have not heard it has been discovered that Leon Black paid 62.5 million to USVI - and this\ndoes not include payments of money to individual women - it's outrageous that criminal charges have\nnot been brought against him.\nI've heard one lawyer represents ten women that he sexually assaulted.\nhttos://www.reuters.com/legaUinvestor-leon-black-settles-with-us-virgin-islands-over-eostein-probe-\n2023-07-21/\n\nI hope that your office is going to take a hard look based on this new information.\n\n\nJeanne M. Christensen\nPartner\n\nWIGDOR LLP\n85 Fifth Avenue, New York, NY 10003\nT:\n\n\nwww.wigdorlaw.com\n\nThis communication may contain Confidential or Attorney-Client Privileged Information and/or Attorney\nWork Product If you are not the addressee indicated in this message or its intended recipient (or\nresponsible for delivery of the message to such person(s)), do not read, copy, or forward this message to\nanyone and, in such case, please immediately destroy or delete this message, including any copies hereof,\nand kindly notify the sender by reply e-mail, facsimile or phone. Thank you.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                                     EFTA02731479",
+            "pages_text": [
+              "From:                 Jeanne M. Christensen\nSent:                 Friday. July 21, 2023 9:55 PM\nTo:\nSubject:              [EXTERNAL] Leon Black follow up\n\n\n\nIn case you have not heard it has been discovered that Leon Black paid 62.5 million to USVI - and this\ndoes not include payments of money to individual women - it's outrageous that criminal charges have\nnot been brought against him.\nI've heard one lawyer represents ten women that he sexually assaulted.\nhttos://www.reuters.com/legaUinvestor-leon-black-settles-with-us-virgin-islands-over-eostein-probe-\n2023-07-21/\n\nI hope that your office is going to take a hard look based on this new information.\n\n\nJeanne M. Christensen\nPartner\n\nWIGDOR LLP\n85 Fifth Avenue, New York, NY 10003\nT:\n\n\nwww.wigdorlaw.com\n\nThis communication may contain Confidential or Attorney-Client Privileged Information and/or Attorney\nWork Product If you are not the addressee indicated in this message or its intended recipient (or\nresponsible for delivery of the message to such person(s)), do not read, copy, or forward this message to\nanyone and, in such case, please immediately destroy or delete this message, including any copies hereof,\nand kindly notify the sender by reply e-mail, facsimile or phone. Thank you.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                                     EFTA02731479"
+            ],
+            "page_count_total": 1
+          }
+        ],
+        "error": null
+      },
+      {
+        "component_name": "clasification",
+        "component_key": "clasification",
+        "component_script": "/home/mourad/Bureau/DMS/core/component/clasification.py",
+        "step_index": 4,
+        "status": "executed",
+        "started_at": "2026-04-08T20:28:09.894240+00:00",
+        "finished_at": "2026-04-08T20:28:09.911169+00:00",
+        "summary": "1 docs classes | epsteain22.pdf->UNCLASSIFIED",
+        "new_context_keys": [
+          "CLASSIFICATION_DIR",
+          "COMMON_PATH",
+          "RESULTS",
+          "_bucket_pairs",
+          "_build_DOCS_from_input",
+          "_doc_text_len",
+          "_drop_empty_duplicates",
+          "_ensure_kw_dict",
+          "_get_previous_cell_input",
+          "_load_json",
+          "_norm_keyword",
+          "_norm_text",
+          "_strip_accents",
+          "ac_targets",
+          "ast",
+          "audit_parts",
+          "best",
+          "best_matches",
+          "bucket",
+          "classification_log",
+          "classify_scores",
+          "cnt",
+          "common",
+          "compact",
+          "compact_vals",
+          "configs",
+          "data",
+          "decide",
+          "doc",
+          "dt",
+          "dt_audit",
+          "dt_row",
+          "json",
+          "kw",
+          "load_classification_configs",
+          "matched_keywords",
+          "order",
+          "ordered_scores",
+          "preferred",
+          "sc",
+          "score_audit_by_type",
+          "scores",
+          "scores_audit",
+          "shown",
+          "status",
+          "unicodedata"
+        ],
+        "changed_context_keys": [
+          "COMPONENT_TRACES",
+          "DOCS",
+          "REPO_ROOT",
+          "d",
+          "item",
+          "total"
+        ],
+        "context_keys_touched": [
+          "CLASSIFICATION_DIR",
+          "COMMON_PATH",
+          "COMPONENT_TRACES",
+          "DOCS",
+          "REPO_ROOT",
+          "RESULTS",
+          "_bucket_pairs",
+          "_build_DOCS_from_input",
+          "_doc_text_len",
+          "_drop_empty_duplicates",
+          "_ensure_kw_dict",
+          "_get_previous_cell_input",
+          "_load_json",
+          "_norm_keyword",
+          "_norm_text",
+          "_strip_accents",
+          "ac_targets",
+          "ast",
+          "audit_parts",
+          "best",
+          "best_matches",
+          "bucket",
+          "classification_log",
+          "classify_scores",
+          "cnt",
+          "common",
+          "compact",
+          "compact_vals",
+          "configs",
+          "d",
+          "data",
+          "decide",
+          "doc",
+          "dt",
+          "dt_audit",
+          "dt_row",
+          "item",
+          "json",
+          "kw",
+          "load_classification_configs",
+          "matched_keywords",
+          "order",
+          "ordered_scores",
+          "preferred",
+          "sc",
+          "score_audit_by_type",
+          "scores",
+          "scores_audit",
+          "shown",
+          "status",
+          "total",
+          "unicodedata"
+        ],
+        "reported_output_type": "list",
+        "reported_output": [
+          {
+            "doc_id": "72a61fd0-ce5a-443b-9767-a2d6db63313e",
+            "filename": "epsteain22.pdf",
+            "doc_type": "UNCLASSIFIED",
+            "status": "REVIEW",
+            "scores": {
+              "ARTICLE": 0,
+              "BON_DE_COMMANDE": 1,
+              "CONTRAT": 0,
+              "FACTURE": 2,
+              "FORMULAIRE": 0
+            },
+            "winning_score": 2,
+            "threshold": 6,
+            "margin": 3,
+            "classification_log": "[classification] epsteain22.pdf -> best=UNCLASSIFIED | status=REVIEW | scores: {'ARTICLE': 0, 'BON_DE_COMMANDE': 1, 'CONTRAT': 0, 'FACTURE': 2, 'FORMULAIRE': 0}",
+            "scores_audit": {
+              "BON_DE_COMMANDE": {
+                "score_total": 1,
+                "matched_keywords": [
+                  {
+                    "keyword": "DELIVERY",
+                    "bucket": "weak",
+                    "count": 1,
+                    "score": 1
+                  }
+                ],
+                "matched_keywords_compact": [
+                  "DELIVERY(x1,+1,weak)"
+                ]
+              },
+              "FACTURE": {
+                "score_total": 2,
+                "matched_keywords": [
+                  {
+                    "keyword": "CLIENT",
+                    "bucket": "medium",
+                    "count": 1,
+                    "score": 2
+                  }
+                ],
+                "matched_keywords_compact": [
+                  "CLIENT(x1,+2,medium)"
+                ]
+              }
+            },
+            "keyword_matches": {
+              "strong": [],
+              "medium": [],
+              "weak": [],
+              "negative": [],
+              "strong_negative": [],
+              "anti_confusion_hits": []
+            },
+            "anti_confusion_targets": [],
+            "decision_debug": {
+              "top_score": 2,
+              "second_score": 1,
+              "diff": 1
+            }
+          }
+        ],
+        "error": null
+      },
+      {
+        "component_name": "tokenisation-layout",
+        "component_key": "tokenisation_layout",
+        "component_script": "/home/mourad/Bureau/DMS/core/component/tokenisation_layout/tokenisation-layout-50ml.py",
+        "step_index": 5,
+        "status": "executed",
+        "started_at": "2026-04-08T20:28:09.912473+00:00",
+        "finished_at": "2026-04-08T20:28:10.480717+00:00",
+        "summary": "2 docs | sentences=16",
+        "new_context_keys": [
+          "BASE_SCRIPT",
+          "Counter",
+          "DEC_RE",
+          "DETECTED_LANGUAGES",
+          "DOC_PACK",
+          "GAP_MIN_NATIVE",
+          "GAP_MIN_OCR",
+          "MAX_SENTENCES_PREVIEW",
+          "MERGE_COL_DIST_NATIVE",
+          "MERGE_COL_DIST_OCR",
+          "MICROTABLE_MAX_ROWS",
+          "MICROTABLE_MIN_DENS",
+          "MICROTABLE_MIN_MULTIROW",
+          "MIN_SENTENCE_NONSPACE",
+          "ML50_CHUNK_VECTORS",
+          "ML50_DOC_VECTORS",
+          "ML50_EMBEDDING_METHOD",
+          "ML50_TOPICS",
+          "ML50_VECTOR_DIM",
+          "ML50_WORD_VECTORS",
+          "NLP_ANALYSES",
+          "NLP_ENTITIES",
+          "NLP_LANGUAGE",
+          "NLP_LANGUAGE_STATS",
+          "NLP_LEMMA",
+          "NLP_POS",
+          "NLP_SENTENCES",
+          "NLP_TOKENS",
+          "NUM_RE",
+          "PRINT_ONLY_SENTENCES",
+          "PRINT_PAGE_TEXT",
+          "PRINT_REPR",
+          "PRINT_SENTENCES",
+          "TABLE_HINT_RE",
+          "TARGET",
+          "TOKEN_RE",
+          "TOK_BY_FILENAME",
+          "TOK_BY_ID",
+          "TOK_DOCS",
+          "Vector",
+          "_ALPHA_RE",
+          "_AR_END_RE",
+          "_AR_RE",
+          "_CTX",
+          "_EN_HINT",
+          "_FR_HINT",
+          "_GENERIC_SENT_END_RE",
+          "_KEYWORD_STRONG_RE",
+          "_KEYWORD_WEAK_HEADING_RE",
+          "_KV_GENERIC_RE",
+          "_LABEL_ONLY_RE",
+          "_NOISE_LINE_RE",
+          "_NUM_MULTI_RE",
+          "_NUM_SIMPLE_RE",
+          "_PARA_BREAK_RE",
+          "_ROMAN_RE",
+          "_SEP_RE",
+          "_STOPWORDS",
+          "_TOPIC_NOISE_TERMS",
+          "_WORD_RE",
+          "_WS_RE",
+          "_assign_to_centers",
+          "_augment_with_ml50",
+          "_build_topic_boost_terms",
+          "_char_ngrams",
+          "_cluster_centers",
+          "_collapse_ws",
+          "_collect_table_block",
+          "_dec_tokens",
+          "_doc_key",
+          "_doc_size_from_paths",
+          "_ensure_nltk",
+          "_extract_chunk_topics",
+          "_extract_terms_from_keyword_item",
+          "_extract_topics_from_chunks",
+          "_fasttext_like_vector",
+          "_has_big_gap",
+          "_hash_index_sign",
+          "_is_address_continuation_line",
+          "_is_grid_like",
+          "_is_micro_table_like",
+          "_is_multicol_candidate_line",
+          "_is_section_start_line",
+          "_is_table_line",
+          "_is_topic_candidate",
+          "_iter_doc_chunks",
+          "_iter_line_spans",
+          "_line_col_from_offset",
+          "_line_segments_by_gaps",
+          "_load_punkt_pickle",
+          "_looks_like_addressish",
+          "_looks_like_header_pair",
+          "_looks_like_paragraphish",
+          "_looks_like_title_line",
+          "_make_span_item",
+          "_mask_digits",
+          "_mean_vectors",
+          "_merge_close_columns",
+          "_merge_label_only",
+          "_nonspace_len",
+          "_norm_token",
+          "_norm_topic_term",
+          "_normalize_kv_generic",
+          "_num_tokens",
+          "_pdf_extract_pages_text",
+          "_prune_topic_redundancy",
+          "_run_base_tokenisation",
+          "_safe_int",
+          "_safe_str",
+          "_score_term_quality",
+          "_select_doc",
+          "_sep_spans",
+          "_sort_key",
+          "_space_runs_ge",
+          "_split_on_lang_switch",
+          "_split_on_newline_gap",
+          "_split_sentence_fallback",
+          "_strip_sep_lines",
+          "_to_list",
+          "_tokenize",
+          "_tokens_to_topic_terms",
+          "_transpose_or_group_multicol",
+          "_unique_keep_order",
+          "_upper_ratio",
+          "_vector_norm",
+          "build_noise_keys_for_doc",
+          "chunk",
+          "chunk_is_noise",
+          "chunk_lang",
+          "chunk_layout_universal",
+          "col",
+          "content_type",
+          "detect_lang",
+          "doc_chars_total",
+          "doc_id",
+          "doc_lang_counter",
+          "end",
+          "full_text",
+          "hashlib",
+          "i2",
+          "is_noise",
+          "is_sentence",
+          "it",
+          "items",
+          "lang",
+          "layout_items",
+          "line",
+          "math",
+          "nltk",
+          "noise_keys",
+          "nonspace",
+          "page_index",
+          "page_text",
+          "pages",
+          "pages_out",
+          "pages_text_for_noise",
+          "pages_tok",
+          "paths",
+          "pg",
+          "pickle",
+          "print_one_doc",
+          "recompose_ok",
+          "recompose_ok_doc",
+          "runpy",
+          "selected",
+          "sent_items",
+          "sentence_chunks_layout",
+          "sp",
+          "split_ar_layout",
+          "split_paragraphs_layout",
+          "split_punkt_layout",
+          "split_sections_layout",
+          "start"
+        ],
+        "changed_context_keys": [
+          "COMPONENT_TRACES",
+          "_pdf_page_count",
+          "_safe_file_size",
+          "d",
+          "doc",
+          "p"
+        ],
+        "context_keys_touched": [
+          "BASE_SCRIPT",
+          "COMPONENT_TRACES",
+          "Counter",
+          "DEC_RE",
+          "DETECTED_LANGUAGES",
+          "DOC_PACK",
+          "GAP_MIN_NATIVE",
+          "GAP_MIN_OCR",
+          "MAX_SENTENCES_PREVIEW",
+          "MERGE_COL_DIST_NATIVE",
+          "MERGE_COL_DIST_OCR",
+          "MICROTABLE_MAX_ROWS",
+          "MICROTABLE_MIN_DENS",
+          "MICROTABLE_MIN_MULTIROW",
+          "MIN_SENTENCE_NONSPACE",
+          "ML50_CHUNK_VECTORS",
+          "ML50_DOC_VECTORS",
+          "ML50_EMBEDDING_METHOD",
+          "ML50_TOPICS",
+          "ML50_VECTOR_DIM",
+          "ML50_WORD_VECTORS",
+          "NLP_ANALYSES",
+          "NLP_ENTITIES",
+          "NLP_LANGUAGE",
+          "NLP_LANGUAGE_STATS",
+          "NLP_LEMMA",
+          "NLP_POS",
+          "NLP_SENTENCES",
+          "NLP_TOKENS",
+          "NUM_RE",
+          "PRINT_ONLY_SENTENCES",
+          "PRINT_PAGE_TEXT",
+          "PRINT_REPR",
+          "PRINT_SENTENCES",
+          "TABLE_HINT_RE",
+          "TARGET",
+          "TOKEN_RE",
+          "TOK_BY_FILENAME",
+          "TOK_BY_ID",
+          "TOK_DOCS",
+          "Vector",
+          "_ALPHA_RE",
+          "_AR_END_RE",
+          "_AR_RE",
+          "_CTX",
+          "_EN_HINT",
+          "_FR_HINT",
+          "_GENERIC_SENT_END_RE",
+          "_KEYWORD_STRONG_RE",
+          "_KEYWORD_WEAK_HEADING_RE",
+          "_KV_GENERIC_RE",
+          "_LABEL_ONLY_RE",
+          "_NOISE_LINE_RE",
+          "_NUM_MULTI_RE",
+          "_NUM_SIMPLE_RE",
+          "_PARA_BREAK_RE",
+          "_ROMAN_RE",
+          "_SEP_RE",
+          "_STOPWORDS",
+          "_TOPIC_NOISE_TERMS",
+          "_WORD_RE",
+          "_WS_RE",
+          "_assign_to_centers",
+          "_augment_with_ml50",
+          "_build_topic_boost_terms",
+          "_char_ngrams",
+          "_cluster_centers",
+          "_collapse_ws",
+          "_collect_table_block",
+          "_dec_tokens",
+          "_doc_key",
+          "_doc_size_from_paths",
+          "_ensure_nltk",
+          "_extract_chunk_topics",
+          "_extract_terms_from_keyword_item",
+          "_extract_topics_from_chunks",
+          "_fasttext_like_vector",
+          "_has_big_gap",
+          "_hash_index_sign",
+          "_is_address_continuation_line",
+          "_is_grid_like",
+          "_is_micro_table_like",
+          "_is_multicol_candidate_line",
+          "_is_section_start_line",
+          "_is_table_line",
+          "_is_topic_candidate",
+          "_iter_doc_chunks",
+          "_iter_line_spans",
+          "_line_col_from_offset",
+          "_line_segments_by_gaps",
+          "_load_punkt_pickle",
+          "_looks_like_addressish",
+          "_looks_like_header_pair",
+          "_looks_like_paragraphish",
+          "_looks_like_title_line",
+          "_make_span_item",
+          "_mask_digits",
+          "_mean_vectors",
+          "_merge_close_columns",
+          "_merge_label_only",
+          "_nonspace_len",
+          "_norm_token",
+          "_norm_topic_term",
+          "_normalize_kv_generic",
+          "_num_tokens",
+          "_pdf_extract_pages_text",
+          "_pdf_page_count",
+          "_prune_topic_redundancy",
+          "_run_base_tokenisation",
+          "_safe_file_size",
+          "_safe_int",
+          "_safe_str",
+          "_score_term_quality",
+          "_select_doc",
+          "_sep_spans",
+          "_sort_key",
+          "_space_runs_ge",
+          "_split_on_lang_switch",
+          "_split_on_newline_gap",
+          "_split_sentence_fallback",
+          "_strip_sep_lines",
+          "_to_list",
+          "_tokenize",
+          "_tokens_to_topic_terms",
+          "_transpose_or_group_multicol",
+          "_unique_keep_order",
+          "_upper_ratio",
+          "_vector_norm",
+          "build_noise_keys_for_doc",
+          "chunk",
+          "chunk_is_noise",
+          "chunk_lang",
+          "chunk_layout_universal",
+          "col",
+          "content_type",
+          "d",
+          "detect_lang",
+          "doc",
+          "doc_chars_total",
+          "doc_id",
+          "doc_lang_counter",
+          "end",
+          "full_text",
+          "hashlib",
+          "i2",
+          "is_noise",
+          "is_sentence",
+          "it",
+          "items",
+          "lang",
+          "layout_items",
+          "line",
+          "math",
+          "nltk",
+          "noise_keys",
+          "nonspace",
+          "p",
+          "page_index",
+          "page_text",
+          "pages",
+          "pages_out",
+          "pages_text_for_noise",
+          "pages_tok",
+          "paths",
+          "pg",
+          "pickle",
+          "print_one_doc",
+          "recompose_ok",
+          "recompose_ok_doc",
+          "runpy",
+          "selected",
+          "sent_items",
+          "sentence_chunks_layout",
+          "sp",
+          "split_ar_layout",
+          "split_paragraphs_layout",
+          "split_punkt_layout",
+          "split_sections_layout",
+          "start"
+        ],
+        "reported_output_type": "list",
+        "reported_output": [
+          {
+            "doc_id": "72a61fd0-ce5a-443b-9767-a2d6db63313e",
+            "filename": "epsteain22.pdf",
+            "paths": [],
+            "size": null,
+            "page_count_total": 1,
+            "content": "image_only",
+            "extraction": "ocr:tesseract",
+            "pages": [
+              {
+                "page_index": 1,
+                "source_path": "",
+                "lang": "en",
+                "chars": 1402,
+                "recompose_ok": false,
+                "sentences_layout": [
+                  {
+                    "text": "From:  Jeanne M. Christensen\nSent:  Friday. July 21, 2023 9:55 PM\nTo:\nSubject:  [EXTERNAL] Leon Black follow up\n",
+                    "start": 0,
+                    "end": 153,
+                    "line": 1,
+                    "col": 0,
+                    "chars": 112,
+                    "nonspace": 91,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "en",
+                    "spans": [
+                      [
+                        0,
+                        5
+                      ],
+                      [
+                        22,
+                        43
+                      ],
+                      [
+                        44,
+                        49
+                      ],
+                      [
+                        66,
+                        95
+                      ],
+                      [
+                        96,
+                        99
+                      ],
+                      [
+                        100,
+                        108
+                      ],
+                      [
+                        122,
+                        153
+                      ]
+                    ],
+                    "layout_kind": "multicol_col",
+                    "col_index": 0,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "In case you have not heard it has been discovered that Leon Black paid 62.5 million to USVI - and this\ndoes not include payments of money to individual women - it's outrageous that criminal charges have\nnot been brought against him.\nI've heard one lawyer represents ten women that he sexually assaulted.\nhttos://www.reuters.com/legaUinvestor-leon-black-settles-with-us-virgin-islands-over-eostein-probe-\n2023-07-21/\n\n",
+                    "start": 157,
+                    "end": 574,
+                    "line": 8,
+                    "col": 0,
+                    "chars": 417,
+                    "nonspace": 361,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "en",
+                    "spans": [
+                      [
+                        157,
+                        574
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "I hope that your office is going to take a hard look based on this new information.\n\n\n",
+                    "start": 574,
+                    "end": 660,
+                    "line": 15,
+                    "col": 0,
+                    "chars": 86,
+                    "nonspace": 67,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "en",
+                    "spans": [
+                      [
+                        574,
+                        660
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "Jeanne M. Christensen\nPartner\n\n",
+                    "start": 660,
+                    "end": 691,
+                    "line": 18,
+                    "col": 0,
+                    "chars": 31,
+                    "nonspace": 26,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "fr",
+                    "spans": [
+                      [
+                        660,
+                        691
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "WIGDOR LLP\n85 Fifth Avenue, New York, NY 10003\nT:\n\n\n",
+                    "start": 691,
+                    "end": 743,
+                    "line": 21,
+                    "col": 0,
+                    "chars": 52,
+                    "nonspace": 40,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "fr",
+                    "spans": [
+                      [
+                        691,
+                        743
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "www.wigdorlaw.com\n\n",
+                    "start": 743,
+                    "end": 762,
+                    "line": 26,
+                    "col": 0,
+                    "chars": 19,
+                    "nonspace": 17,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "fr",
+                    "spans": [
+                      [
+                        743,
+                        762
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "This communication may contain Confidential or Attorney-Client Privileged Information and/or Attorney\nWork Product If you are not the addressee indicated in this message or its intended recipient (or\nresponsible for delivery of the message to such person(s)), do not read, copy, or forward this message to\nanyone and, in such case, please immediately destroy or delete this message, including any copies hereof,\nand kindly notify the sender by reply e-mail, facsimile or phone. Thank you.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                                     ",
+                    "start": 762,
+                    "end": 1390,
+                    "line": 28,
+                    "col": 0,
+                    "chars": 628,
+                    "nonspace": 414,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "en",
+                    "spans": [
+                      [
+                        762,
+                        1390
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "EFTA02731479",
+                    "start": 1390,
+                    "end": 1402,
+                    "line": 55,
+                    "col": 117,
+                    "chars": 12,
+                    "nonspace": 12,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "fr",
+                    "spans": [
+                      [
+                        1390,
+                        1402
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  }
+                ],
+                "page_text": "From:                 Jeanne M. Christensen\nSent:                 Friday. July 21, 2023 9:55 PM\nTo:\nSubject:              [EXTERNAL] Leon Black follow up\n\n\n\nIn case you have not heard it has been discovered that Leon Black paid 62.5 million to USVI - and this\ndoes not include payments of money to individual women - it's outrageous that criminal charges have\nnot been brought against him.\nI've heard one lawyer represents ten women that he sexually assaulted.\nhttos://www.reuters.com/legaUinvestor-leon-black-settles-with-us-virgin-islands-over-eostein-probe-\n2023-07-21/\n\nI hope that your office is going to take a hard look based on this new information.\n\n\nJeanne M. Christensen\nPartner\n\nWIGDOR LLP\n85 Fifth Avenue, New York, NY 10003\nT:\n\n\nwww.wigdorlaw.com\n\nThis communication may contain Confidential or Attorney-Client Privileged Information and/or Attorney\nWork Product If you are not the addressee indicated in this message or its intended recipient (or\nresponsible for delivery of the message to such person(s)), do not read, copy, or forward this message to\nanyone and, in such case, please immediately destroy or delete this message, including any copies hereof,\nand kindly notify the sender by reply e-mail, facsimile or phone. Thank you.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                                     EFTA02731479"
+              }
+            ],
+            "chars_total": 1402,
+            "recompose_ok": false,
+            "detected_languages": [
+              "en",
+              "fr"
+            ],
+            "language_stats": {
+              "en": 5,
+              "fr": 4
+            }
+          },
+          {
+            "doc_id": "72a61fd0-ce5a-443b-9767-a2d6db63313e",
+            "filename": "epsteain22.pdf",
+            "paths": [
+              "/home/mourad/Bureau/DMS/core/api_storage/uploads/d723ed61e62943e4a91a9ca5bec4c170/epsteain22.pdf"
+            ],
+            "size": 45563,
+            "page_count_total": 1,
+            "content": "text",
+            "extraction": "native:pdf:pypdf",
+            "pages": [
+              {
+                "page_index": 1,
+                "source_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/d723ed61e62943e4a91a9ca5bec4c170/epsteain22.pdf",
+                "lang": "en",
+                "chars": 1402,
+                "recompose_ok": false,
+                "sentences_layout": [
+                  {
+                    "text": "From:                 Jeanne M. Christensen\nSent:                 Friday. July 21, 2023 9:55 PM\nTo:\nSubject:              [EXTERNAL] Leon Black follow up\n",
+                    "start": 0,
+                    "end": 157,
+                    "line": 1,
+                    "col": 0,
+                    "chars": 154,
+                    "nonspace": 91,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "en",
+                    "spans": [
+                      [
+                        0,
+                        157
+                      ]
+                    ],
+                    "layout_kind": "header",
+                    "col_index": null,
+                    "table_rows": [
+                      {
+                        "text": "From:                 Jeanne M. Christensen\n",
+                        "spans": [
+                          [
+                            0,
+                            44
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "Sent:                 Friday. July 21, 2023 9:55 PM\n",
+                        "spans": [
+                          [
+                            44,
+                            96
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "To:\n",
+                        "spans": [
+                          [
+                            96,
+                            100
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "Subject:              [EXTERNAL] Leon Black follow up\n",
+                        "spans": [
+                          [
+                            100,
+                            154
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "\n",
+                        "spans": [
+                          [
+                            154,
+                            155
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "\n",
+                        "spans": [
+                          [
+                            155,
+                            156
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "\n",
+                        "spans": [
+                          [
+                            156,
+                            157
+                          ]
+                        ]
+                      }
+                    ],
+                    "header_rows": [
+                      {
+                        "text": "From:                 Jeanne M. Christensen\n",
+                        "spans": [
+                          [
+                            0,
+                            44
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "Sent:                 Friday. July 21, 2023 9:55 PM\n",
+                        "spans": [
+                          [
+                            44,
+                            96
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "To:\n",
+                        "spans": [
+                          [
+                            96,
+                            100
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "Subject:              [EXTERNAL] Leon Black follow up\n",
+                        "spans": [
+                          [
+                            100,
+                            154
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "\n",
+                        "spans": [
+                          [
+                            154,
+                            155
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "\n",
+                        "spans": [
+                          [
+                            155,
+                            156
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "\n",
+                        "spans": [
+                          [
+                            156,
+                            157
+                          ]
+                        ]
+                      }
+                    ],
+                    "header_cells": [
+                      [
+                        {
+                          "col": 0,
+                          "text": "From:",
+                          "spans": [
+                            [
+                              0,
+                              5
+                            ]
+                          ]
+                        },
+                        {
+                          "col": 1,
+                          "text": "Jeanne M. Christensen",
+                          "spans": [
+                            [
+                              22,
+                              43
+                            ]
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "col": 0,
+                          "text": "Sent:",
+                          "spans": [
+                            [
+                              44,
+                              49
+                            ]
+                          ]
+                        },
+                        {
+                          "col": 1,
+                          "text": "Friday. July 21, 2023 9:55 PM",
+                          "spans": [
+                            [
+                              66,
+                              95
+                            ]
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "col": 0,
+                          "text": "To:",
+                          "spans": [
+                            [
+                              96,
+                              99
+                            ]
+                          ]
+                        },
+                        {
+                          "col": 1,
+                          "text": "",
+                          "spans": []
+                        }
+                      ],
+                      [
+                        {
+                          "col": 0,
+                          "text": "Subject:",
+                          "spans": [
+                            [
+                              100,
+                              108
+                            ]
+                          ]
+                        },
+                        {
+                          "col": 1,
+                          "text": "[EXTERNAL] Leon Black follow up",
+                          "spans": [
+                            [
+                              122,
+                              153
+                            ]
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "col": 0,
+                          "text": "",
+                          "spans": []
+                        },
+                        {
+                          "col": 1,
+                          "text": "",
+                          "spans": []
+                        }
+                      ],
+                      [
+                        {
+                          "col": 0,
+                          "text": "",
+                          "spans": []
+                        },
+                        {
+                          "col": 1,
+                          "text": "",
+                          "spans": []
+                        }
+                      ],
+                      [
+                        {
+                          "col": 0,
+                          "text": "",
+                          "spans": []
+                        },
+                        {
+                          "col": 1,
+                          "text": "",
+                          "spans": []
+                        }
+                      ]
+                    ],
+                    "header_source": "micro_multicol"
+                  },
+                  {
+                    "text": "In case you have not heard it has been discovered that Leon Black paid 62.5 million to USVI - and this\ndoes not include payments of money to individual women - it's outrageous that criminal charges have\nnot been brought against him.\nI've heard one lawyer represents ten women that he sexually assaulted.\nhttos://www.reuters.com/legaUinvestor-leon-black-settles-with-us-virgin-islands-over-eostein-probe-\n2023-07-21/\n\n",
+                    "start": 157,
+                    "end": 574,
+                    "line": 8,
+                    "col": 0,
+                    "chars": 417,
+                    "nonspace": 361,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "en",
+                    "spans": [
+                      [
+                        157,
+                        574
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "I hope that your office is going to take a hard look based on this new information.\n\n\n",
+                    "start": 574,
+                    "end": 660,
+                    "line": 15,
+                    "col": 0,
+                    "chars": 86,
+                    "nonspace": 67,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "en",
+                    "spans": [
+                      [
+                        574,
+                        660
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "Jeanne M. Christensen\nPartner\n\n",
+                    "start": 660,
+                    "end": 691,
+                    "line": 18,
+                    "col": 0,
+                    "chars": 31,
+                    "nonspace": 26,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "fr",
+                    "spans": [
+                      [
+                        660,
+                        691
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "WIGDOR LLP\n85 Fifth Avenue, New York, NY 10003\nT:\n\n\n",
+                    "start": 691,
+                    "end": 743,
+                    "line": 21,
+                    "col": 0,
+                    "chars": 52,
+                    "nonspace": 40,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "fr",
+                    "spans": [
+                      [
+                        691,
+                        743
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "www.wigdorlaw.com\n\n",
+                    "start": 743,
+                    "end": 762,
+                    "line": 26,
+                    "col": 0,
+                    "chars": 19,
+                    "nonspace": 17,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "fr",
+                    "spans": [
+                      [
+                        743,
+                        762
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "This communication may contain Confidential or Attorney-Client Privileged Information and/or Attorney\nWork Product If you are not the addressee indicated in this message or its intended recipient (or\nresponsible for delivery of the message to such person(s)), do not read, copy, or forward this message to\nanyone and, in such case, please immediately destroy or delete this message, including any copies hereof,\nand kindly notify the sender by reply e-mail, facsimile or phone. Thank you.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                                     ",
+                    "start": 762,
+                    "end": 1390,
+                    "line": 28,
+                    "col": 0,
+                    "chars": 628,
+                    "nonspace": 414,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "en",
+                    "spans": [
+                      [
+                        762,
+                        1390
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "EFTA02731479",
+                    "start": 1390,
+                    "end": 1402,
+                    "line": 55,
+                    "col": 117,
+                    "chars": 12,
+                    "nonspace": 12,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "fr",
+                    "spans": [
+                      [
+                        1390,
+                        1402
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  }
+                ],
+                "page_text": "From:                 Jeanne M. Christensen\nSent:                 Friday. July 21, 2023 9:55 PM\nTo:\nSubject:              [EXTERNAL] Leon Black follow up\n\n\n\nIn case you have not heard it has been discovered that Leon Black paid 62.5 million to USVI - and this\ndoes not include payments of money to individual women - it's outrageous that criminal charges have\nnot been brought against him.\nI've heard one lawyer represents ten women that he sexually assaulted.\nhttos://www.reuters.com/legaUinvestor-leon-black-settles-with-us-virgin-islands-over-eostein-probe-\n2023-07-21/\n\nI hope that your office is going to take a hard look based on this new information.\n\n\nJeanne M. Christensen\nPartner\n\nWIGDOR LLP\n85 Fifth Avenue, New York, NY 10003\nT:\n\n\nwww.wigdorlaw.com\n\nThis communication may contain Confidential or Attorney-Client Privileged Information and/or Attorney\nWork Product If you are not the addressee indicated in this message or its intended recipient (or\nresponsible for delivery of the message to such person(s)), do not read, copy, or forward this message to\nanyone and, in such case, please immediately destroy or delete this message, including any copies hereof,\nand kindly notify the sender by reply e-mail, facsimile or phone. Thank you.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                                     EFTA02731479"
+              }
+            ],
+            "chars_total": 1402,
+            "recompose_ok": false,
+            "detected_languages": [
+              "en",
+              "fr"
+            ],
+            "language_stats": {
+              "en": 5,
+              "fr": 4
+            }
+          }
+        ],
+        "error": null
+      },
+      {
+        "component_name": "atripusion-gramatical",
+        "component_key": "atripusion_gramatical",
+        "component_script": "/home/mourad/Bureau/DMS/core/component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py",
+        "step_index": 6,
+        "status": "executed",
+        "started_at": "2026-04-08T20:28:10.490433+00:00",
+        "finished_at": "2026-04-08T20:28:26.507061+00:00",
+        "summary": "Langues executees: en, fr | docs=2 | backend=legacy-3files | component=atripusion-gramatical",
+        "new_context_keys": [
+          "AR_RESULTS",
+          "BASE_DIR",
+          "EN_RESULTS",
+          "FR_RESULTS",
+          "HAVE_AR",
+          "MANUAL_OFFLINE",
+          "MAX_SENTENCES_PER_LANG",
+          "OFFLINE",
+          "_is_punct_like_token",
+          "_lang_counter",
+          "_normalize_token_fields",
+          "all_sentences",
+          "base_lemma",
+          "base_pos",
+          "doc_name",
+          "engcode",
+          "entities",
+          "etype",
+          "frcode",
+          "get_previous_cell_input",
+          "has_ar",
+          "has_en",
+          "has_fr",
+          "importlib",
+          "iter_sentences_from_input",
+          "lemmas",
+          "nb_utils",
+          "ner",
+          "ner_value",
+          "ner_view",
+          "norm_lemma",
+          "norm_pos",
+          "page_idx",
+          "pos",
+          "row",
+          "sent",
+          "sent_idx",
+          "sent_index",
+          "sent_text",
+          "size",
+          "tok",
+          "tokens",
+          "types",
+          "val",
+          "values"
+        ],
+        "changed_context_keys": [
+          "COMPONENT_TRACES",
+          "NLP_ENTITIES",
+          "NLP_LEMMA",
+          "NLP_POS",
+          "NLP_TOKENS",
+          "_WORD_RE",
+          "data",
+          "detect_lang"
+        ],
+        "context_keys_touched": [
+          "AR_RESULTS",
+          "BASE_DIR",
+          "COMPONENT_TRACES",
+          "EN_RESULTS",
+          "FR_RESULTS",
+          "HAVE_AR",
+          "MANUAL_OFFLINE",
+          "MAX_SENTENCES_PER_LANG",
+          "NLP_ENTITIES",
+          "NLP_LEMMA",
+          "NLP_POS",
+          "NLP_TOKENS",
+          "OFFLINE",
+          "_WORD_RE",
+          "_is_punct_like_token",
+          "_lang_counter",
+          "_normalize_token_fields",
+          "all_sentences",
+          "base_lemma",
+          "base_pos",
+          "data",
+          "detect_lang",
+          "doc_name",
+          "engcode",
+          "entities",
+          "etype",
+          "frcode",
+          "get_previous_cell_input",
+          "has_ar",
+          "has_en",
+          "has_fr",
+          "importlib",
+          "iter_sentences_from_input",
+          "lemmas",
+          "nb_utils",
+          "ner",
+          "ner_value",
+          "ner_view",
+          "norm_lemma",
+          "norm_pos",
+          "page_idx",
+          "pos",
+          "row",
+          "sent",
+          "sent_idx",
+          "sent_index",
+          "sent_text",
+          "size",
+          "tok",
+          "tokens",
+          "types",
+          "val",
+          "values"
+        ],
+        "reported_output_type": "list",
+        "reported_output": [
+          {
+            "doc_id": "72a61fd0-ce5a-443b-9767-a2d6db63313e",
+            "filename": "epsteain22.pdf",
+            "paths": [],
+            "size": null,
+            "page_count_total": 1,
+            "content": "image_only",
+            "extraction": "ocr:tesseract",
+            "pages": [
+              {
+                "page_index": 1,
+                "source_path": "",
+                "lang": "en",
+                "chars": 1402,
+                "recompose_ok": false,
+                "sentences_layout": [
+                  {
+                    "text": "From:  Jeanne M. Christensen\nSent:  Friday. July 21, 2023 9:55 PM\nTo:\nSubject:  [EXTERNAL] Leon Black follow up\n",
+                    "start": 0,
+                    "end": 153,
+                    "line": 1,
+                    "col": 0,
+                    "chars": 112,
+                    "nonspace": 91,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "en",
+                    "spans": [
+                      [
+                        0,
+                        5
+                      ],
+                      [
+                        22,
+                        43
+                      ],
+                      [
+                        44,
+                        49
+                      ],
+                      [
+                        66,
+                        95
+                      ],
+                      [
+                        96,
+                        99
+                      ],
+                      [
+                        100,
+                        108
+                      ],
+                      [
+                        122,
+                        153
+                      ]
+                    ],
+                    "layout_kind": "multicol_col",
+                    "col_index": 0,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "In case you have not heard it has been discovered that Leon Black paid 62.5 million to USVI - and this\ndoes not include payments of money to individual women - it's outrageous that criminal charges have\nnot been brought against him.\nI've heard one lawyer represents ten women that he sexually assaulted.\nhttos://www.reuters.com/legaUinvestor-leon-black-settles-with-us-virgin-islands-over-eostein-probe-\n2023-07-21/\n\n",
+                    "start": 157,
+                    "end": 574,
+                    "line": 8,
+                    "col": 0,
+                    "chars": 417,
+                    "nonspace": 361,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "en",
+                    "spans": [
+                      [
+                        157,
+                        574
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "I hope that your office is going to take a hard look based on this new information.\n\n\n",
+                    "start": 574,
+                    "end": 660,
+                    "line": 15,
+                    "col": 0,
+                    "chars": 86,
+                    "nonspace": 67,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "en",
+                    "spans": [
+                      [
+                        574,
+                        660
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "Jeanne M. Christensen\nPartner\n\n",
+                    "start": 660,
+                    "end": 691,
+                    "line": 18,
+                    "col": 0,
+                    "chars": 31,
+                    "nonspace": 26,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "fr",
+                    "spans": [
+                      [
+                        660,
+                        691
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "WIGDOR LLP\n85 Fifth Avenue, New York, NY 10003\nT:\n\n\n",
+                    "start": 691,
+                    "end": 743,
+                    "line": 21,
+                    "col": 0,
+                    "chars": 52,
+                    "nonspace": 40,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "fr",
+                    "spans": [
+                      [
+                        691,
+                        743
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "www.wigdorlaw.com\n\n",
+                    "start": 743,
+                    "end": 762,
+                    "line": 26,
+                    "col": 0,
+                    "chars": 19,
+                    "nonspace": 17,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "fr",
+                    "spans": [
+                      [
+                        743,
+                        762
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "This communication may contain Confidential or Attorney-Client Privileged Information and/or Attorney\nWork Product If you are not the addressee indicated in this message or its intended recipient (or\nresponsible for delivery of the message to such person(s)), do not read, copy, or forward this message to\nanyone and, in such case, please immediately destroy or delete this message, including any copies hereof,\nand kindly notify the sender by reply e-mail, facsimile or phone. Thank you.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                                     ",
+                    "start": 762,
+                    "end": 1390,
+                    "line": 28,
+                    "col": 0,
+                    "chars": 628,
+                    "nonspace": 414,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "en",
+                    "spans": [
+                      [
+                        762,
+                        1390
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "EFTA02731479",
+                    "start": 1390,
+                    "end": 1402,
+                    "line": 55,
+                    "col": 117,
+                    "chars": 12,
+                    "nonspace": 12,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "fr",
+                    "spans": [
+                      [
+                        1390,
+                        1402
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  }
+                ],
+                "page_text": "From:                 Jeanne M. Christensen\nSent:                 Friday. July 21, 2023 9:55 PM\nTo:\nSubject:              [EXTERNAL] Leon Black follow up\n\n\n\nIn case you have not heard it has been discovered that Leon Black paid 62.5 million to USVI - and this\ndoes not include payments of money to individual women - it's outrageous that criminal charges have\nnot been brought against him.\nI've heard one lawyer represents ten women that he sexually assaulted.\nhttos://www.reuters.com/legaUinvestor-leon-black-settles-with-us-virgin-islands-over-eostein-probe-\n2023-07-21/\n\nI hope that your office is going to take a hard look based on this new information.\n\n\nJeanne M. Christensen\nPartner\n\nWIGDOR LLP\n85 Fifth Avenue, New York, NY 10003\nT:\n\n\nwww.wigdorlaw.com\n\nThis communication may contain Confidential or Attorney-Client Privileged Information and/or Attorney\nWork Product If you are not the addressee indicated in this message or its intended recipient (or\nresponsible for delivery of the message to such person(s)), do not read, copy, or forward this message to\nanyone and, in such case, please immediately destroy or delete this message, including any copies hereof,\nand kindly notify the sender by reply e-mail, facsimile or phone. Thank you.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                                     EFTA02731479"
+              }
+            ],
+            "chars_total": 1402,
+            "recompose_ok": false,
+            "detected_languages": [
+              "en",
+              "fr"
+            ],
+            "language_stats": {
+              "en": 5,
+              "fr": 4
+            }
+          },
+          {
+            "doc_id": "72a61fd0-ce5a-443b-9767-a2d6db63313e",
+            "filename": "epsteain22.pdf",
+            "paths": [
+              "/home/mourad/Bureau/DMS/core/api_storage/uploads/d723ed61e62943e4a91a9ca5bec4c170/epsteain22.pdf"
+            ],
+            "size": 45563,
+            "page_count_total": 1,
+            "content": "text",
+            "extraction": "native:pdf:pypdf",
+            "pages": [
+              {
+                "page_index": 1,
+                "source_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/d723ed61e62943e4a91a9ca5bec4c170/epsteain22.pdf",
+                "lang": "en",
+                "chars": 1402,
+                "recompose_ok": false,
+                "sentences_layout": [
+                  {
+                    "text": "From:                 Jeanne M. Christensen\nSent:                 Friday. July 21, 2023 9:55 PM\nTo:\nSubject:              [EXTERNAL] Leon Black follow up\n",
+                    "start": 0,
+                    "end": 157,
+                    "line": 1,
+                    "col": 0,
+                    "chars": 154,
+                    "nonspace": 91,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "en",
+                    "spans": [
+                      [
+                        0,
+                        157
+                      ]
+                    ],
+                    "layout_kind": "header",
+                    "col_index": null,
+                    "table_rows": [
+                      {
+                        "text": "From:                 Jeanne M. Christensen\n",
+                        "spans": [
+                          [
+                            0,
+                            44
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "Sent:                 Friday. July 21, 2023 9:55 PM\n",
+                        "spans": [
+                          [
+                            44,
+                            96
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "To:\n",
+                        "spans": [
+                          [
+                            96,
+                            100
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "Subject:              [EXTERNAL] Leon Black follow up\n",
+                        "spans": [
+                          [
+                            100,
+                            154
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "\n",
+                        "spans": [
+                          [
+                            154,
+                            155
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "\n",
+                        "spans": [
+                          [
+                            155,
+                            156
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "\n",
+                        "spans": [
+                          [
+                            156,
+                            157
+                          ]
+                        ]
+                      }
+                    ],
+                    "header_rows": [
+                      {
+                        "text": "From:                 Jeanne M. Christensen\n",
+                        "spans": [
+                          [
+                            0,
+                            44
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "Sent:                 Friday. July 21, 2023 9:55 PM\n",
+                        "spans": [
+                          [
+                            44,
+                            96
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "To:\n",
+                        "spans": [
+                          [
+                            96,
+                            100
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "Subject:              [EXTERNAL] Leon Black follow up\n",
+                        "spans": [
+                          [
+                            100,
+                            154
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "\n",
+                        "spans": [
+                          [
+                            154,
+                            155
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "\n",
+                        "spans": [
+                          [
+                            155,
+                            156
+                          ]
+                        ]
+                      },
+                      {
+                        "text": "\n",
+                        "spans": [
+                          [
+                            156,
+                            157
+                          ]
+                        ]
+                      }
+                    ],
+                    "header_cells": [
+                      [
+                        {
+                          "col": 0,
+                          "text": "From:",
+                          "spans": [
+                            [
+                              0,
+                              5
+                            ]
+                          ]
+                        },
+                        {
+                          "col": 1,
+                          "text": "Jeanne M. Christensen",
+                          "spans": [
+                            [
+                              22,
+                              43
+                            ]
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "col": 0,
+                          "text": "Sent:",
+                          "spans": [
+                            [
+                              44,
+                              49
+                            ]
+                          ]
+                        },
+                        {
+                          "col": 1,
+                          "text": "Friday. July 21, 2023 9:55 PM",
+                          "spans": [
+                            [
+                              66,
+                              95
+                            ]
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "col": 0,
+                          "text": "To:",
+                          "spans": [
+                            [
+                              96,
+                              99
+                            ]
+                          ]
+                        },
+                        {
+                          "col": 1,
+                          "text": "",
+                          "spans": []
+                        }
+                      ],
+                      [
+                        {
+                          "col": 0,
+                          "text": "Subject:",
+                          "spans": [
+                            [
+                              100,
+                              108
+                            ]
+                          ]
+                        },
+                        {
+                          "col": 1,
+                          "text": "[EXTERNAL] Leon Black follow up",
+                          "spans": [
+                            [
+                              122,
+                              153
+                            ]
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "col": 0,
+                          "text": "",
+                          "spans": []
+                        },
+                        {
+                          "col": 1,
+                          "text": "",
+                          "spans": []
+                        }
+                      ],
+                      [
+                        {
+                          "col": 0,
+                          "text": "",
+                          "spans": []
+                        },
+                        {
+                          "col": 1,
+                          "text": "",
+                          "spans": []
+                        }
+                      ],
+                      [
+                        {
+                          "col": 0,
+                          "text": "",
+                          "spans": []
+                        },
+                        {
+                          "col": 1,
+                          "text": "",
+                          "spans": []
+                        }
+                      ]
+                    ],
+                    "header_source": "micro_multicol"
+                  },
+                  {
+                    "text": "In case you have not heard it has been discovered that Leon Black paid 62.5 million to USVI - and this\ndoes not include payments of money to individual women - it's outrageous that criminal charges have\nnot been brought against him.\nI've heard one lawyer represents ten women that he sexually assaulted.\nhttos://www.reuters.com/legaUinvestor-leon-black-settles-with-us-virgin-islands-over-eostein-probe-\n2023-07-21/\n\n",
+                    "start": 157,
+                    "end": 574,
+                    "line": 8,
+                    "col": 0,
+                    "chars": 417,
+                    "nonspace": 361,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "en",
+                    "spans": [
+                      [
+                        157,
+                        574
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "I hope that your office is going to take a hard look based on this new information.\n\n\n",
+                    "start": 574,
+                    "end": 660,
+                    "line": 15,
+                    "col": 0,
+                    "chars": 86,
+                    "nonspace": 67,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "en",
+                    "spans": [
+                      [
+                        574,
+                        660
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "Jeanne M. Christensen\nPartner\n\n",
+                    "start": 660,
+                    "end": 691,
+                    "line": 18,
+                    "col": 0,
+                    "chars": 31,
+                    "nonspace": 26,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "fr",
+                    "spans": [
+                      [
+                        660,
+                        691
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "WIGDOR LLP\n85 Fifth Avenue, New York, NY 10003\nT:\n\n\n",
+                    "start": 691,
+                    "end": 743,
+                    "line": 21,
+                    "col": 0,
+                    "chars": 52,
+                    "nonspace": 40,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "fr",
+                    "spans": [
+                      [
+                        691,
+                        743
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "www.wigdorlaw.com\n\n",
+                    "start": 743,
+                    "end": 762,
+                    "line": 26,
+                    "col": 0,
+                    "chars": 19,
+                    "nonspace": 17,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "fr",
+                    "spans": [
+                      [
+                        743,
+                        762
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "This communication may contain Confidential or Attorney-Client Privileged Information and/or Attorney\nWork Product If you are not the addressee indicated in this message or its intended recipient (or\nresponsible for delivery of the message to such person(s)), do not read, copy, or forward this message to\nanyone and, in such case, please immediately destroy or delete this message, including any copies hereof,\nand kindly notify the sender by reply e-mail, facsimile or phone. Thank you.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                                     ",
+                    "start": 762,
+                    "end": 1390,
+                    "line": 28,
+                    "col": 0,
+                    "chars": 628,
+                    "nonspace": 414,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "en",
+                    "spans": [
+                      [
+                        762,
+                        1390
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  },
+                  {
+                    "text": "EFTA02731479",
+                    "start": 1390,
+                    "end": 1402,
+                    "line": 55,
+                    "col": 117,
+                    "chars": 12,
+                    "nonspace": 12,
+                    "is_noise": false,
+                    "is_sentence": true,
+                    "lang": "fr",
+                    "spans": [
+                      [
+                        1390,
+                        1402
+                      ]
+                    ],
+                    "layout_kind": "plain",
+                    "col_index": null,
+                    "table_rows": null,
+                    "header_rows": null,
+                    "header_cells": null,
+                    "header_source": null
+                  }
+                ],
+                "page_text": "From:                 Jeanne M. Christensen\nSent:                 Friday. July 21, 2023 9:55 PM\nTo:\nSubject:              [EXTERNAL] Leon Black follow up\n\n\n\nIn case you have not heard it has been discovered that Leon Black paid 62.5 million to USVI - and this\ndoes not include payments of money to individual women - it's outrageous that criminal charges have\nnot been brought against him.\nI've heard one lawyer represents ten women that he sexually assaulted.\nhttos://www.reuters.com/legaUinvestor-leon-black-settles-with-us-virgin-islands-over-eostein-probe-\n2023-07-21/\n\nI hope that your office is going to take a hard look based on this new information.\n\n\nJeanne M. Christensen\nPartner\n\nWIGDOR LLP\n85 Fifth Avenue, New York, NY 10003\nT:\n\n\nwww.wigdorlaw.com\n\nThis communication may contain Confidential or Attorney-Client Privileged Information and/or Attorney\nWork Product If you are not the addressee indicated in this message or its intended recipient (or\nresponsible for delivery of the message to such person(s)), do not read, copy, or forward this message to\nanyone and, in such case, please immediately destroy or delete this message, including any copies hereof,\nand kindly notify the sender by reply e-mail, facsimile or phone. Thank you.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                                     EFTA02731479"
+              }
+            ],
+            "chars_total": 1402,
+            "recompose_ok": false,
+            "detected_languages": [
+              "en",
+              "fr"
+            ],
+            "language_stats": {
+              "en": 5,
+              "fr": 4
+            }
+          }
+        ],
+        "error": null
+      },
+      {
+        "component_name": "table-extraction",
+        "component_key": "table_extraction",
+        "component_script": "/home/mourad/Bureau/DMS/core/component/table_extraction/table-extraction.py",
+        "step_index": 7,
+        "status": "executed",
+        "started_at": "2026-04-08T20:28:26.519226+00:00",
+        "finished_at": "2026-04-08T20:28:26.539985+00:00",
+        "summary": "docs=1 | tables=0 | line_items=0",
+        "new_context_keys": [
+          "HERE",
+          "TABLE_EXTRACTIONS",
+          "TABLE_EXTRACTIONS_50ML",
+          "_PROFILE",
+          "_resolve_profile",
+          "run_table_extraction"
+        ],
+        "changed_context_keys": [
+          "COMPONENT_TRACES",
+          "_CTX"
+        ],
+        "context_keys_touched": [
+          "COMPONENT_TRACES",
+          "HERE",
+          "TABLE_EXTRACTIONS",
+          "TABLE_EXTRACTIONS_50ML",
+          "_CTX",
+          "_PROFILE",
+          "_resolve_profile",
+          "run_table_extraction"
+        ],
+        "reported_output_type": "list",
+        "reported_output": [
+          {
+            "doc_id": "72a61fd0-ce5a-443b-9767-a2d6db63313e",
+            "filename": "epsteain22.pdf",
+            "engine": "table-50ml-unified-v6-anchor-geometry-line-items-only",
+            "source_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/d723ed61e62943e4a91a9ca5bec4c170/epsteain22.pdf",
+            "tables_count": 0,
+            "rows_total": 0,
+            "detected_columns": [],
+            "totals": {
+              "total_ht": [],
+              "total_ttc": [],
+              "tax": [],
+              "total": [],
+              "amount_due": [],
+              "stamp": []
+            },
+            "line_items": [],
+            "tables": []
+          }
+        ],
+        "error": null
+      },
+      {
+        "component_name": "verification-totaux",
+        "component_key": "verification_totaux",
+        "component_script": "/home/mourad/Bureau/DMS/core/component/verification-totaux.py",
+        "step_index": 8,
+        "status": "executed",
+        "started_at": "2026-04-08T20:28:26.541849+00:00",
+        "finished_at": "2026-04-08T20:28:26.549492+00:00",
+        "summary": "docs=1 | ok=0 | partial_ok=1 | mismatch=0 | missing=0",
+        "new_context_keys": [
+          "ARABIC_DIGITS",
+          "Decimal",
+          "InvalidOperation",
+          "MONEY_TOLERANCE",
+          "ROUND_HALF_UP",
+          "TOTALS_VERIFICATION",
+          "_build_chunk_lookup",
+          "_candidate_values",
+          "_doc_aliases",
+          "_dominant_table_index",
+          "_is_close",
+          "_locate_chunk",
+          "_locate_total_value",
+          "_money_str",
+          "_norm_match_text",
+          "_pick_nearest",
+          "_pick_subtotal_candidate",
+          "_pick_tax_candidate",
+          "_pick_total_candidate",
+          "_row_label",
+          "_row_total_candidate",
+          "_safe_float",
+          "_safe_list",
+          "_table_anchor_location",
+          "_to_decimal",
+          "_value_position_in_text",
+          "_verify_doc",
+          "_verify_row",
+          "run"
+        ],
+        "changed_context_keys": [
+          "COMPONENT_TRACES",
+          "_CTX",
+          "_doc_key",
+          "_safe_int"
+        ],
+        "context_keys_touched": [
+          "ARABIC_DIGITS",
+          "COMPONENT_TRACES",
+          "Decimal",
+          "InvalidOperation",
+          "MONEY_TOLERANCE",
+          "ROUND_HALF_UP",
+          "TOTALS_VERIFICATION",
+          "_CTX",
+          "_build_chunk_lookup",
+          "_candidate_values",
+          "_doc_aliases",
+          "_doc_key",
+          "_dominant_table_index",
+          "_is_close",
+          "_locate_chunk",
+          "_locate_total_value",
+          "_money_str",
+          "_norm_match_text",
+          "_pick_nearest",
+          "_pick_subtotal_candidate",
+          "_pick_tax_candidate",
+          "_pick_total_candidate",
+          "_row_label",
+          "_row_total_candidate",
+          "_safe_float",
+          "_safe_int",
+          "_safe_list",
+          "_table_anchor_location",
+          "_to_decimal",
+          "_value_position_in_text",
+          "_verify_doc",
+          "_verify_row",
+          "run"
+        ],
+        "reported_output_type": "list",
+        "reported_output": [
+          {
+            "doc_id": "72a61fd0-ce5a-443b-9767-a2d6db63313e",
+            "filename": "epsteain22.pdf",
+            "doc_key": "id:72a61fd0-ce5a-443b-9767-a2d6db63313e",
+            "engine": "totals-verification-0ml-v1",
+            "tables_count": 0,
+            "rows_total": 0,
+            "rows_verified": 0,
+            "rows_ignored_incomplete": 0,
+            "row_ok_count": 0,
+            "row_partial_count": 0,
+            "row_mismatch_count": 0,
+            "declared_totals_raw": {
+              "total_ht": [],
+              "total_ttc": [],
+              "tax": [],
+              "total": [],
+              "amount_due": [],
+              "stamp": []
+            },
+            "table_anchor": {},
+            "computed_subtotal": null,
+            "declared_subtotal": null,
+            "declared_tax": null,
+            "computed_tax": null,
+            "declared_total": null,
+            "expected_total": null,
+            "subtotal_location": {
+              "page_index": 1,
+              "sent_index": 1,
+              "layout_kind": "plain",
+              "line": 8,
+              "col": 0,
+              "chunk_start": 157,
+              "chunk_end": 574,
+              "chunk_text_excerpt": "In case you have not heard it has been discovered that Leon Black paid 62.5 million to USVI - and this\ndoes not include payments of money to individual women - it's outrageous that criminal charges have\nnot been brought against him.\nI've heard one lawyer represents ten women that he sexually assaulted.\nhttos://www.reuters.com/legaUinvestor-leon-black-settles-with-us-virgin-islands-over-eostein-pro",
+              "match_score": 2.0,
+              "field": "subtotal"
+            },
+            "tax_location": {
+              "field": "tax"
+            },
+            "total_location": {
+              "field": "total"
+            },
+            "subtotal_status": "missing",
+            "subtotal_status_raw": "missing",
+            "tax_status": "missing",
+            "tax_status_raw": "missing",
+            "total_status": "missing",
+            "total_status_raw": "missing",
+            "passed": true,
+            "complete": false,
+            "verification_status": "partial_ok",
+            "aggregate_alert_suppressed": false,
+            "checks": [
+              {
+                "name": "rows",
+                "status": "partial"
+              },
+              {
+                "name": "subtotal",
+                "status": "missing"
+              },
+              {
+                "name": "tax",
+                "status": "missing"
+              },
+              {
+                "name": "total",
+                "status": "missing"
+              }
+            ],
+            "issue_locations": [],
+            "row_audit": [],
+            "tolerance": "0.02"
+          }
+        ],
+        "error": null
+      },
+      {
+        "component_name": "liaison-inter-docs",
+        "component_key": "liaison_inter_docs",
+        "component_script": "/home/mourad/Bureau/DMS/core/component/liaison-inter-docs.py",
+        "step_index": 9,
+        "status": "executed",
+        "started_at": "2026-04-08T20:28:26.552205+00:00",
+        "finished_at": "2026-04-08T20:28:26.571174+00:00",
+        "summary": "docs=1 | pairs=0 | links=0 | sentence_pairs=0 | chunk_pairs=0 | vector_profile=pipeline50ml | vector_links=0",
+        "new_context_keys": [
+          "ALLOWED_SHORT_TERMS",
+          "INTERDOC_ANALYSIS",
+          "INTERDOC_DOC_LINKS",
+          "INTERDOC_LINKS",
+          "MAX_MATCHES_PER_LINK",
+          "MAX_SENTENCES_PER_DOC",
+          "MAX_SHARED_TERMS_PER_MATCH",
+          "MAX_VECTOR_CHUNK_CANDIDATES",
+          "MAX_VECTOR_CHUNK_PAIRS",
+          "MIN_INFORMATIVE_TERM_SCORE",
+          "MIN_LINK_SCORE",
+          "MIN_SENTENCE_MATCH_SCORE",
+          "MIN_SHARED_TOPICS",
+          "NOISE_TERMS",
+          "SEMANTIC_POS_ALLOWED",
+          "SEMANTIC_POS_ALLOWED_PREFIX",
+          "SEMANTIC_POS_BLOCKED",
+          "SEMANTIC_POS_BLOCKED_PREFIX",
+          "SENT_SPLIT_RE",
+          "STOPWORDS",
+          "Set",
+          "TOPIC_SOURCES",
+          "VECTOR_PROFILE_CONFIG",
+          "_active_topic_sources",
+          "_build_classification_index",
+          "_build_doc_links_index",
+          "_build_link",
+          "_build_semantic_sentence_index",
+          "_build_vector_index",
+          "_chunk_candidate_priority",
+          "_chunk_topic_terms",
+          "_clip_text",
+          "_coerce_vector",
+          "_compute_links",
+          "_cosine_similarity",
+          "_dedupe_docs",
+          "_doc_text_score",
+          "_extract_classification_terms",
+          "_extract_topics",
+          "_filename_aliases",
+          "_index_topic_rows",
+          "_is_informative_term",
+          "_is_semantic_pos",
+          "_iso_now",
+          "_iter_doc_sentences",
+          "_lookup_semantic_terms",
+          "_mean_vector",
+          "_normalize_pipeline_profile",
+          "_normalize_term",
+          "_prepare_docs",
+          "_score_informative_term",
+          "_select_chunk_candidates",
+          "_sentence_key",
+          "_sentence_match_score",
+          "_sorted_shared_terms",
+          "_split_to_sentences",
+          "_tokenize_terms",
+          "_topic_examples_for_doc",
+          "_unit_cosine_similarity",
+          "_unit_vector",
+          "_vector_chunk_matches",
+          "_vector_profile",
+          "datetime",
+          "timezone"
+        ],
+        "changed_context_keys": [
+          "COMPONENT_TRACES",
+          "TOKEN_RE",
+          "_CTX",
+          "_doc_aliases",
+          "_doc_key",
+          "_safe_float",
+          "_safe_int",
+          "_safe_list",
+          "_vector_norm",
+          "run"
+        ],
+        "context_keys_touched": [
+          "ALLOWED_SHORT_TERMS",
+          "COMPONENT_TRACES",
+          "INTERDOC_ANALYSIS",
+          "INTERDOC_DOC_LINKS",
+          "INTERDOC_LINKS",
+          "MAX_MATCHES_PER_LINK",
+          "MAX_SENTENCES_PER_DOC",
+          "MAX_SHARED_TERMS_PER_MATCH",
+          "MAX_VECTOR_CHUNK_CANDIDATES",
+          "MAX_VECTOR_CHUNK_PAIRS",
+          "MIN_INFORMATIVE_TERM_SCORE",
+          "MIN_LINK_SCORE",
+          "MIN_SENTENCE_MATCH_SCORE",
+          "MIN_SHARED_TOPICS",
+          "NOISE_TERMS",
+          "SEMANTIC_POS_ALLOWED",
+          "SEMANTIC_POS_ALLOWED_PREFIX",
+          "SEMANTIC_POS_BLOCKED",
+          "SEMANTIC_POS_BLOCKED_PREFIX",
+          "SENT_SPLIT_RE",
+          "STOPWORDS",
+          "Set",
+          "TOKEN_RE",
+          "TOPIC_SOURCES",
+          "VECTOR_PROFILE_CONFIG",
+          "_CTX",
+          "_active_topic_sources",
+          "_build_classification_index",
+          "_build_doc_links_index",
+          "_build_link",
+          "_build_semantic_sentence_index",
+          "_build_vector_index",
+          "_chunk_candidate_priority",
+          "_chunk_topic_terms",
+          "_clip_text",
+          "_coerce_vector",
+          "_compute_links",
+          "_cosine_similarity",
+          "_dedupe_docs",
+          "_doc_aliases",
+          "_doc_key",
+          "_doc_text_score",
+          "_extract_classification_terms",
+          "_extract_topics",
+          "_filename_aliases",
+          "_index_topic_rows",
+          "_is_informative_term",
+          "_is_semantic_pos",
+          "_iso_now",
+          "_iter_doc_sentences",
+          "_lookup_semantic_terms",
+          "_mean_vector",
+          "_normalize_pipeline_profile",
+          "_normalize_term",
+          "_prepare_docs",
+          "_safe_float",
+          "_safe_int",
+          "_safe_list",
+          "_score_informative_term",
+          "_select_chunk_candidates",
+          "_sentence_key",
+          "_sentence_match_score",
+          "_sorted_shared_terms",
+          "_split_to_sentences",
+          "_tokenize_terms",
+          "_topic_examples_for_doc",
+          "_unit_cosine_similarity",
+          "_unit_vector",
+          "_vector_chunk_matches",
+          "_vector_norm",
+          "_vector_profile",
+          "datetime",
+          "run",
+          "timezone"
+        ],
+        "reported_output_type": "dict",
+        "reported_output": {
+          "method": "topic-sentence-audit+vector-v2",
+          "documents_analyzed": 1,
+          "pairs_evaluated": 0,
+          "sentence_pairs_scored": 0,
+          "chunk_pairs_scored": 0,
+          "links_count": 0,
+          "vector_profile": "pipeline50ml",
+          "vector_links_count": 0
+        },
+        "error": null
+      },
+      {
+        "component_name": "elasticsearch",
+        "component_key": "elasticsearch",
+        "component_script": "/home/mourad/Bureau/DMS/core/component/elasticsearch.py",
+        "step_index": 10,
+        "status": "executed",
+        "started_at": "2026-04-08T20:28:26.572959+00:00",
+        "finished_at": "2026-04-08T20:28:26.574378+00:00",
+        "summary": "enabled=True | available=False | indexed=0 | cls_input=1 | cls_synced=0 | cls_docs=0 | ext_docs=0 | nlp=None docs=0 tokens=0 errors=0",
+        "new_context_keys": [
+          "ES_CLASSIFICATION_DOCS",
+          "ES_CLASSIFICATION_SYNCED",
+          "ES_DOC_IDS",
+          "ES_EXTRACTION_DOCS",
+          "_normalize_ids",
+          "fetch_sources_for_ids",
+          "index_tok_docs",
+          "maybe_build_store",
+          "sync_nlp_results",
+          "to_classification_docs",
+          "to_extraction_docs",
+          "update_classification_results"
+        ],
+        "changed_context_keys": [
+          "COMPONENT_TRACES",
+          "REPO_ROOT",
+          "_CTX",
+          "run"
+        ],
+        "context_keys_touched": [
+          "COMPONENT_TRACES",
+          "ES_CLASSIFICATION_DOCS",
+          "ES_CLASSIFICATION_SYNCED",
+          "ES_DOC_IDS",
+          "ES_EXTRACTION_DOCS",
+          "REPO_ROOT",
+          "_CTX",
+          "_normalize_ids",
+          "fetch_sources_for_ids",
+          "index_tok_docs",
+          "maybe_build_store",
+          "run",
+          "sync_nlp_results",
+          "to_classification_docs",
+          "to_extraction_docs",
+          "update_classification_results"
+        ],
+        "reported_output_type": "dict",
+        "reported_output": {
+          "enabled": true,
+          "available": false,
+          "es_url": "http://localhost:9200",
+          "es_index": "dms_documents",
+          "doc_ids": 0,
+          "classification_input": 1,
+          "classification_synced": 0,
+          "classification_docs": 0,
+          "extraction_docs": 0,
+          "nlp_level": null,
+          "nlp_docs_synced": 0,
+          "nlp_tokens_indexed": 0,
+          "nlp_token_errors": 0,
+          "nlp_unresolved_rows": 0,
+          "nlp_tokens_index": null
+        },
+        "error": null
+      },
+      {
+        "component_name": "extraction-regles",
+        "component_key": "extraction_regles",
+        "component_script": "/home/mourad/Bureau/DMS/core/component/extraction/extraction-regles-50ml.py",
+        "step_index": 11,
+        "status": "executed",
+        "started_at": "2026-04-08T20:28:26.575697+00:00",
+        "finished_at": "2026-04-08T20:28:26.590835+00:00",
+        "summary": "1 docs | fields=4 | epsteain22.pdf->UNCLASSIFIED",
+        "new_context_keys": [
+          "AMOUNT_ALLOWED",
+          "BM25_RESULTS",
+          "CONFIG_DIR",
+          "DATE_WORD_DMY_RE",
+          "DATE_WORD_MDY_RE",
+          "EMAIL_RE",
+          "EXTRACTIONS",
+          "ROUTES_JSON_FALLBACK",
+          "ROUTES_YAML_PATH",
+          "RULES_DIR",
+          "SEPARATORS",
+          "URL_RE",
+          "_CURRENCY_ALIASES",
+          "_MONTH_PATTERN",
+          "_MONTH_TOKENS",
+          "_WEEKDAY_PATTERN",
+          "_WEEKDAY_TOKENS",
+          "_add_bm25",
+          "_apply_extractor_to_page",
+          "_bm25_scores",
+          "_build_cls_map",
+          "_build_docs_lookup",
+          "_classification_for",
+          "_clean_value",
+          "_collect_query_terms",
+          "_compile_regex",
+          "_detect_emails",
+          "_detect_phones",
+          "_detect_urls",
+          "_detect_values_by_type",
+          "_extract_amount_value",
+          "_extract_currency_value",
+          "_extract_date_value",
+          "_find_label_in_line",
+          "_first_non_empty_line",
+          "_get_input_docs",
+          "_is_common_fallback_doc_type",
+          "_load_json_like_yaml",
+          "_load_routes",
+          "_load_yaml",
+          "_make_match",
+          "_normalize_digits",
+          "_normalize_doc_type",
+          "_normalize_email_value",
+          "_normalize_phone_value",
+          "_normalize_url_value",
+          "_normalize_value_by_type",
+          "_page_text_from_page",
+          "_resolve_rulesets",
+          "_run_base_extraction",
+          "_split_tokens_rough",
+          "_strip_control_and_escapes",
+          "_value_after_label",
+          "load_extractors_for",
+          "yaml"
+        ],
+        "changed_context_keys": [
+          "BASE_SCRIPT",
+          "COMPONENT_TRACES",
+          "REPO_ROOT",
+          "_CTX",
+          "_dedupe_docs",
+          "_doc_key",
+          "_doc_text_score",
+          "_iter_doc_chunks",
+          "_load_json",
+          "_norm_text",
+          "_safe_int",
+          "_tokenize",
+          "_unique_keep_order",
+          "run"
+        ],
+        "context_keys_touched": [
+          "AMOUNT_ALLOWED",
+          "BASE_SCRIPT",
+          "BM25_RESULTS",
+          "COMPONENT_TRACES",
+          "CONFIG_DIR",
+          "DATE_WORD_DMY_RE",
+          "DATE_WORD_MDY_RE",
+          "EMAIL_RE",
+          "EXTRACTIONS",
+          "REPO_ROOT",
+          "ROUTES_JSON_FALLBACK",
+          "ROUTES_YAML_PATH",
+          "RULES_DIR",
+          "SEPARATORS",
+          "URL_RE",
+          "_CTX",
+          "_CURRENCY_ALIASES",
+          "_MONTH_PATTERN",
+          "_MONTH_TOKENS",
+          "_WEEKDAY_PATTERN",
+          "_WEEKDAY_TOKENS",
+          "_add_bm25",
+          "_apply_extractor_to_page",
+          "_bm25_scores",
+          "_build_cls_map",
+          "_build_docs_lookup",
+          "_classification_for",
+          "_clean_value",
+          "_collect_query_terms",
+          "_compile_regex",
+          "_dedupe_docs",
+          "_detect_emails",
+          "_detect_phones",
+          "_detect_urls",
+          "_detect_values_by_type",
+          "_doc_key",
+          "_doc_text_score",
+          "_extract_amount_value",
+          "_extract_currency_value",
+          "_extract_date_value",
+          "_find_label_in_line",
+          "_first_non_empty_line",
+          "_get_input_docs",
+          "_is_common_fallback_doc_type",
+          "_iter_doc_chunks",
+          "_load_json",
+          "_load_json_like_yaml",
+          "_load_routes",
+          "_load_yaml",
+          "_make_match",
+          "_norm_text",
+          "_normalize_digits",
+          "_normalize_doc_type",
+          "_normalize_email_value",
+          "_normalize_phone_value",
+          "_normalize_url_value",
+          "_normalize_value_by_type",
+          "_page_text_from_page",
+          "_resolve_rulesets",
+          "_run_base_extraction",
+          "_safe_int",
+          "_split_tokens_rough",
+          "_strip_control_and_escapes",
+          "_tokenize",
+          "_unique_keep_order",
+          "_value_after_label",
+          "load_extractors_for",
+          "run",
+          "yaml"
+        ],
+        "reported_output_type": "list",
+        "reported_output": [
+          {
+            "doc_id": "72a61fd0-ce5a-443b-9767-a2d6db63313e",
+            "filename": "epsteain22.pdf",
+            "doc_type": "UNCLASSIFIED",
+            "classification_status": "REVIEW",
+            "ruleset": {
+              "routes_config": {
+                "include_common": true,
+                "default_rulesets": [
+                  "{doc_type}.yaml"
+                ],
+                "ruleset_mapping": {
+                  "CONTRAT": [
+                    "CONTRAT.yaml"
+                  ],
+                  "BON_DE_COMMANDE": [
+                    "BON_DE_COMMANDE.yaml"
+                  ],
+                  "FACTURE": [
+                    "FACTURE.yaml"
+                  ]
+                }
+              },
+              "applied_rulesets": [
+                "common.yaml",
+                "common.json"
+              ],
+              "forced_common_fallback": true
+            },
+            "fields": {
+              "doc_date": {
+                "rule_id": "CMN_DATE_01",
+                "type": "date",
+                "many": true,
+                "matches": []
+              },
+              "email": {
+                "rule_id": "CMN_EMAIL_01",
+                "type": "email",
+                "many": true,
+                "matches": []
+              },
+              "telephone": {
+                "rule_id": "CMN_PHONE_01",
+                "type": "phone",
+                "many": true,
+                "matches": []
+              },
+              "site": {
+                "rule_id": "CMN_URL_01",
+                "type": "url",
+                "many": true,
+                "matches": [
+                  {
+                    "value": "www.reuters.com/legaUinvestor-leon-black-settles-with-us-virgin-islands-over-eostein-probe",
+                    "start": 469,
+                    "end": 559,
+                    "snippet": "men that he sexually assaulted.\nhttos://www.reuters.com/legaUinvestor-leon-black-settles-with-us-virgin-islands-over-eostein-probe-\n2023-07-21/\n\nI hope that your office i",
+                    "page_index": 1
+                  },
+                  {
+                    "value": "www.wigdorlaw.com",
+                    "start": 743,
+                    "end": 760,
+                    "snippet": "5 Fifth Avenue, New York, NY 10003\nT:\n\n\nwww.wigdorlaw.com\n\nThis communication may contain Confide",
+                    "page_index": 1
+                  }
+                ]
+              }
+            },
+            "bm25": {
+              "k1": 1.5,
+              "b": 0.75,
+              "query_terms": [
+                "doc",
+                "date",
+                "email",
+                "telephone",
+                "site",
+                "www",
+                "reuters",
+                "com",
+                "legauinvestor",
+                "leon",
+                "black",
+                "settles",
+                "with",
+                "us",
+                "virgin",
+                "islands",
+                "over",
+                "eostein",
+                "probe",
+                "wigdorlaw"
+              ],
+              "chunks_total": 8,
+              "top_chunks": [
+                {
+                  "page_index": 1,
+                  "sent_index": 1,
+                  "score": 13.601078,
+                  "text_preview": "In case you have not heard it has been discovered that Leon Black paid 62.5 million to USVI - and this\ndoes not include payments of money to individual women - it's outrageous that criminal charges have\nnot been brought against him.\nI've heard one lawyer represents ten women that"
+                },
+                {
+                  "page_index": 1,
+                  "sent_index": 5,
+                  "score": 7.223744,
+                  "text_preview": "www.wigdorlaw.com\n\n"
+                },
+                {
+                  "page_index": 1,
+                  "sent_index": 0,
+                  "score": 2.89916,
+                  "text_preview": "From:                 Jeanne M. Christensen\nSent:                 Friday. July 21, 2023 9:55 PM\nTo:\nSubject:              [EXTERNAL] Leon Black follow up\n"
+                },
+                {
+                  "page_index": 1,
+                  "sent_index": 2,
+                  "score": 0.0,
+                  "text_preview": "I hope that your office is going to take a hard look based on this new information.\n\n\n"
+                },
+                {
+                  "page_index": 1,
+                  "sent_index": 3,
+                  "score": 0.0,
+                  "text_preview": "Jeanne M. Christensen\nPartner\n\n"
+                },
+                {
+                  "page_index": 1,
+                  "sent_index": 4,
+                  "score": 0.0,
+                  "text_preview": "WIGDOR LLP\n85 Fifth Avenue, New York, NY 10003\nT:\n\n\n"
+                },
+                {
+                  "page_index": 1,
+                  "sent_index": 6,
+                  "score": 0.0,
+                  "text_preview": "This communication may contain Confidential or Attorney-Client Privileged Information and/or Attorney\nWork Product If you are not the addressee indicated in this message or its intended recipient (or\nresponsible for delivery of the message to such person(s)), do not read, copy, o"
+                },
+                {
+                  "page_index": 1,
+                  "sent_index": 7,
+                  "score": 0.0,
+                  "text_preview": "EFTA02731479"
+                }
+              ],
+              "best_score": 13.601078,
+              "avg_top3_score": 7.907994
+            }
+          }
+        ],
+        "error": null
+      },
+      {
+        "component_name": "fusion-resultats",
+        "component_key": "fusion_resultats",
+        "component_script": "/home/mourad/Bureau/DMS/core/component/fusion_resultats.py",
+        "step_index": 12,
+        "status": "failed",
+        "started_at": "2026-04-08T20:28:26.593984+00:00",
+        "finished_at": "2026-04-08T20:28:26.619037+00:00",
+        "summary": "fusion debug en erreur -> ignore",
+        "new_context_keys": [],
+        "changed_context_keys": [
+          "COMPONENT_TRACES"
+        ],
+        "context_keys_touched": [
+          "COMPONENT_TRACES"
+        ],
+        "reported_output_type": "dict",
+        "reported_output": {
+          "path": null,
+          "source": "disabled",
+          "docs": 0,
+          "es_synced": 0,
+          "skipped": true,
+          "error": "Object of type PosixPath is not JSON serializable"
+        },
+        "error": "Object of type PosixPath is not JSON serializable"
+      },
+      {
+        "component_name": "api-output",
+        "component_key": "api_output",
+        "component_script": "/home/mourad/Bureau/DMS/core/component/api-output.py",
+        "step_index": 13,
+        "status": "running",
+        "started_at": "2026-04-08T20:28:26.620603+00:00",
+        "finished_at": null,
+        "summary": null,
+        "new_context_keys": [],
+        "changed_context_keys": [],
+        "context_keys_touched": [],
+        "reported_output_type": null,
+        "reported_output": null,
+        "error": null
+      }
+    ]
+  },
+  "registries": {
+    "document_ids": [],
+    "entity_registry": [],
+    "identifier_registry": [],
+    "topic_registry": [],
+    "reference_registry": []
+  },
+  "item_templates": {
+    "interdoc_link": {
+      "link_id": null,
+      "score": null,
+      "doc_a": {
+        "document_id": null,
+        "filename": null
+      },
+      "doc_b": {
+        "document_id": null,
+        "filename": null
+      },
+      "shared_topics": [],
+      "score_breakdown": {
+        "topic_overlap": null,
+        "best_sentence_score": null,
+        "signal_overlap": null,
+        "doc_vector_similarity": null,
+        "best_chunk_vector_score": null,
+        "best_chunk_cosine": null
+      },
+      "audit": {
+        "sentence_matches_count": null,
+        "matches": []
+      },
+      "vector_audit": {
+        "profile": null,
+        "embedding_method": null,
+        "embedding_backend": null,
+        "vector_dim": null,
+        "doc_similarity": null,
+        "chunk_pairs_scored": null,
+        "chunk_pair_budget_applied": null,
+        "candidate_chunks_a": null,
+        "candidate_chunks_b": null,
+        "original_chunks_a": null,
+        "original_chunks_b": null,
+        "pairs_skipped_without_overlap": null,
+        "chunk_matches_count": null,
+        "best_chunk_similarity": null,
+        "best_chunk_hybrid_score": null,
+        "chunk_matches": []
+      }
+    },
+    "topic_item": {
+      "term": null,
+      "score": null
+    },
+    "chunk_embedding_item": {
+      "doc_id": null,
+      "doc_key": null,
+      "filename": null,
+      "page_index": null,
+      "sent_index": null,
+      "text_preview": null,
+      "token_count": null,
+      "lang": null,
+      "vector": [],
+      "chunk_primary_topic": null,
+      "chunk_topics": []
+    },
+    "word_embedding_item": {
+      "filename": null,
+      "page_index": null,
+      "sent_index": null,
+      "tok_index": null,
+      "token": null,
+      "lang": null,
+      "vector": [],
+      "doc_id": null
+    },
+    "table_item": {
+      "table_index": null,
+      "page_index": null,
+      "table_type": null,
+      "header_map": {
+        "reference": null,
+        "product": null,
+        "quantity": null,
+        "unit_price": null,
+        "total_ht": null,
+        "total_ttc": null,
+        "total": null
+      },
+      "header_score": null,
+      "detected_columns": [],
+      "rows_count": null,
+      "shape": {
+        "rows_estimated": null,
+        "columns_estimated": null,
+        "source": null
+      },
+      "rows": []
+    },
+    "table_line_item": {
+      "table_index": null,
+      "page_index": null,
+      "row_index": null,
+      "reference": null,
+      "product": null,
+      "description": null,
+      "quantity": null,
+      "unit_price": null,
+      "total_ht": null,
+      "total_ttc": null,
+      "total": null,
+      "raw_cells": [],
+      "confidence": null
+    },
+    "regex_extraction_item": {
+      "doc_id": null,
+      "filename": null,
+      "doc_type": null,
+      "classification_status": null,
+      "ruleset": {
+        "routes_config": {
+          "include_common": null,
+          "default_rulesets": [],
+          "ruleset_mapping": {}
+        },
+        "applied_rulesets": []
+      },
+      "fields": {
+        "_dynamic_field_template": {
+          "rule_id": null,
+          "type": null,
+          "many": null,
+          "matches": []
+        }
+      },
+      "bm25": {
+        "k1": null,
+        "b": null,
+        "query_terms": [],
+        "chunks_total": null,
+        "top_chunks": [],
+        "best_score": null,
+        "avg_top3_score": null
+      }
+    },
+    "sentence_item": {
+      "sentence_id": null,
+      "page_index": null,
+      "sent_index": null,
+      "lang": null,
+      "text": null,
+      "text_normalized": null,
+      "char_start": null,
+      "char_end": null,
+      "tokens_count": null,
+      "topic": null,
+      "source_location": {},
+      "doc_id": null
+    },
+    "token_item": {
+      "filename": null,
+      "page_index": null,
+      "sent_index": null,
+      "tok_index": null,
+      "token": null,
+      "pos": null,
+      "lemma": null,
+      "ner": null,
+      "lang": null,
+      "xlmr_backend": null,
+      "doc_id": null
+    },
+    "visual_mark_item": {
+      "type": null,
+      "kind": null,
+      "score": null,
+      "confidence": null,
+      "bbox_px": {
+        "x0": null,
+        "y0": null,
+        "x1": null,
+        "y1": null
+      },
+      "bbox_norm": {
+        "x0": null,
+        "y0": null,
+        "x1": null,
+        "y1": null
+      },
+      "page_width": null,
+      "page_height": null,
+      "page_index": null,
+      "source": null,
+      "engine": null,
+      "decoded_value": null
+    },
+    "totals_issue_location_item": {
+      "kind": null,
+      "table_index": null,
+      "page_index": null,
+      "computed": null,
+      "declared": null,
+      "source_location": {
+        "page_index": null,
+        "sent_index": null,
+        "layout_kind": null,
+        "line": null,
+        "col": null,
+        "chunk_start": null,
+        "chunk_end": null,
+        "chunk_text_excerpt": null,
+        "match_score": null,
+        "table_index": null,
+        "field": null
+      }
+    },
+    "classification_keyword_match_item": {
+      "keyword": null,
+      "count": null
+    },
+    "classification_score_keyword_item": {
+      "keyword": null,
+      "bucket": null,
+      "count": null,
+      "score": null
+    },
+    "source_location_item": {
+      "page_index": null,
+      "sent_index": null,
+      "layout_kind": null,
+      "line": null,
+      "col": null,
+      "chunk_start": null,
+      "chunk_end": null,
+      "chunk_text_excerpt": null,
+      "match_score": null,
+      "table_index": null,
+      "field": null,
+      "match_start_in_chunk": null,
+      "match_end_in_chunk": null
+    },
+    "page_item": {
+      "page_index": null,
+      "text": null,
+      "page_text": null,
+      "lang": null,
+      "source_path": null,
+      "chars": null,
+      "recompose_ok": null,
+      "sentences_layout": []
+    },
+    "regex_field_match_item": {
+      "value": null,
+      "start": null,
+      "end": null,
+      "snippet": null,
+      "page_index": null
+    },
+    "regex_field_item": {
+      "rule_id": null,
+      "type": null,
+      "many": null,
+      "matches": []
+    },
+    "bm25_chunk_item": {
+      "page_index": null,
+      "sent_index": null,
+      "score": null,
+      "text_preview": null
+    },
+    "totals_row_audit_item": {
+      "page_index": null,
+      "table_index": null,
+      "row_index": null,
+      "label": null,
+      "raw_cells": [],
+      "quantity": null,
+      "unit_price": null,
+      "declared_total": null,
+      "computed_total": null,
+      "effective_total": null,
+      "effective_total_source": null,
+      "status": null,
+      "difference": null,
+      "source_location": {
+        "page_index": null,
+        "sent_index": null,
+        "layout_kind": null,
+        "line": null,
+        "col": null,
+        "chunk_start": null,
+        "chunk_end": null,
+        "chunk_text_excerpt": null,
+        "match_score": null,
+        "table_index": null,
+        "field": null
+      }
+    },
+    "nlp_sentence_item": {
+      "filename": null,
+      "page_index": null,
+      "sent_index": null,
+      "lang": null,
+      "text": null,
+      "doc_id": null
+    },
+    "nlp_entity_item": {
+      "filename": null,
+      "page_index": null,
+      "sent_index": null,
+      "lang": null,
+      "type": null,
+      "text": null,
+      "doc_id": null
+    },
+    "classification_score_audit_item": {
+      "score_total": null,
+      "matched_keywords": [],
+      "matched_keywords_compact": []
+    },
+    "quality_check_item": {
+      "check": null,
+      "engine": null,
+      "status": null,
+      "passed": null,
+      "complete": null,
+      "row_mismatch_count": null,
+      "rows_verified": null,
+      "computed_subtotal": null,
+      "declared_subtotal": null,
+      "declared_tax": null,
+      "declared_total": null,
+      "issue_locations": [],
+      "details": {
+        "_one_of": []
+      }
+    }
+  },
+  "sql_mapping_hints": {
+    "documents_table": "documents",
+    "child_tables": [],
+    "bridge_tables": [],
+    "stable_ids_required": true
+  },
+  "source_context": {
+    "corpus_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads/d723ed61e62943e4a91a9ca5bec4c170",
+    "input_files": [
+      "/home/mourad/Bureau/DMS/core/api_storage/uploads/d723ed61e62943e4a91a9ca5bec4c170/epsteain22.pdf"
+    ],
+    "source_mode": "api",
+    "fusion_source": null,
+    "label": "local-api",
+    "profile_requested": "pipeline50ml",
+    "profile_effective": "pipeline50ml",
+    "fusion_schema_version": null
+  }
+}

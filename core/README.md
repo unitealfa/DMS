@@ -20,6 +20,282 @@ Ce dépôt regroupe des scripts de traitement documentaire (prétraitement, OCR,
 - ce `README`
   - contient maintenant aussi l'index exhaustif des fonctions/classes Python
 
+## Guide Low-Context Pour Modifier Le Projet Sans Casser Le Reste
+Cette section est ecrite pour un agent ou une API avec peu de contexte.
+
+Objectif:
+- pouvoir ajouter un composant
+- pouvoir ajouter une pipeline
+- pouvoir modifier l'input API
+- pouvoir modifier l'output API
+- sans devoir relire tout le depot
+
+Si tu as tres peu de contexte, lis seulement ce `README` puis ouvre uniquement les fichiers cites dans cette section.
+
+### Ordre minimal de lecture recommande
+1. cette section `Guide Low-Context`
+2. `## Ajout d'un nouveau composant sans retoucher tout le code`
+3. `## Ajout d'une nouvelle pipeline sans retoucher le reste`
+4. `## Reference Detaillee Des Pipelines`
+5. `## index.html -> Backend API (detail complet)`
+
+### Fichiers exacts a connaitre selon le type de modification
+Si tu ajoutes un composant:
+- [pipeline/orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
+- [pipeline/components.py](/home/mourad/Bureau/DMS/core/pipeline/components.py)
+- le script du composant dans `component/`
+- optionnel: [component/fusion_resultats.py](/home/mourad/Bureau/DMS/core/component/fusion_resultats.py)
+- optionnel: [component/api-output.py](/home/mourad/Bureau/DMS/core/component/api-output.py)
+
+Si tu ajoutes une pipeline:
+- [pipeline/orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
+- optionnel: [pipeline/cli.py](/home/mourad/Bureau/DMS/core/pipeline/cli.py) si tu veux changer la pipeline par defaut
+
+Si tu modifies l'input API:
+- [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py)
+- optionnel: [pipeline/cli.py](/home/mourad/Bureau/DMS/core/pipeline/cli.py) si le nouveau champ doit devenir une variable de contexte pour les composants
+- optionnel: [index.html](/home/mourad/Bureau/DMS/core/index.html) si le front local doit aussi envoyer ce nouveau champ
+
+Si tu modifies l'output API:
+- [component/api-output.py](/home/mourad/Bureau/DMS/core/component/api-output.py)
+- [dms-unified-output-template.json](/home/mourad/Bureau/DMS/core/dms-unified-output-template.json)
+- optionnel: [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py) seulement si tu changes les routes API, pas si tu changes uniquement le JSON final
+- optionnel: [index.html](/home/mourad/Bureau/DMS/core/index.html) si le front local doit afficher ou telecharger differemment le resultat
+
+### Regle d'or
+Si tu veux que tout continue a marcher facilement:
+- garde `fusion-resultats` avant `api-output`
+- garde `api-output` comme dernier composant de la pipeline
+- fais ecrire les composants dans le `context`
+- si une sortie est liee a un document, mets `doc_id` ou `filename`
+
+### Recette exacte pour ajouter un composant
+1. cree le fichier Python du composant dans `component/` ou un sous-dossier de `component/`
+2. fais en sorte que le script lise/ecrive des variables globales du `context`
+3. si le composant est simple, utilise `Component("nom", chemin_script)` dans `build_components()`
+4. si le composant doit valider/enrichir quelque chose, ajoute un wrapper specialise dans [pipeline/components.py](/home/mourad/Bureau/DMS/core/pipeline/components.py)
+5. ajoute ce composant dans la pipeline voulue dans [pipeline/orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
+6. si tu veux que sa sortie apparaisse automatiquement dans le JSON final par document:
+- ecris une structure contenant `doc_id`
+ou
+- ecris une structure contenant `filename`
+7. si tu veux qu'il soit visible dans la sortie API sans mapping manuel:
+- mets-le avant `api-output`
+- idealement avant `fusion-resultats`
+
+Exemple minimal de composant simple:
+```python
+MY_RESULT = [
+  {
+    "doc_id": "doc-1",
+    "filename": "contrat.pdf",
+    "value": "ok"
+  }
+]
+```
+
+Exemple minimal d'ajout dans une pipeline:
+```python
+Component("mon-composant", COMPONENT_DIR / "mon-composant.py")
+```
+
+### Recette exacte pour ajouter une nouvelle pipeline
+1. ouvre [pipeline/orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
+2. cree une nouvelle classe qui herite de `BasePipelineOrchestrator`
+3. renseigne:
+- `code`
+- `aliases`
+- `label`
+- `description`
+4. implemente `build_components()`
+5. retourne une liste ordonnee de composants
+6. si tu veux un comportement API standard:
+- garde `FusionResultComponent("fusion-resultats", ...)`
+- puis `APIOutputComponent("api-output", ...)` en dernier
+7. relance `main.py` ou `local_api.py`
+
+Exemple minimal:
+```python
+class Pipeline200MLOrchestrator(BasePipelineOrchestrator):
+    code = "pipeline200ml"
+    aliases = ("200ml",)
+    label = "Pipeline 200ML"
+    description = "Pipeline custom."
+
+    def build_components(self):
+        return [
+            PretraitementComponent("pretraitement-de-docs", COMPONENT_DIR / "pretraitement-de-docs.py"),
+            Component("mon-composant", COMPONENT_DIR / "mon-composant.py"),
+            FusionResultComponent("fusion-resultats", COMPONENT_DIR / "fusion_resultats.py"),
+            APIOutputComponent("api-output", COMPONENT_DIR / "api-output.py"),
+        ]
+```
+
+Ce qui s'adapte automatiquement apres ca:
+- `python main.py --pipeline pipeline200ml`
+- `python main.py --list-steps`
+- `POST /api/run` avec `pipeline=pipeline200ml`
+- `GET /api/status` avec les vrais composants de cette nouvelle pipeline
+
+### Recette exacte pour modifier l'input API
+Input API = ce que le backend accepte quand un site externe appelle:
+- `POST /api/run`
+
+Fichier principal:
+- [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py)
+
+Fonctions/zones a modifier:
+- `_extract_uploaded_payload(...)`
+  - pour changer le format HTTP accepte
+  - pour ajouter de nouveaux champs `multipart/form-data`
+- `DMSLauncherHandler.do_POST(...)`
+  - pour valider les nouveaux champs
+  - pour les propager au job
+- `LauncherState.start_job(...)`
+  - pour exporter les nouveaux champs dans l'environnement du process pipeline
+- [pipeline/cli.py](/home/mourad/Bureau/DMS/core/pipeline/cli.py)
+  - si tu veux injecter ces champs dans `context_overrides`
+
+Chemin exact de propagation d'un champ API vers les composants:
+1. le client HTTP envoie le champ a `POST /api/run`
+2. `_extract_uploaded_payload()` le lit
+3. `do_POST()` le valide
+4. `start_job()` le convertit en variable d'environnement `DMS_API_*` ou autre
+5. [pipeline/cli.py](/home/mourad/Bureau/DMS/core/pipeline/cli.py) le lit et le met dans `context_overrides`
+6. les composants le recuperent via le `context`
+
+Variables API deja utilisees pour le composant final `api-output`:
+- `DMS_API_JOB_ID`
+- `DMS_API_MANIFEST_PATH`
+- `DMS_API_RESULT_PATH`
+- `DMS_API_RESULT_ROUTE`
+- `DMS_API_RESULT_URL`
+- `DMS_API_CALLBACK_URL`
+- `DMS_API_CALLBACK_TOKEN`
+- `DMS_API_CALLBACK_TIMEOUT`
+
+Si tu ajoutes un nouveau champ API et que seul `api-output` en a besoin:
+- tu peux l'ajouter dans `start_job()`
+- puis le lire directement dans [component/api-output.py](/home/mourad/Bureau/DMS/core/component/api-output.py)
+- sans toucher les autres composants
+
+### Recette exacte pour modifier l'output API
+Output API = JSON final renvoye par:
+- `GET /api/result/<job_id>`
+- et par le callback HTTP si `callback_url` est fourni
+
+Fichiers principaux:
+- [component/api-output.py](/home/mourad/Bureau/DMS/core/component/api-output.py)
+- [dms-unified-output-template.json](/home/mourad/Bureau/DMS/core/dms-unified-output-template.json)
+
+Regle actuelle:
+- `api-output.py` charge d'abord `FUSION_PAYLOAD`
+- il charge ensuite le template unifie
+- il fusionne les donnees reelles dans le template
+- si un champ manque, il reste `null` ou `[]` selon le template
+- il ajoute aussi automatiquement les traces runtime des composants
+- il ajoute aussi automatiquement un export global du contexte runtime exploitable par l'API
+- il ecrit `result.json`
+- `GET /api/result/<job_id>` sert ce `result.json`
+
+Si tu veux changer la forme du JSON final:
+1. modifie [dms-unified-output-template.json](/home/mourad/Bureau/DMS/core/dms-unified-output-template.json)
+2. modifie [component/api-output.py](/home/mourad/Bureau/DMS/core/component/api-output.py) si tu veux enrichir des zones calculees comme:
+- `source_context`
+- `pipeline`
+- `documents[].components`
+- callback metadata
+3. ne modifie [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py) que si tu changes les routes HTTP ou la facon de servir `result.json`
+
+Zones les plus importantes dans `api-output.py`:
+- `_load_fusion_payload(...)`
+  - source brute a normaliser
+- `_load_template_payload(...)`
+  - lecture du template cible
+- `_merge_template(...)`
+  - fusion template + donnees reelles
+- `_normalize_for_api(...)`
+  - enrichissement du resultat final
+- `_overlay_component_traces(...)`
+  - ajout automatique des sorties des nouveaux composants
+
+Ce que l'API finale renvoie maintenant automatiquement pour eviter d'avoir a modifier la partie API a chaque nouveau composant:
+- `pipeline.component_runs[]`
+  - une ligne par composant execute
+  - contient le `reported_output`
+  - contient aussi `context_values`
+- `pipeline.context_exports`
+  - export global JSON-safe des cles de contexte utiles du run
+  - permet de recuperer automatiquement des structures comme:
+    - `FINAL_DOCS`
+    - `RESULTS`
+    - `TOK_DOCS`
+    - `NLP_SENTENCES`
+    - `NLP_TOKENS`
+    - `NLP_ENTITIES`
+    - `TABLE_EXTRACTIONS`
+    - `TOTALS_VERIFICATION`
+    - `EXTRACTIONS`
+    - et les autres sorties futures exposees en contexte
+
+Regle pratique:
+- si tu ajoutes un nouveau composant qui ecrit ses donnees dans le `context`, l'API finale les renverra automatiquement via:
+  - `documents[].components.<nom_du_composant>`
+  - ou `pipeline.component_runs[].context_values`
+  - ou `pipeline.context_exports`
+- donc tu n'as pas besoin de reprogrammer `local_api.py` ou `api-output.py` pour chaque nouveau composant standard
+
+### Cas ou il ne faut pas modifier autre chose
+Si tu ajoutes seulement un composant standard:
+- modifie seulement le script du composant
+- puis [pipeline/orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
+
+Si tu ajoutes seulement une pipeline:
+- modifie seulement [pipeline/orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
+- optionnel: [pipeline/cli.py](/home/mourad/Bureau/DMS/core/pipeline/cli.py) pour changer la pipeline par defaut
+
+Si tu changes seulement la structure du JSON final:
+- modifie seulement [dms-unified-output-template.json](/home/mourad/Bureau/DMS/core/dms-unified-output-template.json)
+- et si necessaire [component/api-output.py](/home/mourad/Bureau/DMS/core/component/api-output.py)
+
+Si tu changes seulement le format de requete HTTP d'entree:
+- modifie seulement [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py)
+- et [index.html](/home/mourad/Bureau/DMS/core/index.html) si le front local doit suivre
+
+### Validation minimale apres modification
+Pour un composant:
+```bash
+python main.py --pipeline pipeline50ml --list-steps
+```
+
+Pour une pipeline:
+```bash
+python main.py documents/englais.docx --pipeline <nouveau_code> --upto api-output
+```
+
+Pour l'API:
+```bash
+python local_api.py --host 0.0.0.0 --port 8765
+```
+
+Puis:
+```bash
+curl -X POST -F "files=@documents/englais.docx" -F "pipeline=<nouveau_code>" http://127.0.0.1:8765/api/run
+```
+
+Puis:
+```bash
+curl -s http://127.0.0.1:8765/api/status
+```
+
+Puis:
+```bash
+curl -s http://127.0.0.1:8765/api/result/<job_id>
+```
+
+### Reponse courte a la question "est-ce qu'une API peu puissante peut s'en sortir avec seulement le README ?"
+Oui, maintenant, si elle suit strictement cette section et les sections juste en dessous.
+
 ## Ajout d'un nouveau composant sans retoucher tout le code
 Le pipeline est maintenant prepare pour qu'un nouveau composant s'integre sans devoir modifier:
 - le schema de sortie final
@@ -389,7 +665,8 @@ En pratique:
 - etat runtime API: `pipeline/local_api.py`
 - sortie terminal: `outputgeneralterminal.txt`
 - sortie fusion debug: `fusion_output.json`
-- sortie API finale: `api_storage/uploads/<job_id>/result.json`
+- sortie API finale runtime: `/tmp/dms_api_runtime/<job_id>/result.json`
+- sortie API consommee par un client externe: `GET /api/result/<job_id>`
 
 ## Exécution
 ```bash
@@ -566,21 +843,26 @@ Si `PUBLIC_API_BASE_URL` n'est pas defini, le backend utilise l'origine HTTP de 
 - `GET /`
   - sert la page `index.html`
 - `POST /api/run`
-  - recoit les fichiers uploades, les stocke, puis lance la pipeline choisie
-- `POST /api/store`
-  - recoit les fichiers uploades et les stocke seulement, sans lancer la pipeline
+  - recoit les fichiers uploades, les materialise temporairement en runtime, puis lance la pipeline choisie
 - `GET /api/status`
   - retourne l'etat du job courant avec la vraie pipeline, le vrai composant courant et l'URL du resultat final
 - `GET /api/result/<job_id>`
   - retourne le resultat final complet du job, avec le payload fusionne integral
 - `GET /api/documents`
-  - retourne la liste des jobs/documents stockes par l'API
+  - retourne la liste des jobs/documents encore connus en memoire par l'API
 - `GET /api/documents/<job_id>`
-  - retourne le manifest JSON du job stocke, y compris les metadonnees du resultat API
+  - retourne le manifest JSON du job, y compris les metadonnees du resultat API
 - `GET /api/documents/file/<job_id>/<filename>`
-  - retourne le fichier reel stocke par l'API
-- `OPTIONS /api/run`, `OPTIONS /api/store`, `OPTIONS /api/status`
+  - retourne le fichier temporaire du job seulement tant qu'il existe encore en runtime
+- `OPTIONS /api/run`, `OPTIONS /api/status`
   - preflight CORS
+
+Important:
+- `POST /api/store` est desactive
+- les fichiers envoyes a `POST /api/run` ne sont plus stockes de facon persistante dans le depot
+- le mode actuel est `temporary-no-persistence`
+- le backend utilise un dossier runtime temporaire, puis nettoie ce dossier apres la fin du job
+- le resultat JSON final reste toutefois disponible via le cache memoire du backend tant que le processus `local_api.py` reste vivant
 
 Implementation backend: [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py)
 
@@ -638,17 +920,23 @@ Exemples actuels:
 - `--pipeline pipeline50ml`
 - `--pipeline pipeline100ml`
 
-Les fichiers selectionnes dans le navigateur sont d'abord copies dans un dossier dedie persistant:
+Les fichiers selectionnes dans le navigateur sont d'abord materialises dans un dossier runtime temporaire:
 ```text
-/home/mourad/Bureau/DMS/core/api_storage/uploads/<job_id>/
+/tmp/dms_api_runtime/<job_id>/inputs/
 ```
 
-Puis la pipeline est lancee sur ces vrais chemins stockes dans le backend.
+Puis la pipeline est lancee sur ces vrais chemins temporaires dans le backend.
 
 Fichiers generes cote backend pour un job:
-- `api_storage/uploads/<job_id>/manifest.json`
-- `api_storage/uploads/<job_id>/result.json`
-- les fichiers reels uploades
+- `/tmp/dms_api_runtime/<job_id>/manifest.json`
+- `/tmp/dms_api_runtime/<job_id>/result.json`
+- les fichiers reels uploades sous `/tmp/dms_api_runtime/<job_id>/inputs/`
+
+Important:
+- ces fichiers runtime ne sont pas la destination finale du systeme
+- ils servent seulement a executer le job en cours
+- apres la fin du job, le runtime disque est nettoye automatiquement
+- la reponse de `GET /api/result/<job_id>` continue de fonctionner grace au cache memoire du backend
 
 Logs backend ajoutes pour diagnostic:
 - `Content-Type`
@@ -664,10 +952,35 @@ Logs backend ajoutes pour diagnostic:
 - termine
 - en erreur
 
-Pendant le traitement, la page affiche seulement un loader et un message simple.
+`index.html` utilise seulement l'API HTTP du backend. La page ne lit pas directement les fichiers du job ni les sorties Python internes. Elle fait uniquement:
+- `POST /api/run`
+- `GET /api/status`
+- `GET /api/result/<job_id>`
+
+Pendant le traitement, la page affiche seulement:
+- un loader
+- un message simple
+
+Comportement exact de la page:
+1. verification que `GET /api/status` repond
+2. envoi des fichiers via `POST /api/run`
+3. memorisation de `job_id`
+4. memorisation de `result_url` ou `result_route`
+5. polling de `GET /api/status` toutes les `1.5s`
+6. si `status=running`, la page garde le loader et affiche l'etape courante si disponible
+7. si `status=completed` mais `result_available=false`, la page attend encore
+8. si `status=completed` et `result_available=true`, la page appelle `GET /api/result/<job_id>`
+9. la reponse JSON est transformee en fichier telecharge automatiquement dans le navigateur
+10. le nom du fichier telecharge est:
+```text
+dms-output-<job_id>.json
+```
+
+La page ne depend plus d'une version API exacte hardcodee. Tant que les endpoints API repondent correctement, elle fonctionne.
 
 Quand `status=completed`:
-- la page affiche "Traitement termine"
+- la page telecharge automatiquement le resultat JSON final
+- puis elle affiche "Traitement termine"
 
 Quand `status=failed`:
 - la page affiche le `returncode` et la derniere ligne de log
@@ -740,15 +1053,36 @@ curl -s http://127.0.0.1:8765/api/result/<job_id>
 ### 9) Cycle complet de l'API
 Flux reel:
 1. ton site externe envoie les documents vers `POST /api/run`
-2. le backend sauve les fichiers dans `api_storage/uploads/<job_id>/`
+2. le backend materialise les fichiers dans un runtime temporaire `/tmp/dms_api_runtime/<job_id>/inputs/`
 3. il cree un `manifest.json` pour ce job
 4. il lance `python main.py ...`
 5. l'orchestrateur construit la vraie liste des composants de la pipeline active
 6. `fusion-resultats` produit le payload fusionne complet
 7. le composant final `api-output` recopie ce payload integral dans `result.json`
-8. si `callback_url` a ete fourni, `api-output` envoie aussi ce JSON complet en `POST` vers le site externe
-9. `GET /api/status` suit l'avancement live
-10. `GET /api/result/<job_id>` renvoie le JSON final complet deja pret
+8. `api-output` enrichit aussi automatiquement le resultat avec:
+   - `pipeline.component_runs[]`
+   - `pipeline.component_runs[].reported_output`
+   - `pipeline.component_runs[].context_values`
+   - `pipeline.component_runs[].stdout_text`
+   - `pipeline.component_runs[].stdout_lines`
+   - `pipeline.component_runs[].stderr_text`
+   - `pipeline.component_runs[].stderr_lines`
+   - `pipeline.component_runs[].report_text`
+   - `pipeline.component_runs[].report_lines`
+   - `pipeline.component_runs[].terminal_text`
+   - `pipeline.component_runs[].terminal_lines`
+   - `pipeline.context_exports`
+   - `pipeline.terminal_text`
+   - `pipeline.terminal_lines`
+   - `documents[].components.<component_key>.data`
+   - `documents[].components.<component_key>.stdout_text`
+   - `documents[].components.<component_key>.stderr_text`
+   - `documents[].components.<component_key>.terminal_text`
+   - et les variantes `*_lines`
+9. si `callback_url` a ete fourni, `api-output` envoie aussi ce JSON complet en `POST` vers le site externe
+10. `GET /api/status` suit l'avancement live
+11. `GET /api/result/<job_id>` renvoie le JSON final complet deja pret
+12. le runtime disque du job est nettoye automatiquement
 
 Donc:
 - si la pipeline active est `pipeline0ml`, l'API renvoie uniquement les composants de `pipeline0ml`
@@ -788,32 +1122,13 @@ Exemple simplifie:
 }
 ```
 
-### 11) Reponse type de `POST /api/store`
-Exemple simplifie:
+### 11) Note importante sur `POST /api/store`
+Cette route est desactivee.
+
+Reponse actuelle:
 ```json
 {
-  "ok": true,
-  "message": "Documents stockes.",
-  "job_id": "abc123",
-  "pipeline_profile": "pipeline50ml",
-  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
-  "manifest_route": "/api/documents/abc123",
-  "manifest_url": "http://127.0.0.1:8765/api/documents/abc123",
-  "result_route": "/api/result/abc123",
-  "result_url": "http://127.0.0.1:8765/api/result/abc123",
-  "callback_url": "https://mon-site-externe.example.com/api/dms-callback",
-  "documents": [
-    {
-      "api_document_id": "f1",
-      "file_name": "contrat.pdf",
-      "content_type": "application/pdf",
-      "stored_relative_path": "api_storage/uploads/abc123/contrat.pdf",
-      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/abc123/contrat.pdf",
-      "api_route": "/api/documents/file/abc123/contrat.pdf",
-      "api_url": "https://mon-backend.example.com/api/documents/file/abc123/contrat.pdf",
-      "download_url": "https://mon-backend.example.com/api/documents/file/abc123/contrat.pdf"
-    }
-  ]
+  "error": "POST /api/store est desactive. Les documents ne sont plus stockes de facon persistante."
 }
 ```
 
@@ -846,7 +1161,7 @@ Exemple simplifie:
       "file": {
         "name": "contrat.pdf",
         "paths": [
-          "/home/mourad/Bureau/DMS/core/api_storage/uploads/abc123/contrat.pdf"
+          "/tmp/dms_api_runtime/abc123/inputs/contrat.pdf"
         ],
         "size": 12345,
         "page_count": 14,
@@ -875,11 +1190,68 @@ Exemple simplifie:
     "links_count": 0
   },
   "pipeline": {
-    "profile": "pipeline100ml"
+    "profile": "pipeline100ml",
+    "component_runs": [
+      {
+        "component_name": "output-txt",
+        "component_script": "component/output-txt.py",
+        "status": "completed",
+        "summary": "1 docs | pages=14",
+        "reported_output_type": "list",
+        "reported_output": [
+          {
+            "doc_id": "...",
+            "filename": "contrat.pdf"
+          }
+        ],
+        "context_values": {
+          "FINAL_DOCS": [
+            {
+              "doc_id": "...",
+              "filename": "contrat.pdf"
+            }
+          ]
+        },
+        "stdout_text": "Texte extrait...\\nAutre ligne...\\n",
+        "stdout_lines": [
+          "Texte extrait...",
+          "Autre ligne..."
+        ],
+        "stderr_text": "",
+        "stderr_lines": [],
+        "report_text": "[Component: output-txt]\\nType: list\\nSummary: 1 docs | pages=14\\nOutput: ...",
+        "report_lines": [
+          "[Component: output-txt]",
+          "Type: list",
+          "Summary: 1 docs | pages=14"
+        ],
+        "terminal_text": "Execution du composant output-txt via ...\\nTexte extrait...\\n[Component: output-txt]\\nType: list\\nSummary: 1 docs | pages=14\\nOutput: ...",
+        "terminal_lines": [
+          "Execution du composant output-txt via ...",
+          "Texte extrait...",
+          "[Component: output-txt]",
+          "Type: list",
+          "Summary: 1 docs | pages=14"
+        ]
+      }
+    ],
+    "context_exports": {
+      "FINAL_DOCS": [
+        {
+          "doc_id": "...",
+          "filename": "contrat.pdf"
+        }
+      ]
+    },
+    "terminal_text": "Execution du composant pretraitement-de-docs via ...\\n...",
+    "terminal_lines": [
+      "Execution du composant pretraitement-de-docs via ...",
+      "..."
+    ]
   },
   "source_context": {
     "input_files": [
-      "/home/mourad/Bureau/DMS/core/api_storage/uploads/abc123/contrat.pdf"
+      "/tmp/dms_api_runtime/abc123/inputs/contrat.pdf"
     ],
     "source_mode": "api",
     "fusion_schema_version": "2.0",
@@ -894,17 +1266,20 @@ Important:
 - `api-output` part du template puis y injecte les donnees reelles du job
 - aucune chaine de texte extraite n'est volontairement supprimee
 - si un champ manque pour un document, il reste `null` dans la sortie finale
+- les sorties terminal des composants sont maintenant exposees explicitement en JSON
+- si un composant ecrit sur `stdout` ou `stderr`, cette sortie remonte automatiquement
+- si un composant retourne un objet Python, il remonte automatiquement dans `reported_output`
+- si un composant touche des cles du `context`, ces cles remontent automatiquement dans `context_values`
+- si un nouveau composant standard est ajoute a une pipeline, son `reported_output`, ses `context_values` et sa trace terminal remontent automatiquement sans modifier `local_api.py`
+- quand `index.html` recoit ce resultat final, elle le telecharge directement en `.json`
 
 ### 13) Recuperer et afficher les documents depuis un autre site
-Cas 1: stocker sans lancer le pipeline
-- appelle `POST /api/store`
-- recupere `documents[].api_url`
-- utilise cette URL pour afficher ou telecharger le document
-
-Cas 2: stocker et lancer le pipeline
+Cas pratique:
 - appelle `POST /api/run`
 - recupere `job.stored_documents[]`
-- utilise `job.stored_documents[].api_url` pour afficher les documents cote site externe
+- si le job est encore en cours, `job.stored_documents[].api_url` peut servir pour afficher le document temporaire cote site externe
+- une fois le job termine, le runtime disque est nettoye, donc cette URL de fichier temporaire n'est plus garantie
+- la vraie source stable a consommer cote site externe est `GET /api/result/<job_id>` ou le callback JSON final
 - en parallele, poll `GET /api/status` pour suivre la pipeline
 - quand `result_available=true`, appelle `GET /api/result/<job_id>` pour recuperer le JSON final complet normalise sur le template
 - si `callback_url` a ete envoye, le backend poussera aussi ce JSON au site externe
@@ -912,17 +1287,6 @@ Cas 2: stocker et lancer le pipeline
 Exemple JavaScript minimal:
 ```javascript
 const API = "http://IP_DU_BACKEND:8765";
-
-async function storeDocuments(files) {
-  const formData = new FormData();
-  for (const file of files) formData.append("files", file);
-
-  const res = await fetch(`${API}/api/store`, {
-    method: "POST",
-    body: formData
-  });
-  return await res.json();
-}
 
 async function launchPipeline(files) {
   const formData = new FormData();

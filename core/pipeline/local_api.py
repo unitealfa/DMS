@@ -29,8 +29,7 @@ from .runtime_state import RUNTIME_JOB_ENV, RUNTIME_STATE_ENV, read_runtime_stat
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 INDEX_HTML_PATH = REPO_ROOT / "index.html"
-API_STORAGE_ROOT = REPO_ROOT / "api_storage"
-API_UPLOADS_ROOT = API_STORAGE_ROOT / "uploads"
+API_RUNTIME_ROOT = Path(tempfile.gettempdir()) / "dms_api_runtime"
 PUBLIC_API_BASE_URL = str(os.environ.get("PUBLIC_API_BASE_URL") or "").strip().rstrip("/")
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
@@ -48,6 +47,8 @@ DEFAULT_PIPELINE_ARGS = [
 ]
 
 LOGGER = logging.getLogger(__name__)
+JOB_CACHE_LOCK = threading.Lock()
+JOB_CACHE: Dict[str, Dict[str, Any]] = {}
 
 
 def _active_pipeline_profile() -> str:
@@ -110,6 +111,42 @@ def _iso_now() -> str:
 
 def _json_bytes(payload: Dict[str, Any]) -> bytes:
     return json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8")
+
+
+def _job_runtime_dir(job_id: str) -> Path:
+    return API_RUNTIME_ROOT / str(job_id).strip()
+
+
+def _job_inputs_dir(job_id: str) -> Path:
+    return _job_runtime_dir(job_id) / "inputs"
+
+
+def _job_meta_path(job_id: str) -> Path:
+    return _job_runtime_dir(job_id) / "meta.json"
+
+
+def _cache_get(job_id: str) -> Dict[str, Any]:
+    with JOB_CACHE_LOCK:
+        row = JOB_CACHE.get(str(job_id).strip()) or {}
+        return dict(row) if isinstance(row, dict) else {}
+
+
+def _cache_merge(job_id: str, **updates: Any) -> Dict[str, Any]:
+    clean_job_id = str(job_id).strip()
+    with JOB_CACHE_LOCK:
+        row = JOB_CACHE.get(clean_job_id)
+        if not isinstance(row, dict):
+            row = {"job_id": clean_job_id}
+            JOB_CACHE[clean_job_id] = row
+        row.update(updates)
+        return dict(row)
+
+
+def _cleanup_job_runtime(job_id: str) -> None:
+    runtime_dir = _job_runtime_dir(job_id)
+    if not runtime_dir.exists():
+        return
+    shutil.rmtree(runtime_dir, ignore_errors=True)
 
 
 def _tail_recent_lines(path: Path, limit: int = 160, offset: int = 0) -> List[str]:
@@ -388,11 +425,11 @@ def _public_api_base_url(request_origin: str = "") -> str:
 
 
 def _stored_manifest_path(job_id: str) -> Path:
-    return API_UPLOADS_ROOT / job_id / "manifest.json"
+    return _job_runtime_dir(job_id) / "manifest.json"
 
 
 def _stored_result_path(job_id: str) -> Path:
-    return API_UPLOADS_ROOT / job_id / "result.json"
+    return _job_runtime_dir(job_id) / "result.json"
 
 
 def _api_file_route(job_id: str, filename: str) -> str:
@@ -429,11 +466,18 @@ def _build_public_result_url(job_id: str, request_origin: str = "") -> str | Non
 
 
 def _load_manifest(job_id: str) -> Dict[str, Any]:
+    cached = _cache_get(job_id).get("manifest")
+    if isinstance(cached, dict):
+        return cached
     path = _stored_manifest_path(job_id)
     if not path.exists():
         return {}
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(payload, dict):
+            _cache_merge(job_id, manifest=payload)
+            return payload
+        return {}
     except Exception:
         return {}
 
@@ -442,15 +486,23 @@ def _write_manifest(job_id: str, payload: Dict[str, Any]) -> Path:
     path = _stored_manifest_path(job_id)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    _cache_merge(job_id, manifest=payload)
     return path
 
 
 def _load_result(job_id: str) -> Dict[str, Any]:
+    cached = _cache_get(job_id).get("result")
+    if isinstance(cached, dict):
+        return cached
     path = _stored_result_path(job_id)
     if not path.exists():
         return {}
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(payload, dict):
+            _cache_merge(job_id, result=payload)
+            return payload
+        return {}
     except Exception:
         return {}
 
@@ -458,13 +510,14 @@ def _load_result(job_id: str) -> Dict[str, Any]:
 def _result_info(job_id: str, request_origin: str = "") -> Dict[str, Any]:
     result_path = _stored_result_path(job_id)
     manifest = _load_manifest(job_id)
+    result_payload = _load_result(job_id)
     result_meta = manifest.get("result") if isinstance(manifest.get("result"), dict) else {}
     result_url = result_meta.get("url") or _build_public_result_url(job_id, request_origin=request_origin)
     return {
         "result_route": _api_result_route(job_id),
         "result_url": result_url,
-        "result_path": str(result_path.resolve()),
-        "result_available": bool(result_path.exists()),
+        "result_path": str(result_path.resolve()) if result_path.exists() else result_meta.get("path"),
+        "result_available": bool(result_payload) or bool(result_path.exists()),
     }
 
 
@@ -475,7 +528,7 @@ def save_uploaded_files(
     client_ip: str = "",
     callback_url: str = "",
 ) -> List[Dict[str, Any]]:
-    target_dir = API_UPLOADS_ROOT / job_id
+    target_dir = _job_inputs_dir(job_id)
     target_dir.mkdir(parents=True, exist_ok=True)
 
     saved_items: List[Dict[str, Any]] = []
@@ -506,7 +559,7 @@ def save_uploaded_files(
         with destination.open("wb") as fh:
             fh.write(content)
         mime_type = mimetypes.guess_type(destination.name)[0] or "application/octet-stream"
-        relative_path = destination.relative_to(REPO_ROOT)
+        relative_path = destination.relative_to(API_RUNTIME_ROOT)
         api_route = _api_file_route(job_id, destination.name)
         api_url = _build_public_file_url(job_id, destination.name, request_origin=request_origin)
         saved_items.append(
@@ -516,7 +569,7 @@ def save_uploaded_files(
                 "filename": destination.name,
                 "absolute_path": str(destination.resolve()),
                 "relative_path": str(relative_path),
-                "manifest_relative_path": str(_stored_manifest_path(job_id).relative_to(REPO_ROOT)),
+                "manifest_relative_path": str(_stored_manifest_path(job_id).relative_to(API_RUNTIME_ROOT)),
                 "manifest_absolute_path": str(_stored_manifest_path(job_id).resolve()),
                 "api_route": api_route,
                 "api_url": api_url,
@@ -537,7 +590,9 @@ def save_uploaded_files(
     manifest = {
         "job_id": job_id,
         "received_at": _iso_now(),
-        "storage_root": str(API_UPLOADS_ROOT.resolve()),
+        "storage_root": None,
+        "runtime_root": str(_job_runtime_dir(job_id).resolve()),
+        "storage_mode": "temporary-no-persistence",
         "request_origin": request_origin or None,
         "client_ip": client_ip or None,
         "result": {
@@ -568,6 +623,7 @@ def save_uploaded_files(
                 "resolved_source_path": item["resolved_source_path"],
                 "stored_relative_path": item["relative_path"],
                 "stored_absolute_path": item["absolute_path"],
+                "temporary_storage": True,
                 "api_route": item["api_route"],
                 "api_url": item["api_url"],
                 "download_url": item["download_url"],
@@ -576,21 +632,23 @@ def save_uploaded_files(
         ],
     }
     _write_manifest(job_id, manifest)
+    _cache_merge(job_id, documents=manifest.get("documents") or [])
     return saved_items
 
 
 def _documents_index_payload(limit: int = 100) -> Dict[str, Any]:
+    with JOB_CACHE_LOCK:
+        cached_rows = list(JOB_CACHE.values())
     docs: List[Dict[str, Any]] = []
-    if API_UPLOADS_ROOT.exists():
-        for manifest_path in sorted(API_UPLOADS_ROOT.glob("*/manifest.json"), reverse=True)[:limit]:
-            try:
-                payload = json.loads(manifest_path.read_text(encoding="utf-8"))
-            except Exception:
-                continue
-            if isinstance(payload, dict):
-                docs.append(payload)
+    for row in reversed(cached_rows[-limit:]):
+        if not isinstance(row, dict):
+            continue
+        manifest = row.get("manifest")
+        if isinstance(manifest, dict):
+            docs.append(manifest)
     return {
-        "storage_root": str(API_UPLOADS_ROOT.resolve()),
+        "storage_root": None,
+        "storage_mode": "temporary-no-persistence",
         "jobs_count": len(docs),
         "jobs": docs,
     }
@@ -740,7 +798,8 @@ class LauncherState:
                 "callback_url": callback_url or None,
                 "manifest_route": _api_manifest_route(job_id),
                 "manifest_url": _build_public_manifest_url(job_id, request_origin=request_origin),
-                "storage_root": str(API_UPLOADS_ROOT.resolve()),
+                "storage_root": None,
+                "storage_mode": "temporary-no-persistence",
                 "pipeline_profile": requested_profile,
                 "log_offsets": {
                     str(path): path.stat().st_size if path.exists() else 0
@@ -756,6 +815,18 @@ class LauncherState:
 
     def _wait_for_process(self, process: subprocess.Popen[str], job_id: str) -> None:
         returncode = process.wait()
+        manifest = _load_manifest(job_id)
+        result = _load_result(job_id)
+        if isinstance(manifest, dict):
+            manifest["storage_root"] = None
+            manifest["storage_mode"] = "temporary-no-persistence"
+            for row in manifest.get("documents") or []:
+                if not isinstance(row, dict):
+                    continue
+                row["temporary_storage"] = True
+                row["file_available"] = False
+        _cache_merge(job_id, manifest=manifest or None, result=result or None)
+        _cleanup_job_runtime(job_id)
         with self._lock:
             if self._current.get("job_id") != job_id:
                 return
@@ -833,7 +904,7 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
                 return
             job_id = parts[0]
             filename = parts[-1]
-            job_root = (API_UPLOADS_ROOT / job_id).resolve()
+            job_root = _job_inputs_dir(job_id).resolve()
             file_path = (job_root / filename).resolve()
             LOGGER.info("Serving file: job_id=%s filename=%s", job_id, filename)
             LOGGER.info("Resolved job_root=%s", job_root)
@@ -874,6 +945,15 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:  # noqa: N802
         if self.path not in {"/api/run", "/api/store"}:
             self._send_json({"error": "Not found"}, status=HTTPStatus.NOT_FOUND)
+            return
+        if self.path == "/api/store":
+            self._send_json(
+                {
+                    "ok": False,
+                    "error": "POST /api/store est desactive. Les documents ne sont plus stockes de facon persistante.",
+                },
+                status=HTTPStatus.GONE,
+            )
             return
 
         try:
@@ -926,25 +1006,6 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
             result_route = _api_result_route(job_id)
             result_url = _build_public_result_url(job_id, request_origin=request_origin)
 
-            if self.path == "/api/store":
-                self._send_json(
-                    {
-                        "ok": True,
-                        "message": "Documents stockes.",
-                        "job_id": job_id,
-                        "pipeline_profile": requested_pipeline,
-                        "storage_root": str(API_UPLOADS_ROOT.resolve()),
-                        "manifest_route": manifest_route,
-                        "manifest_url": manifest_url,
-                        "result_route": result_route,
-                        "result_url": result_url,
-                        "callback_url": callback_url or None,
-                        "documents": stored_documents,
-                    },
-                    status=HTTPStatus.ACCEPTED,
-                )
-                return
-
             saved_paths = [Path(item["absolute_path"]) for item in saved_items]
             extra_args = ["--pipeline", requested_pipeline] if requested_pipeline else None
             current = self.launcher_state.start_job(
@@ -962,7 +1023,8 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
             current["result_route"] = result_route
             current["result_url"] = result_url
             current["callback_url"] = callback_url or None
-            current["storage_root"] = str(API_UPLOADS_ROOT.resolve())
+            current["storage_root"] = None
+            current["storage_mode"] = "temporary-no-persistence"
             self._send_json(
                 {
                     "ok": True,
@@ -1009,7 +1071,8 @@ def serve(host: str = DEFAULT_HOST, port: int = DEFAULT_PORT) -> None:
     print(f"[local-api] pid={os.getpid()}")
     print(f"[local-api] api_version={API_VERSION}")
     print(f"[local-api] host bind={host}:{port}")
-    print(f"[local-api] api_storage={API_UPLOADS_ROOT.resolve()}")
+    print(f"[local-api] storage_mode=temporary-no-persistence")
+    print(f"[local-api] runtime_root={API_RUNTIME_ROOT.resolve()}")
     for url in _candidate_urls(host, port):
         print(f"[local-api] url={url}")
     print("[local-api] le bouton Lancer de index.html executera main.py avec les fichiers uploades")

@@ -36,6 +36,41 @@ def _json_safe(value: Any) -> Any:
     return str(value)
 
 
+def _text(value: Any) -> str:
+    if value is None:
+        return ""
+    return str(value)
+
+
+def _lines(value: Any) -> List[str]:
+    text = _text(value)
+    return text.splitlines() if text else []
+
+
+def _rebuild_terminal_snapshot(trace: Dict[str, Any]) -> None:
+    execution_line = _text(trace.get("execution_line")).strip()
+    stdout_text = _text(trace.get("stdout_text"))
+    stderr_text = _text(trace.get("stderr_text"))
+    report_text = _text(trace.get("report_text"))
+
+    segments = []
+    if execution_line:
+        segments.append(execution_line)
+    if stdout_text:
+        segments.append(stdout_text.rstrip("\n"))
+    if stderr_text:
+        segments.append(stderr_text.rstrip("\n"))
+    if report_text:
+        segments.append(report_text.rstrip("\n"))
+
+    terminal_text = "\n".join(segment for segment in segments if segment)
+    trace["stdout_lines"] = _lines(stdout_text)
+    trace["stderr_lines"] = _lines(stderr_text)
+    trace["report_lines"] = _lines(report_text)
+    trace["terminal_text"] = terminal_text or None
+    trace["terminal_lines"] = _lines(terminal_text)
+
+
 def _fingerprint(value: Any) -> Any:
     if value is None or isinstance(value, (bool, int, float)):
         return (type(value).__name__, value)
@@ -89,6 +124,7 @@ def start_component_trace(context: Dict[str, Any], component_name: str, componen
         "component_name": component_name,
         "component_key": sanitize_component_key(component_name),
         "component_script": str(component_script or ""),
+        "execution_line": f"Execution du composant {component_name} via {component_script}",
         "step_index": _pipeline_step_index(context, component_name),
         "status": "running",
         "started_at": _iso_now(),
@@ -99,6 +135,14 @@ def start_component_trace(context: Dict[str, Any], component_name: str, componen
         "summary": None,
         "reported_output_type": None,
         "reported_output": None,
+        "stdout_text": "",
+        "stdout_lines": [],
+        "stderr_text": "",
+        "stderr_lines": [],
+        "report_text": None,
+        "report_lines": [],
+        "terminal_text": None,
+        "terminal_lines": [],
         "error": None,
     }
     traces.append(trace)
@@ -149,6 +193,27 @@ def report_component_trace(
         trace["status"] = "completed"
 
 
+def attach_component_io(
+    trace: Optional[Dict[str, Any]],
+    *,
+    stdout_text: Any = "",
+    stderr_text: Any = "",
+) -> None:
+    if not isinstance(trace, dict):
+        return
+    trace["stdout_text"] = _text(stdout_text)
+    trace["stderr_text"] = _text(stderr_text)
+    _rebuild_terminal_snapshot(trace)
+
+
+def attach_component_report(trace: Optional[Dict[str, Any]], report_lines: List[str]) -> None:
+    if not isinstance(trace, dict):
+        return
+    clean_lines = [str(line) for line in (report_lines or [])]
+    trace["report_text"] = "\n".join(clean_lines) if clean_lines else None
+    _rebuild_terminal_snapshot(trace)
+
+
 def component_trace_public_rows(context: Dict[str, Any]) -> List[Dict[str, Any]]:
     rows = context.get("COMPONENT_TRACES")
     if not isinstance(rows, list):
@@ -162,6 +227,7 @@ def component_trace_public_rows(context: Dict[str, Any]) -> List[Dict[str, Any]]
                 "component_name": row.get("component_name"),
                 "component_key": row.get("component_key"),
                 "component_script": row.get("component_script"),
+                "execution_line": row.get("execution_line"),
                 "step_index": _safe_int(row.get("step_index"), 0),
                 "status": row.get("status"),
                 "started_at": row.get("started_at"),
@@ -172,6 +238,14 @@ def component_trace_public_rows(context: Dict[str, Any]) -> List[Dict[str, Any]]
                 "context_keys_touched": list(row.get("context_keys_touched") or []),
                 "reported_output_type": row.get("reported_output_type"),
                 "reported_output": row.get("reported_output"),
+                "stdout_text": row.get("stdout_text"),
+                "stdout_lines": list(row.get("stdout_lines") or []),
+                "stderr_text": row.get("stderr_text"),
+                "stderr_lines": list(row.get("stderr_lines") or []),
+                "report_text": row.get("report_text"),
+                "report_lines": list(row.get("report_lines") or []),
+                "terminal_text": row.get("terminal_text"),
+                "terminal_lines": list(row.get("terminal_lines") or []),
                 "error": row.get("error"),
             }
         )

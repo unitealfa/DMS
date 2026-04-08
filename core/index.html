@@ -196,7 +196,6 @@
     const API_BASE = (
       window.location.protocol.startsWith("http") && window.location.port === "8765"
     ) ? window.location.origin : "http://127.0.0.1:8765";
-    const REQUIRED_API_VERSION = "dms-local-api-2026-03-31-v2";
 
     const input = document.getElementById("file-input");
     const dropzone = document.getElementById("dropzone");
@@ -209,6 +208,55 @@
     let selectedFiles = [];
     let statusTimer = null;
     let isRunning = false;
+    let activeJobId = null;
+    let activeResultUrl = "";
+    const downloadedJobs = new Set();
+
+    function normalizeApiUrl(value) {
+      const raw = String(value || "").trim();
+      if (!raw) {
+        return "";
+      }
+      if (raw.startsWith("http://") || raw.startsWith("https://")) {
+        return raw;
+      }
+      if (raw.startsWith("/")) {
+        return `${API_BASE}${raw}`;
+      }
+      return `${API_BASE}/${raw}`;
+    }
+
+    async function downloadResultJson(jobId, resultUrl) {
+      const finalUrl = normalizeApiUrl(resultUrl || (jobId ? `/api/result/${encodeURIComponent(jobId)}` : ""));
+      if (!finalUrl) {
+        throw new Error("URL du resultat absente.");
+      }
+
+      const response = await fetch(finalUrl);
+      let payload = null;
+      try {
+        payload = await response.json();
+      } catch (error) {
+        throw new Error("Le resultat recu n'est pas un JSON valide.");
+      }
+
+      if (!response.ok) {
+        throw new Error(payload && payload.error ? payload.error : `HTTP ${response.status}`);
+      }
+
+      const blob = new Blob(
+        [JSON.stringify(payload, null, 2)],
+        { type: "application/json;charset=utf-8" }
+      );
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = `dms-output-${jobId || "result"}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(objectUrl);
+    }
 
     function setLoader(active) {
       loaderWrap.classList.toggle("active", Boolean(active));
@@ -225,32 +273,59 @@
       try {
         const response = await fetch(`${API_BASE}/api/status`);
         const data = await response.json();
-        if (!data.api_version || data.api_version !== REQUIRED_API_VERSION) {
-          isRunning = false;
-          status.textContent = "Backend API trop ancien sur le port 8765.";
-          progressDetail.textContent = "Redémarre local_api.py pour charger la version corrigée.";
-          launchBtn.disabled = selectedFiles.length === 0;
-          stopPolling();
-          return;
-        }
         if (!data || data.status === "idle") {
           return;
         }
+
+        if (data.job_id) {
+          activeJobId = data.job_id;
+        }
+        if (data.result_url || data.result_route) {
+          activeResultUrl = normalizeApiUrl(data.result_url || data.result_route);
+        }
+
         if (data.status === "running") {
           isRunning = true;
           launchBtn.disabled = true;
           setLoader(true);
           status.textContent = `Traitement en cours... job=${data.job_id}`;
-          progressDetail.textContent = "Traitement en cours...";
+          progressDetail.textContent = data.current_step
+            ? `Traitement en cours via ${data.current_step}...`
+            : "Traitement en cours...";
           return;
         }
         if (data.status === "completed") {
-          isRunning = false;
-          setLoader(false);
-          status.textContent = `Traitement terminé. job=${data.job_id}`;
-          progressDetail.textContent = "Le traitement est fini.";
-          launchBtn.disabled = selectedFiles.length === 0;
-          stopPolling();
+          if (!data.result_available) {
+            isRunning = true;
+            launchBtn.disabled = true;
+            setLoader(true);
+            status.textContent = `Traitement terminé. job=${data.job_id}`;
+            progressDetail.textContent = "Résultat en préparation...";
+            return;
+          }
+
+          const completedJobId = data.job_id || activeJobId;
+          try {
+            if (completedJobId && !downloadedJobs.has(completedJobId)) {
+              status.textContent = `Traitement terminé. job=${completedJobId}`;
+              progressDetail.textContent = "Résultat reçu, téléchargement du JSON...";
+              await downloadResultJson(completedJobId, activeResultUrl || data.result_url || data.result_route);
+              downloadedJobs.add(completedJobId);
+            }
+            isRunning = false;
+            setLoader(false);
+            status.textContent = `Traitement terminé. job=${completedJobId}`;
+            progressDetail.textContent = "Le JSON final a été téléchargé.";
+            launchBtn.disabled = selectedFiles.length === 0;
+            stopPolling();
+          } catch (error) {
+            isRunning = false;
+            setLoader(false);
+            status.textContent = `Traitement terminé mais téléchargement impossible. job=${completedJobId}`;
+            progressDetail.textContent = error.message || "Le téléchargement du JSON a échoué.";
+            launchBtn.disabled = selectedFiles.length === 0;
+            stopPolling();
+          }
           return;
         }
         if (data.status === "failed") {
@@ -322,11 +397,8 @@
 
       try {
         const statusResponse = await fetch(`${API_BASE}/api/status`);
-        const statusPayload = await statusResponse.json();
-        if (!statusPayload.api_version || statusPayload.api_version !== REQUIRED_API_VERSION) {
-          status.textContent = "Backend API trop ancien sur le port 8765.";
-          progressDetail.textContent = "Arrête l'ancien serveur et relance local_api.py.";
-          return;
+        if (!statusResponse.ok) {
+          throw new Error(`HTTP ${statusResponse.status}`);
         }
       } catch (error) {
         status.textContent = `API locale indisponible: ${error.message}`;
@@ -342,6 +414,8 @@
       isRunning = true;
       launchBtn.disabled = true;
       setLoader(true);
+      activeJobId = null;
+      activeResultUrl = "";
       status.textContent = `Upload et lancement de ${selectedFiles.length} document(s)...`;
       progressDetail.textContent = "Traitement en cours...";
 
@@ -354,8 +428,17 @@
         if (!response.ok || !payload.ok) {
           throw new Error(payload.error || "Echec du lancement");
         }
+        activeJobId = payload.job && payload.job.job_id ? payload.job.job_id : null;
+        activeResultUrl = normalizeApiUrl(
+          payload.job && (payload.job.result_url || payload.job.result_route)
+            ? (payload.job.result_url || payload.job.result_route)
+            : ""
+        );
+        if (activeJobId) {
+          downloadedJobs.delete(activeJobId);
+        }
         setLoader(true);
-        status.textContent = `Pipeline lancé. job=${payload.job.job_id}`;
+        status.textContent = `Pipeline lancé. job=${activeJobId || "inconnu"}`;
         progressDetail.textContent = "Traitement en cours...";
         stopPolling();
         statusTimer = setInterval(refreshJobStatus, 1500);

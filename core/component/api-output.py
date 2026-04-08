@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 import json
 import os
 from datetime import datetime, timezone
@@ -61,11 +62,80 @@ def _load_template_payload() -> Dict[str, Any]:
 
 
 def _materialize_raw(value: Any) -> Any:
+    return _materialize_raw_seen(value, set())
+
+
+def _materialize_raw_seen(value: Any, seen: set[int]) -> Any:
+    if value is None or isinstance(value, (bool, int, float, str)):
+        return value
+    if isinstance(value, Path):
+        return str(value)
+    obj_id = id(value)
+    if obj_id in seen:
+        return "[circular-reference]"
     if isinstance(value, dict):
-        return {str(k): _materialize_raw(v) for k, v in value.items()}
-    if isinstance(value, list):
-        return [_materialize_raw(v) for v in value]
-    return value
+        seen.add(obj_id)
+        return {str(k): _materialize_raw_seen(v, seen) for k, v in value.items()}
+    if isinstance(value, (list, tuple, set)):
+        seen.add(obj_id)
+        return [_materialize_raw_seen(v, seen) for v in value]
+    if isinstance(value, (bytes, bytearray)):
+        try:
+            return bytes(value).decode("utf-8")
+        except Exception:
+            return str(bytes(value))
+    if hasattr(value, "isoformat") and callable(getattr(value, "isoformat", None)):
+        try:
+            return value.isoformat()
+        except Exception:
+            pass
+    return str(value)
+
+
+def _is_exportable_context_value(value: Any) -> bool:
+    if value is None or isinstance(value, (bool, int, float, str, bytes, bytearray, Path)):
+        return True
+    if isinstance(value, (dict, list, tuple, set)):
+        return True
+    if inspect.ismodule(value) or inspect.isclass(value) or inspect.isfunction(value) or inspect.ismethod(value):
+        return False
+    if callable(value):
+        return False
+    return False
+
+
+def _should_export_context_key(key: Any, value: Any) -> bool:
+    name = str(key or "").strip()
+    if not name or name.startswith("__"):
+        return False
+    if name in {
+        "COMPONENT_TRACES",
+        "FUSION_PAYLOAD",
+        "FUSION_PAYLOADS",
+        "final_payload",
+        "payload",
+        "payloads",
+        "ctx",
+        "trace",
+        "manifest",
+        "stored_documents",
+        "fusion_payload",
+        "template_payload",
+        "normalized_payload",
+        "api_result_payload",
+        "API_OUTPUT_RESULT",
+        "API_MANIFEST_PATH",
+        "API_RESULT_PATH",
+        "API_RESULT_ROUTE",
+        "API_RESULT_URL",
+        "API_CALLBACK_URL",
+        "API_CALLBACK_TOKEN",
+        "API_CALLBACK_TIMEOUT",
+    }:
+        return False
+    if name not in {"selected"} and not any(ch.isupper() for ch in name):
+        return False
+    return _is_exportable_context_value(value)
 
 
 def _same_filename(a: Any, b: Any) -> bool:
@@ -258,11 +328,50 @@ def _normalize_for_api(
     return normalized
 
 
+def _fallback_documents_from_manifest(
+    template_payload: Dict[str, Any],
+    manifest: Dict[str, Any],
+) -> List[Dict[str, Any]]:
+    template_documents = _safe_list(template_payload.get("documents"))
+    template_doc = template_documents[0] if template_documents and isinstance(template_documents[0], dict) else {}
+    out: List[Dict[str, Any]] = []
+    for item in _safe_list(_safe_dict(manifest).get("documents")):
+        if not isinstance(item, dict):
+            continue
+        base_doc = {
+            "document_id": item.get("api_document_id"),
+            "file": {
+                "name": item.get("file_name"),
+                "paths": [item.get("stored_absolute_path")] if item.get("stored_absolute_path") else [],
+                "size": item.get("file_size"),
+                "page_count": None,
+                "mime": item.get("file_mime"),
+                "ext": item.get("file_ext"),
+                "content_mode": None,
+            },
+        }
+        out.append(_merge_template(template_doc, base_doc) if template_doc else _materialize_raw(base_doc))
+    return out
+
+
+def _context_exports(globals_dict: Dict[str, Any]) -> Dict[str, Any]:
+    out: Dict[str, Any] = {}
+    for key, value in globals_dict.items():
+        if not _should_export_context_key(key, value):
+            continue
+        out[str(key)] = _materialize_raw(value)
+    return out
+
+
 def _component_trace_context_values(globals_dict: Dict[str, Any], trace: Dict[str, Any]) -> Dict[str, Any]:
     out: Dict[str, Any] = {}
     for key in trace.get("context_keys_touched") or []:
-        if key in globals_dict:
-            out[str(key)] = globals_dict.get(key)
+        if key not in globals_dict:
+            continue
+        value = globals_dict.get(key)
+        if not _should_export_context_key(key, value):
+            continue
+        out[str(key)] = _materialize_raw(value)
     return out
 
 
@@ -295,16 +404,39 @@ def _overlay_component_traces(
 
     pipeline_obj = _safe_dict(normalized_payload.get("pipeline"))
     existing_runs = _safe_list(pipeline_obj.get("component_runs"))
-    if not existing_runs:
-        pipeline_obj["component_runs"] = traces
-    else:
-        seen = {(str(row.get("component_key") or ""), str(row.get("step_index") or "")) for row in existing_runs if isinstance(row, dict)}
-        for trace in traces:
-            ident = (str(trace.get("component_key") or ""), str(trace.get("step_index") or ""))
-            if ident in seen:
-                continue
-            existing_runs.append(trace)
-        pipeline_obj["component_runs"] = existing_runs
+    existing_by_identity = {
+        (str(row.get("component_key") or ""), str(row.get("step_index") or "")): row
+        for row in existing_runs if isinstance(row, dict)
+    }
+    merged_runs: List[Dict[str, Any]] = []
+    seen = set()
+    for trace in traces:
+        ident = (str(trace.get("component_key") or ""), str(trace.get("step_index") or ""))
+        row = existing_by_identity.get(ident)
+        merged = _materialize_raw(row if isinstance(row, dict) else trace)
+        if not isinstance(merged, dict):
+            continue
+        merged["context_values"] = _component_trace_context_values(globals_dict, trace)
+        if "reported_output" not in merged:
+            merged["reported_output"] = _materialize_raw(trace.get("reported_output"))
+        merged_runs.append(merged)
+        seen.add(ident)
+    for row in existing_runs:
+        if not isinstance(row, dict):
+            continue
+        ident = (str(row.get("component_key") or ""), str(row.get("step_index") or ""))
+        if ident in seen:
+            continue
+        merged_runs.append(_materialize_raw(row))
+    pipeline_obj["component_runs"] = merged_runs
+    pipeline_terminal_lines: List[str] = []
+    for row in merged_runs:
+        if not isinstance(row, dict):
+            continue
+        pipeline_terminal_lines.extend(str(line) for line in (row.get("terminal_lines") or []) if str(line))
+    pipeline_obj["terminal_lines"] = pipeline_terminal_lines
+    pipeline_obj["terminal_text"] = "\n".join(pipeline_terminal_lines) if pipeline_terminal_lines else None
+    pipeline_obj["context_exports"] = _context_exports(globals_dict)
     normalized_payload["pipeline"] = pipeline_obj
 
     docs = _safe_list(normalized_payload.get("documents"))
@@ -334,8 +466,19 @@ def _overlay_component_traces(
                 "script": trace.get("component_script"),
                 "status": trace.get("status"),
                 "summary": trace.get("summary"),
+                "started_at": trace.get("started_at"),
+                "finished_at": trace.get("finished_at"),
                 "context_keys": trace.get("context_keys_touched") or [],
                 "output_type": trace.get("reported_output_type"),
+                "execution_line": trace.get("execution_line"),
+                "stdout_text": trace.get("stdout_text"),
+                "stdout_lines": trace.get("stdout_lines") or [],
+                "stderr_text": trace.get("stderr_text"),
+                "stderr_lines": trace.get("stderr_lines") or [],
+                "report_text": trace.get("report_text"),
+                "report_lines": trace.get("report_lines") or [],
+                "terminal_text": trace.get("terminal_text"),
+                "terminal_lines": trace.get("terminal_lines") or [],
                 "data": _materialize_raw(data),
             }
         doc["components"] = components
@@ -365,7 +508,11 @@ api_result_payload = _normalize_for_api(
     pipeline_profile=PIPELINE_PROFILE,
     manifest=manifest,
 )
+if not _safe_list(_safe_dict(api_result_payload).get("documents")) and stored_documents:
+    api_result_payload["documents"] = _fallback_documents_from_manifest(template_payload, manifest)
+    api_result_payload["documents_count"] = len(_safe_list(api_result_payload.get("documents")))
 api_result_payload = _overlay_component_traces(globals(), api_result_payload)
+api_result_payload = _materialize_raw(api_result_payload)
 
 callback_report = {
     "attempted": False,

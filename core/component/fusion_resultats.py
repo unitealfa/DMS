@@ -55,6 +55,30 @@ def _safe_dict(value: Any) -> Dict[str, Any]:
     return value if isinstance(value, dict) else {}
 
 
+def _json_safe(value: Any, _seen: Optional[Set[int]] = None) -> Any:
+    if _seen is None:
+        _seen = set()
+    if value is None or isinstance(value, (bool, int, float, str)):
+        return value
+    if isinstance(value, Path):
+        return str(value)
+    obj_id = id(value)
+    if obj_id in _seen:
+        return "[circular-reference]"
+    if isinstance(value, dict):
+        _seen.add(obj_id)
+        return {str(k): _json_safe(v, _seen) for k, v in value.items()}
+    if isinstance(value, (list, tuple, set)):
+        _seen.add(obj_id)
+        return [_json_safe(v, _seen) for v in value]
+    if hasattr(value, "isoformat") and callable(getattr(value, "isoformat", None)):
+        try:
+            return value.isoformat()
+        except Exception:
+            pass
+    return str(value)
+
+
 def _safe_load_json(value: Any) -> Any:
     if not isinstance(value, str):
         return None
@@ -301,7 +325,20 @@ def _extract_doc_value_from_any(value: Any, doc_id: Optional[str], filename: Opt
 
 def _component_trace_context_values(ctx: Dict[str, Any], trace: Dict[str, Any]) -> Dict[str, Any]:
     out: Dict[str, Any] = {}
+    blocked = {
+        "FUSION_PAYLOAD",
+        "FUSION_PAYLOADS",
+        "API_OUTPUT_RESULT",
+        "final_payload",
+        "payload",
+        "payloads",
+        "ctx",
+        "api_result_payload",
+        "normalized_payload",
+    }
     for key in trace.get("context_keys_touched") or []:
+        if key in blocked:
+            continue
         if key in ctx:
             out[str(key)] = ctx.get(key)
     return out
@@ -331,8 +368,19 @@ def _component_trace_doc_view(
         "script": trace.get("component_script"),
         "status": trace.get("status"),
         "summary": trace.get("summary"),
+        "started_at": trace.get("started_at"),
+        "finished_at": trace.get("finished_at"),
         "context_keys": trace.get("context_keys_touched") or [],
         "output_type": trace.get("reported_output_type"),
+        "execution_line": trace.get("execution_line"),
+        "stdout_text": trace.get("stdout_text"),
+        "stdout_lines": trace.get("stdout_lines") or [],
+        "stderr_text": trace.get("stderr_text"),
+        "stderr_lines": trace.get("stderr_lines") or [],
+        "report_text": trace.get("report_text"),
+        "report_lines": trace.get("report_lines") or [],
+        "terminal_text": trace.get("terminal_text"),
+        "terminal_lines": trace.get("terminal_lines") or [],
         "data": data,
     }
 
@@ -345,17 +393,41 @@ def _pipeline_component_runs(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
                 "component_name": trace.get("component_name"),
                 "component_key": trace.get("component_key"),
                 "component_script": trace.get("component_script"),
+                "execution_line": trace.get("execution_line"),
                 "step_index": _safe_int(trace.get("step_index"), 0),
                 "status": trace.get("status"),
+                "started_at": trace.get("started_at"),
+                "finished_at": trace.get("finished_at"),
                 "summary": trace.get("summary"),
                 "new_context_keys": trace.get("new_context_keys") or [],
                 "changed_context_keys": trace.get("changed_context_keys") or [],
                 "context_keys_touched": trace.get("context_keys_touched") or [],
                 "reported_output_type": trace.get("reported_output_type"),
+                "reported_output": trace.get("reported_output"),
+                "stdout_text": trace.get("stdout_text"),
+                "stdout_lines": trace.get("stdout_lines") or [],
+                "stderr_text": trace.get("stderr_text"),
+                "stderr_lines": trace.get("stderr_lines") or [],
+                "report_text": trace.get("report_text"),
+                "report_lines": trace.get("report_lines") or [],
+                "terminal_text": trace.get("terminal_text"),
+                "terminal_lines": trace.get("terminal_lines") or [],
                 "error": trace.get("error"),
             }
         )
     return rows
+
+
+def _pipeline_terminal_from_runs(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
+    lines: List[str] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        lines.extend(str(line) for line in (row.get("terminal_lines") or []) if str(line))
+    return {
+        "terminal_lines": lines,
+        "terminal_text": "\n".join(lines) if lines else None,
+    }
 
 
 def _auto_component_views(
@@ -1179,6 +1251,8 @@ def _final_output(
     docs_total = len(normalized_payloads)
     docs = [_to_document_output(ctx, p, source, docs_total=docs_total) for p in normalized_payloads]
     interdoc = _interdoc_output(ctx)
+    component_runs = _pipeline_component_runs(ctx)
+    terminal_snapshot = _pipeline_terminal_from_runs(component_runs)
     out: Dict[str, Any] = {
         "schema_version": "2.0",
         "generated_at": _iso_now(),
@@ -1196,7 +1270,9 @@ def _final_output(
             "es_doc_ids": _safe_list(ctx.get("ES_DOC_IDS")),
             "steps": _safe_list(ctx.get("PIPELINE_STEPS")),
             "durations": ctx.get("PROCESS_DURATIONS") or {},
-            "component_runs": _pipeline_component_runs(ctx),
+            "component_runs": component_runs,
+            "terminal_lines": terminal_snapshot.get("terminal_lines") or [],
+            "terminal_text": terminal_snapshot.get("terminal_text"),
         },
     }
     return out
@@ -2879,6 +2955,7 @@ def main() -> None:
         pipeline = {}
     pipeline["profile"] = profile
     final_payload["pipeline"] = pipeline
+    final_payload = _json_safe(final_payload)
     OUTPUT_PATH.write_text(json.dumps(final_payload, ensure_ascii=False, indent=2), encoding="utf-8")
     ctx["FUSION_RESULT"] = str(OUTPUT_PATH)
     ctx["FUSION_PAYLOAD"] = final_payload

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import contextlib
 import importlib.util
+import io
 import logging
 import runpy
 import sys
@@ -17,6 +19,8 @@ from .elasticsearch import (
     update_extraction_results,
 )
 from .component_trace import (
+    attach_component_io,
+    attach_component_report,
     capture_context_fingerprints,
     finish_component_trace,
     report_component_trace,
@@ -87,6 +91,33 @@ def _drop_empty_duplicate_docs(docs: List[Dict[str, Any]]) -> List[Dict[str, Any
     return out
 
 
+class _TeeStream:
+    def __init__(self, *streams: Any):
+        self._streams = [stream for stream in streams if stream is not None]
+
+    def write(self, data: str) -> int:
+        text = str(data)
+        for stream in self._streams:
+            stream.write(text)
+        return len(text)
+
+    def flush(self) -> None:
+        for stream in self._streams:
+            try:
+                stream.flush()
+            except Exception:
+                pass
+
+    def isatty(self) -> bool:
+        for stream in self._streams:
+            try:
+                if bool(stream.isatty()):
+                    return True
+            except Exception:
+                continue
+        return False
+
+
 @dataclass
 class Component:
     name: str
@@ -119,14 +150,33 @@ class Component:
     def _execute_script(self, context: Context) -> Context:
         if not self.script.exists():
             raise FileNotFoundError(f"Script introuvable: {self.script}")
-        logging.info("Execution du composant %s via %s", self.name, self.script)
+        stdout_buffer = io.StringIO()
+        stderr_buffer = io.StringIO()
+        log_buffer = io.StringIO()
+        tee_stdout = _TeeStream(sys.stdout, stdout_buffer)
+        tee_stderr = _TeeStream(sys.stderr, stderr_buffer)
+        root_logger = logging.getLogger()
+        capture_handler = logging.StreamHandler(log_buffer)
+        if root_logger.handlers:
+            try:
+                capture_handler.setFormatter(root_logger.handlers[0].formatter)
+            except Exception:
+                pass
+        capture_handler.setLevel(logging.NOTSET)
+        root_logger.addHandler(capture_handler)
         publish_component_started(context, component_name=self.name, component_script=str(self.script))
         self._last_context = context
         before_fingerprints = capture_context_fingerprints(context)
         trace = start_component_trace(context, self.name, str(self.script))
         self._last_trace = trace
         try:
-            with change_dir(self.script.parent), isolated_argv([self.script.name]):
+            with (
+                change_dir(self.script.parent),
+                isolated_argv([self.script.name]),
+                contextlib.redirect_stdout(tee_stdout),
+                contextlib.redirect_stderr(tee_stderr),
+            ):
+                logging.info("Execution du composant %s via %s", self.name, self.script)
                 result = runpy.run_path(
                     str(self.script),
                     run_name="__main__",
@@ -154,6 +204,19 @@ class Component:
                 error=exc,
             )
             raise
+        finally:
+            root_logger.removeHandler(capture_handler)
+            stderr_text = stderr_buffer.getvalue()
+            log_text = log_buffer.getvalue()
+            if log_text:
+                if stderr_text and not stderr_text.endswith("\n"):
+                    stderr_text += "\n"
+                stderr_text += log_text
+            attach_component_io(
+                trace,
+                stdout_text=stdout_buffer.getvalue(),
+                stderr_text=stderr_text,
+            )
         finish_component_trace(trace, before_fingerprints, context, status="executed")
         publish_component_completed(context, component_name=self.name, component_script=str(self.script))
         self._last_context = context
@@ -162,11 +225,17 @@ class Component:
     def _report(self, output: Any, summary: str) -> None:
         if isinstance(self._last_trace, dict):
             report_component_trace(self._last_trace, output=output, summary=summary)
-        print(f"[Component: {self.name}]")
-        print(f"Type: {type(output).__name__}")
-        print(f"Summary: {summary}")
-        print(f"Output: {safe_repr(output)}")
-        print()
+        report_lines = [
+            f"[Component: {self.name}]",
+            f"Type: {type(output).__name__}",
+            f"Summary: {summary}",
+            f"Output: {safe_repr(output)}",
+            "",
+        ]
+        if isinstance(self._last_trace, dict):
+            attach_component_report(self._last_trace, report_lines)
+        for line in report_lines:
+            print(line)
 
 
 class PretraitementComponent(Component):

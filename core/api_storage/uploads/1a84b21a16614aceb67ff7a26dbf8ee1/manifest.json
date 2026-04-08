@@ -1,0 +1,40 @@
+{
+  "job_id": "1a84b21a16614aceb67ff7a26dbf8ee1",
+  "received_at": "2026-04-08T20:45:06.918516+00:00",
+  "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
+  "request_origin": "http://127.0.0.1:8765",
+  "client_ip": "127.0.0.1",
+  "result": {
+    "ready": true,
+    "generated_at": "2026-04-08T20:45:15.930544+00:00",
+    "path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/1a84b21a16614aceb67ff7a26dbf8ee1/result.json",
+    "route": "/api/result/1a84b21a16614aceb67ff7a26dbf8ee1",
+    "url": "http://127.0.0.1:8765/api/result/1a84b21a16614aceb67ff7a26dbf8ee1",
+    "documents_count": 1,
+    "pipeline_profile": "pipeline50ml"
+  },
+  "callback": {
+    "url": null,
+    "attempted": false,
+    "ok": null,
+    "status_code": null,
+    "error": null
+  },
+  "documents": [
+    {
+      "api_document_id": "83ce2d4506734817b2e81b5c59cb7808",
+      "file_name": "testword.docx",
+      "file_ext": ".docx",
+      "file_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size": 13594,
+      "file_sha256": "0f0ea44e6390ad6300a421a36b8565ffe19474d02183d76f23e3c33f0280b2a4",
+      "resolved_from_lfs_pointer": false,
+      "resolved_source_path": null,
+      "stored_relative_path": "api_storage/uploads/1a84b21a16614aceb67ff7a26dbf8ee1/testword.docx",
+      "stored_absolute_path": "/home/mourad/Bureau/DMS/core/api_storage/uploads/1a84b21a16614aceb67ff7a26dbf8ee1/testword.docx",
+      "api_route": "/api/documents/file/1a84b21a16614aceb67ff7a26dbf8ee1/testword.docx",
+      "api_url": "http://127.0.0.1:8765/api/documents/file/1a84b21a16614aceb67ff7a26dbf8ee1/testword.docx",
+      "download_url": "http://127.0.0.1:8765/api/documents/file/1a84b21a16614aceb67ff7a26dbf8ee1/testword.docx"
+    }
+  ]
+}

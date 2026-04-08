@@ -340,64 +340,82 @@ Exemple simplifie:
 ```
 
 ### 12) Reponse type de `GET /api/result/<job_id>`
-Ce endpoint renvoie le resultat final complet du job. Le champ `pipeline_output` contient litteralement tout le JSON fusionne produit par la pipeline, sans reduction.
+Ce endpoint renvoie directement le resultat final du job au format du template unifie:
+- [dms-unified-output-template.json](/home/mourad/Bureau/DMS/core/dms-unified-output-template.json)
+
+Regle appliquee:
+- si une donnee existe dans la pipeline, elle est injectee
+- si elle manque, la valeur reste `null`
+- les listes absentes restent `[]`
+- les objets restent materialises selon le template
+- la structure racine suit le template unifie
+- `schema_version` vient du template API
+- `source_context.fusion_schema_version` garde la version du payload fusionne brut
+- si un champ reel existe dans `fusion_resultats.py` mais n'est pas explicitement decrit dans le template, `api-output` le preserve quand meme au bon endroit
+- pour une liste d'objets, chaque element est normalise contre le template du premier element de cette liste
 
 Exemple simplifie:
 ```json
 {
-  "ok": true,
-  "schema_version": "api-output-1.0",
+  "schema_version": "dms-unified-final-template-1.0",
   "generated_at": "2026-04-08T19:30:00+00:00",
-  "job_id": "abc123",
-  "pipeline_profile": "pipeline100ml",
-  "pipeline_steps": [
-    "pretraitement-de-docs",
-    "si-image-pretraiter-sinonpass-le-doc",
-    "output-txt",
-    "clasification",
-    "tokenisation-layout",
-    "atripusion-gramatical",
-    "table-extraction",
-    "verification-totaux",
-    "detection-signature-chachet-codebarr",
-    "liaison-inter-docs",
-    "elasticsearch",
-    "extraction-regles",
-    "fusion-resultats",
-    "api-output"
-  ],
-  "input_documents_count": 1,
-  "input_documents": [
+  "source": "local-context",
+  "profile": "pipeline100ml",
+  "documents_count": 1,
+  "documents": [
     {
-      "file_name": "contrat.pdf",
-      "api_url": "https://mon-backend.example.com/api/documents/file/abc123/contrat.pdf"
+      "document_id": "...",
+      "file": {
+        "name": "contrat.pdf",
+        "paths": [
+          "/home/mourad/Bureau/DMS/core/api_storage/uploads/abc123/contrat.pdf"
+        ],
+        "size": 12345,
+        "page_count": 14,
+        "mime": "application/pdf",
+        "ext": ".pdf",
+        "content_mode": "text"
+      },
+      "classification": {
+        "doc_type": "CONTRAT",
+        "winning_score": 11
+      },
+      "ml0": {
+        "table_extraction": {
+          "engine": null
+        }
+      },
+      "ml50": {
+        "embedding_method": null
+      },
+      "ml100": {
+        "embedding_method": "transformer"
+      }
     }
   ],
-  "pipeline_output": {
-    "schema_version": "2.0",
-    "generated_at": "2026-04-08T19:29:58+00:00",
-    "source": "local-context",
-    "documents_count": 1,
-    "documents": [
-      {
-        "document_id": "..."
-      }
-    ],
-    "cross_document_analysis": {},
-    "pipeline": {}
+  "cross_document_analysis": {
+    "links_count": 0
   },
-  "callback_delivery": {
-    "attempted": true,
-    "ok": true,
-    "status_code": 200
+  "pipeline": {
+    "profile": "pipeline100ml"
+  },
+  "source_context": {
+    "input_files": [
+      "/home/mourad/Bureau/DMS/core/api_storage/uploads/abc123/contrat.pdf"
+    ],
+    "source_mode": "api",
+    "fusion_schema_version": "2.0",
+    "profile_requested": "pipeline100ml",
+    "profile_effective": "pipeline100ml"
   }
 }
 ```
 
 Important:
-- `pipeline_output` est la copie integrale du payload fusionne produit par `fusion_resultats.py`
-- aucune virgule, aucun point, aucune chaine de texte extraite n'est volontairement supprimee par `api-output`
-- si un champ manque pour un document, c'est la pipeline elle-meme qui ne l'a pas produit; `api-output` ne le filtre pas
+- la reponse de `GET /api/result/<job_id>` ressemble au template unifie final
+- `api-output` part du template puis y injecte les donnees reelles du job
+- aucune chaine de texte extraite n'est volontairement supprimee
+- si un champ manque pour un document, il reste `null` dans la sortie finale
 
 ### 13) Recuperer et afficher les documents depuis un autre site
 Cas 1: stocker sans lancer le pipeline
@@ -410,7 +428,7 @@ Cas 2: stocker et lancer le pipeline
 - recupere `job.stored_documents[]`
 - utilise `job.stored_documents[].api_url` pour afficher les documents cote site externe
 - en parallele, poll `GET /api/status` pour suivre la pipeline
-- quand `result_available=true`, appelle `GET /api/result/<job_id>` pour recuperer le JSON final complet
+- quand `result_available=true`, appelle `GET /api/result/<job_id>` pour recuperer le JSON final complet normalise sur le template
 - si `callback_url` a ete envoye, le backend poussera aussi ce JSON au site externe
 
 Exemple JavaScript minimal:
@@ -545,7 +563,7 @@ Headers envoyes:
 - `Accept: application/json`
 - `Authorization: Bearer <callback_token>` si `callback_token` est fourni
 
-Le body du callback est exactement le meme JSON que `GET /api/result/<job_id>`.
+Le body du callback est exactement le meme JSON que `GET /api/result/<job_id>`, donc au format du template unifie final.
 
 ### 16) Limite actuelle
 - `GET /api/status` suit le job courant du backend local

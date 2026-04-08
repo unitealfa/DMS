@@ -5,7 +5,7 @@ Date d'audit: 2026-04-08
 ## 1) Scope de l'audit
 - Depot analyse: `/home/mourad/Bureau/DMS/core`
 - Python files analyses: `40`
-- Fonctions/classes indexees: `883` (voir [FUNCTION_INDEX.txt](/home/mourad/Bureau/DMS/core/FUNCTION_INDEX.txt))
+- Fonctions/classes indexees: `883` (voir la section `Index Exhaustif Des Fonctions Et Classes` de [README.md](/home/mourad/Bureau/DMS/core/README.md))
 - Regles metier:
   - `rules/*.json`
   - `rules/*.yaml`
@@ -331,16 +331,12 @@ Resultat final API:
 
 ## 12) Fichiers de documentation interne
 - [README.md](/home/mourad/Bureau/DMS/core/README.md)
-  - doc utilisateur + API + extensibilite
-- [EXPLICATION_PIPELINES.txt](/home/mourad/Bureau/DMS/core/EXPLICATION_PIPELINES.txt)
-  - vue rapide des pipelines
-- [FUNCTION_INDEX.txt](/home/mourad/Bureau/DMS/core/FUNCTION_INDEX.txt)
-  - index exhaustif des fonctions/classes
+  - doc utilisateur + API + extensibilite + reference detaillee des pipelines + index exhaustif des fonctions/classes
 - [PROJECT_CODE_MAP.md](/home/mourad/Bureau/DMS/core/PROJECT_CODE_MAP.md)
   - cartographie technique resumee
 
 ## 13) Regle de maintenance
 A chaque changement dans `pipeline/` ou `component/`:
-- mettre a jour [FUNCTION_INDEX.txt](/home/mourad/Bureau/DMS/core/FUNCTION_INDEX.txt)
+- mettre a jour la section `Index Exhaustif Des Fonctions Et Classes` de [README.md](/home/mourad/Bureau/DMS/core/README.md)
 - mettre a jour [PROJECT_CODE_MAP.md](/home/mourad/Bureau/DMS/core/PROJECT_CODE_MAP.md)
 - mettre a jour [README.md](/home/mourad/Bureau/DMS/core/README.md) si le comportement externe change

@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any, List, Optional
 
 from .components import (
+    APIOutputComponent,
     ClassificationComponent,
     ElasticsearchComponent,
     InterDocLinkingComponent,
@@ -38,6 +39,7 @@ class Pipeline0MLOrchestrator:
             ElasticsearchComponent("elasticsearch", COMPONENT_DIR / "elasticsearch.py"),
             RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction" / "extraction-regles.py"),
             FusionResultComponent("fusion-resultats", COMPONENT_DIR / "fusion_resultats.py"),
+            APIOutputComponent("api-output", COMPONENT_DIR / "api-output.py"),
         ]
 
     def list_steps(self) -> List[str]:
@@ -110,6 +112,7 @@ class Pipeline50MLOrchestrator:
             ElasticsearchComponent("elasticsearch", COMPONENT_DIR / "elasticsearch.py"),
             RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction" / "extraction-regles-50ml.py"),
             FusionResultComponent("fusion-resultats", COMPONENT_DIR / "fusion_resultats.py"),
+            APIOutputComponent("api-output", COMPONENT_DIR / "api-output.py"),
         ]
 
     def list_steps(self) -> List[str]:
@@ -183,6 +186,7 @@ class Pipeline100MLOrchestrator:
             ElasticsearchComponent("elasticsearch", COMPONENT_DIR / "elasticsearch.py"),
             RuleExtractionComponent("extraction-regles", COMPONENT_DIR / "extraction" / "extraction-regles-100ml.py"),
             FusionResultComponent("fusion-resultats", COMPONENT_DIR / "fusion_resultats.py"),
+            APIOutputComponent("api-output", COMPONENT_DIR / "api-output.py"),
         ]
 
     def list_steps(self) -> List[str]:

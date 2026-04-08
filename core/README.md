@@ -3,10 +3,10 @@
 Ce dépôt regroupe des scripts de traitement documentaire (prétraitement, OCR, tokenisation, grammaire, classification) et un orchestrateur léger qui les enchaîne **sans modifier leur logique métier**.
 
 ## Architecture
-- `pretraitement-de-docs.py` → `si-image-pretraiter-sinonpass-le-doc` → `output-txt.py` → `clasification.py` → `tokenisation-layout` → `atripusion-gramatical` → `liaison-inter-docs.py` → `elasticsearch.py` → `extraction-regles.py` → `fusion_resultats.py`
+- `pretraitement-de-docs.py` → `si-image-pretraiter-sinonpass-le-doc` → `output-txt.py` → `clasification.py` → `tokenisation-layout` → `atripusion-gramatical` → `table-extraction.py` → `verification-totaux.py` → `liaison-inter-docs.py` → `elasticsearch.py` → `extraction-regles.py` → `fusion_resultats.py` → `api-output.py`
 - `component/tokenisation_layout/` : scripts de tokenisation/layout (`default`, `50ml`, `100ml`)
 - `component/extraction/` : scripts d'extraction (`regex`, `yaml`, `50ml`, `100ml`)
-- `component/fusion_resultats.py` : fichier unique de fusion pour `default`, `pipeline50ml`, `pipeline100ml`
+- `component/fusion_resultats.py` : fichier unique de fusion pour `pipeline0ml`, `pipeline50ml`, `pipeline100ml`
 - `pipeline/` : couche d'orchestration open-source friendly  
   - `settings.py` : logging, helpers (argv isolation, cwd, normalisation des entrées)  
   - `components.py` : wrappers `Component` pour chaque script  
@@ -89,18 +89,20 @@ Si `PUBLIC_API_BASE_URL` n'est pas defini, le backend utilise l'origine HTTP de 
 - `GET /`
   - sert la page `index.html`
 - `POST /api/run`
-  - recoit les fichiers uploades, les stocke dans le dossier dedie API, enregistre leurs chemins/references, puis lance le pipeline
+  - recoit les fichiers uploades, les stocke, puis lance la pipeline choisie
 - `POST /api/store`
-  - recoit les fichiers uploades et les stocke seulement, sans lancer le pipeline
+  - recoit les fichiers uploades et les stocke seulement, sans lancer la pipeline
 - `GET /api/status`
-  - retourne l'etat simple du job courant (`idle` / `running` / `completed` / `failed`) et la derniere information utile pour l'UI
+  - retourne l'etat du job courant avec la vraie pipeline, le vrai composant courant et l'URL du resultat final
+- `GET /api/result/<job_id>`
+  - retourne le resultat final complet du job, avec le payload fusionne integral
 - `GET /api/documents`
   - retourne la liste des jobs/documents stockes par l'API
 - `GET /api/documents/<job_id>`
-  - retourne le manifest JSON du job stocke
+  - retourne le manifest JSON du job stocke, y compris les metadonnees du resultat API
 - `GET /api/documents/file/<job_id>/<filename>`
   - retourne le fichier reel stocke par l'API
-- `OPTIONS /api/run`, `OPTIONS /api/store` et `OPTIONS /api/status`
+- `OPTIONS /api/run`, `OPTIONS /api/store`, `OPTIONS /api/status`
   - preflight CORS
 
 Implementation backend: [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py)
@@ -114,6 +116,14 @@ Champs fichier acceptes:
 - `files[]`
 - `file`
 
+Champs texte optionnels:
+- `pipeline`
+  - valeurs supportees: `pipeline0ml` | `pipeline50ml` | `pipeline100ml`
+- `callback_url`
+  - URL HTTP distante a laquelle renvoyer le resultat final complet en `POST`
+- `callback_token`
+  - token Bearer ajoute dans l'entete `Authorization` du callback
+
 Si aucun fichier n'est recu:
 - reponse `400 Bad Request`
 
@@ -125,12 +135,30 @@ Si une erreur interne non prevue arrive apres l'upload:
 
 Reponse normale:
 - `202 Accepted`
-- JSON avec `ok=true`, `job_id`, commande lancee et metadonnees job
+- JSON avec:
+  - `job.job_id`
+  - `job.pipeline_profile`
+  - `job.manifest_url`
+  - `job.result_url`
+  - `job.stored_documents[]`
 
 ### 5) Commande reelle lancee par le backend
 Le backend construit et execute:
 ```bash
-python main.py <fichiers_uploades_temp> --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
+python main.py <fichiers_uploades_stockes> --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
+```
+
+Si `pipeline` est envoye dans la requete, il ajoute aussi:
+```bash
+--pipeline pipeline0ml
+```
+ou:
+```bash
+--pipeline pipeline50ml
+```
+ou:
+```bash
+--pipeline pipeline100ml
 ```
 
 Les fichiers selectionnes dans le navigateur sont d'abord copies dans un dossier dedie persistant:
@@ -138,7 +166,12 @@ Les fichiers selectionnes dans le navigateur sont d'abord copies dans un dossier
 /home/mourad/Bureau/DMS/core/api_storage/uploads/<job_id>/
 ```
 
-Puis le pipeline est lance sur ces vrais chemins stockes dans le backend.
+Puis la pipeline est lancee sur ces vrais chemins stockes dans le backend.
+
+Fichiers generes cote backend pour un job:
+- `api_storage/uploads/<job_id>/manifest.json`
+- `api_storage/uploads/<job_id>/result.json`
+- les fichiers reels uploades
 
 Logs backend ajoutes pour diagnostic:
 - `Content-Type`
@@ -163,7 +196,7 @@ Quand `status=failed`:
 - la page affiche le `returncode` et la derniere ligne de log
 
 ### 7) Champs exacts disponibles dans `GET /api/status`
-Le backend expose aussi un etat exact de la pipeline en cours pour un autre front/site externe.
+Le backend expose l'etat exact de la pipeline en cours pour un autre front/site externe.
 
 Champs utiles:
 - `pipeline_profile`
@@ -196,17 +229,24 @@ Champs utiles:
   - avancement calcule a partir du composant reel en cours
 - `last_log_line`
   - derniere ligne utile du log runtime
+- `result_route`
+  - route du resultat final complet
+- `result_url`
+  - URL complete du resultat final complet
+- `result_available`
+  - `true` si `result.json` est deja pret
 
 Important:
-- cet etat est maintenant alimente par un fichier runtime dedie au job courant
-- ce n'est plus seulement une deduction basee sur les logs
-- donc si la pipeline active est `pipeline100ml`, l'API renvoie les vrais composants de `pipeline100ml` et le vrai composant courant
+- si la pipeline active est `pipeline100ml`, l'API renvoie les vrais composants de `pipeline100ml` et le vrai composant courant
 - meme logique pour `pipeline0ml` et `pipeline50ml`
+- le champ `result_available` passe a `true` seulement apres execution du composant final `api-output`
 
 ### 8) Exemple cURL
 ```bash
 curl -X POST \
   -F "files=@documents/signettab.png" \
+  -F "pipeline=pipeline100ml" \
+  -F "callback_url=https://mon-site-externe.example.com/api/dms-callback" \
   http://127.0.0.1:8765/api/run
 ```
 
@@ -215,18 +255,23 @@ Puis:
 curl -s http://127.0.0.1:8765/api/status
 ```
 
+Puis quand `result_available=true`:
+```bash
+curl -s http://127.0.0.1:8765/api/result/<job_id>
+```
+
 ### 9) Cycle complet de l'API
 Flux reel:
 1. ton site externe envoie les documents vers `POST /api/run`
-2. le backend sauve les fichiers dans `/tmp/dms_launcher_uploads/<job_id>/`
-3. le backend lance `python main.py ...`
-4. la pipeline active est choisie selon:
-   - `PIPELINE_DEFAULT`
-   - ou `PIPELINE_PROFILE`
-   - ou sinon `PIPELINE_DEFAULT_CODE`
+2. le backend sauve les fichiers dans `api_storage/uploads/<job_id>/`
+3. il cree un `manifest.json` pour ce job
+4. il lance `python main.py ...`
 5. l'orchestrateur construit la vraie liste des composants de la pipeline active
-6. a chaque demarrage/fin/erreur de composant, le backend met a jour un etat runtime du job
-7. `GET /api/status` relit cet etat runtime et le renvoie a ton autre site
+6. `fusion-resultats` produit le payload fusionne complet
+7. le composant final `api-output` recopie ce payload integral dans `result.json`
+8. si `callback_url` a ete fourni, `api-output` envoie aussi ce JSON complet en `POST` vers le site externe
+9. `GET /api/status` suit l'avancement live
+10. `GET /api/result/<job_id>` renvoie le JSON final complet deja pret
 
 Donc:
 - si la pipeline active est `pipeline0ml`, l'API renvoie uniquement les composants de `pipeline0ml`
@@ -249,6 +294,9 @@ Exemple simplifie:
   "steps_total": 14,
   "completed_steps_count": 6,
   "progress_percent": 46,
+  "result_route": "/api/result/abc123",
+  "result_url": "http://127.0.0.1:8765/api/result/abc123",
+  "result_available": false,
   "pipeline_steps": [
     "pretraitement-de-docs",
     "si-image-pretraiter-sinonpass-le-doc",
@@ -269,9 +317,13 @@ Exemple simplifie:
   "ok": true,
   "message": "Documents stockes.",
   "job_id": "abc123",
+  "pipeline_profile": "pipeline50ml",
   "storage_root": "/home/mourad/Bureau/DMS/core/api_storage/uploads",
   "manifest_route": "/api/documents/abc123",
   "manifest_url": "http://127.0.0.1:8765/api/documents/abc123",
+  "result_route": "/api/result/abc123",
+  "result_url": "http://127.0.0.1:8765/api/result/abc123",
+  "callback_url": "https://mon-site-externe.example.com/api/dms-callback",
   "documents": [
     {
       "api_document_id": "f1",
@@ -287,7 +339,67 @@ Exemple simplifie:
 }
 ```
 
-### 12) Recuperer et afficher les documents depuis un autre site
+### 12) Reponse type de `GET /api/result/<job_id>`
+Ce endpoint renvoie le resultat final complet du job. Le champ `pipeline_output` contient litteralement tout le JSON fusionne produit par la pipeline, sans reduction.
+
+Exemple simplifie:
+```json
+{
+  "ok": true,
+  "schema_version": "api-output-1.0",
+  "generated_at": "2026-04-08T19:30:00+00:00",
+  "job_id": "abc123",
+  "pipeline_profile": "pipeline100ml",
+  "pipeline_steps": [
+    "pretraitement-de-docs",
+    "si-image-pretraiter-sinonpass-le-doc",
+    "output-txt",
+    "clasification",
+    "tokenisation-layout",
+    "atripusion-gramatical",
+    "table-extraction",
+    "verification-totaux",
+    "detection-signature-chachet-codebarr",
+    "liaison-inter-docs",
+    "elasticsearch",
+    "extraction-regles",
+    "fusion-resultats",
+    "api-output"
+  ],
+  "input_documents_count": 1,
+  "input_documents": [
+    {
+      "file_name": "contrat.pdf",
+      "api_url": "https://mon-backend.example.com/api/documents/file/abc123/contrat.pdf"
+    }
+  ],
+  "pipeline_output": {
+    "schema_version": "2.0",
+    "generated_at": "2026-04-08T19:29:58+00:00",
+    "source": "local-context",
+    "documents_count": 1,
+    "documents": [
+      {
+        "document_id": "..."
+      }
+    ],
+    "cross_document_analysis": {},
+    "pipeline": {}
+  },
+  "callback_delivery": {
+    "attempted": true,
+    "ok": true,
+    "status_code": 200
+  }
+}
+```
+
+Important:
+- `pipeline_output` est la copie integrale du payload fusionne produit par `fusion_resultats.py`
+- aucune virgule, aucun point, aucune chaine de texte extraite n'est volontairement supprimee par `api-output`
+- si un champ manque pour un document, c'est la pipeline elle-meme qui ne l'a pas produit; `api-output` ne le filtre pas
+
+### 13) Recuperer et afficher les documents depuis un autre site
 Cas 1: stocker sans lancer le pipeline
 - appelle `POST /api/store`
 - recupere `documents[].api_url`
@@ -298,6 +410,8 @@ Cas 2: stocker et lancer le pipeline
 - recupere `job.stored_documents[]`
 - utilise `job.stored_documents[].api_url` pour afficher les documents cote site externe
 - en parallele, poll `GET /api/status` pour suivre la pipeline
+- quand `result_available=true`, appelle `GET /api/result/<job_id>` pour recuperer le JSON final complet
+- si `callback_url` a ete envoye, le backend poussera aussi ce JSON au site externe
 
 Exemple JavaScript minimal:
 ```javascript
@@ -317,11 +431,18 @@ async function storeDocuments(files) {
 async function launchPipeline(files) {
   const formData = new FormData();
   for (const file of files) formData.append("files", file);
+  formData.append("pipeline", "pipeline100ml");
+  formData.append("callback_url", "https://mon-site-externe.example.com/api/dms-callback");
 
   const res = await fetch(`${API}/api/run`, {
     method: "POST",
     body: formData
   });
+  return await res.json();
+}
+
+async function fetchApiResult(jobId) {
+  const res = await fetch(`${API}/api/result/${jobId}`);
   return await res.json();
 }
 
@@ -349,8 +470,12 @@ curl -s http://127.0.0.1:8765/api/documents/<job_id>
 ```bash
 curl -O http://127.0.0.1:8765/api/documents/file/<job_id>/<filename>
 ```
+- resultat final complet:
+```bash
+curl -s http://127.0.0.1:8765/api/result/<job_id>
+```
 
-### 13) Recuperer ces infos depuis un autre site
+### 14) Recuperer ces infos depuis un autre site
 Exemple JavaScript minimal:
 ```javascript
 const API = "http://IP_DU_BACKEND:8765";
@@ -374,6 +499,11 @@ async function fetchPipelineStatus() {
   return await res.json();
 }
 
+async function fetchPipelineResult(jobId) {
+  const res = await fetch(`${API}/api/result/${jobId}`);
+  return await res.json();
+}
+
 function watchPipeline() {
   const timer = setInterval(async () => {
     const status = await fetchPipelineStatus();
@@ -383,6 +513,7 @@ function watchPipeline() {
     console.log("composant =", status.component_name);
     console.log("script =", status.component_script);
     console.log("progression =", status.progress_percent);
+    console.log("resultat_pret =", status.result_available);
 
     if (status.status === "completed" || status.status === "failed") {
       clearInterval(timer);
@@ -398,18 +529,32 @@ Affichage conseille dans ton autre site:
 - progression: `progress_percent`
 - etape courante: `current_step`
 - log le plus recent: `last_log_line`
+- URL du resultat final: `result_url`
 - pour afficher un document stocke:
   - utilise directement `api_url`
   - ne reconstruis pas l'URL toi-meme a partir d'un chemin relatif
+- pour recuperer le JSON final complet:
+  - utilise `result_url`
+  - ou `GET /api/result/<job_id>`
 
-### 14) Limite actuelle
+### 15) Callback sortant vers le site externe
+Si le site externe envoie `callback_url`, alors le composant final `api-output` fait un `POST` JSON vers cette URL des que la pipeline est terminee.
+
+Headers envoyes:
+- `Content-Type: application/json; charset=utf-8`
+- `Accept: application/json`
+- `Authorization: Bearer <callback_token>` si `callback_token` est fourni
+
+Le body du callback est exactement le meme JSON que `GET /api/result/<job_id>`.
+
+### 16) Limite actuelle
 - `GET /api/status` suit le job courant du backend local
 - ce n'est pas un systeme multi-jobs paralleles
 - pour un affichage live simple, il faut:
   - lancer le job avec `POST /api/run`
   - puis poller `GET /api/status` toutes les `1s` ou `1.5s`
 
-### 16) CORS
+### 17) CORS
 Le backend renvoie:
 - `Access-Control-Allow-Origin: *`
 - `Access-Control-Allow-Methods: GET, POST, OPTIONS`

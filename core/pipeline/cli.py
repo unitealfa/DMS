@@ -47,6 +47,7 @@ _STEP_CHOICES = [
     "elasticsearch",
     "extraction-regles",
     "fusion-resultats",
+    "api-output",
 ]
 
 
@@ -263,6 +264,14 @@ def main() -> None:
                 "ML100_MAX_LENGTH": _env_int("ML100_MAX_LENGTH", 256),
                 "ML100_BATCH_SIZE": _env_int("ML100_BATCH_SIZE", 8),
                 "ML100_HASH_FALLBACK_DIM": _env_int("ML100_HASH_FALLBACK_DIM", 384),
+                "API_JOB_ID": _env_optional("DMS_API_JOB_ID"),
+                "API_MANIFEST_PATH": _env_optional("DMS_API_MANIFEST_PATH"),
+                "API_RESULT_PATH": _env_optional("DMS_API_RESULT_PATH"),
+                "API_RESULT_ROUTE": _env_optional("DMS_API_RESULT_ROUTE"),
+                "API_RESULT_URL": _env_optional("DMS_API_RESULT_URL"),
+                "API_CALLBACK_URL": _env_optional("DMS_API_CALLBACK_URL"),
+                "API_CALLBACK_TOKEN": _env_optional("DMS_API_CALLBACK_TOKEN"),
+                "API_CALLBACK_TIMEOUT": _env_int("DMS_API_CALLBACK_TIMEOUT", 30),
                 "PIPELINE_PROFILE": pipeline_name,
             },
         )

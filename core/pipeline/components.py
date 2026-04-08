@@ -620,3 +620,34 @@ class FusionResultComponent(Component):
         self._report(output, summary)
         return output
 
+
+class APIOutputComponent(Component):
+    """Prepare le resultat API complet a partir du payload fusionne."""
+
+    def run(self, context: Context) -> Any:
+        ctx = self._execute_script(context)
+        output = ctx.get("API_OUTPUT_RESULT")
+        if not isinstance(output, dict):
+            output = {
+                "job_id": ctx.get("API_JOB_ID"),
+                "pipeline_profile": ctx.get("PIPELINE_PROFILE"),
+                "documents_count": len((ctx.get("FUSION_PAYLOAD") or {}).get("documents") or [])
+                if isinstance(ctx.get("FUSION_PAYLOAD"), dict)
+                else 0,
+                "result_path": ctx.get("API_RESULT_PATH"),
+                "result_route": ctx.get("API_RESULT_ROUTE"),
+                "result_url": ctx.get("API_RESULT_URL"),
+                "callback_attempted": False,
+                "callback_ok": None,
+            }
+
+        summary = (
+            f"job={output.get('job_id') or '-'} | "
+            f"profile={output.get('pipeline_profile') or '-'} | "
+            f"docs={int(output.get('documents_count') or 0)} | "
+            f"result={output.get('result_path') or '-'}"
+        )
+        if output.get("callback_attempted"):
+            summary += f" | callback_ok={output.get('callback_ok')}"
+        self._report(output, summary)
+        return output

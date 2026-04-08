@@ -37,6 +37,7 @@ Pipeline 1: Pipeline0MLOrchestrator
 - `ElasticsearchComponent("elasticsearch", "component/elasticsearch.py")`
 - `RuleExtractionComponent("extraction-regles", "component/extraction/extraction-regles.py")`
 - `FusionResultComponent("fusion-resultats", "component/fusion_resultats.py")`
+- `APIOutputComponent("api-output", "component/api-output.py")`
 `]`
 
 Pipeline 2: Pipeline50MLOrchestrator
@@ -53,6 +54,7 @@ Pipeline 2: Pipeline50MLOrchestrator
 - `ElasticsearchComponent("elasticsearch", "component/elasticsearch.py")`
 - `RuleExtractionComponent("extraction-regles", "component/extraction/extraction-regles-50ml.py")`
 - `FusionResultComponent("fusion-resultats", "component/fusion_resultats.py")`
+- `APIOutputComponent("api-output", "component/api-output.py")`
 `]`
 
 Pipeline 3: Pipeline100MLOrchestrator
@@ -70,6 +72,7 @@ Pipeline 3: Pipeline100MLOrchestrator
 - `ElasticsearchComponent("elasticsearch", "component/elasticsearch.py")`
 - `RuleExtractionComponent("extraction-regles", "component/extraction/extraction-regles-100ml.py")`
 - `FusionResultComponent("fusion-resultats", "component/fusion_resultats.py")`
+- `APIOutputComponent("api-output", "component/api-output.py")`
 `]`
 
 Comment les composants sont relies
@@ -87,9 +90,10 @@ Comment les composants sont relies
 - `elasticsearch` indexe ou synchronise les donnees et produit `ES_*`
 - `extraction-regles` lit surtout classification + texte + parfois ES et produit `EXTRACTIONS`
 - `fusion-resultats` fusionne tout dans `fusion_output.json` et produit `FUSION_*`
+- `api-output` recopie `FUSION_PAYLOAD` dans un resultat API complet et ecrit `result.json` quand le run vient de `local_api.py`
 
 Flux logique court
-- fichier -> type de contenu -> texte final -> classification -> phrases/chunks/tokens -> grammaire/NER/lemma/POS -> tables -> verification totaux -> visuel 100ml -> liens inter-docs -> sync Elasticsearch -> extraction metier -> JSON final
+- fichier -> type de contenu -> texte final -> classification -> phrases/chunks/tokens -> grammaire/NER/lemma/POS -> tables -> verification totaux -> visuel 100ml -> liens inter-docs -> sync Elasticsearch -> extraction metier -> JSON final -> sortie API complete
 
 Ce que chaque composant extrait ou produit
 

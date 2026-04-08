@@ -34,7 +34,7 @@ API_UPLOADS_ROOT = API_STORAGE_ROOT / "uploads"
 PUBLIC_API_BASE_URL = str(os.environ.get("PUBLIC_API_BASE_URL") or "").strip().rstrip("/")
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
-API_VERSION = "dms-local-api-2026-04-02-v3"
+API_VERSION = "dms-local-api-2026-04-08-v4"
 LOG_PATH_CANDIDATES = [
     REPO_ROOT / "outputgeneralterminal.runtime.txt",
     REPO_ROOT / "outputgeneralterminal.txt",
@@ -83,13 +83,13 @@ def _pipeline_orchestrator(profile: str):
     return Pipeline0MLOrchestrator(REPO_ROOT)
 
 
-def _active_pipeline_steps() -> List[str]:
-    profile = _active_pipeline_profile()
+def _active_pipeline_steps(profile: str | None = None) -> List[str]:
+    profile = _normalize_pipeline_name(profile, _active_pipeline_profile())
     return _pipeline_orchestrator(profile).list_steps()
 
 
-def _active_pipeline_metadata() -> Dict[str, Any]:
-    profile = _active_pipeline_profile()
+def _active_pipeline_metadata(profile: str | None = None) -> Dict[str, Any]:
+    profile = _normalize_pipeline_name(profile, _active_pipeline_profile())
     orchestrator = _pipeline_orchestrator(profile)
     components = []
     for component in getattr(orchestrator, "components", []):
@@ -300,7 +300,7 @@ def _sanitize_filename(name: str, index: int) -> str:
     return base.replace("\x00", "")
 
 
-def _extract_uploaded_files(handler: BaseHTTPRequestHandler) -> List[Dict[str, Any]]:
+def _extract_uploaded_payload(handler: BaseHTTPRequestHandler) -> Dict[str, Any]:
     content_type = handler.headers.get("Content-Type", "")
     LOGGER.info(
         "POST %s content_type=%s content_length=%s",
@@ -356,7 +356,26 @@ def _extract_uploaded_files(handler: BaseHTTPRequestHandler) -> List[Dict[str, A
             }
         )
     LOGGER.info("extracted_files_count=%s", len(items))
-    return items
+    text_fields: Dict[str, Any] = {}
+    for item in form.list or []:
+        name = str(getattr(item, "name", "") or "").strip()
+        if not name or getattr(item, "filename", None):
+            continue
+        value = str(getattr(item, "value", "") or "").strip()
+        if not value:
+            continue
+        if name in text_fields:
+            current = text_fields[name]
+            if isinstance(current, list):
+                current.append(value)
+            else:
+                text_fields[name] = [current, value]
+        else:
+            text_fields[name] = value
+    return {
+        "files": items,
+        "fields": text_fields,
+    }
 
 
 def _sha256_bytes(data: bytes) -> str:
@@ -371,6 +390,16 @@ def _request_origin(handler: BaseHTTPRequestHandler) -> str:
     return f"{proto}://{host}" if host else ""
 
 
+def _first_text_field(payload: Any) -> str:
+    if isinstance(payload, list):
+        for item in payload:
+            value = str(item or "").strip()
+            if value:
+                return value
+        return ""
+    return str(payload or "").strip()
+
+
 def _public_api_base_url(request_origin: str = "") -> str:
     if PUBLIC_API_BASE_URL:
         return PUBLIC_API_BASE_URL
@@ -381,12 +410,20 @@ def _stored_manifest_path(job_id: str) -> Path:
     return API_UPLOADS_ROOT / job_id / "manifest.json"
 
 
+def _stored_result_path(job_id: str) -> Path:
+    return API_UPLOADS_ROOT / job_id / "result.json"
+
+
 def _api_file_route(job_id: str, filename: str) -> str:
     return f"/api/documents/file/{quote(job_id)}/{quote(filename)}"
 
 
 def _api_manifest_route(job_id: str) -> str:
     return f"/api/documents/{quote(job_id)}"
+
+
+def _api_result_route(job_id: str) -> str:
+    return f"/api/result/{quote(job_id)}"
 
 
 def _build_public_file_url(job_id: str, filename: str, request_origin: str = "") -> str | None:
@@ -401,6 +438,13 @@ def _build_public_manifest_url(job_id: str, request_origin: str = "") -> str | N
     if not base:
         return None
     return f"{base}{_api_manifest_route(job_id)}"
+
+
+def _build_public_result_url(job_id: str, request_origin: str = "") -> str | None:
+    base = _public_api_base_url(request_origin)
+    if not base:
+        return None
+    return f"{base}{_api_result_route(job_id)}"
 
 
 def _load_manifest(job_id: str) -> Dict[str, Any]:
@@ -420,7 +464,36 @@ def _write_manifest(job_id: str, payload: Dict[str, Any]) -> Path:
     return path
 
 
-def save_uploaded_files(upload_items: List[Dict[str, Any]], job_id: str, request_origin: str = "", client_ip: str = "") -> List[Dict[str, Any]]:
+def _load_result(job_id: str) -> Dict[str, Any]:
+    path = _stored_result_path(job_id)
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _result_info(job_id: str, request_origin: str = "") -> Dict[str, Any]:
+    result_path = _stored_result_path(job_id)
+    manifest = _load_manifest(job_id)
+    result_meta = manifest.get("result") if isinstance(manifest.get("result"), dict) else {}
+    result_url = result_meta.get("url") or _build_public_result_url(job_id, request_origin=request_origin)
+    return {
+        "result_route": _api_result_route(job_id),
+        "result_url": result_url,
+        "result_path": str(result_path.resolve()),
+        "result_available": bool(result_path.exists()),
+    }
+
+
+def save_uploaded_files(
+    upload_items: List[Dict[str, Any]],
+    job_id: str,
+    request_origin: str = "",
+    client_ip: str = "",
+    callback_url: str = "",
+) -> List[Dict[str, Any]]:
     target_dir = API_UPLOADS_ROOT / job_id
     target_dir.mkdir(parents=True, exist_ok=True)
 
@@ -484,6 +557,24 @@ def save_uploaded_files(upload_items: List[Dict[str, Any]], job_id: str, request
         "job_id": job_id,
         "received_at": _iso_now(),
         "storage_root": str(API_UPLOADS_ROOT.resolve()),
+        "request_origin": request_origin or None,
+        "client_ip": client_ip or None,
+        "result": {
+            "ready": False,
+            "generated_at": None,
+            "path": str(_stored_result_path(job_id).resolve()),
+            "route": _api_result_route(job_id),
+            "url": _build_public_result_url(job_id, request_origin=request_origin),
+            "documents_count": 0,
+            "pipeline_profile": None,
+        },
+        "callback": {
+            "url": callback_url or None,
+            "attempted": False,
+            "ok": None,
+            "status_code": None,
+            "error": None,
+        },
         "documents": [
             {
                 "api_document_id": item["api_document_id"],
@@ -608,6 +699,9 @@ class LauncherState:
             }
         else:
             snap.update(_current_runtime_progress(str(snap.get("status") or ""), metadata=metadata, log_offsets=log_offsets))
+        job_id = str(snap.get("job_id") or "").strip()
+        if job_id:
+            snap.update(_result_info(job_id))
         return snap
 
     def start_job(
@@ -615,6 +709,10 @@ class LauncherState:
         file_paths: List[Path],
         extra_args: List[str] | None = None,
         job_id: str | None = None,
+        pipeline_profile: str | None = None,
+        request_origin: str = "",
+        callback_url: str = "",
+        callback_token: str = "",
     ) -> Dict[str, Any]:
         with self._lock:
             if self._process is not None and self._process.poll() is None:
@@ -622,7 +720,8 @@ class LauncherState:
 
             job_id = job_id or uuid.uuid4().hex
             command = build_cli_command(file_paths, extra_args=extra_args)
-            metadata = _active_pipeline_metadata()
+            requested_profile = _normalize_pipeline_name(pipeline_profile, _active_pipeline_profile())
+            metadata = _active_pipeline_metadata(requested_profile)
             runtime_state_path = Path(tempfile.gettempdir()) / "dms_launcher_runtime" / f"{job_id}.json"
             print(f"[local-api] lancement job={job_id}")
             print(f"[local-api] commande: {' '.join(command)}")
@@ -631,6 +730,14 @@ class LauncherState:
             env = os.environ.copy()
             env[RUNTIME_STATE_ENV] = str(runtime_state_path)
             env[RUNTIME_JOB_ENV] = job_id
+            env["DMS_API_JOB_ID"] = job_id
+            env["DMS_API_MANIFEST_PATH"] = str(_stored_manifest_path(job_id).resolve())
+            env["DMS_API_RESULT_PATH"] = str(_stored_result_path(job_id).resolve())
+            env["DMS_API_RESULT_ROUTE"] = _api_result_route(job_id)
+            env["DMS_API_RESULT_URL"] = _build_public_result_url(job_id, request_origin=request_origin) or ""
+            env["DMS_API_CALLBACK_URL"] = callback_url or ""
+            env["DMS_API_CALLBACK_TOKEN"] = callback_token or ""
+            env["PIPELINE_PROFILE"] = requested_profile
             process = subprocess.Popen(
                 command,
                 cwd=str(REPO_ROOT),
@@ -649,12 +756,18 @@ class LauncherState:
                 "error": None,
                 "upload_dir": str(file_paths[0].parent) if file_paths else None,
                 "runtime_state_path": str(runtime_state_path),
+                "callback_url": callback_url or None,
+                "manifest_route": _api_manifest_route(job_id),
+                "manifest_url": _build_public_manifest_url(job_id, request_origin=request_origin),
+                "storage_root": str(API_UPLOADS_ROOT.resolve()),
+                "pipeline_profile": requested_profile,
                 "log_offsets": {
                     str(path): path.stat().st_size if path.exists() else 0
                     for path in LOG_PATH_CANDIDATES
                 },
             }
             self._current.update(metadata)
+            self._current.update(_result_info(job_id, request_origin=request_origin))
 
             watcher = threading.Thread(target=self._wait_for_process, args=(process, job_id), daemon=True)
             watcher.start()
@@ -715,6 +828,18 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
             self._send_json(self.launcher_state.snapshot())
             return
 
+        if self.path.startswith("/api/result/"):
+            job_id = unquote(self.path[len("/api/result/"):].strip("/"))
+            if not job_id:
+                self._send_json({"error": "job_id manquant"}, status=HTTPStatus.BAD_REQUEST)
+                return
+            result = _load_result(job_id)
+            if not result:
+                self._send_json({"error": "Resultat introuvable"}, status=HTTPStatus.NOT_FOUND)
+                return
+            self._send_json(result)
+            return
+
         if self.path == "/api/documents":
             self._send_json(_documents_index_payload())
             return
@@ -771,13 +896,31 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
             return
 
         try:
-            upload_items = _extract_uploaded_files(self)
+            request_payload = _extract_uploaded_payload(self)
+            upload_items = request_payload.get("files") or []
+            request_fields = request_payload.get("fields") or {}
             if not upload_items:
                 raise ValueError("Aucun fichier exploitable recu.")
             job_id = uuid.uuid4().hex
             request_origin = _request_origin(self)
             client_ip = str(self.client_address[0] if self.client_address else "").strip()
-            saved_items = save_uploaded_files(upload_items, job_id, request_origin=request_origin, client_ip=client_ip)
+            requested_pipeline = _normalize_pipeline_name(
+                _first_text_field(request_fields.get("pipeline")) or self.headers.get("X-Pipeline-Profile") or None,
+                _active_pipeline_profile(),
+            )
+            callback_url = _first_text_field(request_fields.get("callback_url")) or str(
+                self.headers.get("X-Callback-Url") or ""
+            ).strip()
+            callback_token = _first_text_field(request_fields.get("callback_token")) or str(
+                self.headers.get("X-Callback-Token") or ""
+            ).strip()
+            saved_items = save_uploaded_files(
+                upload_items,
+                job_id,
+                request_origin=request_origin,
+                client_ip=client_ip,
+                callback_url=callback_url,
+            )
             LOGGER.info("saved_items=%s", [item["absolute_path"] for item in saved_items])
             stored_documents = [
                 {
@@ -799,6 +942,8 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
             ]
             manifest_route = _api_manifest_route(job_id)
             manifest_url = _build_public_manifest_url(job_id, request_origin=request_origin)
+            result_route = _api_result_route(job_id)
+            result_url = _build_public_result_url(job_id, request_origin=request_origin)
 
             if self.path == "/api/store":
                 self._send_json(
@@ -806,9 +951,13 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
                         "ok": True,
                         "message": "Documents stockes.",
                         "job_id": job_id,
+                        "pipeline_profile": requested_pipeline,
                         "storage_root": str(API_UPLOADS_ROOT.resolve()),
                         "manifest_route": manifest_route,
                         "manifest_url": manifest_url,
+                        "result_route": result_route,
+                        "result_url": result_url,
+                        "callback_url": callback_url or None,
                         "documents": stored_documents,
                     },
                     status=HTTPStatus.ACCEPTED,
@@ -816,10 +965,22 @@ class DMSLauncherHandler(BaseHTTPRequestHandler):
                 return
 
             saved_paths = [Path(item["absolute_path"]) for item in saved_items]
-            current = self.launcher_state.start_job(saved_paths, job_id=job_id)
+            extra_args = ["--pipeline", requested_pipeline] if requested_pipeline else None
+            current = self.launcher_state.start_job(
+                saved_paths,
+                extra_args=extra_args,
+                job_id=job_id,
+                pipeline_profile=requested_pipeline,
+                request_origin=request_origin,
+                callback_url=callback_url,
+                callback_token=callback_token,
+            )
             current["stored_documents"] = stored_documents
             current["manifest_route"] = manifest_route
             current["manifest_url"] = manifest_url
+            current["result_route"] = result_route
+            current["result_url"] = result_url
+            current["callback_url"] = callback_url or None
             current["storage_root"] = str(API_UPLOADS_ROOT.resolve())
             self._send_json(
                 {

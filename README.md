@@ -1,3 +1,5 @@
+TOUT DANS /CORE
+
 DMS
 Installation
 🔹 Installation sous Ubuntu 22.04

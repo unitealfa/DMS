@@ -3,9 +3,9 @@
 Date d'audit: 2026-04-08
 
 ## 1) Scope de l'audit
-- Depot analyse: `/home/mourad/Bureau/DMS/core`
+- Depot analyse: `/DMS/core`
 - Python files analyses: `40`
-- Fonctions/classes indexees: `883` (voir la section `Index Exhaustif Des Fonctions Et Classes` de [README.md](/home/mourad/Bureau/DMS/core/README.md))
+- Fonctions/classes indexees: `883` (voir la section `Index Exhaustif Des Fonctions Et Classes` de [README.md](/DMS/core/README.md))
 - Regles metier:
   - `rules/*.json`
   - `rules/*.yaml`
@@ -15,45 +15,45 @@ Date d'audit: 2026-04-08
 
 ## 2) Points d'entree
 - CLI principal:
-  - [main.py](/home/mourad/Bureau/DMS/core/main.py)
+  - [main.py](/DMS/core/main.py)
   - pointe vers `pipeline.cli:main`
 - API locale:
-  - [local_api.py](/home/mourad/Bureau/DMS/core/local_api.py)
+  - [local_api.py](/DMS/core/local_api.py)
   - pointe vers `pipeline.local_api:main`
 - CLI package:
   - `orchestre`
-  - defini dans [pyproject.toml](/home/mourad/Bureau/DMS/core/pyproject.toml)
+  - defini dans [pyproject.toml](/DMS/core/pyproject.toml)
 - API locale package:
   - `dms-local-api`
-  - defini dans [pyproject.toml](/home/mourad/Bureau/DMS/core/pyproject.toml)
+  - defini dans [pyproject.toml](/DMS/core/pyproject.toml)
 
 ## 3) Couches runtime principales
-- [pipeline/cli.py](/home/mourad/Bureau/DMS/core/pipeline/cli.py)
+- [pipeline/cli.py](/DMS/core/pipeline/cli.py)
   - parsing CLI
   - selection de pipeline
   - options Elasticsearch
   - `PIPELINE_DEFAULT_CODE`
-- [pipeline/orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
+- [pipeline/orchestrator.py](/DMS/core/pipeline/orchestrator.py)
   - `BasePipelineOrchestrator`
   - pipelines concretes
   - registre dynamique des pipelines
   - resolution `default` / aliases / codes
-- [pipeline/components.py](/home/mourad/Bureau/DMS/core/pipeline/components.py)
+- [pipeline/components.py](/DMS/core/pipeline/components.py)
   - wrappers des composants
   - execution via `runpy.run_path`
   - resumes terminal
   - wrapper generique `Component` executable
-- [pipeline/component_trace.py](/home/mourad/Bureau/DMS/core/pipeline/component_trace.py)
+- [pipeline/component_trace.py](/DMS/core/pipeline/component_trace.py)
   - trace runtime des composants
   - cles touchees
   - resume/output reporte
-- [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py)
+- [pipeline/local_api.py](/DMS/core/pipeline/local_api.py)
   - serveur HTTP local
   - upload
   - lancement pipeline
   - polling status
   - retour du resultat final API
-- [pipeline/runtime_state.py](/home/mourad/Bureau/DMS/core/pipeline/runtime_state.py)
+- [pipeline/runtime_state.py](/DMS/core/pipeline/runtime_state.py)
   - etat runtime job/pipeline/composant
 
 ## 4) Pipelines enregistrees
@@ -66,7 +66,7 @@ Pipelines actuellement presentes dans le depot:
 
 Pipeline par defaut actuelle:
 - `PIPELINE_DEFAULT_CODE = "pipeline50ml"`
-- defini dans [pipeline/cli.py](/home/mourad/Bureau/DMS/core/pipeline/cli.py)
+- defini dans [pipeline/cli.py](/DMS/core/pipeline/cli.py)
 
 Registre dynamique:
 - `pipeline_orchestrator_classes()`
@@ -75,7 +75,7 @@ Registre dynamique:
 - `available_pipeline_choices()`
 - `normalize_pipeline_name()`
 - `create_pipeline_orchestrator()`
-- tout cela est dans [pipeline/orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
+- tout cela est dans [pipeline/orchestrator.py](/DMS/core/pipeline/orchestrator.py)
 
 ## 5) Ordre reel des pipelines
 
@@ -156,35 +156,35 @@ Sorties intermediaires majeures:
 - `API_OUTPUT_RESULT`
 
 Passage entre composants:
-- execution via `runpy.run_path(..., init_globals=context)` dans [pipeline/components.py](/home/mourad/Bureau/DMS/core/pipeline/components.py)
+- execution via `runpy.run_path(..., init_globals=context)` dans [pipeline/components.py](/DMS/core/pipeline/components.py)
 - le composant suivant reutilise directement les cles ecrites par le precedent
 
 ## 7) Role des grands composants
 
 ### 7.1 Pretraitement
-- [component/pretraitement-de-docs.py](/home/mourad/Bureau/DMS/core/component/pretraitement-de-docs.py)
+- [component/pretraitement-de-docs.py](/DMS/core/component/pretraitement-de-docs.py)
 - detecte le format
 - classe grossierement `text` / `image_only` / `unsupported`
 
 ### 7.2 Routage OCR / natif
-- [component/si-image-pretraiter-sinonpass-le-doc.py](/home/mourad/Bureau/DMS/core/component/si-image-pretraiter-sinonpass-le-doc.py)
+- [component/si-image-pretraiter-sinonpass-le-doc.py](/DMS/core/component/si-image-pretraiter-sinonpass-le-doc.py)
 - separe texte natif et image OCR
 - prepare `TEXT_FILES`, `IMAGE_ONLY_FILES`, `DOCS`
 
 ### 7.3 Extraction texte
-- [component/output-txt.py](/home/mourad/Bureau/DMS/core/component/output-txt.py)
+- [component/output-txt.py](/DMS/core/component/output-txt.py)
 - extrait le texte final exploitable
 - gere PDF, DOCX, HTML, images OCR, XLSX
 
 ### 7.4 Classification
-- [component/clasification.py](/home/mourad/Bureau/DMS/core/component/clasification.py)
+- [component/clasification.py](/DMS/core/component/clasification.py)
 - classement documentaire par regles/mots-cles
 - sortie `RESULTS`
 
 ### 7.5 Tokenisation / layout
-- [component/tokenisation_layout/tokenisation-layout.py](/home/mourad/Bureau/DMS/core/component/tokenisation_layout/tokenisation-layout.py)
-- [component/tokenisation_layout/tokenisation-layout-50ml.py](/home/mourad/Bureau/DMS/core/component/tokenisation_layout/tokenisation-layout-50ml.py)
-- [component/tokenisation_layout/tokenisation-layout-100ml.py](/home/mourad/Bureau/DMS/core/component/tokenisation_layout/tokenisation-layout-100ml.py)
+- [component/tokenisation_layout/tokenisation-layout.py](/DMS/core/component/tokenisation_layout/tokenisation-layout.py)
+- [component/tokenisation_layout/tokenisation-layout-50ml.py](/DMS/core/component/tokenisation_layout/tokenisation-layout-50ml.py)
+- [component/tokenisation_layout/tokenisation-layout-100ml.py](/DMS/core/component/tokenisation_layout/tokenisation-layout-100ml.py)
 - version 50ml:
   - vecteurs/hash/topics legers
 - version 100ml:
@@ -192,8 +192,8 @@ Passage entre composants:
   - topics document/chunk
 
 ### 7.6 Grammaire / NLP
-- [component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py](/home/mourad/Bureau/DMS/core/component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py)
-- [component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py](/home/mourad/Bureau/DMS/core/component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py)
+- [component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py](/DMS/core/component/atrribution-gramatical/atripusion-gramatical-en-utilisant-les3ficherla.py)
+- [component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py](/DMS/core/component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py)
 - produit POS, lemma, NER, langue
 - sorties:
   - `NLP_ANALYSES`
@@ -202,8 +202,8 @@ Passage entre composants:
   - `NLP_ENTITIES`
 
 ### 7.7 Tableaux
-- [component/table_extraction/table-extraction.py](/home/mourad/Bureau/DMS/core/component/table_extraction/table-extraction.py)
-- [component/table_extraction/table_extraction_lib.py](/home/mourad/Bureau/DMS/core/component/table_extraction/table_extraction_lib.py)
+- [component/table_extraction/table-extraction.py](/DMS/core/component/table_extraction/table-extraction.py)
+- [component/table_extraction/table_extraction_lib.py](/DMS/core/component/table_extraction/table_extraction_lib.py)
 - detecte tableaux et lignes utiles produit/quantite/prix/total
 - sorties:
   - `TABLE_EXTRACTIONS`
@@ -211,12 +211,12 @@ Passage entre composants:
   - `TABLE_EXTRACTIONS_100ML`
 
 ### 7.8 Verification des totaux
-- [component/verification-totaux.py](/home/mourad/Bureau/DMS/core/component/verification-totaux.py)
+- [component/verification-totaux.py](/DMS/core/component/verification-totaux.py)
 - compare lignes et totaux declares
 - sortie `TOTALS_VERIFICATION`
 
 ### 7.9 Detection visuelle
-- [component/detection-signature-chachet-codebarr.py](/home/mourad/Bureau/DMS/core/component/detection-signature-chachet-codebarr.py)
+- [component/detection-signature-chachet-codebarr.py](/DMS/core/component/detection-signature-chachet-codebarr.py)
 - uniquement dans `pipeline100ml`
 - detecte:
   - signatures
@@ -225,35 +225,35 @@ Passage entre composants:
   - codes-barres
 
 ### 7.10 Liaison inter-documents
-- [component/liaison-inter-docs.py](/home/mourad/Bureau/DMS/core/component/liaison-inter-docs.py)
+- [component/liaison-inter-docs.py](/DMS/core/component/liaison-inter-docs.py)
 - rapprochement documents par topics, phrases, vecteurs si disponibles
 - sortie `INTERDOC_ANALYSIS`
 
 ### 7.11 Elasticsearch
-- [component/elasticsearch.py](/home/mourad/Bureau/DMS/core/component/elasticsearch.py)
+- [component/elasticsearch.py](/DMS/core/component/elasticsearch.py)
 - indexation / sync optionnelle
 - index principal par defaut: `dms_documents`
 - index NLP full par defaut: `dms_nlp_tokens`
 
 ### 7.12 Extraction metier
-- [component/extraction/extraction-regles.py](/home/mourad/Bureau/DMS/core/component/extraction/extraction-regles.py)
-- [component/extraction/extraction-regles-50ml.py](/home/mourad/Bureau/DMS/core/component/extraction/extraction-regles-50ml.py)
-- [component/extraction/extraction-regles-100ml.py](/home/mourad/Bureau/DMS/core/component/extraction/extraction-regles-100ml.py)
+- [component/extraction/extraction-regles.py](/DMS/core/component/extraction/extraction-regles.py)
+- [component/extraction/extraction-regles-50ml.py](/DMS/core/component/extraction/extraction-regles-50ml.py)
+- [component/extraction/extraction-regles-100ml.py](/DMS/core/component/extraction/extraction-regles-100ml.py)
 - version standard:
   - extraction regles/regex
 - versions 50ml/100ml:
   - YAML + BM25 maison
 
 ### 7.13 Fusion finale
-- [component/fusion_resultats.py](/home/mourad/Bureau/DMS/core/component/fusion_resultats.py)
+- [component/fusion_resultats.py](/DMS/core/component/fusion_resultats.py)
 - construit `fusion_output.json`
 - expose `FUSION_RESULT`, `FUSION_PAYLOAD`, `FUSION_PAYLOADS`
 - auto-expose aussi les sorties des nouveaux composants traces
 
 ### 7.14 Sortie API finale
-- [component/api-output.py](/home/mourad/Bureau/DMS/core/component/api-output.py)
+- [component/api-output.py](/DMS/core/component/api-output.py)
 - normalise la sortie finale selon:
-  - [dms-unified-output-template.json](/home/mourad/Bureau/DMS/core/dms-unified-output-template.json)
+  - [dms-unified-output-template.json](/DMS/core/dms-unified-output-template.json)
 - ecrit:
   - `api_storage/uploads/<job_id>/result.json`
 - peut aussi POSTer le resultat complet vers `callback_url`
@@ -262,7 +262,7 @@ Passage entre composants:
 
 ### 8.1 Ajouter un composant
 - creer le script dans `component/`
-- l'ajouter dans une pipeline dans [pipeline/orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
+- l'ajouter dans une pipeline dans [pipeline/orchestrator.py](/DMS/core/pipeline/orchestrator.py)
 - pour un composant standard, le wrapper generique `Component(...)` suffit
 - la CLI, `fusion-resultats` et `api-output` recuperent alors automatiquement sa trace runtime
 
@@ -281,7 +281,7 @@ Passage entre composants:
 
 ## 9) API locale
 Serveur:
-- [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py)
+- [pipeline/local_api.py](/DMS/core/pipeline/local_api.py)
 
 Fichiers stockes:
 - `api_storage/uploads/<job_id>/`
@@ -298,7 +298,7 @@ Endpoints principaux:
 
 Resultat final API:
 - `result.json`
-- schema base sur [dms-unified-output-template.json](/home/mourad/Bureau/DMS/core/dms-unified-output-template.json)
+- schema base sur [dms-unified-output-template.json](/DMS/core/dms-unified-output-template.json)
 - champs absents laisses a `null` ou `[]` selon le template
 
 ## 10) Sorties importantes sur disque
@@ -330,13 +330,13 @@ Resultat final API:
   - retire du code actuel
 
 ## 12) Fichiers de documentation interne
-- [README.md](/home/mourad/Bureau/DMS/core/README.md)
+- [README.md](/DMS/core/README.md)
   - doc utilisateur + API + extensibilite + reference detaillee des pipelines + index exhaustif des fonctions/classes
-- [PROJECT_CODE_MAP.md](/home/mourad/Bureau/DMS/core/PROJECT_CODE_MAP.md)
+- [PROJECT_CODE_MAP.md](/DMS/core/PROJECT_CODE_MAP.md)
   - cartographie technique resumee
 
 ## 13) Regle de maintenance
 A chaque changement dans `pipeline/` ou `component/`:
-- mettre a jour la section `Index Exhaustif Des Fonctions Et Classes` de [README.md](/home/mourad/Bureau/DMS/core/README.md)
-- mettre a jour [PROJECT_CODE_MAP.md](/home/mourad/Bureau/DMS/core/PROJECT_CODE_MAP.md)
-- mettre a jour [README.md](/home/mourad/Bureau/DMS/core/README.md) si le comportement externe change
+- mettre a jour la section `Index Exhaustif Des Fonctions Et Classes` de [README.md](/DMS/core/README.md)
+- mettre a jour [PROJECT_CODE_MAP.md](/DMS/core/PROJECT_CODE_MAP.md)
+- mettre a jour [README.md](/DMS/core/README.md) si le comportement externe change

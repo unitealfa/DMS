@@ -15,7 +15,7 @@ Ce dépôt regroupe des scripts de traitement documentaire (prétraitement, OCR,
 - `main.py` : shim pour lancer le CLI (`python main.py ...` ou `orchestre ...` via console_script).
 
 ## Documentation Interne
-- [PROJECT_CODE_MAP.md](/home/mourad/Bureau/DMS/core/PROJECT_CODE_MAP.md)
+- [PROJECT_CODE_MAP.md](/DMS/core/PROJECT_CODE_MAP.md)
   - cartographie technique resumee du depot
 - ce `README`
   - contient maintenant aussi l'index exhaustif des fonctions/classes Python
@@ -41,26 +41,26 @@ Si tu as tres peu de contexte, lis seulement ce `README` puis ouvre uniquement l
 
 ### Fichiers exacts a connaitre selon le type de modification
 Si tu ajoutes un composant:
-- [pipeline/orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
-- [pipeline/components.py](/home/mourad/Bureau/DMS/core/pipeline/components.py)
+- [pipeline/orchestrator.py](/DMS/core/pipeline/orchestrator.py)
+- [pipeline/components.py](/DMS/core/pipeline/components.py)
 - le script du composant dans `component/`
-- optionnel: [component/fusion_resultats.py](/home/mourad/Bureau/DMS/core/component/fusion_resultats.py)
-- optionnel: [component/api-output.py](/home/mourad/Bureau/DMS/core/component/api-output.py)
+- optionnel: [component/fusion_resultats.py](/DMS/core/component/fusion_resultats.py)
+- optionnel: [component/api-output.py](/DMS/core/component/api-output.py)
 
 Si tu ajoutes une pipeline:
-- [pipeline/orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
-- optionnel: [pipeline/cli.py](/home/mourad/Bureau/DMS/core/pipeline/cli.py) si tu veux changer la pipeline par defaut
+- [pipeline/orchestrator.py](/DMS/core/pipeline/orchestrator.py)
+- optionnel: [pipeline/cli.py](/DMS/core/pipeline/cli.py) si tu veux changer la pipeline par defaut
 
 Si tu modifies l'input API:
-- [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py)
-- optionnel: [pipeline/cli.py](/home/mourad/Bureau/DMS/core/pipeline/cli.py) si le nouveau champ doit devenir une variable de contexte pour les composants
-- optionnel: [index.html](/home/mourad/Bureau/DMS/core/index.html) si le front local doit aussi envoyer ce nouveau champ
+- [pipeline/local_api.py](/DMS/core/pipeline/local_api.py)
+- optionnel: [pipeline/cli.py](/DMS/core/pipeline/cli.py) si le nouveau champ doit devenir une variable de contexte pour les composants
+- optionnel: [index.html](/DMS/core/index.html) si le front local doit aussi envoyer ce nouveau champ
 
 Si tu modifies l'output API:
-- [component/api-output.py](/home/mourad/Bureau/DMS/core/component/api-output.py)
-- [dms-unified-output-template.json](/home/mourad/Bureau/DMS/core/dms-unified-output-template.json)
-- optionnel: [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py) seulement si tu changes les routes API, pas si tu changes uniquement le JSON final
-- optionnel: [index.html](/home/mourad/Bureau/DMS/core/index.html) si le front local doit afficher ou telecharger differemment le resultat
+- [component/api-output.py](/DMS/core/component/api-output.py)
+- [dms-unified-output-template.json](/DMS/core/dms-unified-output-template.json)
+- optionnel: [pipeline/local_api.py](/DMS/core/pipeline/local_api.py) seulement si tu changes les routes API, pas si tu changes uniquement le JSON final
+- optionnel: [index.html](/DMS/core/index.html) si le front local doit afficher ou telecharger differemment le resultat
 
 ### Regle d'or
 Si tu veux que tout continue a marcher facilement:
@@ -73,8 +73,8 @@ Si tu veux que tout continue a marcher facilement:
 1. cree le fichier Python du composant dans `component/` ou un sous-dossier de `component/`
 2. fais en sorte que le script lise/ecrive des variables globales du `context`
 3. si le composant est simple, utilise `Component("nom", chemin_script)` dans `build_components()`
-4. si le composant doit valider/enrichir quelque chose, ajoute un wrapper specialise dans [pipeline/components.py](/home/mourad/Bureau/DMS/core/pipeline/components.py)
-5. ajoute ce composant dans la pipeline voulue dans [pipeline/orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
+4. si le composant doit valider/enrichir quelque chose, ajoute un wrapper specialise dans [pipeline/components.py](/DMS/core/pipeline/components.py)
+5. ajoute ce composant dans la pipeline voulue dans [pipeline/orchestrator.py](/DMS/core/pipeline/orchestrator.py)
 6. si tu veux que sa sortie apparaisse automatiquement dans le JSON final par document:
 - ecris une structure contenant `doc_id`
 ou
@@ -100,7 +100,7 @@ Component("mon-composant", COMPONENT_DIR / "mon-composant.py")
 ```
 
 ### Recette exacte pour ajouter une nouvelle pipeline
-1. ouvre [pipeline/orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
+1. ouvre [pipeline/orchestrator.py](/DMS/core/pipeline/orchestrator.py)
 2. cree une nouvelle classe qui herite de `BasePipelineOrchestrator`
 3. renseigne:
 - `code`
@@ -142,7 +142,7 @@ Input API = ce que le backend accepte quand un site externe appelle:
 - `POST /api/run`
 
 Fichier principal:
-- [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py)
+- [pipeline/local_api.py](/DMS/core/pipeline/local_api.py)
 
 Fonctions/zones a modifier:
 - `_extract_uploaded_payload(...)`
@@ -153,7 +153,7 @@ Fonctions/zones a modifier:
   - pour les propager au job
 - `LauncherState.start_job(...)`
   - pour exporter les nouveaux champs dans l'environnement du process pipeline
-- [pipeline/cli.py](/home/mourad/Bureau/DMS/core/pipeline/cli.py)
+- [pipeline/cli.py](/DMS/core/pipeline/cli.py)
   - si tu veux injecter ces champs dans `context_overrides`
 
 Chemin exact de propagation d'un champ API vers les composants:
@@ -161,7 +161,7 @@ Chemin exact de propagation d'un champ API vers les composants:
 2. `_extract_uploaded_payload()` le lit
 3. `do_POST()` le valide
 4. `start_job()` le convertit en variable d'environnement `DMS_API_*` ou autre
-5. [pipeline/cli.py](/home/mourad/Bureau/DMS/core/pipeline/cli.py) le lit et le met dans `context_overrides`
+5. [pipeline/cli.py](/DMS/core/pipeline/cli.py) le lit et le met dans `context_overrides`
 6. les composants le recuperent via le `context`
 
 Variables API deja utilisees pour le composant final `api-output`:
@@ -176,7 +176,7 @@ Variables API deja utilisees pour le composant final `api-output`:
 
 Si tu ajoutes un nouveau champ API et que seul `api-output` en a besoin:
 - tu peux l'ajouter dans `start_job()`
-- puis le lire directement dans [component/api-output.py](/home/mourad/Bureau/DMS/core/component/api-output.py)
+- puis le lire directement dans [component/api-output.py](/DMS/core/component/api-output.py)
 - sans toucher les autres composants
 
 ### Recette exacte pour modifier l'output API
@@ -185,8 +185,8 @@ Output API = JSON final renvoye par:
 - et par le callback HTTP si `callback_url` est fourni
 
 Fichiers principaux:
-- [component/api-output.py](/home/mourad/Bureau/DMS/core/component/api-output.py)
-- [dms-unified-output-template.json](/home/mourad/Bureau/DMS/core/dms-unified-output-template.json)
+- [component/api-output.py](/DMS/core/component/api-output.py)
+- [dms-unified-output-template.json](/DMS/core/dms-unified-output-template.json)
 
 Regle actuelle:
 - `api-output.py` charge d'abord `FUSION_PAYLOAD`
@@ -199,13 +199,13 @@ Regle actuelle:
 - `GET /api/result/<job_id>` sert ce `result.json`
 
 Si tu veux changer la forme du JSON final:
-1. modifie [dms-unified-output-template.json](/home/mourad/Bureau/DMS/core/dms-unified-output-template.json)
-2. modifie [component/api-output.py](/home/mourad/Bureau/DMS/core/component/api-output.py) si tu veux enrichir des zones calculees comme:
+1. modifie [dms-unified-output-template.json](/DMS/core/dms-unified-output-template.json)
+2. modifie [component/api-output.py](/DMS/core/component/api-output.py) si tu veux enrichir des zones calculees comme:
 - `source_context`
 - `pipeline`
 - `documents[].components`
 - callback metadata
-3. ne modifie [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py) que si tu changes les routes HTTP ou la facon de servir `result.json`
+3. ne modifie [pipeline/local_api.py](/DMS/core/pipeline/local_api.py) que si tu changes les routes HTTP ou la facon de servir `result.json`
 
 Zones les plus importantes dans `api-output.py`:
 - `_load_fusion_payload(...)`
@@ -248,19 +248,19 @@ Regle pratique:
 ### Cas ou il ne faut pas modifier autre chose
 Si tu ajoutes seulement un composant standard:
 - modifie seulement le script du composant
-- puis [pipeline/orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
+- puis [pipeline/orchestrator.py](/DMS/core/pipeline/orchestrator.py)
 
 Si tu ajoutes seulement une pipeline:
-- modifie seulement [pipeline/orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
-- optionnel: [pipeline/cli.py](/home/mourad/Bureau/DMS/core/pipeline/cli.py) pour changer la pipeline par defaut
+- modifie seulement [pipeline/orchestrator.py](/DMS/core/pipeline/orchestrator.py)
+- optionnel: [pipeline/cli.py](/DMS/core/pipeline/cli.py) pour changer la pipeline par defaut
 
 Si tu changes seulement la structure du JSON final:
-- modifie seulement [dms-unified-output-template.json](/home/mourad/Bureau/DMS/core/dms-unified-output-template.json)
-- et si necessaire [component/api-output.py](/home/mourad/Bureau/DMS/core/component/api-output.py)
+- modifie seulement [dms-unified-output-template.json](/DMS/core/dms-unified-output-template.json)
+- et si necessaire [component/api-output.py](/DMS/core/component/api-output.py)
 
 Si tu changes seulement le format de requete HTTP d'entree:
-- modifie seulement [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py)
-- et [index.html](/home/mourad/Bureau/DMS/core/index.html) si le front local doit suivre
+- modifie seulement [pipeline/local_api.py](/DMS/core/pipeline/local_api.py)
+- et [index.html](/DMS/core/index.html) si le front local doit suivre
 
 ### Validation minimale apres modification
 Pour un composant:
@@ -305,7 +305,7 @@ Le pipeline est maintenant prepare pour qu'un nouveau composant s'integre sans d
 ### Regle pratique
 Pour ajouter un nouveau composant simple:
 1. creer le script Python du composant dans `component/`
-2. ajouter ce composant dans la pipeline voulue dans [orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
+2. ajouter ce composant dans la pipeline voulue dans [orchestrator.py](/DMS/core/pipeline/orchestrator.py)
 3. utiliser directement le wrapper generique `Component(...)` si aucune logique speciale n'est necessaire
 
 Exemple:
@@ -371,11 +371,11 @@ Si un nouveau composant est ajoute apres `fusion-resultats`, alors:
 - mais `api-output.py` recompose quand meme le resultat API final avec les traces runtime du composant
 
 ### Fichiers qui portent ce mecanisme
-- [pipeline/component_trace.py](/home/mourad/Bureau/DMS/core/pipeline/component_trace.py)
-- [pipeline/components.py](/home/mourad/Bureau/DMS/core/pipeline/components.py)
-- [pipeline/cli.py](/home/mourad/Bureau/DMS/core/pipeline/cli.py)
-- [component/fusion_resultats.py](/home/mourad/Bureau/DMS/core/component/fusion_resultats.py)
-- [component/api-output.py](/home/mourad/Bureau/DMS/core/component/api-output.py)
+- [pipeline/component_trace.py](/DMS/core/pipeline/component_trace.py)
+- [pipeline/components.py](/DMS/core/pipeline/components.py)
+- [pipeline/cli.py](/DMS/core/pipeline/cli.py)
+- [component/fusion_resultats.py](/DMS/core/component/fusion_resultats.py)
+- [component/api-output.py](/DMS/core/component/api-output.py)
 
 ## Ajout d'une nouvelle pipeline sans retoucher le reste
 Le systeme est maintenant aussi prepare pour qu'une nouvelle pipeline soit detectee automatiquement par:
@@ -388,7 +388,7 @@ Le systeme est maintenant aussi prepare pour qu'une nouvelle pipeline soit detec
 
 ### Regle pratique
 Pour ajouter une nouvelle pipeline:
-1. ouvrir [orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
+1. ouvrir [orchestrator.py](/DMS/core/pipeline/orchestrator.py)
 2. creer une nouvelle classe qui herite de `BasePipelineOrchestrator`
 3. definir au minimum:
    - `code`
@@ -397,7 +397,7 @@ Pour ajouter une nouvelle pipeline:
    - `description`
    - `build_components()`
 4. mettre les composants voulus dans `build_components()`
-5. si tu veux que `default` pointe dessus, mettre ce code dans `PIPELINE_DEFAULT_CODE` de [cli.py](/home/mourad/Bureau/DMS/core/pipeline/cli.py)
+5. si tu veux que `default` pointe dessus, mettre ce code dans `PIPELINE_DEFAULT_CODE` de [cli.py](/DMS/core/pipeline/cli.py)
 
 Exemple minimal:
 ```python
@@ -430,9 +430,9 @@ class Pipeline200MLOrchestrator(BasePipelineOrchestrator):
   - `pipeline_components`
 
 ### Fichiers qui portent ce mecanisme pipeline
-- [pipeline/orchestrator.py](/home/mourad/Bureau/DMS/core/pipeline/orchestrator.py)
-- [pipeline/cli.py](/home/mourad/Bureau/DMS/core/pipeline/cli.py)
-- [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py)
+- [pipeline/orchestrator.py](/DMS/core/pipeline/orchestrator.py)
+- [pipeline/cli.py](/DMS/core/pipeline/cli.py)
+- [pipeline/local_api.py](/DMS/core/pipeline/local_api.py)
 
 ### Valeurs acceptees par `POST /api/run`
 Le champ `pipeline` accepte maintenant:
@@ -683,12 +683,124 @@ Important:
 - ne lance jamais le document lui-meme comme commande shell
 - faux:
 ```bash
-/home/mourad/Bureau/DMS/core/documents/testwordvw.docx --use-elasticsearch
+/DMS/core/documents/testwordvw.docx --use-elasticsearch
 ```
 - correct:
 ```bash
-./run-dms /home/mourad/Bureau/DMS/core/documents/testwordvw.docx --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
+./run-dms /DMS/core/documents/testwordvw.docx --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
 ```
+
+## Installation Complete
+Ordre recommande pour faire fonctionner le projet complet sans oublier les prerequis manuels.
+
+### 1) Se placer a la racine du projet
+```bash
+cd /DMS/core
+```
+
+### 2) Installer les paquets systeme requis
+```bash
+sudo apt update
+sudo apt install -y \
+  python3 \
+  python3-venv \
+  python3-pip \
+  poppler-utils \
+  tesseract-ocr \
+  tesseract-ocr-fra \
+  tesseract-ocr-eng \
+  tesseract-ocr-ara \
+  libzbar0
+```
+
+### 3) Creer et activer le venv
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### 4) Mettre a jour pip et les outils de build
+```bash
+python -m pip install --upgrade pip setuptools wheel
+```
+
+### 5) Installer les dependances deja declarees dans le requirements parent
+```bash
+python -m pip install -r /DMS/requirements.txt
+```
+
+### 6) Installer le projet en mode editable
+```bash
+python -m pip install -e .
+```
+
+### 7) Installer les dependances Python encore necessaires et non deja presentes dans `/DMS/requirements.txt`
+```bash
+python -m pip install \
+  opencv-python-headless \
+  pyzbar \
+  PyYAML \
+  pdfminer.six \
+  huggingface_hub \
+  sentencepiece
+```
+
+### 8) Installer les donnees `camel_tools` pour l'arabe
+```bash
+python -m camel_tools.cli.camel_data -i morphology-db-msa-r13
+python -m camel_tools.cli.camel_data -i ner-arabert
+```
+
+### 9) Installer et demarrer Elasticsearch si tu veux le mode complet avec `--use-elasticsearch`
+Objectif:
+- Elasticsearch doit repondre sur `http://localhost:9200`
+
+Verification:
+```bash
+curl -s http://localhost:9200
+```
+
+Si besoin de demarrage manuel:
+```bash
+sudo systemctl start elasticsearch
+sudo systemctl status elasticsearch --no-pager
+curl -s http://localhost:9200
+```
+
+### 10) Verifier les binaires systeme
+```bash
+which tesseract
+which pdftoppm
+which pdfinfo
+```
+
+### 11) Tester les 3 pipelines en local
+```bash
+python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf --pipeline pipeline0ml
+python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf --pipeline pipeline50ml
+python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf --pipeline pipeline100ml
+```
+
+### 12) Tester l'API locale
+```bash
+python local_api.py --host 0.0.0.0 --port 8765
+```
+
+### 13) Tester les console scripts apres installation
+```bash
+orchestre documents/contrat_regex_test_corpus_fr_en_ar.pdf --pipeline pipeline50ml
+dms-local-api --host 0.0.0.0 --port 8765
+```
+
+### 14) Tester le mode Elasticsearch complet avec NLP indexe
+```bash
+python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
+```
+
+### 15) Ce qui ne doit pas etre installe manuellement dans cette section
+- les downloads NLTK automatiques
+- les downloads Hugging Face automatiques
+- les ressources que le code telecharge tout seul au premier lancement
 
 ## Commandes De Lancement Utiles
 Cette section remplace entierement l'ancien mémo `commade lacer le code.txt`.
@@ -806,8 +918,8 @@ python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf \
 ```
 
 ## `index.html` -> Backend API (detail complet)
-Le front [index.html](/home/mourad/Bureau/DMS/core/index.html) n'execute pas le pipeline directement.
-Il envoie les fichiers au backend local [local_api.py](/home/mourad/Bureau/DMS/core/local_api.py), qui lance ensuite `main.py`.
+Le front [index.html](/DMS/core/index.html) n'execute pas le pipeline directement.
+Il envoie les fichiers au backend local [local_api.py](/DMS/core/local_api.py), qui lance ensuite `main.py`.
 
 ### 1) Lancer le backend API
 ```bash
@@ -868,7 +980,7 @@ Important:
 - si aucun callback n'est fourni, le resultat est purge de la memoire juste apres le premier `GET /api/result/<job_id>`
 - donc `GET /api/result/<job_id>` doit etre considere comme une lecture de livraison, pas comme un stockage permanent
 
-Implementation backend: [pipeline/local_api.py](/home/mourad/Bureau/DMS/core/pipeline/local_api.py)
+Implementation backend: [pipeline/local_api.py](/DMS/core/pipeline/local_api.py)
 
 ### 4) Format exact de la requete `POST /api/run`
 Content-Type requis:
@@ -1108,7 +1220,7 @@ Exemple simplifie:
   "pipeline_source": "PIPELINE_DEFAULT_CODE",
   "current_step": "table-extraction",
   "component_name": "table-extraction",
-  "component_script": "/home/mourad/Bureau/DMS/core/component/table_extraction/table-extraction.py",
+  "component_script": "/DMS/core/component/table_extraction/table-extraction.py",
   "component_status": "running",
   "step_index": 7,
   "steps_total": 14,
@@ -1146,7 +1258,7 @@ Reponse actuelle:
 
 ### 12) Reponse type de `GET /api/result/<job_id>`
 Ce endpoint renvoie directement le resultat final du job au format du template unifie:
-- [dms-unified-output-template.json](/home/mourad/Bureau/DMS/core/dms-unified-output-template.json)
+- [dms-unified-output-template.json](/DMS/core/dms-unified-output-template.json)
 
 Regle appliquee:
 - si une donnee existe dans la pipeline, elle est injectee
@@ -1458,7 +1570,7 @@ Artefacts téléchargés automatiquement (si absents):
 
 Emplacements:
 1. `ML100_MODEL_LOCAL_DIR` si défini (utilise ce dossier, pas de téléchargement)
-2. sinon cache projet: `/home/mourad/Bureau/DMS/core/component/atrribution-gramatical/.hf_model_cache`
+2. sinon cache projet: `/DMS/core/component/atrribution-gramatical/.hf_model_cache`
 3. fallback `transformers` direct Hub: `~/.cache/huggingface/hub` (ou `HF_HOME` / `TRANSFORMERS_CACHE`)
 
 Variables:
@@ -1536,7 +1648,7 @@ ce que Elasticsearch stocke dans son index dms_documents :
       "filename": "contrat_regex_test_corpus_fr_en_ar.pdf",
       "content": "text",
       "extraction": "native:pdf:pypdf",
-      "paths": ["/home/mourad/Bureau/DMS/core/documents/contrat_regex_test_corpus_fr_en_ar.pdf"],
+      "paths": ["/DMS/core/documents/contrat_regex_test_corpus_fr_en_ar.pdf"],
       "page_count_total": 12,
 
       "pages": [

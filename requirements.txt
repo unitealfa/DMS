@@ -17,3 +17,9 @@ transformers
 tokenizers
 ipython
 nltk
+opencv-python-headless
+pyzbar
+PyYAML
+pdfminer.six
+huggingface_hub
+sentencepiece

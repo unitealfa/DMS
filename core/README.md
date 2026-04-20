@@ -786,6 +786,28 @@ python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf --pipeline pipel
 python local_api.py --host 0.0.0.0 --port 8765
 ```
 
+### 12bis) Quand une modification s'applique
+Il n'y a pas de `npm run build` dans ce projet.
+
+Si tu modifies seulement `index.html`:
+- un refresh navigateur suffit
+- si le navigateur garde une ancienne version: `Ctrl+Shift+R`
+
+Si tu modifies du code Python dans `component/*.py` ou `pipeline/*.py`:
+- un simple refresh ne suffit pas
+- il faut arreter puis relancer `local_api.py`
+
+Commande de relance:
+```bash
+python local_api.py --host 0.0.0.0 --port 8765
+```
+
+Resume rapide:
+- `index.html` -> refresh navigateur
+- `component/*.py` -> redemarrage du serveur Python
+- `pipeline/*.py` -> redemarrage du serveur Python
+- aucun build frontend requis
+
 ### 13) Tester les console scripts apres installation
 ```bash
 orchestre documents/contrat_regex_test_corpus_fr_en_ar.pdf --pipeline pipeline50ml

@@ -5,20 +5,13 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-    tesseract-ocr \
-    tesseract-ocr-fra \
-    tesseract-ocr-eng \
-    tesseract-ocr-ara \
-    poppler-utils \
-    libzbar0 \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y     tesseract-ocr     tesseract-ocr-fra     tesseract-ocr-eng     tesseract-ocr-ara     poppler-utils     libzbar0     curl     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -r /app/requirements.txt
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 COPY core /app
+RUN pip install --no-cache-dir -e /app
 
 EXPOSE 8765
 

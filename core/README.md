@@ -968,6 +968,20 @@ Ce que fait `run.sh`:
 - lance les conteneurs
 - expose l'API sur `http://localhost:8765`
 - verifie `GET /api/status`
+- monte `./core` en volume dans le conteneur API sur `/app`
+
+### Ce que permet maintenant le mode Docker
+Une fois la stack lancee, un user peut:
+- utiliser l'API sur `http://localhost:8765`
+- modifier le code dans `core/`
+- ajouter une pipeline
+- ajouter un composant
+- modifier `PIPELINE_DEFAULT_CODE`
+- puis relancer normalement sans rebuild pour du code uniquement
+
+Point important:
+- `docker-compose.yml` ne force plus `PIPELINE_DEFAULT`
+- donc si tu modifies `PIPELINE_DEFAULT_CODE` dans `core/pipeline/cli.py`, Docker prendra bien cette nouvelle valeur apres redemarrage du service API
 
 ### URL utile en mode Docker
 - API:
@@ -980,12 +994,11 @@ http://localhost:8765/api/status
 ```
 
 ### Regle importante sur les modifications de code en Docker
-En mode Docker actuel, les modifications de code ne s'appliquent pas automatiquement.
+Le code source `./core` est monte en volume dans le conteneur API.
 
 Pourquoi:
-- le `Dockerfile` fait un `COPY core /app`
-- le `docker-compose.yml` ne monte pas le code source en volume
-- donc le conteneur tourne sur une copie du code prise au moment du build
+- `docker-compose.yml` monte `./core:/app`
+- donc quand tu modifies un fichier dans `core/`, le conteneur voit directement la nouvelle version du fichier
 
 Consequence:
 - si tu modifies `component/*.py`
@@ -993,13 +1006,20 @@ Consequence:
 - si tu modifies `index.html`
 - si tu modifies les pipelines, les composants, les regles ou l'API
 
-il faut rebuild puis relancer:
+tu n'as pas besoin de rebuild pour du code uniquement.
+
+Il faut seulement redemarrer le service API:
 ```bash
-cd ~/Bureau/DMS
-./run.sh
+sudo docker restart dms-api
 ```
 
-ou:
+Le rebuild reste necessaire seulement si tu modifies:
+- `Dockerfile`
+- `docker-compose.yml`
+- `requirements.txt`
+- la facon dont l'image Docker est construite
+
+Dans ce cas:
 ```bash
 cd ~/Bureau/DMS
 sudo docker compose up -d --build
@@ -1007,8 +1027,31 @@ sudo docker compose up -d --build
 
 ### Ce qui n'existe pas en Docker actuel
 - pas de hot reload
-- pas de prise en compte automatique des fichiers modifies
-- pas de simple refresh navigateur pour recharger une modification Python deja embarquee dans l'image
+- pas de reload automatique du serveur Python
+- donc apres modification de code Python il faut redemarrer `dms-api`
+
+### Commandes exactes disponibles depuis la racine du depot
+Depuis `~/Bureau/DMS`, tu peux utiliser directement:
+
+Pipeline:
+```bash
+python main.py documents/image2tab.webp --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
+```
+
+API:
+```bash
+python local_api.py --host 0.0.0.0 --port 8765
+```
+
+Pourquoi ces commandes marchent meme en mode Docker-only:
+- `main.py` a maintenant un wrapper racine
+- `local_api.py` a maintenant un wrapper racine
+- si l'environnement Python local n'est pas pret, ces wrappers deleguent automatiquement au conteneur `dms-api`
+
+Donc:
+- pas besoin d'installer toutes les dependances Python locales juste pour lancer ces commandes
+- le mode Docker reste la source d'execution
+- le user peut garder les commandes Python simples
 
 ### Si tu veux utiliser l'equivalent de `python main.py ...` en Docker
 Commande locale hors Docker:
@@ -1016,20 +1059,43 @@ Commande locale hors Docker:
 python main.py documents/image2tab.webp --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
 ```
 
-Equivalent dans le conteneur Docker:
+Equivalent interne utilise par le wrapper Docker:
 ```bash
 sudo docker exec -it dms-api python main.py documents/image2tab.webp --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
 ```
 
 Important:
-- cette commande execute le code actuellement embarque dans le conteneur
-- si tu as modifie le code avant, il faut d'abord rebuild la stack
-- sinon le conteneur executera l'ancienne version
+- cette commande execute le code courant visible dans `/app`
+- comme `./core` est monte en volume, les modifications de code sont deja visibles sans rebuild
+- si tu modifies seulement du code, un nouveau `python main.py ...` suffit
+
+### Si tu veux relancer l'API Docker apres modification de code
+Commande recommande:
+```bash
+sudo docker restart dms-api
+```
+
+Puis si tu veux suivre les logs:
+```bash
+sudo docker logs -f dms-api
+```
+
+Ou bien tu peux reutiliser:
+```bash
+python local_api.py --host 0.0.0.0 --port 8765
+```
+
+En mode Docker-only, ce wrapper:
+- redemarre `dms-api`
+- laisse l'API disponible sur `http://127.0.0.1:8765`
+- puis affiche les logs du conteneur
 
 ### Resume simple
 - mode local avec `python main.py ...`: tu modifies puis tu relances la commande
 - mode local avec `python local_api.py ...`: tu modifies puis tu redemarres le serveur
-- mode Docker avec `./run.sh`: tu modifies puis tu rebuild/restart la stack
+- mode Docker avec `./run.sh`: tu build une premiere fois
+- ensuite si tu modifies seulement `core/`: tu fais juste `sudo docker restart dms-api`
+- si tu modifies l'image Docker ou ses dependances: tu rebuild avec `./run.sh` ou `sudo docker compose up -d --build`
 
 ## Exécution avec Elasticsearch
 Le pipeline peut maintenant indexer les documents tokenisés dans Elasticsearch à l'étape

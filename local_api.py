@@ -4,18 +4,18 @@ from __future__ import annotations
 import runpy
 import sys
 
-from _docker_dev import CORE, docker_exec_python, prefer_docker
+from _docker_dev import CORE, prefer_docker, restart_api_service
 
 
 def _run_local() -> None:
     sys.path.insert(0, str(CORE))
-    runpy.run_path(str(CORE / "main.py"), run_name="__main__")
+    runpy.run_path(str(CORE / "local_api.py"), run_name="__main__")
 
 
 if __name__ == "__main__":
     if prefer_docker():
-        raise SystemExit(docker_exec_python("main.py", sys.argv[1:]))
+        raise SystemExit(restart_api_service(sys.argv[1:]))
     try:
         _run_local()
     except (ModuleNotFoundError, ImportError):
-        raise SystemExit(docker_exec_python("main.py", sys.argv[1:]))
+        raise SystemExit(restart_api_service(sys.argv[1:]))

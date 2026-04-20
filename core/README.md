@@ -924,6 +924,90 @@ nohup python local_api.py --host 0.0.0.0 --port 8765 > local_api.log 2>&1 &
 kill -9 $(lsof -t -i :8765)
 ```
 
+## Utilisation avec Docker
+Cette section est dediee au cas ou tu clones le depot sur une autre machine et tu veux utiliser le projet uniquement avec Docker.
+
+### Lancer toute la stack Docker
+Depuis la racine du depot `DMS`:
+```bash
+cd ~/Bureau/DMS
+./run.sh
+```
+
+Commande equivalente manuelle:
+```bash
+cd ~/Bureau/DMS
+sudo docker compose up -d --build
+```
+
+Ce que fait `run.sh`:
+- build l'image Docker
+- lance les conteneurs
+- expose l'API sur `http://localhost:8765`
+- verifie `GET /api/status`
+
+### URL utile en mode Docker
+- API:
+```text
+http://localhost:8765
+```
+- statut:
+```text
+http://localhost:8765/api/status
+```
+
+### Regle importante sur les modifications de code en Docker
+En mode Docker actuel, les modifications de code ne s'appliquent pas automatiquement.
+
+Pourquoi:
+- le `Dockerfile` fait un `COPY core /app`
+- le `docker-compose.yml` ne monte pas le code source en volume
+- donc le conteneur tourne sur une copie du code prise au moment du build
+
+Consequence:
+- si tu modifies `component/*.py`
+- si tu modifies `pipeline/*.py`
+- si tu modifies `index.html`
+- si tu modifies les pipelines, les composants, les regles ou l'API
+
+il faut rebuild puis relancer:
+```bash
+cd ~/Bureau/DMS
+./run.sh
+```
+
+ou:
+```bash
+cd ~/Bureau/DMS
+sudo docker compose up -d --build
+```
+
+### Ce qui n'existe pas en Docker actuel
+- pas de hot reload
+- pas de prise en compte automatique des fichiers modifies
+- pas de simple refresh navigateur pour recharger une modification Python deja embarquee dans l'image
+
+### Si tu veux utiliser l'equivalent de `python main.py ...` en Docker
+Commande locale hors Docker:
+```bash
+python main.py documents/image2tab.webp --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
+```
+
+Equivalent dans le conteneur Docker:
+```bash
+sudo docker exec -it dms-api python main.py documents/image2tab.webp --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
+```
+
+Important:
+- cette commande execute le code actuellement embarque dans le conteneur
+- si tu as modifie le code avant, il faut d'abord rebuild la stack
+- sinon le conteneur executera l'ancienne version
+
+### Resume simple
+- mode local avec `python main.py ...`: tu modifies puis tu relances la commande
+- mode local avec `python local_api.py ...`: tu modifies puis tu redemarres le serveur
+- mode Docker avec `./run.sh`: tu modifies puis tu rebuild/restart la stack
+
 ## Exécution avec Elasticsearch
 Le pipeline peut maintenant indexer les documents tokenisés dans Elasticsearch à l'étape
 `elasticsearch`, puis:

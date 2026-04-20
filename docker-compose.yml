@@ -1,0 +1,28 @@
+services:
+  dms-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dms-api
+    ports:
+      - "8765:8765"
+    environment:
+      DMS_API_HOST: 0.0.0.0
+      DMS_API_PORT: 8765
+      USE_ELASTICSEARCH: "1"
+      ES_URL: http://elasticsearch:9200
+      PIPELINE_DEFAULT: pipeline50ml
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: dms-elasticsearch
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+    ports:
+      - "9200:9200"
+    restart: unless-stopped

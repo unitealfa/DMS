@@ -14,6 +14,9 @@ services:
       DMS_API_PORT: 8765
       USE_ELASTICSEARCH: "1"
       ES_URL: http://elasticsearch:9200
+      LANG_PIPE_OFFLINE: "1"
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
     depends_on:
       - elasticsearch
     restart: unless-stopped

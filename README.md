@@ -17,6 +17,7 @@ Ce que fait `run.sh`:
 - demarre `dms-api`
 - demarre `dms-elasticsearch`
 - expose l'API sur `http://127.0.0.1:8765`
+- force le mode offline fallback pour eviter les downloads de modeles HF dans Docker
 
 ## Commandes directes depuis la racine du depot
 Une fois la stack Docker lancee, tu peux utiliser directement:

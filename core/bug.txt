@@ -1,5 +1,30 @@
-mourad@asus:~/Bureau/test dms/DMS$ docker pull python:3.11-slim
-  docker pull docker.elastic.co/elasticsearch/elasticsearch:8.13.4
-3.11-slim: Pulling from library/python
-failed to copy: httpReadSeeker: failed open: failed to do request: Get "https://docker-images-prod.6aa30f8b08e16409b46e0173d6de2f56.r2.cloudflarestorage.com/registry-v2/docker/registry/v2/blobs/sha256/6f/6f70bfdcb954351890834d147c0a4ea05b9176ee4490cd5f3476a333ab78bc26/data?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=f1baa2dd9b876aeb89efebbfc9e5d5f4%2F20260420%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260420T152455Z&X-Amz-Expires=1200&X-Amz-SignedHeaders=host&X-Amz-Signature=bd0d457d54ae6a96a5c9912313eaad643659160ab6b5b7e89c1084a8c1f89d6c": dial tcp [2606:4700:2ff9::1]:443: connect: network is unreachable
-Error response from daemon: failed to resolve reference "docker.elastic.co/elasticsearch/elasticsearch:8.13.4": failed to do request: Head "https://docker.elastic.co/v2/elasticsearch/elasticsearch/manifests/8.13.4": net/http: TLS handshake timeout
+[warn] arabcode.py non chargé (dépendances manquantes ?). Détail: CAMeL morphology DB not found. Run:
+  "/usr/local/bin/python" -m camel_tools.cli.camel_data -i morphology-db-msa-r13
+
+
+========================================================================================================================
+RUN EN (engcode.py)
+========================================================================================================================
+
+##########################################################################################
+DOC=Prosit_BURNOUT _.docx | page=1 | sent=5 | lang=en
+##########################################################################################
+[local-api] "GET /api/status HTTP/1.1" 200 -
+[local-api] "GET /api/status HTTP/1.1" 200 -
+[local-api] "GET /api/status HTTP/1.1" 200 -
+'(MaxRetryError("HTTPSConnectionPool(host='huggingface.co', port=443): Max retries exceeded with url: /dslim/bert-base-NER/resolve/main/tokenizer_config.json (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x72a130fc39d0>: Failed to establish a new connection: [Errno 101] Network is unreachable'))"), '(Request ID: 6ded9a95-4bd7-499f-9321-f03d0bd3b234)')' thrown while requesting HEAD https://huggingface.co/dslim/bert-base-NER/resolve/main/tokenizer_config.json
+2026-04-20 16:11:51,718 [WARNING] '(MaxRetryError("HTTPSConnectionPool(host='huggingface.co', port=443): Max retries exceeded with url: /dslim/bert-base-NER/resolve/main/tokenizer_config.json (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x72a130fc39d0>: Failed to establish a new connection: [Errno 101] Network is unreachable'))"), '(Request ID: 6ded9a95-4bd7-499f-9321-f03d0bd3b234)')' thrown while requesting HEAD https://huggingface.co/dslim/bert-base-NER/resolve/main/tokenizer_config.json
+Retrying in 1s [Retry 1/5].
+2026-04-20 16:11:51,718 [WARNING] Retrying in 1s [Retry 1/5].
+[local-api] "GET /api/status HTTP/1.1" 200 -
+[local-api] "GET /api/status HTTP/1.1" 200 -
+[local-api] "GET /api/status HTTP/1.1" 200 -
+[local-api] "GET /api/status HTTP/1.1" 200 -
+[local-api] "GET /api/status HTTP/1.1" 200 -
+[local-api] "GET /api/status HTTP/1.1" 200 -
+[local-api] "GET /api/status HTTP/1.1" 200 -
+[local-api] "GET /api/status HTTP/1.1" 200 -
+model.safetensors:   0%|          | 0.00/433M [00:01<?, ?B/s][local-api] "GET /api/status HTTP/1.1" 200 -
+model.safetensors:   0%|          | 0.00/433M [00:02<?, ?B/s][local-api] "GET /api/status HTTP/1.1" 200 -
+model.safetensors:   0%|          | 0.00/433M [00:04<?, ?B/s][local-api] "GET /api/status HTTP/1.1" 200 -
+model.safetensors:   0%|          | 0.00/433M [00:05<?, ?B/s][local-api] "GET /api/status HTTP/1.1" 200 -

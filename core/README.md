@@ -970,6 +970,16 @@ Ce que fait `run.sh`:
 - verifie `GET /api/status`
 - monte `./core` en volume dans le conteneur API sur `/app`
 - installe `torch` en roue CPU dans l'image Docker pour eviter les gros downloads CUDA et les timeouts de build
+- force aussi le mode offline fallback des composants HF dans Docker:
+  - `LANG_PIPE_OFFLINE=1`
+  - `HF_HUB_OFFLINE=1`
+  - `TRANSFORMERS_OFFLINE=1`
+
+Pourquoi:
+- si la machine Docker n'a pas d'Internet sortant stable
+- ou si Hugging Face est inaccessible
+- le pipeline ne doit pas essayer de telecharger des modeles pendant un upload API
+- il doit retomber sur les fallbacks heuristiques / hash deja prevus par le code
 
 ### Ce que permet maintenant le mode Docker
 Une fois la stack lancee, un user peut:

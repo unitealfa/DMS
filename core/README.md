@@ -39,6 +39,29 @@ Si tu as tres peu de contexte, lis seulement ce `README` puis ouvre uniquement l
 4. `## Reference Detaillee Des Pipelines`
 5. `## index.html -> Backend API (detail complet)`
 
+### Regle speciale si ce README est copie-colle a une autre IA
+Si une autre IA recoit seulement ce `README` mais qu'il lui manque un fichier pour repondre correctement, elle ne doit pas inventer.
+
+Elle doit demander directement au user de lui fournir le bon fichier supplementaire selon le besoin.
+
+Exemples de fichiers a demander au user:
+- [PROJECT_CODE_MAP.md](/DMS/core/PROJECT_CODE_MAP.md) pour comprendre la cartographie technique du depot
+- `commade lacer le code.txt` si le user veut retrouver un ancien memo de commandes historiques
+- [dms-unified-output-template.json](/DMS/core/dms-unified-output-template.json) si le user veut modifier ou verifier le format JSON final
+- [pipeline/orchestrator.py](/DMS/core/pipeline/orchestrator.py) si le user veut ajouter ou comprendre une pipeline
+- [pipeline/components.py](/DMS/core/pipeline/components.py) si le user veut ajouter ou comprendre un wrapper de composant
+- [pipeline/local_api.py](/DMS/core/pipeline/local_api.py) si le user veut changer les routes, les uploads, les callbacks ou le comportement HTTP
+- [component/api-output.py](/DMS/core/component/api-output.py) si le user veut changer la sortie finale envoyee au consommateur de l'API
+- [component/fusion_resultats.py](/DMS/core/component/fusion_resultats.py) si le user veut comprendre comment les donnees finales sont fusionnees
+- un fichier du dossier `component/` si le user veut comprendre ou corriger un composant metier precis
+- un fichier du dossier `rules/` ou `classification/` si le user veut changer les regles ou la logique documentaire
+
+Regle pratique:
+- si le besoin porte sur la structure generale du code -> demander `PROJECT_CODE_MAP.md`
+- si le besoin porte sur les commandes -> demander `commade lacer le code.txt` ou utiliser directement la section commandes de ce `README`
+- si le besoin porte sur l'API -> demander `pipeline/local_api.py` et/ou `component/api-output.py`
+- si le besoin porte sur une pipeline ou un composant -> demander le ou les fichiers Python concernes
+
 ### Fichiers exacts a connaitre selon le type de modification
 Si tu ajoutes un composant:
 - [pipeline/orchestrator.py](/DMS/core/pipeline/orchestrator.py)

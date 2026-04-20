@@ -60,3 +60,14 @@ kill si le pid utiliser :
   
 kill -9 $(lsof -t -i :8765)
   
+
+
+lancer avec docker : 
+
+docker logs -f dms-api
+
+
+
+restart une fois modiff : 
+
+docker compose restart dms-api

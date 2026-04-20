@@ -19,6 +19,43 @@ Ce que fait `run.sh`:
 - expose l'API sur `http://127.0.0.1:8765`
 - force le mode offline fallback pour eviter les downloads de modeles HF dans Docker
 
+## Commandes utiles Docker
+Ajoute `sudo` devant `docker` si ta machine le demande.
+
+Premier lancement:
+```bash
+cd ~/Bureau/DMS
+./run.sh
+```
+
+Rebuild complet apres changement de `Dockerfile`, `docker-compose.yml` ou `requirements.txt`:
+```bash
+cd ~/Bureau/DMS
+docker compose up -d --build
+```
+
+Redemarrage rapide de l'API apres changement de code dans `core/`:
+```bash
+cd ~/Bureau/DMS
+docker compose restart dms-api
+```
+
+Verifier que l'API tourne et voir la pipeline active:
+```bash
+curl -s http://127.0.0.1:8765/api/status
+```
+
+Suivre les logs de l'API:
+```bash
+docker logs -f dms-api
+```
+
+Arreter toute la stack:
+```bash
+cd ~/Bureau/DMS
+docker compose down
+```
+
 ## Commandes directes depuis la racine du depot
 Une fois la stack Docker lancee, tu peux utiliser directement:
 
@@ -41,7 +78,7 @@ Donc:
 - si tu modifies seulement du code dans `core/`, pas besoin de rebuild
 - redemarre juste le service API:
 ```bash
-sudo docker restart dms-api
+docker compose restart dms-api
 ```
 
 Rebuild requis seulement si tu modifies:
@@ -51,7 +88,7 @@ Rebuild requis seulement si tu modifies:
 
 Dans ce cas:
 ```bash
-sudo docker compose up -d --build
+docker compose up -d --build
 ```
 
 ## API

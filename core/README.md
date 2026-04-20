@@ -488,7 +488,7 @@ En pratique:
 
 ### Choix de la pipeline
 - fichier a regarder: `pipeline/cli.py`
-- variable actuelle par defaut: `PIPELINE_DEFAULT_CODE = "pipeline50ml"`
+- variable actuelle par defaut: `PIPELINE_DEFAULT_CODE = "pipeline0ml"`
 - `default` pointe vers la valeur de `PIPELINE_DEFAULT_CODE`
 - la selection n'est plus faite par une liste statique codee en dur
 - les pipelines sont auto-decouvertes depuis `pipeline/orchestrator.py`
@@ -994,6 +994,43 @@ Point important:
 - `docker-compose.yml` ne force plus `PIPELINE_DEFAULT`
 - donc si tu modifies `PIPELINE_DEFAULT_CODE` dans `core/pipeline/cli.py`, Docker prendra bien cette nouvelle valeur apres redemarrage du service API
 
+### Commandes utiles en mode Docker
+Ajoute `sudo` devant `docker` si ta machine le demande.
+
+Premier lancement:
+```bash
+cd ~/Bureau/DMS
+./run.sh
+```
+
+Rebuild complet:
+```bash
+cd ~/Bureau/DMS
+docker compose up -d --build
+```
+
+Redemarrage rapide de l'API apres modification de code:
+```bash
+cd ~/Bureau/DMS
+docker compose restart dms-api
+```
+
+Verifier le statut et la pipeline active:
+```bash
+curl -s http://localhost:8765/api/status
+```
+
+Suivre les logs de l'API:
+```bash
+docker logs -f dms-api
+```
+
+Arreter la stack:
+```bash
+cd ~/Bureau/DMS
+docker compose down
+```
+
 ### URL utile en mode Docker
 - API:
 ```text
@@ -1021,7 +1058,7 @@ tu n'as pas besoin de rebuild pour du code uniquement.
 
 Il faut seulement redemarrer le service API:
 ```bash
-sudo docker restart dms-api
+docker compose restart dms-api
 ```
 
 Le rebuild reste necessaire seulement si tu modifies:
@@ -1033,7 +1070,7 @@ Le rebuild reste necessaire seulement si tu modifies:
 Dans ce cas:
 ```bash
 cd ~/Bureau/DMS
-sudo docker compose up -d --build
+docker compose up -d --build
 ```
 
 ### Ce qui n'existe pas en Docker actuel
@@ -1083,12 +1120,12 @@ Important:
 ### Si tu veux relancer l'API Docker apres modification de code
 Commande recommande:
 ```bash
-sudo docker restart dms-api
+docker compose restart dms-api
 ```
 
 Puis si tu veux suivre les logs:
 ```bash
-sudo docker logs -f dms-api
+docker logs -f dms-api
 ```
 
 Ou bien tu peux reutiliser:
@@ -1105,8 +1142,8 @@ En mode Docker-only, ce wrapper:
 - mode local avec `python main.py ...`: tu modifies puis tu relances la commande
 - mode local avec `python local_api.py ...`: tu modifies puis tu redemarres le serveur
 - mode Docker avec `./run.sh`: tu build une premiere fois
-- ensuite si tu modifies seulement `core/`: tu fais juste `sudo docker restart dms-api`
-- si tu modifies l'image Docker ou ses dependances: tu rebuild avec `./run.sh` ou `sudo docker compose up -d --build`
+- ensuite si tu modifies seulement `core/`: tu fais juste `docker compose restart dms-api`
+- si tu modifies l'image Docker ou ses dependances: tu rebuild avec `./run.sh` ou `docker compose up -d --build`
 
 ## Exécution avec Elasticsearch
 Le pipeline peut maintenant indexer les documents tokenisés dans Elasticsearch à l'étape

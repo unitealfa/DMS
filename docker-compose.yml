@@ -13,7 +13,6 @@ services:
       DMS_API_PORT: 8765
       USE_ELASTICSEARCH: "1"
       ES_URL: http://elasticsearch:9200
-      PIPELINE_DEFAULT: pipeline50ml
     depends_on:
       - elasticsearch
     restart: unless-stopped

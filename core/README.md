@@ -969,6 +969,7 @@ Ce que fait `run.sh`:
 - expose l'API sur `http://localhost:8765`
 - verifie `GET /api/status`
 - monte `./core` en volume dans le conteneur API sur `/app`
+- installe `torch` en roue CPU dans l'image Docker pour eviter les gros downloads CUDA et les timeouts de build
 
 ### Ce que permet maintenant le mode Docker
 Une fois la stack lancee, un user peut:

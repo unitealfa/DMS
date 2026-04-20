@@ -10,14 +10,12 @@ Output: {'MISSING_FILES': [],
                            'size': 47454}]}
 
 [info] Using INPUT_FILE=/home/mourad/Bureau/DMS/core/documents/image2tab.webp
-<PIL.WebPImagePlugin.WebPImageFile image mode=RGB size=768x1024 at 0x7ED4C2BB1810>
-<PIL.Image.Image image mode=L size=1152x1536 at 0x7ED4C5560700>
 [Component: si-image-pretraiter-sinonpass-le-doc]
 Type: dict
 Summary: text=0, image=1, unsupported=0, missing=0, docs_prepped=1
-Output: {'DOCS': [{'original': <PIL.WebPImagePlugin.WebPImageFile image mode=RGB size=768x1024 at 0x7ED4C2BB1810>,
+Output: {'DOCS': [{'original': <PIL.WebPImagePlugin.WebPImageFile image mode=RGB size=768x1024 at 0x72F0AF95D3F0>,
            'path': PosixPath('/home/mourad/Bureau/DMS/core/documents/image2tab.webp'),
-           'prepped': <PIL.Image.Image image mode=L size=1152x1536 at 0x7ED4C5560700>}],
+           'prepped': <PIL.Image.Image image mode=L size=1152x1536 at 0x72F0AF95D030>}],
  'IMAGE_ONLY_FILES': ['/home/mourad/Bureau/DMS/core/documents/image2tab.webp'],
  'MISSING_FILES': [],
  'TEXT_FILES': [],
@@ -104,7 +102,7 @@ Output: {'DOCS': [{'original': <PIL.WebPImagePlugin.WebPImageFile image mode=RGB
 Type: list
 Summary: 1 docs | pages=1
 Output: [{'content': 'image_only',
-  'doc_id': '527f2d07-2de2-4626-b7da-3091dd416123',
+  'doc_id': 'bb03701f-51ae-4333-98c2-c5594e6bcc97',
   'extraction': 'ocr:tesseract',
   'filename': 'image2tab.webp',
   'page_count_total': 1,
@@ -273,7 +271,7 @@ Output: [{'anti_confusion_targets': ['BON_DE_COMMANDE', 'CONTRAT', 'DEVIS', 'BON
                         "{'ARTICLE': 2, 'BON_DE_COMMANDE': -21, 'CONTRAT': -18, 'FACTURE': 20, "
                         "'FORMULAIRE': 4}",
   'decision_debug': {'diff': 16, 'second_score': 4, 'top_score': 20},
-  'doc_id': '527f2d07-2de2-4626-b7da-3091dd416123',
+  'doc_id': 'bb03701f-51ae-4333-98c2-c5594e6bcc97',
   'doc_type': 'FACTURE',
   'filename': 'image2tab.webp',
   'keyword_matches': {'anti_confusion_hits': [],
@@ -384,7 +382,7 @@ Output: [{'anti_confusion_targets': ['BON_DE_COMMANDE', 'CONTRAT', 'DEVIS', 'BON
 
 ========================================================================================================================
 [doc] image2tab.webp
-  doc_id       : 527f2d07-2de2-4626-b7da-3091dd416123
+  doc_id       : bb03701f-51ae-4333-98c2-c5594e6bcc97
   content      : image_only
   extraction   : ocr:tesseract
   pages_total  : 1
@@ -457,7 +455,7 @@ Summary: 1 docs | sentences=12
 Output: [{'chars_total': 960,
   'content': 'image_only',
   'detected_languages': ['fr', 'en'],
-  'doc_id': '527f2d07-2de2-4626-b7da-3091dd416123',
+  'doc_id': 'bb03701f-51ae-4333-98c2-c5594e6bcc97',
   'extraction': 'ocr:tesseract',
   'filename': 'image2tab.webp',
   'language_stats': {'en': 1, 'fr': 12},
@@ -998,9 +996,20 @@ Output: [{'chars_total': 960,
   'recompose_ok': False,
   'size': None}]
 
-[warn] arabcode.py non chargé (dépendances manquantes ?). Détail: CAMeL morphology DB not found. Run:
-  "/home/mourad/Bureau/DMS/.venv/bin/python" -m camel_tools.cli.camel_data -i morphology-db-msa-r13
 
+[error] camel_tools not available: No module named 'camel_tools'
+
+[install help] Sans venv, local dans .pylibs (utilise CE python):
+  "/usr/bin/python" -m pip install --upgrade --no-user-cfg --target "/home/mourad/Bureau/DMS/core/component/atrribution-gramatical/.pylibs" camel-tools transformers tokenizers
+  "/usr/bin/python" -m camel_tools.cli.camel_data -i morphology-db-msa-r13
+  "/usr/bin/python" -m camel_tools.cli.camel_data -i ner-arabert
+
+Si tu as lâ€™erreur: Can not combine '--user' and '--target'
+  PowerShell:
+    $env:PIP_CONFIG_FILE="NUL"
+    Remove-Item Env:PIP_USER -ErrorAction SilentlyContinue
+    py -3.11 -m pip install --upgrade --no-user-cfg --target .\.pylibs camel-tools
+[warn] arabcode.py non chargé (dépendances manquantes ?). Détail: No module named 'camel_tools'
 
 ========================================================================================================================
 RUN EN (engcode.py)
@@ -1015,14 +1024,14 @@ INPUT: c1001                                                            1.00
       1001  CD      lemma=1001
       1.00  CD      lemma=1.00
 
-NER (IA (transformers): dslim/bert-base-NER) (token, label):
+NER (fallback (rules)) (token, label):
 [('c', 'O'), ('1001', 'O'), ('1.00', 'O')]
 Entities:
 
 Audit (heuristique, pas une mesure de justesse):
   tokens total     : 3
   POS mode         : heuristics
-  lemma mode       : NLTK WordNetLemmatizer
+  lemma mode       : fallback rules
   NN/NNP ratio     : 1/3 = 33.33 %
   contraction tokens (approx): 0 (0.00 %)
 
@@ -1035,15 +1044,16 @@ INPUT: Cachet & Signature
          &  PUNCT   lemma=∅
  Signature  NNP     lemma=signature
 
-NER (IA (transformers): dslim/bert-base-NER) (token, label):
-[('Cachet', 'B-ORG'), ('&', 'I-ORG'), ('Signature', 'I-ORG')]
+NER (fallback (rules)) (token, label):
+[('Cachet', 'B-MISC'), ('&', 'O'), ('Signature', 'B-MISC')]
 Entities:
-  ORG: Cachet & Signature
+  MISC: Cachet
+  MISC: Signature
 
 Audit (heuristique, pas une mesure de justesse):
   tokens total     : 3
   POS mode         : heuristics
-  lemma mode       : NLTK WordNetLemmatizer
+  lemma mode       : fallback rules
   NN/NNP ratio     : 2/3 = 66.67 %
   contraction tokens (approx): 0 (0.00 %)
 
@@ -1074,8 +1084,8 @@ INPUT: Ma   petite entreprise                                         CLIENT
    Mode  de paiement  :        Espèce
 
    Date Échéance :            5/20/2016
-            Ma  DT      lemma=son
-        petite  NN      lemma=petit
+            Ma  DT      lemma=ma
+        petite  NN      lemma=petite
     entreprise  NN      lemma=entreprise
         CLIENT  NNP     lemma=client
             19  CD      lemma=19
@@ -1086,25 +1096,25 @@ INPUT: Ma   petite entreprise                                         CLIENT
              1  CD      lemma=1
              °  NN      lemma=°
            mai  NN      lemma=mai
-            EL  NNP     lemma=EL
-          HANA  NNP     lemma=HANA
+            EL  NNP     lemma=el
+          HANA  NNP     lemma=hana
          16000  CD      lemma=16000
-         Alger  NNP     lemma=Alger
+         Alger  NNP     lemma=alger
         Centre  NNP     lemma=centre
             DE  IN      lemma=de
-        BEJAIA  NNP     lemma=BEJAIA
-         SETIF  NNP     lemma=SETIF
+        BEJAIA  NNP     lemma=bejaia
+         SETIF  NNP     lemma=setif
            Tel  NNP     lemma=tel
              :  PUNCT   lemma=∅
       00-00-52  CD      lemma=00-00-52
              -  PUNCT   lemma=∅
             12  CD      lemma=12
              -  PUNCT   lemma=∅
-         Ident  NNP     lemma=Ident
+         Ident  NNP     lemma=ident
         Fiscal  NNP     lemma=fiscal
              :  PUNCT   lemma=∅
 16010000000000  CD      lemma=16010000000000
-             N  NN      lemma=ne
+             N  NN      lemma=n
              °  NN      lemma=°
            art  NN      lemma=art
              :  PUNCT   lemma=∅
@@ -1119,14 +1129,12 @@ INPUT: Ma   petite entreprise                                         CLIENT
              :  PUNCT   lemma=∅
      5/20/2016  CD      lemma=5/20/2016
 
-NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
-[('Ma', 'O'), ('petite', 'O'), ('entreprise', 'O'), ('CLIENT', 'O'), ('19', 'O'), (',', 'O'), ('rue', 'B-LOC'), ('de', 'I-LOC'), ('place', 'I-LOC'), ('1', 'O'), ('°', 'O'), ('mai', 'O'), ('EL', 'O'), ('HANA', 'O'), ('16000', 'O'), ('Alger', 'B-LOC'), ('Centre', 'O'), ('DE', 'O'), ('BEJAIA', 'O'), ('SETIF', 'O'), ('Tel', 'O'), (':', 'O'), ('00-00-52', 'B-DATE'), ('-', 'O'), ('12', 'O'), ('-', 'O'), ('Ident', 'O'), ('Fiscal', 'O'), (':', 'O'), ('16010000000000', 'O'), ('N', 'O'), ('°', 'O'), ('art', 'O'), (':', 'O'), ('16010000000', 'O'), ('Mode', 'O'), ('de', 'O'), ('paiement', 'O'), (':', 'O'), ('Espèce', 'B-LOC'), ('Date', 'O'), ('Échéance', 'O'), (':', 'O'), ('5/20/2016', 'B-DATE')]
+NER (fallback (règles)) (token, label):
+[('Ma', 'O'), ('petite', 'O'), ('entreprise', 'O'), ('CLIENT', 'O'), ('19', 'O'), (',', 'O'), ('rue', 'O'), ('de', 'O'), ('place', 'O'), ('1', 'O'), ('°', 'O'), ('mai', 'O'), ('EL', 'O'), ('HANA', 'O'), ('16000', 'O'), ('Alger', 'O'), ('Centre', 'O'), ('DE', 'O'), ('BEJAIA', 'B-LOC'), ('SETIF', 'I-LOC'), ('Tel', 'I-LOC'), (':', 'O'), ('00-00-52', 'B-DATE'), ('-', 'O'), ('12', 'O'), ('-', 'O'), ('Ident', 'O'), ('Fiscal', 'O'), (':', 'O'), ('16010000000000', 'O'), ('N', 'O'), ('°', 'O'), ('art', 'O'), (':', 'O'), ('16010000000', 'O'), ('Mode', 'O'), ('de', 'O'), ('paiement', 'O'), (':', 'O'), ('Espèce', 'O'), ('Date', 'O'), ('Échéance', 'O'), (':', 'O'), ('5/20/2016', 'B-DATE')]
 Entities:
   DATE: 00-00-52
   DATE: 5/20/2016
-  LOC: rue de place
-  LOC: Alger
-  LOC: Espèce
+  LOC: BEJAIA SETIF Tel
 
 ##########################################################################################
 DOC=image2tab.webp | page=1 | sent=4 | lang=fr
@@ -1135,27 +1143,26 @@ DOC=image2tab.webp | page=1 | sent=4 | lang=fr
 INPUT: Référence                     Produit                           P.Unitaire
  Référence  NNP     lemma=référence
    Produit  NNP     lemma=produit
-         P  NN      lemma=P
+         P  NN      lemma=p
          .  PUNCT   lemma=∅
   Unitaire  NNP     lemma=unitaire
 
-NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
-[('Référence', 'O'), ('Produit', 'O'), ('P', 'B-ORG'), ('.', 'I-ORG'), ('Unitaire', 'I-ORG')]
+NER (fallback (règles)) (token, label):
+[('Référence', 'O'), ('Produit', 'O'), ('P', 'O'), ('.', 'O'), ('Unitaire', 'O')]
 Entities:
-  ORG: P. Unitaire
 
 ##########################################################################################
 DOC=image2tab.webp | page=1 | sent=8 | lang=fr
 ##########################################################################################
 ==========================================================================================
 INPUT: Non assujetti à la tva
-       Non  RP      lemma=Non
+       Non  RP      lemma=non
  assujetti  NN      lemma=assujetti
          à  IN      lemma=à
-        la  DT      lemma=le
+        la  DT      lemma=la
        tva  NN      lemma=tva
 
-NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
+NER (fallback (règles)) (token, label):
 [('Non', 'O'), ('assujetti', 'O'), ('à', 'O'), ('la', 'O'), ('tva', 'O')]
 Entities:
 
@@ -1164,7 +1171,7 @@ DOC=image2tab.webp | page=1 | sent=10 | lang=fr
 ##########################################################################################
 ==========================================================================================
 INPUT: Monatnt  Facture en Lettre   Cinq mille huit cent quatre vingt huit Dinars Algériens
-   Monatnt  NNP     lemma=Monatnt
+   Monatnt  NNP     lemma=monatnt
    Facture  NNP     lemma=facture
         en  IN      lemma=en
     Lettre  NNP     lemma=lettre
@@ -1178,17 +1185,18 @@ INPUT: Monatnt  Facture en Lettre   Cinq mille huit cent quatre vingt huit Dinar
     Dinars  NNP     lemma=dinar
  Algériens  NNP     lemma=algérien
 
-NER (IA (transformers): Davlan/bert-base-multilingual-cased-ner-hrl) (token, label):
-[('Monatnt', 'O'), ('Facture', 'O'), ('en', 'O'), ('Lettre', 'O'), ('Cinq', 'O'), ('mille', 'O'), ('huit', 'O'), ('cent', 'O'), ('quatre', 'O'), ('vingt', 'O'), ('huit', 'O'), ('Dinars', 'B-ORG'), ('Algériens', 'O')]
+NER (fallback (règles)) (token, label):
+[('Monatnt', 'O'), ('Facture', 'O'), ('en', 'O'), ('Lettre', 'B-LOC'), ('Cinq', 'I-LOC'), ('mille', 'O'), ('huit', 'O'), ('cent', 'O'), ('quatre', 'O'), ('vingt', 'O'), ('huit', 'O'), ('Dinars', 'B-CUR'), ('Algériens', 'O')]
 Entities:
-  ORG: Dinars
+  CUR: Dinars
+  LOC: Lettre Cinq
 [Component: atripusion-gramatical]
 Type: list
 Summary: Langues executees: en, fr | docs=1 | backend=legacy-3files | component=atripusion-gramatical
 Output: [{'chars_total': 960,
   'content': 'image_only',
   'detected_languages': ['fr', 'en'],
-  'doc_id': '527f2d07-2de2-4626-b7da-3091dd416123',
+  'doc_id': 'bb03701f-51ae-4333-98c2-c5594e6bcc97',
   'extraction': 'ocr:tesseract',
   'filename': 'image2tab.webp',
   'language_stats': {'en': 1, 'fr': 12},
@@ -1735,7 +1743,7 @@ Output: [{'chars_total': 960,
 Type: list
 Summary: docs=1 | tables=1 | line_items=10
 Output: [{'detected_columns': ['product', 'quantity', 'reference', 'total', 'unit_price'],
-  'doc_id': '527f2d07-2de2-4626-b7da-3091dd416123',
+  'doc_id': 'bb03701f-51ae-4333-98c2-c5594e6bcc97',
   'engine': 'table-50ml-unified-v6-anchor-geometry-line-items-only',
   'filename': 'image2tab.webp',
   'line_items': [{'confidence': 0.62,
@@ -2020,8 +2028,8 @@ Output: [{'aggregate_alert_suppressed': False,
                           'total': [],
                           'total_ht': [],
                           'total_ttc': ['182006.00']},
-  'doc_id': '527f2d07-2de2-4626-b7da-3091dd416123',
-  'doc_key': 'id:527f2d07-2de2-4626-b7da-3091dd416123',
+  'doc_id': 'bb03701f-51ae-4333-98c2-c5594e6bcc97',
+  'doc_key': 'id:bb03701f-51ae-4333-98c2-c5594e6bcc97',
   'engine': 'totals-verification-0ml-v1',
   'expected_total': None,
   'filename': 'image2tab.webp',
@@ -2389,24 +2397,24 @@ Output: {'chunk_pairs_scored': 0,
  'vector_links_count': 0,
  'vector_profile': 'pipeline50ml'}
 
-[elasticsearch] desactive ou indisponible -> fallback flux local.
+[elasticsearch] index=dms_documents | docs_indexed=1 | classification_input=1 | classification_synced=1 | classification_docs=1 | extraction_docs=1 | nlp_level=full | nlp_docs=1 | nlp_tokens=73 | nlp_errors=0
 [Component: elasticsearch]
 Type: dict
-Summary: enabled=True | available=False | indexed=0 | cls_input=1 | cls_synced=0 | cls_docs=0 | ext_docs=0 | nlp=None docs=0 tokens=0 errors=0
-Output: {'available': False,
- 'classification_docs': 0,
+Summary: enabled=True | available=True | indexed=1 | cls_input=1 | cls_synced=1 | cls_docs=1 | ext_docs=1 | nlp=full docs=1 tokens=73 errors=0
+Output: {'available': True,
+ 'classification_docs': 1,
  'classification_input': 1,
- 'classification_synced': 0,
- 'doc_ids': 0,
+ 'classification_synced': 1,
+ 'doc_ids': 1,
  'enabled': True,
  'es_index': 'dms_documents',
  'es_url': 'http://localhost:9200',
- 'extraction_docs': 0,
- 'nlp_docs_synced': 0,
- 'nlp_level': None,
+ 'extraction_docs': 1,
+ 'nlp_docs_synced': 1,
+ 'nlp_level': 'full',
  'nlp_token_errors': 0,
- 'nlp_tokens_index': None,
- 'nlp_tokens_indexed': 0,
+ 'nlp_tokens_index': 'dms_nlp_tokens',
+ 'nlp_tokens_indexed': 73,
  'nlp_unresolved_rows': 0}
 
 
@@ -2520,7 +2528,7 @@ Output: [{'bm25': {'avg_top3_score': 2.216456,
                                            '\n'
                                            '   '}]},
   'classification_status': 'OK',
-  'doc_id': '527f2d07-2de2-4626-b7da-3091dd416123',
+  'doc_id': 'bb03701f-51ae-4333-98c2-c5594e6bcc97',
   'doc_type': 'FACTURE',
   'fields': {'date_commande': {'many': True,
                                'matches': [],
@@ -2612,21 +2620,21 @@ Output: [{'bm25': {'avg_top3_score': 2.216456,
                                                     'CONTRAT': ['CONTRAT.yaml'],
                                                     'FACTURE': ['FACTURE.yaml']}}}}]
 
-[ml50-topic] image2tab.webp | document_primary_topics=['facture', 'huit'] | document_top_topics=['facture', 'huit', 'client', 'mode', 'echeance'] | blocked_terms=14 | topics_removed=3
+[ml50-topic] image2tab.webp | document_primary_topics=['facture', 'huit'] | document_top_topics=['facture', 'huit', 'client', 'mode', 'echeance'] | blocked_terms=12 | topics_removed=3
 [table-50ml] image2tab.webp | tables=1 | rows=10 | cols=['product', 'quantity', 'reference', 'total', 'unit_price']
 [totaux-check] image2tab.webp | status=partial_ok | passed=1 | rows=10/10 | subtotal=180204.00~None | tax=None | total=180204.00
 [Component: fusion-resultats]
-[fusion-result] source=local-context | docs=1 | es_synced=0
+[fusion-result] source=elasticsearch | docs=1 | es_synced=0
 [fusion-result] JSON fusionne ecrit dans /home/mourad/Bureau/DMS/core/fusion_output.json
 [fusion-resultats-50ml] docs=1 | doc_vectors=1 | bm25_docs=1
 [Component: fusion-resultats]
 Type: dict
-Summary: fusion -> /home/mourad/Bureau/DMS/core/fusion_output.json | source=local-context | docs=1 | es_synced=0
+Summary: fusion -> /home/mourad/Bureau/DMS/core/fusion_output.json | source=elasticsearch | docs=1 | es_synced=0
 Output: {'docs': 1,
  'es_synced': 0,
  'path': '/home/mourad/Bureau/DMS/core/fusion_output.json',
  'skipped': False,
- 'source': 'local-context'}
+ 'source': 'elasticsearch'}
 
 [api-output] job=- | profile=pipeline50ml | docs=1 | schema=dms-unified-final-template-1.0 | result_path=- | callback=no
 [Component: api-output]

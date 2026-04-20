@@ -6,6 +6,8 @@ services:
     container_name: dms-api
     ports:
       - "8765:8765"
+    volumes:
+      - ./core:/app
     environment:
       DMS_API_HOST: 0.0.0.0
       DMS_API_PORT: 8765

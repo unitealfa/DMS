@@ -44,44 +44,19 @@ source .venv/bin/activate
 
 
 
-
-2. Mode complet tokens: 
-
-lancer une fois EA manuelmetn sinon sa marche pas : 
-
-  sudo systemctl start elasticsearch
-  sudo systemctl status elasticsearch --no-pager
-  curl -s http://localhost:9200
-
-
-
-
-• Pour stocker la grammaire dans ES:
+• Pour lancer dans le terminal avec le fichier ou les fichiers voulu :
 
   python main.py documents/image2tab.webp --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
-  python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf --use-elasticsearch --es-nlp-level full --es-nlp-index dms_nlp_tokens
-
-  Pour ne pas stocker la grammaire token par token (juste résumé):
-
-  python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf --use-elasticsearch --es-nlp-level summary
-
-  Pour ne rien stocker NLP:
-
-  python main.py documents/contrat_regex_test_corpus_fr_en_ar.pdf --use-elasticsearch --es-nlp-level off
 
 
 
 
 laisser tourner en arrière-plan : (cd core)
 
-attention : (ommande nohup) :
-  nohup python local_api.py --host 0.0.0.0 --port 8765 > local_api.log 2>&1 &
- 
- commande normal:
   python local_api.py --host 0.0.0.0 --port 8765
   
   
-  kill si le pid utiliser : 
+kill si le pid utiliser : 
   
-  kill -9 $(lsof -t -i :8765)
+kill -9 $(lsof -t -i :8765)
   

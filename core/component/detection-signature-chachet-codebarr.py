@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import base64
+import io
 import subprocess
 import tempfile
 from pathlib import Path
@@ -37,6 +39,7 @@ MAX_SIDE = 720
 PDF_RENDER_DPI = 110
 MAX_PDF_RENDER_SECONDS = 20
 SIGNATURE_MAX_PER_PAGE = 1
+PAGE_PREVIEW_MAX_SIDE = 900
 
 
 def _safe_list(value: Any) -> List[Any]:
@@ -55,6 +58,25 @@ def _safe_float(value: Any, default: float = 0.0) -> float:
         return float(value)
     except Exception:
         return default
+
+
+def _image_to_data_url(img: Image.Image, *, max_side: int = PAGE_PREVIEW_MAX_SIDE, quality: int = 72) -> str | None:
+    try:
+        preview = img.convert("RGB")
+        width, height = preview.size
+        max_dim = max(width, height)
+        if max_dim > max_side:
+            ratio = float(max_side) / float(max_dim)
+            preview = preview.resize(
+                (max(32, int(round(width * ratio))), max(32, int(round(height * ratio)))),
+                Image.Resampling.LANCZOS,
+            )
+        buf = io.BytesIO()
+        preview.save(buf, format="JPEG", quality=quality, optimize=True)
+        payload = base64.b64encode(buf.getvalue()).decode("ascii")
+        return f"data:image/jpeg;base64,{payload}"
+    except Exception:
+        return None
 
 
 def _doc_key(doc_id: Any, filename: Any, idx: int) -> str:
@@ -365,6 +387,86 @@ def _border_center_ratio(binary: "np.ndarray", border_frac: float = 0.18) -> Tup
     return border_ratio, center_ratio
 
 
+def _largest_contour_stats(mask: "np.ndarray") -> Dict[str, float]:
+    if cv2 is None or np is None or mask.size == 0:
+        return {"area_ratio": 0.0, "circularity": 0.0, "extent": 0.0}
+    binary = (np.asarray(mask, dtype=np.uint8) * 255)
+    contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if not contours:
+        return {"area_ratio": 0.0, "circularity": 0.0, "extent": 0.0}
+    contour = max(contours, key=cv2.contourArea)
+    area = float(cv2.contourArea(contour))
+    if area <= 1.0:
+        return {"area_ratio": 0.0, "circularity": 0.0, "extent": 0.0}
+    perimeter = float(cv2.arcLength(contour, True))
+    x, y, w, h = cv2.boundingRect(contour)
+    bbox_area = float(max(1, w * h))
+    full_area = float(max(1, mask.shape[0] * mask.shape[1]))
+    circularity = (4.0 * np.pi * area / (perimeter * perimeter)) if perimeter > 1.0 else 0.0
+    return {
+        "area_ratio": area / full_area,
+        "circularity": float(circularity),
+        "extent": area / bbox_area,
+    }
+
+
+def _component_layout_stats(comps: List[Dict[str, int]], width: int, height: int) -> Dict[str, float]:
+    if not comps or width <= 0 or height <= 0:
+        return {
+            "span_x": 0.0,
+            "span_y": 0.0,
+            "weighted_cx": 0.0,
+            "weighted_cy": 0.0,
+            "edge_share": 0.0,
+        }
+    total_area = float(sum(max(1, int(comp.get("area") or 0)) for comp in comps))
+    min_x = min(int(comp.get("x0") or 0) for comp in comps)
+    min_y = min(int(comp.get("y0") or 0) for comp in comps)
+    max_x = max(int(comp.get("x1") or 0) for comp in comps)
+    max_y = max(int(comp.get("y1") or 0) for comp in comps)
+    weighted_cx = 0.0
+    weighted_cy = 0.0
+    edge_area = 0.0
+    edge_limit_x = max(1, int(round(width * 0.10)))
+    edge_limit_y = max(1, int(round(height * 0.12)))
+    for comp in comps:
+        area = float(max(1, int(comp.get("area") or 0)))
+        x0 = int(comp.get("x0") or 0)
+        y0 = int(comp.get("y0") or 0)
+        x1 = int(comp.get("x1") or 0)
+        y1 = int(comp.get("y1") or 0)
+        cx = (x0 + x1) / 2.0
+        cy = (y0 + y1) / 2.0
+        weighted_cx += cx * area
+        weighted_cy += cy * area
+        if x0 <= edge_limit_x or x1 >= (width - edge_limit_x) or y0 <= edge_limit_y or y1 >= (height - edge_limit_y):
+            edge_area += area
+    return {
+        "span_x": (max_x - min_x) / float(width),
+        "span_y": (max_y - min_y) / float(height),
+        "weighted_cx": (weighted_cx / total_area) / float(width),
+        "weighted_cy": (weighted_cy / total_area) / float(height),
+        "edge_share": edge_area / total_area,
+    }
+
+
+def _gradient_axis_energy(crop_gray: "np.ndarray") -> Tuple[float, float, float]:
+    if cv2 is None or np is None or crop_gray.size == 0:
+        return 0.0, 0.0, 0.0
+    gray32 = crop_gray.astype(np.float32)
+    gx = cv2.Sobel(gray32, cv2.CV_32F, 1, 0, ksize=3)
+    gy = cv2.Sobel(gray32, cv2.CV_32F, 0, 1, ksize=3)
+    abs_gx = np.abs(gx)
+    abs_gy = np.abs(gy)
+    diag = np.abs(gx - gy) * 0.5
+    scale = 255.0 * float(max(1, crop_gray.shape[0] * crop_gray.shape[1]))
+    return (
+        float(np.sum(abs_gx)) / scale,
+        float(np.sum(abs_gy)) / scale,
+        float(np.sum(diag)) / scale,
+    )
+
+
 def _score_signature(crop_rgb: "np.ndarray", crop_gray: "np.ndarray") -> float:
     if np is None:
         return 0.0
@@ -388,6 +490,8 @@ def _score_signature(crop_rgb: "np.ndarray", crop_gray: "np.ndarray") -> float:
     dense_cols = float(np.mean(col_profile > 0.28))
     min_area = max(8, int(round((h * w) * 0.0025)))
     comps = _mask_components(dark, min_area=min_area)
+    contour_stats = _largest_contour_stats(dark)
+    layout_stats = _component_layout_stats(comps, w, h)
     comp_count = len(comps)
     total_dark = max(1, int(np.count_nonzero(dark)))
     largest_ratio = (int(comps[0]["area"]) / float(total_dark)) if comps else 0.0
@@ -397,6 +501,7 @@ def _score_signature(crop_rgb: "np.ndarray", crop_gray: "np.ndarray") -> float:
     )
     line_penalty = max(float(np.max(row_profile, initial=0.0)), float(np.max(col_profile, initial=0.0)))
     border_ratio, center_ratio = _border_center_ratio(dark, border_frac=0.10)
+    gx_energy, gy_energy, diag_energy = _gradient_axis_energy(crop_gray)
     edge_touch_count = sum(
         1
         for edge_ratio in (
@@ -423,12 +528,34 @@ def _score_signature(crop_rgb: "np.ndarray", crop_gray: "np.ndarray") -> float:
         score += 0.06
     if 0.08 <= largest_ratio <= 0.72:
         score += 0.11
+    elif largest_ratio > 0.82:
+        score -= 0.12
+    if 0.05 <= contour_stats["extent"] <= 0.48:
+        score += 0.06
+    elif contour_stats["extent"] > 0.62:
+        score -= 0.16
     if 0.18 <= active_rows <= 0.82:
         score += 0.08
     if 0.20 <= active_cols <= 0.92:
         score += 0.06
+    if 0.34 <= layout_stats["span_x"] <= 0.94:
+        score += 0.10
+    else:
+        score -= 0.12
+    if 0.10 <= layout_stats["span_y"] <= 0.64:
+        score += 0.06
+    else:
+        score -= 0.08
+    if 0.16 <= layout_stats["weighted_cx"] <= 0.88:
+        score += 0.04
+    if 0.24 <= layout_stats["weighted_cy"] <= 0.78:
+        score += 0.05
     score += min(0.10, row_t * 0.38)
     score += min(0.07, contrast * 0.20)
+    if 0.15 <= diag_energy <= 1.10:
+        score += 0.06
+    if gx_energy > (gy_energy * 1.8):
+        score -= 0.06
     score -= dense_rows * 0.20
     score -= dense_cols * 0.20
     score -= max(0.0, line_penalty - 0.42) * 0.35
@@ -437,7 +564,12 @@ def _score_signature(crop_rgb: "np.ndarray", crop_gray: "np.ndarray") -> float:
     score -= max(0, len(row_bands) - 2) * 0.12
     score -= max(0, comp_count - 18) * 0.02
     score -= tiny_share * 0.10
+    score -= max(0.0, layout_stats["edge_share"] - 0.38) * 0.28
     score -= max(0.0, col_t - 0.26) * 0.18
+    if contour_stats["circularity"] > 0.45:
+        score -= 0.10
+    if comp_count <= 1 and largest_ratio > 0.74:
+        score -= 0.16
     return max(0.0, min(score, 1.0))
 
 
@@ -456,6 +588,7 @@ def _score_stamp(crop_rgb: "np.ndarray", crop_gray: "np.ndarray") -> float:
     color_ratio = float(np.mean(color_mask))
     dark = crop_gray < min(180, int(np.percentile(crop_gray, 45)))
     dark_ratio = float(np.mean(dark))
+    contour_stats = _largest_contour_stats(color_mask if color_ratio >= 0.01 else dark)
     aspect = float(w) / float(max(1, h))
     if not (0.72 <= aspect <= 1.35):
         return 0.0
@@ -463,16 +596,25 @@ def _score_stamp(crop_rgb: "np.ndarray", crop_gray: "np.ndarray") -> float:
     border_ratio, center_ratio = _border_center_ratio(color_mask if color_ratio >= 0.01 else dark)
     ring_hint = max(0.0, border_ratio - center_ratio)
     contrast = float(np.std(crop_gray)) / 255.0
+    gx_energy, gy_energy, _ = _gradient_axis_energy(crop_gray)
     if color_ratio < 0.018 and ring_hint < 0.10:
         return 0.0
     score = 0.0
     score += min(0.46, color_ratio * 4.5)
     score += min(0.20, ring_hint * 0.75)
     score += square_bonus * 0.14
+    if 0.18 <= contour_stats["circularity"] <= 1.15:
+        score += 0.10
+    if 0.10 <= contour_stats["extent"] <= 0.70:
+        score += 0.05
     score += min(0.08, dark_ratio * 0.18)
     score += min(0.05, contrast * 0.12)
+    if 0.10 <= gx_energy <= 1.5 and 0.10 <= gy_energy <= 1.5:
+        score += 0.04
     if center_ratio > 0.48:
         score -= (center_ratio - 0.48) * 0.28
+    if contour_stats["circularity"] < 0.08 and ring_hint < 0.16:
+        score -= 0.12
     return max(0.0, min(score, 1.0))
 
 
@@ -501,9 +643,14 @@ def _score_qrcode(crop_rgb: "np.ndarray", crop_gray: "np.ndarray") -> float:
     corner_scores = sorted((float(np.mean(part)) for part in corners if part.size), reverse=True)
     finder_hint = float(sum(corner_scores[:3]) / 3.0) if len(corner_scores) >= 3 else 0.0
     balance = max(0.0, 1.0 - abs(black_ratio - 0.38) * 2.4)
+    gx_energy, gy_energy, _ = _gradient_axis_energy(crop_gray)
+    axis_balance = max(0.0, 1.0 - abs(gx_energy - gy_energy) / float(max(0.15, gx_energy + gy_energy)))
     score = (row_t * 0.34) + (col_t * 0.34) + (balance * 0.18) + (finder_hint * 0.24)
+    score += axis_balance * 0.08
     if finder_hint < 0.18:
         score -= 0.16
+    if row_t < 0.18 or col_t < 0.18:
+        score -= 0.10
     return max(0.0, min(score, 1.0))
 
 
@@ -527,6 +674,7 @@ def _score_barcode(crop_rgb: "np.ndarray", crop_gray: "np.ndarray") -> float:
     stripe_var = float(np.std(col_profile))
     stripe_jump = float(np.mean(np.abs(np.diff(col_profile)) > 0.10)) if col_profile.size > 1 else 0.0
     row_var = float(np.std(row_profile))
+    gx_energy, gy_energy, _ = _gradient_axis_energy(crop_gray)
     aspect_bonus = min(0.28, (aspect - 1.8) * 0.06)
     balance = max(0.0, 1.0 - abs(black_ratio - 0.42) * 2.1)
     score = (
@@ -538,7 +686,221 @@ def _score_barcode(crop_rgb: "np.ndarray", crop_gray: "np.ndarray") -> float:
         - (col_t * 0.12)
         - (row_var * 0.12)
     )
+    if gx_energy > (gy_energy * 1.35):
+        score += 0.08
+    else:
+        score -= 0.10
+    if stripe_var < 0.10 or stripe_jump < 0.08:
+        score -= 0.12
     return max(0.0, min(score, 1.0))
+
+
+def _detection_geom(row: Dict[str, Any]) -> Dict[str, float]:
+    bbox = row.get("bbox_norm") or {}
+    x0 = max(0.0, min(1.0, _safe_float(bbox.get("x0"), 0.0)))
+    y0 = max(0.0, min(1.0, _safe_float(bbox.get("y0"), 0.0)))
+    x1 = max(x0, min(1.0, _safe_float(bbox.get("x1"), x0)))
+    y1 = max(y0, min(1.0, _safe_float(bbox.get("y1"), y0)))
+    w = max(0.0, x1 - x0)
+    h = max(0.0, y1 - y0)
+    area = w * h
+    cx = x0 + (w / 2.0)
+    cy = y0 + (h / 2.0)
+    aspect = (w / h) if h > 0.0 else 0.0
+    return {"x0": x0, "y0": y0, "x1": x1, "y1": y1, "w": w, "h": h, "area": area, "cx": cx, "cy": cy, "aspect": aspect}
+
+
+def _passes_type_geometry(row: Dict[str, Any]) -> bool:
+    kind = str(row.get("type") or "")
+    g = _detection_geom(row)
+    if kind == "signature":
+        return (
+            0.08 <= g["w"] <= 0.68
+            and 0.015 <= g["h"] <= 0.22
+            and 2.4 <= g["aspect"] <= 11.5
+            and 0.48 <= g["cy"] <= 0.93
+            and g["area"] <= 0.08
+        )
+    if kind == "stamp":
+        return (
+            0.04 <= g["w"] <= 0.32
+            and 0.04 <= g["h"] <= 0.32
+            and 0.68 <= g["aspect"] <= 1.45
+            and g["area"] <= 0.09
+        )
+    if kind == "qrcode":
+        return (
+            0.03 <= g["w"] <= 0.28
+            and 0.03 <= g["h"] <= 0.28
+            and 0.74 <= g["aspect"] <= 1.28
+            and g["area"] <= 0.08
+        )
+    if kind == "barcode":
+        return (
+            0.06 <= g["w"] <= 0.70
+            and 0.012 <= g["h"] <= 0.18
+            and 1.7 <= g["aspect"] <= 18.0
+            and g["area"] <= 0.10
+        )
+    return True
+
+
+def _prefer_decoder_detections(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    decoder_rows = [row for row in rows if str(row.get("source") or "") in {"pyzbar", "opencv-qrcode"}]
+    if not decoder_rows:
+        return rows
+    kept: List[Dict[str, Any]] = []
+    for row in rows:
+        source = str(row.get("source") or "")
+        kind = str(row.get("type") or "")
+        if source in {"pyzbar", "opencv-qrcode"}:
+            kept.append(row)
+            continue
+        if kind not in {"barcode", "qrcode"}:
+            kept.append(row)
+            continue
+        bbox = row.get("bbox_px") or {}
+        a = (
+            _safe_int(bbox.get("x0")),
+            _safe_int(bbox.get("y0")),
+            _safe_int(bbox.get("x1")),
+            _safe_int(bbox.get("y1")),
+        )
+        overlap = False
+        for dec in decoder_rows:
+            if str(dec.get("type") or "") != kind:
+                continue
+            db = dec.get("bbox_px") or {}
+            b = (
+                _safe_int(db.get("x0")),
+                _safe_int(db.get("y0")),
+                _safe_int(db.get("x1")),
+                _safe_int(db.get("y1")),
+            )
+            if _safe_int(dec.get("page_index"), 0) == _safe_int(row.get("page_index"), 0) and _bbox_iou(a, b) > 0.18:
+                overlap = True
+                break
+        if not overlap:
+            kept.append(row)
+    return kept
+
+
+def _postfilter_page_detections(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    filtered: List[Dict[str, Any]] = []
+    for row in rows:
+        if not _passes_type_geometry(row):
+            continue
+        if str(row.get("type") or "") == "signature":
+            score = _safe_float(row.get("score"), 0.0)
+            source = str(row.get("source") or "")
+            if source == "vision-heuristics" and score < 0.74:
+                continue
+        filtered.append(row)
+    filtered = _prefer_decoder_detections(filtered)
+    filtered.sort(key=lambda x: (str(x.get("type") or ""), -_safe_float(x.get("score"), 0.0)))
+    return filtered
+
+
+def _make_detection(
+    det_type: str,
+    score: float,
+    width: int,
+    height: int,
+    page_index: int,
+    x0: int,
+    y0: int,
+    x1: int,
+    y1: int,
+    source: str,
+    *,
+    decoded_type: str | None = None,
+    decoded_value: str | None = None,
+    variant: str | None = None,
+) -> Dict[str, Any]:
+    x0 = max(0, min(width, int(x0)))
+    y0 = max(0, min(height, int(y0)))
+    x1 = max(x0 + 1, min(width, int(x1)))
+    y1 = max(y0 + 1, min(height, int(y1)))
+    row: Dict[str, Any] = {
+        "type": det_type,
+        "score": round(float(score), 6),
+        "bbox_px": {"x0": x0, "y0": y0, "x1": x1, "y1": y1},
+        "bbox_norm": {
+            "x0": round(x0 / float(max(1, width)), 6),
+            "y0": round(y0 / float(max(1, height)), 6),
+            "x1": round(x1 / float(max(1, width)), 6),
+            "y1": round(y1 / float(max(1, height)), 6),
+        },
+        "page_width": width,
+        "page_height": height,
+        "page_index": int(page_index),
+        "source": source,
+    }
+    if decoded_type:
+        row["decoded_type"] = decoded_type
+    if decoded_value:
+        row["decoded_value"] = decoded_value
+    if variant:
+        row["variant"] = variant
+    return row
+
+
+def _variant_images_for_decoder(img: Image.Image) -> List[Tuple[str, Image.Image]]:
+    variants: List[Tuple[str, Image.Image]] = [("gray", img.convert("L"))]
+    if cv2 is None or np is None:
+        return variants
+    try:
+        gray = np.asarray(img.convert("L"), dtype=np.uint8)
+        _, otsu = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        variants.append(("otsu", Image.fromarray(otsu)))
+        adaptive = cv2.adaptiveThreshold(
+            gray,
+            255,
+            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+            cv2.THRESH_BINARY,
+            31,
+            11,
+        )
+        variants.append(("adaptive", Image.fromarray(adaptive)))
+        up = cv2.resize(gray, None, fx=1.7, fy=1.7, interpolation=cv2.INTER_CUBIC)
+        variants.append(("gray-x17", Image.fromarray(up)))
+        _, up_otsu = cv2.threshold(up, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        variants.append(("otsu-x17", Image.fromarray(up_otsu)))
+    except Exception:
+        pass
+    return variants
+
+
+def _dedupe_decoder_detections(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    kept: List[Dict[str, Any]] = []
+    for row in sorted(rows, key=lambda x: float(x.get("score") or 0.0), reverse=True):
+        bbox = row.get("bbox_px") or {}
+        a = (
+            _safe_int(bbox.get("x0")),
+            _safe_int(bbox.get("y0")),
+            _safe_int(bbox.get("x1")),
+            _safe_int(bbox.get("y1")),
+        )
+        skip = False
+        for other in kept:
+            if str(other.get("type") or "") != str(row.get("type") or ""):
+                continue
+            if _safe_int(other.get("page_index"), 0) != _safe_int(row.get("page_index"), 0):
+                continue
+            ob = other.get("bbox_px") or {}
+            b = (
+                _safe_int(ob.get("x0")),
+                _safe_int(ob.get("y0")),
+                _safe_int(ob.get("x1")),
+                _safe_int(ob.get("y1")),
+            )
+            same_value = str(other.get("decoded_value") or "") == str(row.get("decoded_value") or "")
+            if _bbox_iou(a, b) > 0.30 or (same_value and same_value != ""):
+                skip = True
+                break
+        if not skip:
+            kept.append(row)
+    return kept
 
 
 def _detect_qr_barcode_decoders(img: Image.Image, page_index: int) -> List[Dict[str, Any]]:
@@ -546,42 +908,46 @@ def _detect_qr_barcode_decoders(img: Image.Image, page_index: int) -> List[Dict[
     width, height = img.size
 
     if zbar_decode is not None:
-        try:
-            for sym in zbar_decode(img.convert("L")):
-                rect = getattr(sym, "rect", None)
-                if rect is None:
-                    continue
-                x0 = _safe_int(getattr(rect, "left", 0))
-                y0 = _safe_int(getattr(rect, "top", 0))
-                w = max(1, _safe_int(getattr(rect, "width", 0)))
-                h = max(1, _safe_int(getattr(rect, "height", 0)))
-                x1 = x0 + w
-                y1 = y0 + h
-                raw_type = str(getattr(sym, "type", "") or "").strip().upper()
-                det_type = "qrcode" if "QRCODE" in raw_type or "QR" == raw_type else "barcode"
-                detections.append(
-                    {
-                        "type": det_type,
-                        "score": 0.99,
-                        "bbox_px": {"x0": x0, "y0": y0, "x1": x1, "y1": y1},
-                        "bbox_norm": {
-                            "x0": round(x0 / float(max(1, width)), 6),
-                            "y0": round(y0 / float(max(1, height)), 6),
-                            "x1": round(x1 / float(max(1, width)), 6),
-                            "y1": round(y1 / float(max(1, height)), 6),
-                        },
-                        "page_width": width,
-                        "page_height": height,
-                        "page_index": int(page_index),
-                        "source": "pyzbar",
-                        "decoded_type": raw_type or None,
-                        "decoded_value": (
-                            getattr(sym, "data", b"").decode("utf-8", errors="ignore") or None
-                        ),
-                    }
-                )
-        except Exception:
-            pass
+        for variant_name, variant_img in _variant_images_for_decoder(img):
+            try:
+                variant_w, variant_h = variant_img.size
+                scale_x = float(width) / float(max(1, variant_w))
+                scale_y = float(height) / float(max(1, variant_h))
+                for sym in zbar_decode(variant_img):
+                    rect = getattr(sym, "rect", None)
+                    if rect is None:
+                        continue
+                    raw_x0 = _safe_int(getattr(rect, "left", 0))
+                    raw_y0 = _safe_int(getattr(rect, "top", 0))
+                    raw_w = max(1, _safe_int(getattr(rect, "width", 0)))
+                    raw_h = max(1, _safe_int(getattr(rect, "height", 0)))
+                    x0 = int(round(raw_x0 * scale_x))
+                    y0 = int(round(raw_y0 * scale_y))
+                    x1 = int(round((raw_x0 + raw_w) * scale_x))
+                    y1 = int(round((raw_y0 + raw_h) * scale_y))
+                    raw_type = str(getattr(sym, "type", "") or "").strip().upper()
+                    det_type = "qrcode" if "QRCODE" in raw_type or "QR" == raw_type else "barcode"
+                    decoded_value = getattr(sym, "data", b"").decode("utf-8", errors="ignore") or None
+                    score = 0.995 if variant_name == "gray" else 0.985
+                    detections.append(
+                        _make_detection(
+                            det_type,
+                            score,
+                            width,
+                            height,
+                            page_index,
+                            x0,
+                            y0,
+                            x1,
+                            y1,
+                            "pyzbar",
+                            decoded_type=raw_type or None,
+                            decoded_value=decoded_value,
+                            variant=variant_name,
+                        )
+                    )
+            except Exception:
+                pass
 
     if cv2 is not None:
         try:
@@ -601,27 +967,66 @@ def _detect_qr_barcode_decoders(img: Image.Image, page_index: int) -> List[Dict[
                         x1 = min(width, int(round(max(xs))))
                         y1 = min(height, int(round(max(ys))))
                         detections.append(
-                            {
-                                "type": "qrcode",
-                                "score": 0.98,
-                                "bbox_px": {"x0": x0, "y0": y0, "x1": x1, "y1": y1},
-                                "bbox_norm": {
-                                    "x0": round(x0 / float(max(1, width)), 6),
-                                    "y0": round(y0 / float(max(1, height)), 6),
-                                    "x1": round(x1 / float(max(1, width)), 6),
-                                    "y1": round(y1 / float(max(1, height)), 6),
-                                },
-                                "page_width": width,
-                                "page_height": height,
-                                "page_index": int(page_index),
-                                "source": "opencv-qrcode",
-                                "decoded_value": decoded_infos[idx] if idx < len(decoded_infos) else None,
-                            }
+                            _make_detection(
+                                "qrcode",
+                                0.98,
+                                width,
+                                height,
+                                page_index,
+                                x0,
+                                y0,
+                                x1,
+                                y1,
+                                "opencv-qrcode",
+                                decoded_value=decoded_infos[idx] if idx < len(decoded_infos) else None,
+                            )
                         )
         except Exception:
             pass
 
-    return detections
+        try:
+            barcode_detector = None
+            if hasattr(cv2, "barcode_BarcodeDetector"):
+                barcode_detector = cv2.barcode_BarcodeDetector()
+            elif hasattr(cv2, "barcode") and hasattr(cv2.barcode, "BarcodeDetector"):
+                barcode_detector = cv2.barcode.BarcodeDetector()
+            if barcode_detector is not None:
+                gray = np.asarray(img.convert("L"), dtype=np.uint8)
+                ok, decoded_infos, decoded_types, corners = barcode_detector.detectAndDecode(gray)
+                if ok and corners is not None:
+                    decoded_infos = list(decoded_infos or [])
+                    decoded_types = list(decoded_types or [])
+                    for idx, quad in enumerate(corners):
+                        if quad is None:
+                            continue
+                        xs = [float(pt[0]) for pt in quad]
+                        ys = [float(pt[1]) for pt in quad]
+                        x0 = max(0, int(round(min(xs))))
+                        y0 = max(0, int(round(min(ys))))
+                        x1 = min(width, int(round(max(xs))))
+                        y1 = min(height, int(round(max(ys))))
+                        decoded_type = str(decoded_types[idx]) if idx < len(decoded_types) else None
+                        decoded_value = str(decoded_infos[idx]) if idx < len(decoded_infos) else None
+                        detections.append(
+                            _make_detection(
+                                "barcode",
+                                0.985,
+                                width,
+                                height,
+                                page_index,
+                                x0,
+                                y0,
+                                x1,
+                                y1,
+                                "opencv-barcode",
+                                decoded_type=decoded_type,
+                                decoded_value=decoded_value,
+                            )
+                        )
+        except Exception:
+            pass
+
+    return _dedupe_decoder_detections(detections)
 
 
 def _bbox_iou(a: Tuple[int, int, int, int], b: Tuple[int, int, int, int]) -> float:
@@ -661,22 +1066,22 @@ def _scan_windows(
         sizes = [(0.40, 0.10), (0.32, 0.08), (0.48, 0.12)]
         y_min, y_max = 0.52, 0.92
         scorer = _score_signature
-        threshold = 0.62
+        threshold = 0.72
     elif kind == "stamp":
         sizes = [(0.18, 0.18), (0.22, 0.16), (0.14, 0.14)]
         y_min, y_max = 0.10, 0.95
         scorer = _score_stamp
-        threshold = 0.58
+        threshold = 0.63
     elif kind == "qrcode":
         sizes = [(0.14, 0.14), (0.18, 0.18), (0.24, 0.24)]
         y_min, y_max = 0.05, 0.95
         scorer = _score_qrcode
-        threshold = 0.66
+        threshold = 0.72
     else:
         sizes = [(0.34, 0.10), (0.28, 0.08), (0.42, 0.12)]
         y_min, y_max = 0.05, 0.95
         scorer = _score_barcode
-        threshold = 0.68
+        threshold = 0.74
 
     raw: List[Dict[str, Any]] = []
     for wf, hf in sizes:
@@ -696,6 +1101,10 @@ def _scan_windows(
                 center_x = (x + (win_w / 2.0)) / float(max(1, width))
                 center_y = (y + (win_h / 2.0)) / float(max(1, height))
                 if kind == "signature":
+                    if not (0.10 <= center_x <= 0.92):
+                        score -= 0.12
+                    if 0.62 <= center_y <= 0.86:
+                        score += 0.05
                     if center_y > 0.88:
                         score -= 0.18
                     if center_y < 0.54:
@@ -704,6 +1113,20 @@ def _scan_windows(
                         score -= 0.08
                     if center_x < 0.12 or center_x > 0.94:
                         score -= 0.08
+                elif kind == "stamp":
+                    if 0.16 <= center_y <= 0.88:
+                        score += 0.03
+                    if center_y < 0.06 or center_y > 0.96:
+                        score -= 0.12
+                elif kind == "barcode":
+                    if aspect := (float(win_w) / float(max(1, win_h))):
+                        if aspect > 2.8:
+                            score += 0.04
+                    if center_y < 0.08 or center_y > 0.94:
+                        score -= 0.08
+                elif kind == "qrcode":
+                    if center_y < 0.04 or center_y > 0.96 or center_x < 0.04 or center_x > 0.96:
+                        score -= 0.10
                 if score < threshold:
                     continue
                 x0 = int(round(x * sx))
@@ -761,8 +1184,44 @@ def _detect_page_marks(img: Image.Image, page_index: int) -> List[Dict[str, Any]
             det = dict(row)
             det["page_index"] = int(page_index)
             detections.append(det)
+    detections = _postfilter_page_detections(detections)
     detections.sort(key=lambda x: (str(x.get("type") or ""), -_safe_float(x.get("score"), 0.0)))
     return detections
+
+
+def _build_page_previews(
+    pages: List[Image.Image],
+    sampled_pages: List[int],
+    detections: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    by_page: Dict[int, List[Dict[str, Any]]] = {}
+    for row in detections:
+        page_idx = _safe_int(row.get("page_index"), 0)
+        if page_idx <= 0:
+            continue
+        by_page.setdefault(page_idx, []).append(row)
+
+    previews: List[Dict[str, Any]] = []
+    for page_number, img in zip(sampled_pages, pages):
+        page_rows = by_page.get(int(page_number)) or []
+        if not page_rows:
+            continue
+        data_url = _image_to_data_url(img)
+        if not data_url:
+            continue
+        width, height = img.size
+        previews.append(
+            {
+                "page_index": int(page_number),
+                "page_width": int(width),
+                "page_height": int(height),
+                "image_data_url": data_url,
+                "detections": page_rows,
+            }
+        )
+        if len(previews) >= 6:
+            break
+    return previews
 
 
 def _dedupe_doc_detections(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -821,6 +1280,7 @@ def run(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
         for page_number, img in zip(sampled_pages, pages):
             detections.extend(_detect_page_marks(img, page_index=page_number))
         detections = _dedupe_doc_detections(detections)
+        page_previews = _build_page_previews(pages, sampled_pages, detections)
 
         counts = {
             "signature": sum(1 for d in detections if str(d.get("type") or "") == "signature"),
@@ -848,6 +1308,7 @@ def run(ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
                 "has_qrcode": bool(counts["qrcode"]),
                 "counts": counts,
                 "detections": detections,
+                "page_previews": page_previews,
             }
         )
 

@@ -681,6 +681,158 @@ En pratique:
 - Elasticsearch: optionnel selon la config/runtime
 - Word2Vec: non utilise
 
+## Justification Des Choix Techniques
+
+### Objectif global du projet
+Le projet est construit pour traiter des documents et renvoyer un JSON exploitable par une API externe, notamment un site ou un module Odoo.
+
+Le principe principal est:
+- utiliser d'abord des traitements deterministes, explicables et controlables
+- eviter le ML et l'IA quand une regle, un OCR, un parseur, une verification arithmetique ou une heuristique suffit
+- reserver les briques plus lourdes au `pipeline100ml`, quand le besoin demande plus de contexte semantique
+- garder une API simple a appeler depuis Odoo: upload de documents, lancement pipeline, statut, resultat JSON
+
+### Pourquoi 3 pipelines
+| Choix | Ou c'est utilise | Pourquoi ce choix | Pourquoi pas uniquement une seule pipeline |
+|---|---|---|---|
+| `pipeline0ml` | `pipeline/orchestrator.py`, `pipeline/cli.py`, `pipeline/local_api.py` | Pipeline la plus deterministe: OCR, regex, tableaux, verification, fusion. Elle sert quand on veut eviter au maximum ML/IA. | Une seule pipeline lourde ralentirait tous les cas simples. |
+| `pipeline50ml` | tokenisation `tokenisation-layout-50ml.py`, regles `extraction-regles-50ml.py` | Ajoute des signaux legers: hashing subword, topics locaux, BM25. C'est un compromis entre precision et cout. | Le 0ml peut manquer de rappel sur des documents varies. Le 100ml peut etre trop lourd. |
+| `pipeline100ml` | tokenisation `tokenisation-layout-100ml.py`, grammaire XLM-R, detection visuelle, extraction YAML/BM25 | Reserve aux cas ou on veut le maximum de contexte: chunks, embeddings, POS/NER plus riches, visuel. | Tout lancer en 100ml par defaut augmente le temps, les dependances et le risque de telechargement modele. |
+
+### Pourquoi `runpy` et un dictionnaire `context`
+| Choix | Ou c'est utilise | Pourquoi ce choix | Pourquoi pas autre chose |
+|---|---|---|---|
+| `runpy.run_path(..., init_globals=context)` | `pipeline/components.py` | Permet de reutiliser les scripts existants sans les transformer en package complexe. Chaque composant lit et ecrit dans le meme dictionnaire partage. | Une architecture classes/events complete demanderait de reecrire beaucoup de composants et casserait plus facilement l'existant. |
+| `context` global | tous les composants dans `component/` | Sert de bus interne simple: `INPUT_FILE`, `FINAL_DOCS`, `TOK_DOCS`, `TABLE_EXTRACTIONS`, `FUSION_PAYLOAD`, etc. | Une base temporaire ou une file de messages serait plus lourde pour une pipeline locale appelee par API. |
+| wrappers `Component` | `pipeline/components.py` | Encapsulent les scripts, capturent les sorties, logs, erreurs et changements de contexte. | Appeler les scripts directement rendrait l'API incapable de savoir quel composant est en cours ou ce qu'il a produit. |
+
+### Pourquoi eviter le ML/IA par defaut
+| Zone | Ou c'est utilise | Choix retenu | Raison |
+|---|---|---|---|
+| Classification | `component/clasification.py` | scores, mots forts/moyens/faibles, seuils | Plus explicable et plus stable qu'un modele opaque pour des documents metier. |
+| Extraction metier | `component/extraction/`, `rules/` | regex, YAML, BM25 selon pipeline | Les champs comme facture, telephone, devise, IBAN, totaux sont mieux controles par regles inspectables. |
+| Verification totaux | `component/verification-totaux.py` | controles arithmetiques | Une addition ligne/totaux est deterministe, donc pas besoin de modele. |
+| Tableaux | `component/table_extraction/` | structure, cellules, lignes produits, filtres metier | Les tableaux doivent etre reconstruits et verifies, pas devines par un modele. |
+| Langue | `component/language_detection.py` | scoring local FR/EN/AR | Evite un modele supplementaire pour une detection de langue simple et explicable. |
+| 100ml | tokenisation/grammaire 100ml | embeddings et XLM-R seulement en mode lourd | Le ML reste disponible quand il apporte une vraie valeur, mais il n'est pas impose aux cas simples. |
+
+### Pourquoi Tesseract pour l'OCR
+| Point | Detail |
+|---|---|
+| Ou c'est utilise | `component/output-txt.py`, composants OCR/pretraitement, lecture images/PDF scannes |
+| Pourquoi | Tesseract est local, gratuit, scriptable, fonctionne hors cloud, supporte FR/EN/AR avec paquets systeme. |
+| Pourquoi pas une API OCR cloud | Cout, dependance reseau, confidentialite documents, latence, plus difficile a integrer dans un usage Odoo local. |
+| Pourquoi pas uniquement extraction PDF native | Beaucoup de documents sont des scans ou images. L'extraction native ne suffit pas. |
+
+### Pourquoi OpenCV
+| Point | Detail |
+|---|---|
+| Ou c'est utilise | `component/detection-signature-chachet-codebarr.py`, pretraitement image, analyse visuelle |
+| Sert a quoi | seuils, contours, gradients, redimensionnement, detection QR OpenCV, BarcodeDetector si disponible. |
+| Pourquoi | OpenCV donne des operations image rapides et locales pour detecter signature, cachet, code-barres et QR sans modele IA. |
+| Pourquoi pas un modele vision IA | Le besoin est d'abord de localiser des formes et codes. Les heuristiques OpenCV sont plus explicables, moins lourdes et plus faciles a debugger. |
+| Limite | OpenCV ne "comprend" pas le document comme un humain. Les seuils doivent etre ajustes selon les vrais documents. |
+
+### Pourquoi `pyzbar` pour QR et code-barres
+| Point | Detail |
+|---|---|
+| Ou c'est utilise | `component/detection-signature-chachet-codebarr.py` |
+| Sert a quoi | Decoder de vrais QR/code-barres quand ils sont lisibles, avec type et valeur decodee. |
+| Pourquoi | C'est plus fiable qu'une simple heuristique visuelle: si `pyzbar` lit le code, la detection est quasi certaine. |
+| Pourquoi avec OpenCV aussi | OpenCV complete `pyzbar` sur certains QR ou images transformees. Les deux moteurs augmentent le rappel. |
+
+### Pourquoi regex/YAML pour l'extraction
+| Point | Detail |
+|---|---|
+| Ou c'est utilise | `component/extraction/extraction-regles.py`, `extraction-regles-50ml.py`, `extraction-regles-100ml.py`, `rules/*.json`, `rules/*.yaml` |
+| Sert a quoi | Extraire telephones, emails, devises, references, dates, totaux, champs facture/contrat. |
+| Pourquoi | Les regles sont lisibles, auditables et modifiables sans reentrainer un modele. |
+| Pourquoi YAML en 50ml/100ml | YAML est plus lisible pour gerer des ensembles de regles, variantes, priorites et champs metier. |
+| Pourquoi pas tout en ML | Les champs critiques doivent etre predecibles. Une regex corrigee reste stable; un modele peut halluciner ou changer selon contexte. |
+
+### Pourquoi BM25 et hashing en 50ml
+| Point | Detail |
+|---|---|
+| Ou c'est utilise | `component/extraction/extraction-regles-50ml.py`, `component/extraction/extraction-regles-100ml.py`, tokenisation 50ml |
+| Sert a quoi | Retrouver les passages les plus proches d'un champ ou d'une regle sans modele lourd. |
+| Pourquoi | BM25 est rapide, local, explicable, bon pour recherche texte et documents metier. |
+| Pourquoi pas embeddings partout | Les embeddings coutent plus cher en temps, memoire et dependances. BM25 suffit souvent pour retrouver des passages. |
+
+### Pourquoi XLM-R et Transformers en 100ml
+| Point | Detail |
+|---|---|
+| Ou c'est utilise | `component/atrribution-gramatical/attribution-gramatical-100ml-xlmr.py`, tokenisation 100ml |
+| Sert a quoi | Mieux gerer multilingue, POS/NER, similarite semantique et chunks complexes. |
+| Pourquoi | XLM-R est adapte au FR/EN/AR et aux documents multilingues. |
+| Pourquoi seulement 100ml | C'est plus lourd. Le projet garde 0ml/50ml pour les cas ou on veut rapidite, controle et moins de ML. |
+
+### Pourquoi Elasticsearch
+| Point | Detail |
+|---|---|
+| Ou c'est utilise | `component/elasticsearch.py`, `pipeline/elasticsearch.py`, option `--use-elasticsearch` |
+| Sert a quoi | Indexer textes, passages, tokens NLP, resultats d'extraction et permettre une recherche rapide par API ou debug. |
+| Pourquoi | Elasticsearch est fait pour la recherche plein texte, le ranking, l'indexation de gros volumes et les requetes rapides. |
+| Pourquoi pas PostgreSQL FTS | Le projet ne veut plus dependre d'une BDD relationnelle pour stocker les sorties. Pour la recherche texte pure, Elasticsearch est plus specialise. |
+| Pourquoi pas OpenSearch | OpenSearch est proche, mais le code et les commandes existantes ciblent Elasticsearch. Garder un seul moteur evite de multiplier les variantes a maintenir. |
+| Pourquoi pas Whoosh | Whoosh est local mais moins adapte a un usage API/Odoo avec volumes plus grands, index persistants et requetes concurrentes. |
+| Statut | Optionnel. Le pipeline fonctionne sans Elasticsearch si `--use-elasticsearch` n'est pas active. |
+
+### Pourquoi une API locale simple
+| Point | Detail |
+|---|---|
+| Ou c'est utilise | `pipeline/local_api.py`, `local_api.py`, `index.html` |
+| Sert a quoi | Recevoir des documents via `POST /api/run`, suivre le traitement via `GET /api/status`, recuperer le JSON via `GET /api/result/<job_id>`. |
+| Pourquoi | C'est simple a appeler depuis Odoo ou un autre site: multipart upload, statut, resultat JSON. |
+| Pourquoi `http.server` et pas FastAPI/Flask | Moins de dependances, demarrage direct, compatible avec Docker et tests locaux. Le besoin actuel est un lanceur API interne. |
+| Limite | Pour une exposition publique internet, il faudra mettre un vrai reverse proxy, authentification, limites upload et observabilite plus complete. |
+
+### Pourquoi `fusion_resultats.py` puis `api-output.py`
+| Point | Detail |
+|---|---|
+| Ou c'est utilise | `component/fusion_resultats.py`, `component/api-output.py`, `dms-unified-output-template.json` |
+| Sert a quoi | Fusionner toutes les sorties composants, puis normaliser le JSON final livre a l'API. |
+| Pourquoi separer les deux | `fusion_resultats.py` construit la vue metier globale; `api-output.py` livre le contrat API final et le callback. |
+| Pourquoi un template JSON | Il garantit que les champs absents restent visibles en `null` ou `[]`, ce qui simplifie la consommation cote Odoo. |
+| Pourquoi pas envoyer seulement les logs terminal | Les logs sont utiles pour debug, mais Odoo a besoin d'un JSON stable, structure et parseable. |
+
+### Pourquoi `index.html`
+| Point | Detail |
+|---|---|
+| Ou c'est utilise | `index.html` servi par `local_api.py` |
+| Sert a quoi | Tester l'API localement: selection de documents, lancement, loader, affichage structure du resultat, telechargement JSON. |
+| Pourquoi un seul fichier HTML | Simple a ouvrir, simple a servir, pas de build frontend, utile pour demo et debug. |
+| Pourquoi pas une app React/Vue | Pas necessaire pour l'objectif actuel. Le vrai consommateur vise est un site externe ou Odoo via API. |
+
+### Pourquoi Docker
+| Point | Detail |
+|---|---|
+| Ou c'est utilise | `Dockerfile`, `docker-compose.yml`, `run.sh` |
+| Sert a quoi | Permettre a un autre PC de lancer le projet avec les dependances principales sans refaire toute l'installation a la main. |
+| Pourquoi avec volume `./core:/app` | Les modifications locales dans `core/` sont visibles dans le conteneur apres redemarrage rapide du service. |
+| Pourquoi redemarrer le service apres modification Python | Le serveur Python ne fait pas de reload automatique. |
+
+### Pourquoi cette architecture pour Odoo
+| Besoin Odoo | Choix dans ce projet |
+|---|---|
+| Envoyer un ou plusieurs documents | `POST /api/run` en `multipart/form-data` |
+| Savoir si le traitement est fini | `GET /api/status` |
+| Recuperer toutes les donnees | `GET /api/result/<job_id>` |
+| Recevoir automatiquement le resultat | `callback_url` dans la requete API, gere par `api-output.py` |
+| Eviter une BDD dans le pipeline | Le resultat complet est renvoye en JSON; Odoo decide ensuite quoi stocker. |
+| Garder un contrat stable | `dms-unified-output-template.json` conserve les champs meme quand une donnee manque. |
+
+### Resume des choix
+| Sujet | Choix retenu | Raison principale |
+|---|---|---|
+| Extraction texte | Tesseract + extraction native | Local, gratuit, compatible scans et documents texte |
+| Image/visuel | OpenCV + pyzbar | Eviter IA, detecter formes/codes localement |
+| Champs metier | Regex/YAML/BM25 | Explicable, corrigeable, stable |
+| NLP leger | hashing/topics locaux | Compromis precision/performance |
+| NLP lourd | XLM-R en 100ml | Seulement quand le contexte multilingue le justifie |
+| Recherche | Elasticsearch optionnel | Recherche plein texte rapide et specialisee |
+| API | `local_api.py` | Simple pour Odoo et sites externes |
+| Sortie | template JSON + fusion | Contrat API stable, champs manquants visibles |
+
 ### Fichiers a retenir
 - choix par defaut pipeline: `pipeline/cli.py`
 - registre et definition des pipelines: `pipeline/orchestrator.py`
@@ -981,6 +1133,13 @@ Pourquoi:
 - le pipeline ne doit pas essayer de telecharger des modeles pendant un upload API
 - il doit retomber sur les fallbacks heuristiques / hash deja prevus par le code
 
+Important cote API:
+- `/api/run` force aussi ces variables dans le sous-processus `main.py` par defaut
+- le controle se fait avec `DMS_API_OFFLINE_MODE`
+- valeur par defaut: `DMS_API_OFFLINE_MODE=1`
+- si tu veux autoriser les downloads Hugging Face pendant un traitement API, lance le serveur avec `DMS_API_OFFLINE_MODE=0` et retire les variables offline
+- pour une demo ou une machine clonee chez quelqu'un, garde le mode par defaut
+
 ### Ce que permet maintenant le mode Docker
 Une fois la stack lancee, un user peut:
 - utiliser l'API sur `http://localhost:8765`
@@ -1181,9 +1340,9 @@ Important:
 - le mode actuel est `temporary-no-persistence`
 - le backend utilise un dossier runtime temporaire, puis nettoie ce dossier apres la fin du job
 - les fichiers d'entree sont supprimes du disque a la fin du job
-- le resultat JSON final n'est garde qu'en memoire le temps de la livraison
-- si `callback_url` est fourni et que le callback reussit, le resultat est purge de la memoire juste apres envoi
-- si aucun callback n'est fourni, le resultat est purge de la memoire juste apres le premier `GET /api/result/<job_id>`
+- le resultat JSON final est garde en memoire par le serveur tant que `local_api.py` tourne
+- si `callback_url` est fourni et que le callback reussit, le resultat est marque livre mais reste lisible en memoire
+- si aucun callback n'est fourni, `GET /api/result/<job_id>` peut etre relu par le front tant que le serveur n'a pas redemarre
 - donc `GET /api/result/<job_id>` doit etre considere comme une lecture de livraison, pas comme un stockage permanent
 
 Implementation backend: [pipeline/local_api.py](/DMS/core/pipeline/local_api.py)
@@ -1279,33 +1438,64 @@ Logs backend ajoutes pour diagnostic:
 - `GET /api/status`
 - `GET /api/result/<job_id>`
 
-Pendant le traitement, la page affiche seulement:
-- un loader
-- un message simple
+Pendant le traitement, la page affiche:
+- le loader de traitement
+- la vraie pipeline demandee (`default`, `pipeline0ml`, `pipeline50ml`, `pipeline100ml` ou autre pipeline enregistree)
+- la timeline des composants de la pipeline
+- le composant courant retourne par `GET /api/status`
+- le statut de chaque etape quand il est connu
 
 Comportement exact de la page:
 1. verification que `GET /api/status` repond
 2. envoi des fichiers via `POST /api/run`
 3. memorisation de `job_id`
 4. memorisation de `result_url` ou `result_route`
-5. polling de `GET /api/status` toutes les `1.5s`
-6. si `status=running`, la page garde le loader et affiche l'etape courante si disponible
+5. polling de `GET /api/status` toutes les `1s`
+6. si `status=running`, la page garde le loader et affiche la timeline des composants avec l'etape courante
 7. si `status=completed` mais `result_available=false`, la page attend encore
 8. si `status=completed` et `result_available=true`, la page appelle `GET /api/result/<job_id>`
-9. la reponse JSON est transformee en fichier telecharge automatiquement dans le navigateur
-10. le nom du fichier telecharge est:
+9. la reponse JSON est affichee dans la page sous forme de demo par document et par composant
+10. le bouton `Telecharger JSON` permet de telecharger le payload complet
+11. le nom du fichier telecharge est:
 ```text
-dms-output-<job_id>.json
+dms-demo-output-<job_id>.json
 ```
 
 La page ne depend plus d'une version API exacte hardcodee. Tant que les endpoints API repondent correctement, elle fonctionne.
 
 Quand `status=completed`:
-- la page telecharge automatiquement le resultat JSON final
-- puis elle affiche "Traitement termine"
+- la page recupere le resultat JSON final une seule fois
+- elle affiche une demonstration pedagogique de chaque document
+- elle affiche les composants presents dans `documents[].components`
+- elle garde un panneau `JSON API complet` pour verifier le payload brut
+- elle laisse le bouton de telechargement disponible
 
 Quand `status=failed`:
 - la page affiche le `returncode` et la derniere ligne de log
+
+### 6.1) Ce que la demo HTML affiche apres traitement
+La page [index.html](/DMS/core/index.html) reste un seul fichier HTML/CSS/JS.
+
+Elle affiche automatiquement, selon les donnees presentes dans le resultat:
+- `pretraitement-de-docs`: document original cote navigateur, type detecte, metadata du pretraitement
+- `si-image-pretraiter-sinonpass-le-doc`: sortie texte/OCR ou indication de routage image/texte
+- `output-txt`: texte brut extrait, methode et statistiques
+- `clasification` / `classification`: type detecte, score gagnant, scores par classe, mots `strong`, `medium`, `weak`, `negative`
+- `tokenisation-layout`: pages, langues detectees, chunks, topics, embeddings disponibles
+- `atripusion-gramatical` / attribution grammaticale: texte, tokens, POS, lemmes, NER, langue
+- `table-extraction`: lignes produits, quantites, prix unitaires, totaux de ligne, engine
+- `verification-totaux`: resume des totaux et controles disponibles
+- `extraction-regles`: champs regex, rules, matches et valeurs
+- `detection-signature-chachet-codebarr`: signature, cachet, code-barres, QR-code, detections visuelles
+- `liaison-inter-docs`: liens inter-documents et analyse globale
+- `elasticsearch`: etat d'indexation et synchronisation NLP
+- tout composant inconnu ou futur: carte generique avec ses champs principaux et son JSON brut
+
+Important:
+- la demo n'a pas besoin de connaitre manuellement chaque nouveau composant
+- si un composant est ajoute a une pipeline et qu'il apparait dans `documents[].components`, il sera affiche automatiquement
+- si une donnee specialisee n'existe pas, la carte affiche quand meme le JSON brut du composant
+- le JSON complet reste telechargeable sans perte via le bouton `Telecharger JSON`
 
 ### 7) Champs exacts disponibles dans `GET /api/status`
 Le backend expose l'etat exact de la pipeline en cours pour un autre front/site externe.
@@ -1353,7 +1543,7 @@ Important:
 - meme logique pour les pipelines deja presentes dans le depot
 - le champ `result_available` passe a `true` seulement apres execution du composant final `api-output`
 - une fois le resultat livre, `result_available` repasse a `false`
-- les champs `result_delivered`, `result_delivery_mode`, `result_delivered_at` et `artifacts_purged` permettent de savoir si le payload a deja ete remis puis purge
+- les champs `result_delivered`, `result_delivery_mode`, `result_delivered_at` et `artifacts_purged` permettent de savoir si le payload a deja ete remis et si les fichiers temporaires ont ete purges
 
 ### 8) Exemple cURL
 ```bash
@@ -1407,8 +1597,8 @@ Flux reel:
 10. `GET /api/status` suit l'avancement live
 11. `GET /api/result/<job_id>` renvoie le JSON final complet deja pret
 12. le runtime disque du job est nettoye automatiquement
-13. si le callback reussit, le resultat en memoire est purge juste apres livraison
-14. sinon, le resultat en memoire est purge apres le premier `GET /api/result/<job_id>`
+13. si le callback reussit, le resultat est marque livre et reste lisible en memoire
+14. sinon, le resultat reste lisible via `GET /api/result/<job_id>` tant que le serveur tourne
 
 Donc:
 - si la pipeline active est `pipeline0ml`, l'API renvoie uniquement les composants de `pipeline0ml`
@@ -1602,7 +1792,7 @@ Important:
 - si un composant touche des cles du `context`, ces cles remontent automatiquement dans `context_values`
 - si un nouveau composant standard est ajoute a une pipeline, son `reported_output`, ses `context_values` et sa trace terminal remontent automatiquement sans modifier `local_api.py`
 - quand `index.html` recoit ce resultat final, elle le telecharge directement en `.json`
-- apres livraison du resultat, le backend ne conserve plus le payload complet en memoire
+- apres livraison du resultat, le backend conserve le payload complet en memoire tant que le serveur tourne
 - donc si le client veut archiver le JSON, c'est au client externe de le stocker
 
 ### 13) Recuperer et afficher les documents depuis un autre site

@@ -4,6 +4,7 @@ import hashlib
 import math
 import re
 import runpy
+import sys
 import unicodedata
 from collections import Counter
 from pathlib import Path
@@ -12,6 +13,16 @@ from typing import Any, Dict, Iterable, List, Tuple
 BASE_SCRIPT = Path(__file__).resolve().with_name("tokenisation-layout.py")
 TOKEN_RE = re.compile(r"[A-Za-z0-9_\u00C0-\u024F\u0600-\u06FF]+", re.UNICODE)
 Vector = List[float]
+
+CORE_DIR = Path(__file__).resolve().parents[2]
+if str(CORE_DIR) not in sys.path:
+    sys.path.insert(0, str(CORE_DIR))
+try:
+    from component.language_detection import detect_lang as _detect_lang_shared, normalize_lang_code
+except Exception:
+    _detect_lang_shared = None
+    def normalize_lang_code(value: Any) -> str:
+        return str(value or "").strip().lower() or "unknown"
 
 _STOPWORDS = {
     "the", "and", "for", "with", "from", "that", "this", "are", "was", "were", "will", "shall", "must",
@@ -255,7 +266,10 @@ def _iter_doc_chunks(doc: Dict[str, Any]) -> Iterable[Tuple[int, int, str, str]]
         if not isinstance(page, dict):
             continue
         page_index = _safe_int(page.get("page_index"), 1)
-        lang = str(page.get("lang") or "")
+        page_text = str(page.get("page_text") or page.get("text") or "")
+        lang = normalize_lang_code(page.get("lang"))
+        if (not lang or lang == "unknown") and _detect_lang_shared is not None:
+            lang = _detect_lang_shared(page_text, default="unknown")
         sents = page.get("sentences_layout")
         if isinstance(sents, list) and sents:
             for sent_index, sent in enumerate(sents):
@@ -263,10 +277,12 @@ def _iter_doc_chunks(doc: Dict[str, Any]) -> Iterable[Tuple[int, int, str, str]]
                     continue
                 text = str(sent.get("text") or "")
                 if text.strip():
-                    yield page_index, sent_index, text, lang
+                    sent_lang = normalize_lang_code(sent.get("lang"))
+                    if (not sent_lang or sent_lang == "unknown") and _detect_lang_shared is not None:
+                        sent_lang = _detect_lang_shared(text, default=lang or "unknown")
+                    yield page_index, sent_index, text, sent_lang or lang
             continue
 
-        page_text = str(page.get("page_text") or page.get("text") or "")
         if page_text.strip():
             yield page_index, 0, page_text, lang
 
@@ -386,7 +402,8 @@ def _augment_with_ml50(ctx: Dict[str, Any]) -> None:
             tokens = _tokenize(text)
             if not tokens:
                 continue
-            lang_counter[lang or "unknown"] += 1
+            if lang and lang != "unknown":
+                lang_counter[lang] += 1
             token_counter.update(tokens)
             tokenized_chunks.append(tokens)
 

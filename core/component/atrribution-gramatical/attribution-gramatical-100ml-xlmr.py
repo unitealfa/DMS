@@ -7,9 +7,18 @@ import unicodedata
 from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
+import sys
 
 Vector = List[float]
 Matrix = List[Vector]
+
+CORE_DIR = Path(__file__).resolve().parents[2]
+if str(CORE_DIR) not in sys.path:
+    sys.path.insert(0, str(CORE_DIR))
+try:
+    from component.language_detection import detect_lang as _detect_lang_shared
+except Exception:
+    _detect_lang_shared = None
 
 AR_RE = re.compile(r"[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]")
 WORD_RE = re.compile(r"[A-Za-zÀ-ÖØ-öø-ÿ]+", flags=re.UNICODE)
@@ -218,17 +227,23 @@ def _norm_token(text: str) -> str:
 
 
 def detect_lang(text: str) -> str:
+    if _detect_lang_shared is not None:
+        lang = _detect_lang_shared(text, default="unknown")
+        if lang != "unknown":
+            return lang
     t = text or ""
     if AR_RE.search(t):
         return "ar"
     words = [w.lower() for w in WORD_RE.findall(t[:8000])]
     if not words:
-        return "en"
+        return "unknown"
     fr_score = sum(1 for w in words if w in FR_HINT)
     en_score = sum(1 for w in words if w in EN_HINT)
     if re.search(r"[éèêàùçôîï]", t.lower()):
         fr_score += 1
-    return "fr" if fr_score >= en_score else "en"
+    if fr_score == en_score == 0:
+        return "unknown"
+    return "fr" if fr_score > en_score else "en"
 
 
 def get_previous_cell_input():
@@ -691,7 +706,9 @@ def _run() -> None:
         page_index = row["page_index"]
         sent_index = row["sent_index"]
         text = row["text"]
-        lang = str(row.get("lang") or detect_lang(text))
+        lang = str(row.get("lang") or detect_lang(text) or "unknown")
+        if lang == "unknown":
+            lang = detect_lang(text) or "unknown"
         tokens = token_lists[idx] if idx < len(token_lists) else _basic_tokenize(text)
         vecs = embeddings[idx] if idx < len(embeddings) else _zeros_matrix(len(tokens), encoder.dim)
 
@@ -789,7 +806,8 @@ def _run() -> None:
                 "text": text,
             }
         )
-        lang_counter[lang] += 1
+        if lang != "unknown":
+            lang_counter[lang] += 1
 
     NLP_ANALYSES = nlp_analyses
     NLP_SENTENCES = nlp_sentences

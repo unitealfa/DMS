@@ -9,6 +9,17 @@ LOCAL_DEPS_DIR = os.path.join(os.getcwd(), ".pylibs")
 if os.path.isdir(LOCAL_DEPS_DIR) and LOCAL_DEPS_DIR not in sys.path:
     sys.path.insert(0, LOCAL_DEPS_DIR)
 
+_TRUE_VALUES = {"1", "true", "yes", "on"}
+
+def _env_true(name: str) -> bool:
+    return str(os.environ.get(name) or "").strip().lower() in _TRUE_VALUES
+
+_OFFLINE_MODE = (
+    _env_true("LANG_PIPE_OFFLINE")
+    or _env_true("HF_HUB_OFFLINE")
+    or _env_true("TRANSFORMERS_OFFLINE")
+)
+
 def print_install_help():
     py = sys.executable
     print("\n[install] Sans venv, en local dans .pylibs (utilise CE python):")
@@ -49,6 +60,8 @@ def _ensure_nltk():
         try:
             nltk.data.find(probe)
         except LookupError:
+            if _OFFLINE_MODE:
+                continue
             try:
                 nltk.download(pkg, quiet=True)
             except Exception as e:
@@ -72,6 +85,8 @@ if NLTK_OK and _WORDNET_OK:
 HF_OK = False
 _HF_IMPORT_ERR = None
 try:
+    if _OFFLINE_MODE:
+        raise RuntimeError("offline mode: Hugging Face NER disabled")
     import torch
     from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
     HF_OK = True
@@ -545,6 +560,8 @@ def currency_spans(toks: List[Tok]) -> List[Tuple[int,int,str]]:
     return spans
 
 def load_hf_ner(model_name: str):
+    if _OFFLINE_MODE:
+        raise RuntimeError("offline mode: Hugging Face NER disabled")
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     torch.set_num_threads(1)
     try:

@@ -28,6 +28,12 @@ if str(REPO_ROOT) not in sys.path:
 
 from pipeline.elasticsearch import fetch_sources_for_ids, maybe_build_store  # noqa: E402
 from pipeline.component_trace import component_trace_public_rows  # noqa: E402
+try:
+    from component.language_detection import normalize_lang_code
+except Exception:  # pragma: no cover - fallback standalone
+    def normalize_lang_code(value: Any) -> str:
+        raw = str(value or "").strip().lower()
+        return raw or "unknown"
 
 
 # ---------- Helpers ----------
@@ -53,6 +59,36 @@ def _safe_list(value: Any) -> List[Any]:
 
 def _safe_dict(value: Any) -> Dict[str, Any]:
     return value if isinstance(value, dict) else {}
+
+
+def _clone_jsonish(value: Any, _stack: Optional[Set[int]] = None) -> Any:
+    if _stack is None:
+        _stack = set()
+    if value is None or isinstance(value, (bool, int, float, str)):
+        return value
+    if isinstance(value, Path):
+        return str(value)
+    obj_id = id(value)
+    if obj_id in _stack:
+        return "[circular-reference]"
+    if isinstance(value, dict):
+        _stack.add(obj_id)
+        try:
+            return {str(k): _clone_jsonish(v, _stack) for k, v in value.items()}
+        finally:
+            _stack.discard(obj_id)
+    if isinstance(value, (list, tuple, set)):
+        _stack.add(obj_id)
+        try:
+            return [_clone_jsonish(v, _stack) for v in value]
+        finally:
+            _stack.discard(obj_id)
+    if hasattr(value, "isoformat") and callable(getattr(value, "isoformat", None)):
+        try:
+            return value.isoformat()
+        except Exception:
+            pass
+    return str(value)
 
 
 def _json_safe(value: Any, _seen: Optional[Set[int]] = None) -> Any:
@@ -1367,6 +1403,7 @@ def _split_lang_values(raw: Any) -> List[str]:
     parts = [part.strip() for part in text.split(",")] if "," in text else [text]
     out: List[str] = []
     for part in parts:
+        part = normalize_lang_code(part)
         if not part or part in {"unknown", "und", "none", "null", "non_specified", "n/a"}:
             continue
         out.append(part)
@@ -1450,7 +1487,8 @@ def _derive_doc_languages(
         _add_lang_counts(counter, order, fallback)
 
     langs = sorted(counter.keys(), key=lambda lang: (-counter[lang], order.get(lang, 10**9), lang))
-    return langs, (langs[0] if langs else None), {lang: int(counter[lang]) for lang in langs}
+    primary = ",".join(langs) if len(langs) > 1 else (langs[0] if langs else None)
+    return langs, primary, {lang: int(counter[lang]) for lang in langs}
 
 
 def _text_from_tok_pages(pages: List[Dict[str, Any]]) -> str:
@@ -2483,8 +2521,8 @@ def _augment_payload_for_profile(ctx: Dict[str, Any], payload: Dict[str, Any], p
                 "rows_total": int(table_row.get("rows_total") or 0),
                 "detected_columns": _safe_list(table_row.get("detected_columns")),
                 "totals": table_row.get("totals") if isinstance(table_row.get("totals"), dict) else {},
-                "line_items": _safe_list(table_row.get("line_items")),
-                "tables": _safe_list(table_row.get("tables")),
+                "line_items": _clone_jsonish(_safe_list(table_row.get("line_items"))),
+                "tables": _clone_jsonish(_safe_list(table_row.get("tables"))),
             }
         doc["extraction"] = extraction
 
@@ -2579,7 +2617,7 @@ def _augment_payload_with_default_tables(ctx: Dict[str, Any], payload: Dict[str,
         if not isinstance(structure, dict):
             structure = {}
         if _safe_list(table_row.get("tables")):
-            structure["tables"] = _safe_list(table_row.get("tables"))
+            structure["tables"] = _clone_jsonish(_safe_list(table_row.get("tables")))
         if not _safe_list(structure.get("detected_columns")):
             structure["detected_columns"] = _safe_list(table_row.get("detected_columns"))
         doc["document_structure"] = structure
@@ -2593,8 +2631,8 @@ def _augment_payload_with_default_tables(ctx: Dict[str, Any], payload: Dict[str,
             "rows_total": int(table_row.get("rows_total") or 0),
             "detected_columns": _safe_list(table_row.get("detected_columns")),
             "totals": table_row.get("totals") if isinstance(table_row.get("totals"), dict) else {},
-            "line_items": _safe_list(table_row.get("line_items")),
-            "tables": _safe_list(table_row.get("tables")),
+            "line_items": _clone_jsonish(_safe_list(table_row.get("line_items"))),
+            "tables": _clone_jsonish(_safe_list(table_row.get("tables"))),
         }
         doc["extraction"] = extraction
 
@@ -2850,6 +2888,7 @@ def _augment_payload_with_visual_marks_100ml(ctx: Dict[str, Any], payload: Dict[
         if not isinstance(structure, dict):
             structure = {}
         structure["visual_marks"] = _safe_list(visual_row.get("detections"))
+        structure["visual_pages"] = _safe_list(visual_row.get("page_previews"))
         structure["visual_marks_summary"] = {
             "engine": visual_row.get("engine"),
             "pages_total": _safe_int(visual_row.get("pages_total"), 0),
@@ -2876,6 +2915,7 @@ def _augment_payload_with_visual_marks_100ml(ctx: Dict[str, Any], payload: Dict[
             "has_stamp": bool(visual_row.get("has_stamp")),
             "has_barcode": bool(visual_row.get("has_barcode")),
             "has_qrcode": bool(visual_row.get("has_qrcode")),
+            "page_previews": _safe_list(visual_row.get("page_previews")),
         }
         doc["extraction"] = extraction
 
@@ -2892,6 +2932,7 @@ def _augment_payload_with_visual_marks_100ml(ctx: Dict[str, Any], payload: Dict[
             "has_stamp": bool(visual_row.get("has_stamp")),
             "has_barcode": bool(visual_row.get("has_barcode")),
             "has_qrcode": bool(visual_row.get("has_qrcode")),
+            "page_previews": _safe_list(visual_row.get("page_previews")),
         }
         doc["components"] = components
 

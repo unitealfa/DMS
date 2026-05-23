@@ -3,193 +3,1077 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DMS Launcher</title>
+  <title>DMS Demo Pipeline</title>
   <style>
     :root {
-      --bg: #111111;
-      --panel: #1b1b1b;
-      --border: #343434;
-      --text: #f3f3f3;
-      --muted: #a7a7a7;
-      --accent: #f5f5f5;
-      --accent-text: #111111;
+      --bg: #0c1118;
+      --bg-2: #121a24;
+      --panel: rgba(18, 25, 35, 0.92);
+      --panel-2: rgba(255, 255, 255, 0.045);
+      --panel-3: rgba(255, 255, 255, 0.075);
+      --line: rgba(255, 255, 255, 0.13);
+      --line-strong: rgba(255, 255, 255, 0.23);
+      --text: #eef4f8;
+      --muted: #93a3b5;
+      --soft: #c9d5df;
+      --accent: #f4c35d;
+      --accent-2: #5ed4b5;
+      --danger: #ff7474;
+      --warn: #ffb75e;
+      --ok: #75df9f;
+      --ink: #11151d;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+      --radius: 22px;
     }
 
     * { box-sizing: border-box; }
 
+    html { scroll-behavior: smooth; }
+
     body {
       margin: 0;
       min-height: 100vh;
-      display: grid;
-      place-items: center;
+      color: var(--text);
+      font: 15px/1.5 "Aptos", "Segoe UI", "Helvetica Neue", sans-serif;
       background:
-        radial-gradient(circle at top, #232323 0%, #111111 55%),
-        linear-gradient(180deg, #101010 0%, #171717 100%);
-      color: var(--text);
-      font: 16px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        radial-gradient(circle at 10% -10%, rgba(244, 195, 93, 0.22), transparent 34%),
+        radial-gradient(circle at 92% 4%, rgba(94, 212, 181, 0.18), transparent 30%),
+        linear-gradient(135deg, #071019 0%, #111927 46%, #1a1a15 100%);
     }
 
-    .page {
-      width: min(680px, calc(100vw - 32px));
-      padding: 24px;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background: rgba(27, 27, 27, 0.92);
-      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.35);
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,0.8), transparent 78%);
     }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: 28px;
-      font-weight: 700;
-    }
-
-    p {
-      margin: 0 0 18px;
-      color: var(--muted);
-    }
-
-    .dropzone {
-      width: 100%;
-      min-height: 180px;
-      padding: 20px;
-      border: 2px dashed #4a4a4a;
-      border-radius: 16px;
-      background: #151515;
-      color: var(--muted);
-      display: grid;
-      place-items: center;
-      text-align: center;
-      transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
-      cursor: pointer;
-    }
-
-    .dropzone.dragover {
-      border-color: #d6d6d6;
-      background: #202020;
-      color: var(--text);
-    }
-
-    .dropzone strong {
-      display: block;
-      margin-bottom: 6px;
-      color: var(--text);
-      font-size: 18px;
-    }
-
-    input[type="file"] {
-      display: none;
-    }
-
-    .files {
-      margin: 18px 0 20px;
-      padding: 0;
-      list-style: none;
-      display: grid;
-      gap: 8px;
-    }
-
-    .files li {
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: #131313;
-      color: var(--text);
-      word-break: break-word;
-    }
-
-    .actions {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .progress {
-      margin-top: 16px;
-      display: grid;
-      gap: 8px;
-    }
-
-    .loader-wrap {
-      display: none;
-      align-items: center;
-      gap: 12px;
-      min-height: 22px;
-    }
-
-    .loader-wrap.active {
-      display: flex;
-    }
-
-    .loader {
-      width: 18px;
-      height: 18px;
-      border: 2px solid #4a4a4a;
-      border-top-color: #f5f5f5;
-      border-radius: 999px;
-      animation: spin 0.8s linear infinite;
+    button, input, select {
+      font: inherit;
     }
 
     button {
       border: 0;
-      border-radius: 12px;
-      padding: 12px 18px;
-      font: inherit;
-      font-weight: 700;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-weight: 800;
       cursor: pointer;
       background: var(--accent);
-      color: var(--accent-text);
+      color: var(--ink);
+      box-shadow: 0 10px 24px rgba(244, 195, 93, 0.22);
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--line-strong);
+      box-shadow: none;
     }
 
     button:disabled {
       opacity: 0.45;
       cursor: not-allowed;
+      box-shadow: none;
     }
 
-    .status {
-      color: var(--muted);
-      font-size: 14px;
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      color: var(--text);
+      background: rgba(255,255,255,0.07);
+      outline: none;
     }
 
-    .detail {
-      color: var(--muted);
+    pre {
+      margin: 0;
+      overflow: auto;
+      max-height: 360px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      color: #d6e6f0;
+      background: rgba(0,0,0,0.24);
+      font: 12px/1.45 "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 14px;
       font-size: 13px;
-      min-height: 18px;
     }
+
+    th, td {
+      padding: 9px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--soft);
+      background: rgba(255,255,255,0.06);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .shell {
+      width: min(1500px, calc(100vw - 28px));
+      margin: 0 auto;
+      padding: 26px 0 46px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .hero-card,
+    .panel,
+    .document-card,
+    .component-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .hero-card {
+      min-height: 360px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      top: -120px;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(244,195,93,0.26), transparent 64%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      width: fit-content;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--soft);
+      background: rgba(255,255,255,0.06);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    h1 {
+      max-width: 780px;
+      margin: 20px 0 14px;
+      font-size: clamp(34px, 5vw, 78px);
+      line-height: 0.95;
+      letter-spacing: -0.055em;
+    }
+
+    h2, h3 {
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .hero-copy {
+      max-width: 760px;
+      color: var(--soft);
+      font-size: 17px;
+    }
+
+    .routes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .route {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.052);
+    }
+
+    .route strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .route code {
+      color: var(--accent);
+      font-size: 12px;
+      word-break: break-all;
+    }
+
+    .upload-card {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.06);
+      box-shadow: var(--shadow);
+    }
+
+    .dropzone {
+      min-height: 190px;
+      border: 2px dashed rgba(255,255,255,0.22);
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 22px;
+      cursor: pointer;
+      background:
+        linear-gradient(135deg, rgba(94,212,181,0.08), rgba(244,195,93,0.08)),
+        rgba(0,0,0,0.12);
+      transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
+    }
+
+    .dropzone.dragover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      background: rgba(244,195,93,0.13);
+    }
+
+    .dropzone strong {
+      display: block;
+      color: var(--text);
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+
+    .dropzone small {
+      color: var(--muted);
+    }
+
+    #file-input { display: none; }
+
+    .control-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .control-label {
+      display: grid;
+      gap: 6px;
+      color: var(--soft);
+      font-size: 13px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .files {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .files li {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(0,0,0,0.16);
+      color: var(--soft);
+      word-break: break-word;
+    }
+
+    .status-strip {
+      margin-top: 18px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(0,0,0,0.18);
+    }
+
+    .loader-line {
+      display: none;
+      gap: 10px;
+      align-items: center;
+      color: var(--soft);
+      margin-top: 8px;
+    }
+
+    .loader-line.active { display: flex; }
+
+    .loader {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.25);
+      border-top-color: var(--accent);
+      animation: spin 0.8s linear infinite;
+      flex: 0 0 auto;
+    }
+
+    .progress-bar {
+      height: 10px;
+      margin-top: 12px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.09);
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width 0.25s ease;
+    }
+
+    .section {
+      margin-top: 20px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: end;
+      margin: 0 0 12px;
+    }
+
+    .panel {
+      padding: 20px;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+
+    .step {
+      display: grid;
+      gap: 7px;
+      min-height: 112px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.046);
+    }
+
+    .step strong {
+      color: var(--text);
+      word-break: break-word;
+    }
+
+    .step small {
+      color: var(--muted);
+      word-break: break-word;
+    }
+
+    .step.done { border-color: rgba(117,223,159,0.38); }
+    .step.running { border-color: rgba(244,195,93,0.65); background: rgba(244,195,93,0.10); }
+    .step.failed { border-color: rgba(255,116,116,0.65); background: rgba(255,116,116,0.09); }
+
+    .badge-row,
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      align-items: center;
+    }
+
+    .badge,
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+      max-width: 100%;
+      padding: 5px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--soft);
+      background: rgba(255,255,255,0.055);
+      font-size: 12px;
+      word-break: break-word;
+    }
+
+    .badge.ok { color: var(--ok); border-color: rgba(117,223,159,0.35); }
+    .badge.warn { color: var(--warn); border-color: rgba(255,183,94,0.35); }
+    .badge.danger { color: var(--danger); border-color: rgba(255,116,116,0.4); }
+    .badge.accent { color: var(--accent); border-color: rgba(244,195,93,0.42); }
+
+    .documents {
+      display: grid;
+      gap: 16px;
+    }
+
+    .document-card {
+      padding: 20px;
+    }
+
+    .document-card + .document-card {
+      margin-top: 22px;
+    }
+
+    .doc-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .doc-title {
+      display: grid;
+      gap: 5px;
+    }
+
+    .doc-title h3 {
+      font-size: 24px;
+    }
+
+    .document-map {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0 4px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(0,0,0,0.15);
+    }
+
+    .doc-chapters {
+      display: grid;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .doc-chapter {
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 20px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.058), rgba(255,255,255,0.026)),
+        rgba(0,0,0,0.12);
+    }
+
+    .doc-chapter-head {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(94,212,181,0.13), transparent 28%),
+        rgba(0,0,0,0.16);
+    }
+
+    .chapter-index {
+      display: inline-grid;
+      place-items: center;
+      min-width: 42px;
+      height: 42px;
+      border-radius: 15px;
+      color: var(--ink);
+      background: linear-gradient(135deg, var(--accent-2), #c7fff0);
+      font-weight: 950;
+      letter-spacing: -0.03em;
+    }
+
+    .doc-chapter-head h4 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.025em;
+    }
+
+    .doc-chapter-head p {
+      margin-top: 4px;
+      color: var(--soft);
+    }
+
+    .doc-chapter-body {
+      display: grid;
+      gap: 14px;
+      padding: 16px;
+    }
+
+    .chapter-focus {
+      display: grid;
+      gap: 12px;
+    }
+
+    .doc-summary-grid {
+      display: grid;
+      grid-template-columns: minmax(240px, 0.45fr) minmax(0, 1fr);
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .document-preview {
+      min-height: 220px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(244,195,93,0.08), rgba(94,212,181,0.08)),
+        rgba(0,0,0,0.18);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      padding: 12px;
+    }
+
+    .document-preview img {
+      max-width: 100%;
+      max-height: 360px;
+      object-fit: contain;
+      border-radius: 14px;
+      background: rgba(0,0,0,0.35);
+    }
+
+    .chapter-components {
+      display: grid;
+      gap: 14px;
+    }
+
+    .component-group {
+      display: grid;
+      gap: 12px;
+    }
+
+    .component-group-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.045);
+      color: var(--text);
+      font-weight: 900;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .kpi {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.046);
+    }
+
+    .kpi span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+
+    .kpi strong {
+      display: block;
+      color: var(--text);
+      word-break: break-word;
+    }
+
+    .demo-split {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .visual-box {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(0,0,0,0.18);
+      display: grid;
+      gap: 9px;
+      align-content: start;
+    }
+
+    .visual-box img {
+      max-width: 100%;
+      max-height: 320px;
+      object-fit: contain;
+      border-radius: 12px;
+      background: #0a0d12;
+    }
+
+    .visual-page-stack {
+      display: grid;
+      gap: 16px;
+      margin-top: 14px;
+    }
+
+    .visual-compare {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .visual-sheet {
+      position: relative;
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      aspect-ratio: var(--sheet-ratio, 1 / 1.414);
+    }
+
+    .visual-sheet img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      max-height: none;
+      border-radius: 0;
+      background: #ffffff;
+    }
+
+    .visual-sheet.blank {
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.03), rgba(0,0,0,0.01)),
+        #ffffff;
+    }
+
+    .visual-sheet svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .visual-detection-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .placeholder {
+      display: grid;
+      place-items: center;
+      min-height: 150px;
+      padding: 18px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 14px;
+      color: var(--muted);
+      text-align: center;
+      background: rgba(255,255,255,0.035);
+    }
+
+    .component-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 22px;
+      margin-top: 20px;
+    }
+
+    .component-card {
+      padding: 0;
+      box-shadow: none;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035)),
+        rgba(255,255,255,0.052);
+      border-color: rgba(255,255,255,0.18);
+    }
+
+    .component-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 17px 18px;
+      border-bottom: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(244,195,93,0.12), transparent 34%),
+        rgba(0,0,0,0.18);
+    }
+
+    .component-head h4 {
+      margin: 0;
+      font-size: 21px;
+      word-break: break-word;
+    }
+
+    .component-title-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .component-number {
+      display: inline-grid;
+      place-items: center;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 8px;
+      border-radius: 12px;
+      color: var(--ink);
+      background: linear-gradient(135deg, var(--accent), #ffe7a5);
+      font-weight: 900;
+      box-shadow: 0 8px 22px rgba(244,195,93,0.18);
+    }
+
+    .component-purpose {
+      margin-top: 7px;
+      color: var(--soft);
+      max-width: 980px;
+    }
+
+    .component-body {
+      display: grid;
+      gap: 16px;
+      padding: 18px;
+    }
+
+    .demo-block {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(0,0,0,0.16);
+    }
+
+    .demo-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      color: var(--text);
+      font-weight: 900;
+      letter-spacing: -0.015em;
+    }
+
+    .demo-title small {
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .score-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .score-row {
+      display: grid;
+      grid-template-columns: minmax(110px, 170px) 1fr minmax(44px, auto);
+      gap: 9px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .score-track {
+      height: 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      overflow: hidden;
+    }
+
+    .score-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+
+    .text-preview {
+      max-height: 240px;
+      overflow: auto;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(0,0,0,0.17);
+      color: #dce7ee;
+      white-space: pre-wrap;
+    }
+
+    .decision-card {
+      display: grid;
+      grid-template-columns: minmax(180px, 0.4fr) minmax(0, 1fr);
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .decision-main {
+      display: grid;
+      gap: 7px;
+      padding: 16px;
+      border-radius: 16px;
+      color: var(--ink);
+      background: linear-gradient(135deg, var(--accent), #ffe3a0);
+    }
+
+    .decision-main span {
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.72;
+    }
+
+    .decision-main strong {
+      font-size: 26px;
+      line-height: 1;
+      word-break: break-word;
+    }
+
+    .keyword-lanes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+    }
+
+    .keyword-lane {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.045);
+    }
+
+    .keyword-lane strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .pos-noun { --pos-color: #5ed4b5; }
+    .pos-proper { --pos-color: #7ec8ff; }
+    .pos-verb { --pos-color: #ffb75e; }
+    .pos-adj { --pos-color: #f98eb8; }
+    .pos-adv { --pos-color: #b59cff; }
+    .pos-det { --pos-color: #f4c35d; }
+    .pos-prep { --pos-color: #8fd17f; }
+    .pos-pron { --pos-color: #77d9ff; }
+    .pos-num { --pos-color: #d9e86f; }
+    .pos-punct { --pos-color: #7e8a97; opacity: 0.72; }
+    .pos-other { --pos-color: #cbd7e2; }
+
+    .chip.pos-noun,
+    .chip.pos-proper,
+    .chip.pos-verb,
+    .chip.pos-adj,
+    .chip.pos-adv,
+    .chip.pos-det,
+    .chip.pos-prep,
+    .chip.pos-pron,
+    .chip.pos-num,
+    .chip.pos-punct,
+    .chip.pos-other {
+      color: var(--pos-color);
+      border-color: currentColor;
+      background: rgba(255,255,255,0.045);
+    }
+
+    .empty {
+      padding: 12px;
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.035);
+    }
+
+    .raw-details {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .raw-details summary {
+      cursor: pointer;
+      padding: 10px 12px;
+      color: var(--soft);
+      background: rgba(255,255,255,0.045);
+    }
+
+    .raw-details pre {
+      border: 0;
+      border-radius: 0;
+    }
+
+    .hidden { display: none !important; }
 
     @keyframes spin {
-      to {
-        transform: rotate(360deg);
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .demo-split,
+      .decision-card,
+      .doc-summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .routes {
+        grid-template-columns: 1fr;
+      }
+
+      .component-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .doc-header,
+      .section-head {
+        flex-direction: column;
+        align-items: stretch;
       }
     }
   </style>
 </head>
 <body>
-  <main class="page">
-    <h1>DMS Launcher</h1>
-    <p>Glisse tes documents ici ou clique pour les sélectionner, puis lance via l'API locale.</p>
-
-    <label class="dropzone" id="dropzone" for="file-input">
-      <span>
-        <strong>Déposer les documents</strong>
-        PDF, DOCX, TXT, PNG, WEBP, XLSX
-      </span>
-    </label>
-    <input id="file-input" type="file" multiple>
-
-    <ul class="files" id="files-list"></ul>
-
-    <div class="actions">
-      <button id="launch-btn" type="button" disabled>Lancer</button>
-      <span class="status" id="status">Aucun document sélectionné.</span>
-    </div>
-
-    <div class="progress">
-      <div class="loader-wrap" id="loader-wrap">
-        <div class="loader" aria-hidden="true"></div>
-        <div class="detail" id="progress-detail"></div>
+  <main class="shell">
+    <section class="hero">
+      <div class="hero-card">
+        <div>
+          <span class="eyebrow">DMS pipeline demo</span>
+          <h1>Demonstration complete des traitements documentaires</h1>
+          <p class="hero-copy">
+            Dépose un document, choisis la pipeline, puis regarde chaque composant:
+            prétraitement, OCR, classification, tokenisation, attribution grammaticale,
+            tableaux, totaux, regex, signatures/cachets/codes-barres et sortie API.
+          </p>
+        </div>
+        <div class="routes">
+          <div class="route">
+            <strong>Envoyer</strong>
+            <code>POST /api/run</code>
+          </div>
+          <div class="route">
+            <strong>Suivre</strong>
+            <code>GET /api/status</code>
+          </div>
+          <div class="route">
+            <strong>Résultat</strong>
+            <code>GET /api/result/&lt;job_id&gt;</code>
+          </div>
+        </div>
       </div>
-    </div>
+
+      <aside class="upload-card">
+        <label class="dropzone" id="dropzone" for="file-input">
+          <span>
+            <strong>Glisser ou sélectionner</strong>
+            <small>PDF, DOCX, TXT, PNG, JPG, WEBP, XLSX</small>
+          </span>
+        </label>
+        <input id="file-input" type="file" multiple>
+
+        <div class="control-grid">
+          <label class="control-label">
+            Pipeline à utiliser
+            <select id="pipeline-select">
+              <option value="default">default du code</option>
+              <option value="pipeline0ml">pipeline0ml</option>
+              <option value="pipeline50ml">pipeline50ml</option>
+              <option value="pipeline100ml">pipeline100ml</option>
+            </select>
+          </label>
+        </div>
+
+        <ul class="files" id="files-list"></ul>
+
+        <div class="actions">
+          <button id="launch-btn" type="button" disabled>Lancer la démonstration</button>
+          <button id="download-json-btn" class="secondary" type="button" disabled>Télécharger JSON</button>
+        </div>
+
+        <div class="status-strip">
+          <div id="status-text">Aucun document sélectionné.</div>
+          <div class="loader-line" id="loader-line">
+            <span class="loader" aria-hidden="true"></span>
+            <span id="progress-detail">En attente...</span>
+          </div>
+          <div class="progress-bar" aria-hidden="true">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section" id="pipeline-section">
+      <div class="section-head">
+        <div>
+          <h2>Pipeline en cours</h2>
+          <p id="pipeline-subtitle">Les étapes apparaissent dès que le backend répond.</p>
+        </div>
+        <div class="badge-row" id="pipeline-badges"></div>
+      </div>
+      <div class="panel">
+        <div class="timeline" id="timeline">
+          <div class="empty">Aucun traitement lancé.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section hidden" id="result-section">
+      <div class="section-head">
+        <div>
+          <h2>Résultat démonstratif</h2>
+          <p>Chaque document contient ses composants spécialisés et le JSON brut complet reste disponible.</p>
+        </div>
+        <div class="badge-row" id="result-badges"></div>
+      </div>
+      <div class="documents" id="documents-root"></div>
+      <div class="panel section">
+        <h3>JSON API complet</h3>
+        <p>Le téléchargement contient 100% du payload retourné par l'API. L'aperçu ci-dessous est tronqué si le JSON est très grand.</p>
+        <details class="raw-details" open>
+          <summary>Voir l'aperçu JSON</summary>
+          <pre id="raw-json-preview"></pre>
+        </details>
+      </div>
+    </section>
   </main>
 
   <script>
@@ -197,227 +1081,1921 @@
       window.location.protocol.startsWith("http") && window.location.port === "8765"
     ) ? window.location.origin : "http://127.0.0.1:8765";
 
-    const input = document.getElementById("file-input");
-    const dropzone = document.getElementById("dropzone");
-    const filesList = document.getElementById("files-list");
-    const launchBtn = document.getElementById("launch-btn");
-    const status = document.getElementById("status");
-    const loaderWrap = document.getElementById("loader-wrap");
-    const progressDetail = document.getElementById("progress-detail");
+    const refs = {
+      input: document.getElementById("file-input"),
+      dropzone: document.getElementById("dropzone"),
+      filesList: document.getElementById("files-list"),
+      pipelineSelect: document.getElementById("pipeline-select"),
+      launchBtn: document.getElementById("launch-btn"),
+      downloadJsonBtn: document.getElementById("download-json-btn"),
+      statusText: document.getElementById("status-text"),
+      loaderLine: document.getElementById("loader-line"),
+      progressDetail: document.getElementById("progress-detail"),
+      progressFill: document.getElementById("progress-fill"),
+      pipelineSubtitle: document.getElementById("pipeline-subtitle"),
+      pipelineBadges: document.getElementById("pipeline-badges"),
+      timeline: document.getElementById("timeline"),
+      resultSection: document.getElementById("result-section"),
+      resultBadges: document.getElementById("result-badges"),
+      documentsRoot: document.getElementById("documents-root"),
+      rawJsonPreview: document.getElementById("raw-json-preview")
+    };
 
-    let selectedFiles = [];
-    let statusTimer = null;
-    let isRunning = false;
-    let activeJobId = null;
-    let activeResultUrl = "";
-    const downloadedJobs = new Set();
+    const state = {
+      files: [],
+      fileUrls: new Map(),
+      fileMeta: new Map(),
+      running: false,
+      timer: null,
+      jobId: "",
+      resultUrl: "",
+      result: null,
+      lastStatus: null,
+      fetchingResult: false
+    };
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function asArray(value) {
+      return Array.isArray(value) ? value : [];
+    }
+
+    function asObject(value) {
+      return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+    }
+
+    function valueOrDash(value) {
+      if (value === null || value === undefined || value === "") return "—";
+      if (Array.isArray(value)) return value.length ? value.join(", ") : "—";
+      if (typeof value === "object") return JSON.stringify(value);
+      return String(value);
+    }
+
+    function normalizeName(value) {
+      return String(value || "").trim().toLowerCase();
+    }
+
+    function normalizeLangDisplay(value) {
+      return String(value || "")
+        .split(/[,|;/]+/)
+        .map((part) => part.trim().toLowerCase())
+        .filter((part) => part && !["unknown", "und", "none", "null", "n/a"].includes(part));
+    }
 
     function normalizeApiUrl(value) {
       const raw = String(value || "").trim();
-      if (!raw) {
-        return "";
-      }
-      if (raw.startsWith("http://") || raw.startsWith("https://")) {
-        return raw;
-      }
-      if (raw.startsWith("/")) {
-        return `${API_BASE}${raw}`;
-      }
+      if (!raw) return "";
+      if (raw.startsWith("http://") || raw.startsWith("https://")) return raw;
+      if (raw.startsWith("/")) return `${API_BASE}${raw}`;
       return `${API_BASE}/${raw}`;
     }
 
-    async function downloadResultJson(jobId, resultUrl) {
-      const finalUrl = normalizeApiUrl(resultUrl || (jobId ? `/api/result/${encodeURIComponent(jobId)}` : ""));
-      if (!finalUrl) {
-        throw new Error("URL du resultat absente.");
+    function formatBytes(size) {
+      const n = Number(size || 0);
+      if (!Number.isFinite(n) || n <= 0) return "—";
+      const units = ["o", "Ko", "Mo", "Go"];
+      let value = n;
+      let index = 0;
+      while (value >= 1024 && index < units.length - 1) {
+        value /= 1024;
+        index += 1;
+      }
+      return `${value.toFixed(index ? 1 : 0)} ${units[index]}`;
+    }
+
+    function jsonPreview(value, maxChars = 30000) {
+      let text = "";
+      try {
+        text = JSON.stringify(value, null, 2);
+      } catch (error) {
+        text = String(value);
+      }
+      if (text.length > maxChars) {
+        return `${text.slice(0, maxChars)}\n\n... aperçu tronqué, télécharge le JSON pour le contenu complet.`;
+      }
+      return text;
+    }
+
+    function resolveResultPayload(payload) {
+      const root = asObject(payload);
+      if (Array.isArray(root.documents)) return root;
+      const candidates = [
+        root.result,
+        root.payload,
+        root.data,
+        root.output,
+        root.api_result,
+        root.api_result_payload,
+        root.API_OUTPUT_RESULT,
+        root.FUSION_PAYLOAD
+      ];
+      for (const candidate of candidates) {
+        const obj = asObject(candidate);
+        if (Array.isArray(obj.documents)) return obj;
+      }
+      return root;
+    }
+
+    function resultDocuments(result) {
+      const resolved = resolveResultPayload(result);
+      const docs = asArray(resolved.documents);
+      if (docs.length) return docs;
+      const manifestDocs = asArray(asObject(resolved.manifest).documents);
+      if (manifestDocs.length) {
+        return manifestDocs.map((doc) => ({
+          document_id: doc.api_document_id || doc.document_id || doc.file_sha256 || doc.file_name,
+          file: {
+            name: doc.file_name || doc.name,
+            size: doc.file_size,
+            page_count: doc.page_count,
+            mime: doc.file_mime,
+            ext: doc.file_ext
+          },
+          doc_type: doc.doc_type || null,
+          classification: {},
+          components: {},
+          text: {},
+          document_structure: {},
+          extraction: {},
+          nlp: {},
+          content: {}
+        }));
+      }
+      return [];
+    }
+
+    function stopPolling() {
+      if (state.timer) {
+        clearInterval(state.timer);
+        state.timer = null;
+      }
+    }
+
+    function setRunning(active) {
+      state.running = Boolean(active);
+      refs.loaderLine.classList.toggle("active", state.running);
+      refs.launchBtn.disabled = state.running || state.files.length === 0;
+    }
+
+    function setProgress(percent) {
+      const safe = Math.max(0, Math.min(100, Number(percent || 0)));
+      refs.progressFill.style.width = `${safe}%`;
+    }
+
+    function setMessage(text, detail) {
+      refs.statusText.textContent = text || "";
+      refs.progressDetail.textContent = detail || "";
+    }
+
+    function statusBadge(status) {
+      const s = String(status || "pending").toLowerCase();
+      if (s === "completed" || s === "executed" || s === "done") return "ok";
+      if (s === "running") return "accent";
+      if (s === "failed" || s === "error") return "danger";
+      if (s === "review" || s === "partial") return "warn";
+      return "";
+    }
+
+    function badge(label, value, cls = "") {
+      return `<span class="badge ${cls}"><strong>${escapeHtml(label)}</strong>${escapeHtml(value)}</span>`;
+    }
+
+    function chip(value, cls = "") {
+      return `<span class="chip ${cls}">${escapeHtml(value)}</span>`;
+    }
+
+    function renderFiles() {
+      refs.filesList.innerHTML = "";
+      for (const file of state.files) {
+        const li = document.createElement("li");
+        const left = document.createElement("span");
+        const right = document.createElement("span");
+        left.textContent = file.name;
+        right.textContent = formatBytes(file.size);
+        li.append(left, right);
+        refs.filesList.appendChild(li);
+      }
+      refs.launchBtn.disabled = state.running || state.files.length === 0;
+      if (!state.running) {
+        setMessage(
+          state.files.length ? `${state.files.length} document(s) prêt(s).` : "Aucun document sélectionné.",
+          state.files.length ? `API cible: ${API_BASE}` : ""
+        );
+      }
+    }
+
+    function revokeFileUrls() {
+      for (const url of state.fileUrls.values()) {
+        URL.revokeObjectURL(url);
+      }
+      state.fileUrls.clear();
+      state.fileMeta.clear();
+    }
+
+    function setFiles(fileList) {
+      revokeFileUrls();
+      state.files = Array.from(fileList || []);
+      for (const file of state.files) {
+        const key = normalizeName(file.name);
+        state.fileMeta.set(key, {
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          isImage: String(file.type || "").startsWith("image/")
+        });
+        if (String(file.type || "").startsWith("image/")) {
+          state.fileUrls.set(key, URL.createObjectURL(file));
+        }
+      }
+      renderFiles();
+    }
+
+    function getLocalPreviewUrl(filename) {
+      return state.fileUrls.get(normalizeName(filename)) || "";
+    }
+
+    function getLocalFileMeta(filename) {
+      return state.fileMeta.get(normalizeName(filename)) || {};
+    }
+
+    function deepFindImageUrl(value, depth = 0) {
+      if (depth > 4 || value === null || value === undefined) return "";
+      if (typeof value === "string") {
+        const v = value.trim();
+        if (v.startsWith("data:image/")) return v;
+        if (/^https?:\/\/.+\.(png|jpe?g|webp|gif)(\?.*)?$/i.test(v)) return v;
+        return "";
+      }
+      if (Array.isArray(value)) {
+        for (const item of value) {
+          const found = deepFindImageUrl(item, depth + 1);
+          if (found) return found;
+        }
+      }
+      if (typeof value === "object") {
+        for (const item of Object.values(value)) {
+          const found = deepFindImageUrl(item, depth + 1);
+          if (found) return found;
+        }
+      }
+      return "";
+    }
+
+    function componentData(component) {
+      const obj = asObject(component);
+      const data = asObject(obj.data);
+      return Object.keys(data).length ? data : obj;
+    }
+
+    function renderPipelineTimeline(statusPayload, resultPayload) {
+      const status = asObject(statusPayload);
+      const result = asObject(resultPayload);
+      const pipeline = asObject(result.pipeline);
+      const runs = asArray(pipeline.component_runs);
+      const metaComponents = asArray(status.pipeline_components);
+      const runByStep = new Map();
+
+      for (const run of runs) {
+        const row = asObject(run);
+        const name = row.component_name || row.step || row.component_key;
+        if (name) runByStep.set(String(name), row);
       }
 
+      let steps = metaComponents.map((item) => asObject(item));
+      if (!steps.length && runs.length) {
+        steps = runs.map((run) => ({
+          step: run.component_name || run.component_key,
+          script: run.component_script || "",
+          script_path: run.component_script || ""
+        }));
+      }
+      if (!steps.length) {
+        steps = asArray(pipeline.steps).map((step) => ({ step }));
+      }
+
+      const current = status.component_name || status.current_step || "";
+      const completedCount = Number(status.completed_steps_count || 0);
+      const failed = String(status.status || "").toLowerCase() === "failed";
+
+      refs.pipelineSubtitle.textContent = steps.length
+        ? `${steps.length} composant(s) dans ${status.pipeline_profile || pipeline.profile || refs.pipelineSelect.value}.`
+        : "Les étapes apparaissent dès que le backend répond.";
+
+      refs.pipelineBadges.innerHTML = [
+        badge("API", API_BASE, "accent"),
+        badge("Pipeline", status.pipeline_profile || pipeline.profile || refs.pipelineSelect.value || "default", "ok"),
+        badge("Status", status.status || (state.running ? "running" : "idle"), statusBadge(status.status || (state.running ? "running" : "idle")))
+      ].join("");
+
+      if (!steps.length) {
+        refs.timeline.innerHTML = `<div class="empty">Aucun traitement lancé.</div>`;
+        return;
+      }
+
+      refs.timeline.innerHTML = steps.map((item, index) => {
+        const stepName = item.step || item.component_name || `step-${index + 1}`;
+        const run = runByStep.get(String(stepName)) || {};
+        let statusName = run.status || "pending";
+        if (String(stepName) === String(current) && state.running) statusName = "running";
+        if (!run.status && completedCount && index < completedCount) statusName = "completed";
+        if (failed && String(stepName) === String(current)) statusName = "failed";
+        const klass = statusName === "running" ? "running" : statusName === "failed" ? "failed" : (statusName === "completed" || statusName === "executed") ? "done" : "";
+        const script = item.script_path || item.script || run.component_script || "";
+        const summary = run.summary || item.component_class || "";
+        return `
+          <article class="step ${klass}">
+            <div class="badge ${statusBadge(statusName)}">${escapeHtml(statusName)}</div>
+            <strong>${index + 1}. ${escapeHtml(stepName)}</strong>
+            <small>${escapeHtml(script)}</small>
+            ${summary ? `<small>${escapeHtml(summary)}</small>` : ""}
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderKpis(items) {
+      return `<div class="kpi-grid">${items.map((item) => `
+        <div class="kpi">
+          <span>${escapeHtml(item.label)}</span>
+          <strong>${escapeHtml(valueOrDash(item.value))}</strong>
+        </div>
+      `).join("")}</div>`;
+    }
+
+    function renderKeyValueGrid(obj, limit = 12) {
+      const entries = Object.entries(asObject(obj))
+        .filter(([, value]) => value !== undefined && value !== null && value !== "")
+        .slice(0, limit);
+      if (!entries.length) return `<div class="empty">Aucune donnée synthétique disponible.</div>`;
+      return renderKpis(entries.map(([key, value]) => ({
+        label: key,
+        value: typeof value === "object" ? JSON.stringify(value).slice(0, 160) : value
+      })));
+    }
+
+    function compactObject(obj, omittedKeys = []) {
+      const skip = new Set(omittedKeys.map((key) => normalizeName(key)));
+      return Object.fromEntries(
+        Object.entries(asObject(obj)).filter(([key, value]) => {
+          if (skip.has(normalizeName(key))) return false;
+          return value !== undefined && value !== null && value !== "";
+        })
+      );
+    }
+
+    function extractDisplayValue(value, depth = 0) {
+      if (depth > 6) return null;
+      if (value === null || value === undefined || value === "") return null;
+      if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return value;
+      if (Array.isArray(value)) {
+        for (const item of value) {
+          const resolved = extractDisplayValue(item, depth + 1);
+          if (resolved !== null && resolved !== undefined && resolved !== "") return resolved;
+        }
+        return null;
+      }
+      const obj = asObject(value);
+      const preferredKeys = [
+        "value",
+        "amount",
+        "detected",
+        "best",
+        "normalized",
+        "text",
+        "label",
+        "total",
+        "total_ht",
+        "total_ttc",
+        "tax",
+        "vat"
+      ];
+      for (const key of preferredKeys) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          const resolved = extractDisplayValue(obj[key], depth + 1);
+          if (resolved !== null && resolved !== undefined && resolved !== "") return resolved;
+        }
+      }
+      if (Array.isArray(obj._one_of)) {
+        const resolved = extractDisplayValue(obj._one_of, depth + 1);
+        if (resolved !== null && resolved !== undefined && resolved !== "") return resolved;
+      }
+      for (const nested of Object.values(obj)) {
+        const resolved = extractDisplayValue(nested, depth + 1);
+        if (resolved !== null && resolved !== undefined && resolved !== "") return resolved;
+      }
+      return null;
+    }
+
+    function flattenTotalsForDisplay(value) {
+      const source = asObject(value);
+      const orderedKeys = ["available", "tax", "total_ht", "total_ttc", "total"];
+      const out = {};
+      orderedKeys.forEach((key) => {
+        if (!Object.prototype.hasOwnProperty.call(source, key)) return;
+        const resolved = extractDisplayValue(source[key]);
+        out[key] = resolved !== null && resolved !== undefined && resolved !== "" ? resolved : null;
+      });
+      Object.entries(source).forEach(([key, rawValue]) => {
+        if (Object.prototype.hasOwnProperty.call(out, key)) return;
+        const resolved = extractDisplayValue(rawValue);
+        if (resolved !== null && resolved !== undefined && resolved !== "") {
+          out[key] = resolved;
+        }
+      });
+      return out;
+    }
+
+    function stopwordSet() {
+      return new Set([
+        "a", "à", "au", "aux", "b", "c", "d", "dans", "de", "des", "du", "e", "en", "et",
+        "f", "g", "h", "i", "j", "k", "l", "la", "le", "les", "m", "mais", "n", "ne", "o",
+        "ou", "p", "par", "pas", "pour", "q", "que", "qui", "r", "s", "sans", "sur", "t",
+        "u", "un", "une", "v", "w", "x", "y", "z", "with", "the", "and", "for", "from", "to",
+        "of", "in", "on", "is", "are"
+      ]);
+    }
+
+    function extractReadableKeywords(doc, limit = 24) {
+      const text = String(
+        asObject(asObject(doc.text).search).full_text
+        || asObject(doc.text).text_raw
+        || ""
+      );
+      const provided = asArray(asObject(asObject(doc.text).search).keywords);
+      const stopwords = stopwordSet();
+      const out = [];
+      const seen = new Set();
+
+      function pushKeyword(value) {
+        const raw = String(value || "").trim();
+        if (!raw) return;
+        const normalized = raw.toLowerCase();
+        if (normalized.length < 2) return;
+        if (/^[a-zà-ÿ]$/i.test(raw)) return;
+        if (/^\d+$/.test(raw)) return;
+        if (stopwords.has(normalized)) return;
+        if (seen.has(normalized)) return;
+        seen.add(normalized);
+        out.push(raw);
+      }
+
+      provided.forEach(pushKeyword);
+      if (out.length >= limit || !text.trim()) {
+        return out.slice(0, limit);
+      }
+
+      const counts = new Map();
+      const matches = text.match(/[\p{L}\p{N}][\p{L}\p{N}'’-]*/gu) || [];
+      for (const token of matches) {
+        const cleaned = String(token || "").trim().replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, "");
+        const normalized = cleaned.toLowerCase();
+        if (!normalized || normalized.length < 3) continue;
+        if (/^\d+$/.test(normalized)) continue;
+        if (stopwords.has(normalized)) continue;
+        counts.set(cleaned, (counts.get(cleaned) || 0) + 1);
+      }
+      Array.from(counts.entries())
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        .forEach(([token]) => {
+          if (out.length < limit) pushKeyword(token);
+        });
+      return out.slice(0, limit);
+    }
+
+    function tokenisationSentenceCount(doc, data, pages) {
+      const direct = Number(data.sentences_count || 0);
+      if (direct > 0) return direct;
+      const fromPages = pages.reduce((sum, page) => sum + asArray(asObject(page).sentences_layout).length, 0);
+      if (fromPages > 0) return fromPages;
+      return asArray(asObject(doc.nlp).sentences).length || null;
+    }
+
+    function tokenisationTokenCount(doc, data, chunks) {
+      const direct = Number(data.tokens_count || 0);
+      if (direct > 0) return direct;
+      const fromNlp = asArray(asObject(doc.nlp).tokens).length;
+      if (fromNlp > 0) return fromNlp;
+      const fromChunks = chunks.reduce((sum, row) => sum + Number(asObject(row).token_count || 0), 0);
+      if (fromChunks > 0) return fromChunks;
+      return null;
+    }
+
+    function renderDemoBlock(title, body, note = "") {
+      return `
+        <section class="demo-block">
+          <div class="demo-title">
+            <span>${escapeHtml(title)}</span>
+            ${note ? `<small>${escapeHtml(note)}</small>` : ""}
+          </div>
+          ${body}
+        </section>
+      `;
+    }
+
+    function renderRawDetails(value, title = "JSON brut du composant") {
+      return `
+        <details class="raw-details">
+          <summary>${escapeHtml(title)}</summary>
+          <pre>${escapeHtml(jsonPreview(value, 16000))}</pre>
+        </details>
+      `;
+    }
+
+    function extractPageTexts(doc) {
+      const pages = asArray(asObject(doc.document_structure).pages);
+      return pages.map((page, index) => {
+        const item = asObject(page);
+        const text = String(item.text || item.page_text || item.ocr_text || "").trim();
+        return {
+          page_index: item.page_index || index + 1,
+          text
+        };
+      }).filter((row) => row.text);
+    }
+
+    function renderPreprocessing(doc, data) {
+      const file = asObject(doc.file);
+      const filename = file.name || data.filename || data.matched_path || "document";
+      const localUrl = getLocalPreviewUrl(filename);
+      const localMeta = getLocalFileMeta(filename);
+      const processedUrl = deepFindImageUrl(data) || deepFindImageUrl(doc.extraction);
+      const original = localUrl
+        ? `<img src="${escapeHtml(localUrl)}" alt="Image originale">`
+        : `<div class="placeholder">Aperçu original non image ou non disponible côté navigateur.<br>${escapeHtml(filename)}</div>`;
+      const processed = processedUrl
+        ? `<img src="${escapeHtml(processedUrl)}" alt="Image traitée">`
+        : `<div class="placeholder">Image traitée non exposée en URL par l'API.<br>Les métadonnées du prétraitement sont affichées dessous.</div>`;
+      return `
+        <div class="demo-split">
+          <div class="visual-box">
+            <strong>Document original</strong>
+            ${original}
+            ${renderKpis([
+              { label: "nom", value: filename },
+              { label: "type navigateur", value: localMeta.type || file.mime || file.ext },
+              { label: "taille", value: formatBytes(localMeta.size || file.size) }
+            ])}
+          </div>
+          <div class="visual-box">
+            <strong>Sortie prétraitée</strong>
+            ${processed}
+            ${renderKeyValueGrid(compactObject(data, ["size", "content"]), 8)}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderOutputText(doc, data) {
+      const text = asObject(doc.text);
+      const raw = text.text_raw || text.full_text || data.text || data.raw_text || "";
+      const normalized = text.text_normalized || data.text_normalized || "";
+      return `
+        ${renderKpis([
+          { label: "méthode extraction", value: asObject(doc.extraction).method || data.extraction },
+          { label: "pages", value: data.pages_count || asObject(doc.file).page_count },
+          { label: "caractères", value: raw ? raw.length : data.text_length },
+          { label: "a du texte", value: data.has_text }
+        ])}
+        <div class="text-preview">${escapeHtml(raw || "Aucun texte brut dans ce résultat.")}</div>
+        ${normalized ? `<div class="text-preview">${escapeHtml(normalized)}</div>` : ""}
+      `;
+    }
+
+    function renderRouting(doc, data) {
+      return `
+        ${renderDemoBlock("Routage du document", `
+          ${renderKpis([
+            { label: "texte direct", value: data.is_text_file },
+            { label: "image OCR", value: data.is_image_only_file },
+            { label: "text files", value: data.text_files_count },
+            { label: "image files", value: data.image_only_files_count },
+            { label: "unsupported", value: data.unsupported_files_count },
+            { label: "missing", value: data.missing_files_count }
+          ])}
+        `)}
+      `;
+    }
+
+    function renderOutputTextSummary(doc, data) {
+      const text = asObject(doc.text);
+      const raw = text.text_raw || text.full_text || data.text || data.raw_text || "";
+      return renderDemoBlock("Résumé extraction texte", `
+        ${renderKpis([
+          { label: "méthode extraction", value: asObject(doc.extraction).method || data.extraction },
+          { label: "pages", value: data.pages_count || asObject(doc.file).page_count },
+          { label: "caractères", value: raw ? raw.length : data.text_length },
+          { label: "a du texte", value: data.has_text }
+        ])}
+      `);
+    }
+
+    function renderClassification(doc, data) {
+      const c = asObject(doc.classification);
+      const merged = { ...data, ...c };
+      const scores = asObject(merged.scores);
+      const scoreEntries = Object.entries(scores).sort((a, b) => Number(b[1] || 0) - Number(a[1] || 0));
+      const maxScore = Math.max(1, ...scoreEntries.map(([, score]) => Number(score || 0)));
+      const scoreHtml = scoreEntries.length ? `
+        <div class="score-list">
+          ${scoreEntries.map(([name, score]) => {
+            const pct = Math.max(0, Math.min(100, (Number(score || 0) / maxScore) * 100));
+            return `
+              <div class="score-row">
+                <strong>${escapeHtml(name)}</strong>
+                <div class="score-track"><div class="score-fill" style="width:${pct}%"></div></div>
+                <span>${escapeHtml(score)}</span>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      ` : `<div class="empty">Aucun score de classification.</div>`;
+
+      const matches = asObject(merged.keyword_matches);
+      const categories = [
+        ["strong", "Strong"],
+        ["medium", "Medium"],
+        ["weak", "Weak"],
+        ["negative", "Negative"],
+        ["strong_negative", "Strong negative"],
+        ["anti_confusion_hits", "Anti-confusion"]
+      ];
+      const matchHtml = categories.map(([key, label]) => {
+        const values = asArray(matches[key]).map((item) => {
+          if (typeof item === "object" && item) {
+            return item.keyword || item.value || item.term || JSON.stringify(item);
+          }
+          return item;
+        }).filter(Boolean);
+        return `
+          <div>
+            <strong>${escapeHtml(label)}</strong>
+            <div class="chip-row">${values.length ? values.map((v) => chip(v)).join("") : chip("aucun")}</div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        ${renderDemoBlock("Décision de classification", `
+          <div class="decision-card">
+            <div class="decision-main">
+              <span>Type retenu</span>
+              <strong>${escapeHtml(merged.doc_type || doc.doc_type || "UNCLASSIFIED")}</strong>
+              <em>${escapeHtml(merged.status || "status inconnu")}</em>
+            </div>
+            ${renderKpis([
+              { label: "winning score", value: merged.winning_score },
+              { label: "threshold", value: merged.threshold },
+              { label: "margin", value: merged.margin },
+              { label: "2e score", value: asObject(merged.decision_debug).second_score }
+            ])}
+          </div>
+        `)}
+        ${renderDemoBlock("Scores par type documentaire", scoreHtml)}
+        ${renderDemoBlock("Mots détectés par force", `<div class="keyword-lanes">${matchHtml}</div>`)}
+      `;
+    }
+
+    function renderTokenisation(doc, data) {
+      const structure = asObject(doc.document_structure);
+      const pages = asArray(structure.pages);
+      const ml50 = asObject(doc.ml50);
+      const ml100 = asObject(doc.ml100);
+      const chunks = [...asArray(ml50.chunks_embeddings), ...asArray(ml100.chunks_embeddings)];
+      const topics = [
+        ...asArray(ml50.document_primary_topics),
+        ...asArray(ml100.document_primary_topics),
+        ...asArray(ml50.document_topics).map((x) => asObject(x).term).filter(Boolean),
+        ...asArray(ml100.document_topics).map((x) => asObject(x).term).filter(Boolean)
+      ].filter(Boolean);
+      const langs = new Set([
+        ...asArray(data.detected_languages),
+        ...pages.map((p) => asObject(p).lang).filter(Boolean),
+        ...chunks.map((c) => asObject(c).lang).filter(Boolean)
+      ]);
+      const sentencesCount = tokenisationSentenceCount(doc, data, pages);
+      const tokensCount = tokenisationTokenCount(doc, data, chunks);
+
+      const chunkRows = chunks.slice(0, 12).map((row) => {
+        const item = asObject(row);
+        return `
+          <tr>
+            <td>${escapeHtml(item.page_index)}</td>
+            <td>${escapeHtml(item.lang)}</td>
+            <td>${escapeHtml(item.token_count)}</td>
+            <td>${escapeHtml(item.chunk_primary_topic || "")}</td>
+            <td>${escapeHtml(item.text_preview || "")}</td>
+          </tr>
+        `;
+      }).join("");
+
+      return `
+        ${renderKpis([
+          { label: "pages", value: pages.length || data.pages_count },
+          { label: "phrases", value: sentencesCount },
+          { label: "tokens", value: tokensCount },
+          { label: "embedding", value: ml100.embedding_method || ml50.embedding_method || data.embedding_method }
+        ])}
+        <div class="chip-row">${Array.from(langs).length ? Array.from(langs).map((lang) => chip(lang, "accent")).join("") : chip("langue non détectée")}</div>
+        <div class="chip-row">${topics.length ? topics.slice(0, 30).map((topic) => chip(topic)).join("") : chip("aucun topic")}</div>
+        ${chunkRows ? `
+          <table>
+            <thead><tr><th>Page</th><th>Langue</th><th>Tokens</th><th>Topic</th><th>Texte chunk</th></tr></thead>
+            <tbody>${chunkRows}</tbody>
+          </table>
+        ` : `<div class="empty">Aucun chunk vectorisé affichable.</div>`}
+      `;
+    }
+
+    function posFamily(posValue, tokenValue) {
+      const pos = String(posValue || "").trim().toUpperCase();
+      const token = String(tokenValue || "").trim();
+      if (!pos && /^[\p{P}\p{S}]+$/u.test(token)) return "punct";
+      if (["NNP", "NNPS", "PROPN", "PERS", "PER", "ORG", "LOC"].some((x) => pos.includes(x))) return "proper";
+      if (["NN", "NNS", "NOUN", "NOM", "NC", "N"].some((x) => pos === x || pos.startsWith(`${x}_`))) return "noun";
+      if (["VB", "VBD", "VBG", "VBN", "VBP", "VBZ", "VERB", "AUX", "V"].some((x) => pos === x || pos.startsWith(x))) return "verb";
+      if (["JJ", "JJR", "JJS", "ADJ"].some((x) => pos === x || pos.startsWith(x))) return "adj";
+      if (["RB", "RBR", "RBS", "ADV"].some((x) => pos === x || pos.startsWith(x))) return "adv";
+      if (["DT", "DET", "ART"].some((x) => pos === x || pos.startsWith(x))) return "det";
+      if (["IN", "ADP", "PREP", "PRP"].some((x) => pos === x || pos.startsWith(x))) return "prep";
+      if (["PRON", "PRP", "PRP$", "WP"].some((x) => pos === x || pos.startsWith(x))) return "pron";
+      if (["CD", "NUM", "NUMBER"].some((x) => pos === x || pos.startsWith(x))) return "num";
+      if (["PUNCT", ".", ",", ":", ";"].includes(pos) || /^[\p{P}\p{S}]+$/u.test(token)) return "punct";
+      return "other";
+    }
+
+    function normalizeGrammarToken(row, index) {
+      const item = asObject(row);
+      const token = item.token ?? item.text ?? item.word ?? item.tok ?? item.value ?? item.form ?? "";
+      const pos = item.pos ?? item.POS ?? item.tag ?? item.upos ?? item.xpos ?? item.morph_pos ?? "";
+      const lemma = item.lemma ?? item.lemme ?? item.base ?? item.root ?? "";
+      const ner = item.ner ?? item.NER ?? item.entity ?? item.entity_group ?? item.label ?? "";
+      const lang = item.lang ?? item.language ?? "";
+      const start = Number(item.start ?? item.char_start ?? item.begin ?? item.offset_start ?? item.start_char);
+      const end = Number(item.end ?? item.char_end ?? item.stop ?? item.offset_end ?? item.end_char);
+      if (!token && !pos && !lemma && !ner) return null;
+      return {
+        index,
+        token: String(token || ""),
+        pos: String(pos || ""),
+        lemma: String(lemma || ""),
+        ner: String(ner || ""),
+        lang: String(lang || ""),
+        start: Number.isFinite(start) ? start : null,
+        end: Number.isFinite(end) ? end : null
+      };
+    }
+
+    function grammarTokenSources(doc, data, component) {
+      const nlp = asObject(doc.nlp);
+      const nlpFull = asObject(nlp.full);
+      const comp = asObject(component);
+      const contextValues = asObject(comp.context_values);
+      const reported = asObject(comp.reported_output);
+      const sources = [
+        nlp.tokens,
+        nlpFull.tokens,
+        nlpFull.NLP_TOKENS,
+        data.tokens,
+        data.NLP_TOKENS,
+        data.NLP_POS,
+        data.NLP_LEMMA,
+        data.NLP_ANALYSES,
+        data.FR_RESULTS,
+        data.EN_RESULTS,
+        data.AR_RESULTS,
+        contextValues.NLP_TOKENS,
+        contextValues.NLP_POS,
+        contextValues.NLP_LEMMA,
+        contextValues.NLP_ANALYSES,
+        contextValues.FR_RESULTS,
+        contextValues.EN_RESULTS,
+        contextValues.AR_RESULTS,
+        reported.NLP_TOKENS,
+        reported.NLP_POS,
+        reported.NLP_LEMMA,
+        reported.NLP_ANALYSES,
+        reported.FR_RESULTS,
+        reported.EN_RESULTS,
+        reported.AR_RESULTS,
+        reported.tokens
+      ];
+      for (const [key, value] of Object.entries(asObject(doc.components))) {
+        const keyNorm = normalizeName(key);
+        if (!(keyNorm.includes("atripusion") || keyNorm.includes("attribution") || keyNorm.includes("grammatical"))) {
+          continue;
+        }
+        const obj = asObject(value);
+        const objData = asObject(obj.data);
+        const objContext = asObject(obj.context_values);
+        const objReported = asObject(obj.reported_output);
+        sources.push(
+          obj.tokens,
+          obj.NLP_TOKENS,
+          obj.NLP_POS,
+          obj.NLP_LEMMA,
+          obj.FR_RESULTS,
+          obj.EN_RESULTS,
+          obj.AR_RESULTS,
+          objData.tokens,
+          objData.NLP_TOKENS,
+          objData.NLP_POS,
+          objData.NLP_LEMMA,
+          objData.FR_RESULTS,
+          objData.EN_RESULTS,
+          objData.AR_RESULTS,
+          objContext.NLP_TOKENS,
+          objContext.NLP_POS,
+          objContext.NLP_LEMMA,
+          objContext.FR_RESULTS,
+          objContext.EN_RESULTS,
+          objContext.AR_RESULTS,
+          objReported.NLP_TOKENS,
+          objReported.NLP_POS,
+          objReported.NLP_LEMMA,
+          objReported.FR_RESULTS,
+          objReported.EN_RESULTS,
+          objReported.AR_RESULTS
+        );
+      }
+      return sources;
+    }
+
+    function extractGrammarText(value, depth = 0) {
+      if (depth > 5 || value === null || value === undefined) return "";
+      if (typeof value === "string") return "";
+      if (Array.isArray(value)) {
+        for (const item of value) {
+          const text = extractGrammarText(item, depth + 1);
+          if (text) return text;
+        }
+        return "";
+      }
+      const obj = asObject(value);
+      const textKeys = [
+        "text",
+        "TEXT",
+        "raw_text",
+        "text_raw",
+        "ocr_text",
+        "extracted_text",
+        "original_text",
+        "normalized_text",
+        "sentence",
+        "content"
+      ];
+      for (const key of textKeys) {
+        const candidate = obj[key];
+        if (typeof candidate === "string" && candidate.trim().length > 1) {
+          return candidate;
+        }
+      }
+      const nestedKeys = [
+        "FR_RESULTS",
+        "EN_RESULTS",
+        "AR_RESULTS",
+        "NLP_ANALYSES",
+        "results",
+        "sentences",
+        "data",
+        "context_values",
+        "reported_output"
+      ];
+      for (const key of nestedKeys) {
+        const text = extractGrammarText(obj[key], depth + 1);
+        if (text) return text;
+      }
+      return "";
+    }
+
+    function collectGrammarText(doc, data, component, tokens) {
+      const docText = asObject(doc.text);
+      const nlp = asObject(doc.nlp);
+      const direct = [
+        docText.text_raw,
+        docText.raw,
+        docText.text,
+        docText.ocr_text,
+        data.text,
+        data.raw_text,
+        data.text_raw,
+        data.ocr_text,
+        data.extracted_text
+      ].find((value) => typeof value === "string" && value.trim());
+      if (direct) return direct;
+
+      const sentences = asArray(nlp.sentences).map(asObject).map((row) => row.text).filter(Boolean);
+      if (sentences.length) return sentences.join("\n");
+
+      const sources = [data, component];
+      for (const value of Object.values(asObject(doc.components))) {
+        const obj = asObject(value);
+        const key = normalizeName(obj.component || obj.name || obj.key || "");
+        const looksGrammar = key.includes("atripusion") || key.includes("attribution") || key.includes("grammatical");
+        if (looksGrammar || obj.data || obj.context_values || obj.reported_output) {
+          sources.push(obj);
+        }
+      }
+      for (const source of sources) {
+        const text = extractGrammarText(source);
+        if (text) return text;
+      }
+      if (tokens.length) {
+        return tokens.map((row) => row.token).filter(Boolean).join(" ");
+      }
+      return "";
+    }
+
+    function expandGrammarTokenSource(source) {
+      const rows = asArray(source);
+      const out = [];
+      rows.forEach((row, rowIndex) => {
+        const item = asObject(row);
+        const tokens = asArray(item.tokens);
+        const posRows = asArray(item.pos || item.POS || item.tags || item.pos_tags);
+        const lemmas = asArray(item.lemmas || item.lemma || item.lemmes);
+        const nerRows = asArray(item.ner_labels || item.ner || item.entities_labels || item.labels);
+        if (tokens.length && (posRows.length || lemmas.length || nerRows.length)) {
+          tokens.forEach((token, tokenIndex) => {
+            out.push({
+              index: out.length,
+              token: String(token || ""),
+              pos: String(posRows[tokenIndex] || ""),
+              lemma: String(lemmas[tokenIndex] || ""),
+              ner: String(nerRows[tokenIndex] || ""),
+              lang: String(item.lang || item.language || ""),
+              start: null,
+              end: null,
+              source_row: rowIndex
+            });
+          });
+          return;
+        }
+        const normalized = normalizeGrammarToken(row, out.length);
+        if (normalized) {
+          out.push(normalized);
+        }
+      });
+      return out;
+    }
+
+    function collectGrammarTokens(doc, data, component) {
+      for (const source of grammarTokenSources(doc, data, component)) {
+        const rows = expandGrammarTokenSource(source)
+          .filter(Boolean)
+          .filter((row) => row.token || row.pos || row.lemma || row.ner);
+        const meaningful = rows.filter((row) => row.token && (row.pos || row.lemma || row.ner));
+        if (meaningful.length) return meaningful.slice(0, 260);
+      }
+      return [];
+    }
+
+    function fallbackTokensFromText(text) {
+      const sourceText = String(text || "");
+      const out = [];
+      const regex = /[\p{L}\p{N}_]+(?:[’'][\p{L}\p{N}_]+)?|[^\s]/gu;
+      let match = null;
+      while ((match = regex.exec(sourceText)) !== null && out.length < 260) {
+        const token = match[0];
+        out.push({
+          index: out.length,
+          token,
+          pos: /^[\p{P}\p{S}]$/u.test(token) ? "PUNCT" : "",
+          lemma: "",
+          ner: "",
+          lang: "",
+          start: match.index,
+          end: match.index + token.length
+        });
+      }
+      return out;
+    }
+
+    function renderGrammar(doc, data, component = {}) {
+      const tokens = collectGrammarTokens(doc, data, component);
+      const text = collectGrammarText(doc, data, component, tokens);
+      const rows = (tokens.length ? tokens : fallbackTokensFromText(text)).slice(0, 500);
+      const tokenRows = rows.map((row) => `
+        <tr>
+          <td>${escapeHtml(row.token)}</td>
+          <td>${escapeHtml(row.pos)}</td>
+          <td>${escapeHtml(row.lemma)}</td>
+          <td>${escapeHtml(row.ner)}</td>
+          <td>${escapeHtml(row.lang)}</td>
+        </tr>
+      `).join("");
+
+      if (!tokenRows) {
+        return `<table><thead><tr><th>Mot</th><th>POS</th><th>Lemme</th><th>NER</th><th>Langue</th></tr></thead><tbody></tbody></table>`;
+      }
+      return `
+        ${renderKpis([
+          { label: "phrases", value: asArray(asObject(doc.nlp).sentences).length || data.sentences_count || null },
+          { label: "tokens", value: rows.length || data.tokens_count || null },
+          { label: "entités", value: asArray(asObject(doc.nlp).entities).length || data.entities_count || null },
+          { label: "langues", value: asArray(asObject(doc.nlp).languages).join(", ") || asObject(doc.nlp).language || data.language || null }
+        ])}
+        <table>
+          <thead><tr><th>Mot</th><th>POS</th><th>Lemme</th><th>NER</th><th>Langue</th></tr></thead>
+          <tbody>${tokenRows}</tbody>
+        </table>
+      `;
+    }
+
+    function extractTablePayload(doc, data) {
+      const extraction = asObject(doc.extraction);
+      const nested = asObject(data.TABLE_EXTRACTIONS || data.table_extractions || data.table_extraction);
+      const candidates = [
+        asObject(extraction.table_extraction),
+        asObject(asObject(doc.ml0).table_extraction),
+        asObject(asObject(doc.ml50).table_extraction),
+        asObject(asObject(doc.ml100).table_extraction),
+        nested,
+        data
+      ];
+      return candidates.find((item) => Object.keys(item).length) || {};
+    }
+
+    function tableRowDisplayCells(row) {
+      const item = asObject(row);
+      const rawCells = asArray(item.raw_cells).filter((value) => value !== null && value !== undefined && String(value).trim() !== "");
+      if (rawCells.length) return rawCells.map((value) => String(value));
+      const preferred = [
+        item.reference,
+        item.description || item.label || item.product || item.item,
+        item.quantity || item.qty,
+        item.unit_price || item.price,
+        item.total || item.amount
+      ].filter((value) => value !== null && value !== undefined && String(value).trim() !== "");
+      if (preferred.length) return preferred.map((value) => String(value));
+      return Object.entries(item)
+        .filter(([key, value]) => !["table_index", "page_index", "row_index", "confidence", "status"].includes(key) && value !== null && value !== undefined && String(value).trim() !== "")
+        .map(([, value]) => String(value));
+    }
+
+    function prettifyTableFieldName(name) {
+      const key = String(name || "").trim();
+      const mapping = {
+        reference: "Reference",
+        product: "Produit",
+        quantity: "Quantite",
+        unit_price: "Prix unitaire",
+        total: "Total",
+        total_ht: "Total HT",
+        total_ttc: "Total TTC",
+        description: "Description",
+        item: "Produit"
+      };
+      return mapping[key] || key.replaceAll("_", " ");
+    }
+
+    function renderExtractedTables(tables) {
+      const rendered = asArray(tables).map(asObject).slice(0, 10).map((table, index) => {
+        const rows = asArray(table.rows).map(asObject).filter((row) => Object.keys(row).length);
+        if (!rows.length) return "";
+        const headerMap = asObject(table.header_map);
+        const headerEntries = Object.entries(headerMap)
+          .map(([key, idx]) => ({ key, idx: Number(idx) }))
+          .filter((row) => Number.isFinite(row.idx))
+          .sort((a, b) => a.idx - b.idx);
+        const headerNames = headerEntries.length
+          ? headerEntries.map((row) => prettifyTableFieldName(row.key))
+          : [];
+        const matrix = rows.map((row) => {
+          if (headerEntries.length) {
+            return headerEntries.map(({ key }) => {
+              const value = row[key];
+              if (value !== null && value !== undefined && String(value).trim() !== "") return String(value);
+              return "";
+            });
+          }
+          return tableRowDisplayCells(row);
+        });
+        const colCount = Math.max(headerNames.length, ...matrix.map((cells) => cells.length), 0);
+        if (!colCount) return "";
+        const headings = headerNames.length
+          ? Array.from({ length: colCount }, (_, i) => `<th>${escapeHtml(headerNames[i] || `Col ${i + 1}`)}</th>`).join("")
+          : Array.from({ length: colCount }, (_, i) => `<th>Col ${i + 1}</th>`).join("");
+        const body = matrix.map((cells) => `
+          <tr>${Array.from({ length: colCount }, (_, i) => `<td>${escapeHtml(cells[i] || "")}</td>`).join("")}</tr>
+        `).join("");
+        return `
+          <div class="demo-block">
+            <div class="demo-title">
+              <span>Tableau ${index + 1}</span>
+              <small>${escapeHtml(String(table.table_type || "table"))} | ${escapeHtml(String(table.rows_count || rows.length))} ligne(s)</small>
+            </div>
+            <table>
+              <thead><tr>${headings}</tr></thead>
+              <tbody>${body}</tbody>
+            </table>
+          </div>
+        `;
+      }).filter(Boolean).join("");
+      return rendered || "";
+    }
+
+    function renderTableExtraction(doc, data) {
+      const tablePayload = extractTablePayload(doc, data);
+      const lineItems = asArray(tablePayload.line_items).map(asObject);
+      const tables = asArray(tablePayload.tables);
+      const rows = lineItems.slice(0, 60).map((row) => `
+        <tr>
+          <td>${escapeHtml(row.description || row.label || row.product || row.item || "")}</td>
+          <td>${escapeHtml(row.qty || row.quantity || "")}</td>
+          <td>${escapeHtml(row.unit_price || row.price || "")}</td>
+          <td>${escapeHtml(row.total || row.amount || "")}</td>
+          <td>${escapeHtml(row.status || "")}</td>
+        </tr>
+      `).join("");
+
+      return `
+        ${renderKpis([
+          { label: "engine", value: tablePayload.engine },
+          { label: "tables", value: tablePayload.tables_count || tables.length },
+          { label: "lignes produits", value: lineItems.length || tablePayload.rows_total },
+          { label: "colonnes", value: asArray(tablePayload.detected_columns).join(", ") }
+        ])}
+        ${renderExtractedTables(tables)}
+        ${rows ? `
+          <table>
+            <thead><tr><th>Produit</th><th>Qty</th><th>Unit price</th><th>Total</th><th>Status</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        ` : `<div class="empty">Aucune ligne produit valide affichable.</div>`}
+      `;
+    }
+
+    function renderTotals(doc, data) {
+      const tablePayload = extractTablePayload(doc, data);
+      const totals = flattenTotalsForDisplay(tablePayload.totals || data.totals || data);
+      return `
+        ${renderKeyValueGrid(totals, 16)}
+        ${asArray(doc.quality_checks).length ? renderRawDetails(doc.quality_checks, "Quality checks") : ""}
+      `;
+    }
+
+    function renderRegex(doc, data) {
+      const regexRows = asArray(asObject(doc.extraction).regex_extractions);
+      const first = asObject(regexRows[0]);
+      const fields = asObject(first.fields || data.fields || data);
+      const rows = Object.entries(fields).map(([field, payload]) => {
+        const item = asObject(payload);
+        const matches = asArray(item.matches);
+        const compact = matches.map((match) => {
+          if (typeof match === "object" && match) {
+            return match.value || match.text || match.match || JSON.stringify(match);
+          }
+          return match;
+        }).filter(Boolean).join(", ");
+        return { field, rule: item.rule_id, type: item.type, count: matches.length, values: compact };
+      }).filter((row) => row.count || row.rule || row.type).slice(0, 80);
+
+      if (!rows.length) {
+        return `<div class="empty">Aucune extraction regex non vide.</div>${renderRawDetails(regexRows.length ? regexRows : data, "Données regex")}`;
+      }
+      return `
+        <table>
+          <thead><tr><th>Champ</th><th>Rule</th><th>Type</th><th>Matches</th><th>Valeurs</th></tr></thead>
+          <tbody>
+            ${rows.map((row) => `
+              <tr>
+                <td>${escapeHtml(row.field)}</td>
+                <td>${escapeHtml(row.rule)}</td>
+                <td>${escapeHtml(row.type)}</td>
+                <td>${escapeHtml(row.count)}</td>
+                <td>${escapeHtml(row.values)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function visualDetectionColor(type) {
+      const key = normalizeName(type);
+      if (key === "signature") return "#5ed4b5";
+      if (key === "stamp") return "#ff7474";
+      if (key === "barcode") return "#7ec8ff";
+      if (key === "qrcode") return "#f4c35d";
+      return "#cbd7e2";
+    }
+
+    function renderVisualDetectionBadge(row) {
+      const type = String(row.type || "zone");
+      const score = Number(row.score || 0);
+      return chip(`${type} ${score ? `(${score.toFixed(2)})` : ""}`.trim());
+    }
+
+    function renderVisualBlankSheet(page) {
+      const width = Math.max(1, Number(page.page_width || 1));
+      const height = Math.max(1, Number(page.page_height || 1));
+      const detections = asArray(page.detections).map(asObject).filter((row) => asObject(row.bbox_norm).x1 !== undefined);
+      const rects = detections.map((row) => {
+        const box = asObject(row.bbox_norm);
+        const x = Math.max(0, Math.min(1, Number(box.x0 || 0))) * 100;
+        const y = Math.max(0, Math.min(1, Number(box.y0 || 0))) * 100;
+        const w = Math.max(0.4, (Math.max(0, Math.min(1, Number(box.x1 || 0))) - Math.max(0, Math.min(1, Number(box.x0 || 0)))) * 100);
+        const h = Math.max(0.4, (Math.max(0, Math.min(1, Number(box.y1 || 0))) - Math.max(0, Math.min(1, Number(box.y0 || 0)))) * 100);
+        const color = visualDetectionColor(row.type);
+        return `
+          <rect x="${x}%" y="${y}%" width="${w}%" height="${h}%"
+            fill="none" stroke="${color}" stroke-width="2.5" rx="4" ry="4"></rect>
+          <text x="${x}%" y="${Math.max(3, y - 1)}%" fill="${color}" font-size="14" font-weight="700">
+            ${escapeHtml(String(row.type || ""))}
+          </text>
+        `;
+      }).join("");
+      return `
+        <div class="visual-sheet blank" style="--sheet-ratio:${width} / ${height};">
+          <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-label="Page blanche annotée">
+            <rect x="0" y="0" width="${width}" height="${height}" fill="#ffffff"></rect>
+            ${rects}
+          </svg>
+        </div>
+      `;
+    }
+
+    function renderVisualPageComparison(page) {
+      const item = asObject(page);
+      const width = Math.max(1, Number(item.page_width || 1));
+      const height = Math.max(1, Number(item.page_height || 1));
+      const pageIndex = item.page_index || "?";
+      const imageUrl = String(item.image_data_url || "").trim();
+      const original = imageUrl
+        ? `<div class="visual-sheet" style="--sheet-ratio:${width} / ${height};"><img src="${escapeHtml(imageUrl)}" alt="Page ${escapeHtml(pageIndex)} originale"></div>`
+        : `<div class="placeholder">Aperçu original de la page ${escapeHtml(pageIndex)} non disponible.</div>`;
+      return `
+        <div class="visual-box">
+          <strong>Page ${escapeHtml(pageIndex)}</strong>
+          <div class="visual-compare">
+            <div class="visual-box">
+              <strong>Original</strong>
+              ${original}
+            </div>
+            <div class="visual-box">
+              <strong>Emplacement détecté</strong>
+              ${renderVisualBlankSheet(item)}
+            </div>
+          </div>
+          <div class="visual-detection-list">
+            ${asArray(item.detections).map((row) => renderVisualDetectionBadge(asObject(row))).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderVisualMarks(doc, data) {
+      const structure = asObject(doc.document_structure);
+      const summary = asObject(structure.visual_marks_summary);
+      const flags = asObject(asObject(doc.content).visual_flags);
+      const merged = { ...summary, ...flags, ...data };
+      const pages = asArray(structure.visual_pages).map(asObject).filter((row) => asArray(row.detections).length);
+      return `
+        ${renderKpis([
+          { label: "signature", value: merged.has_signature },
+          { label: "cachet", value: merged.has_stamp },
+          { label: "code-barres", value: merged.has_barcode },
+          { label: "qr-code", value: merged.has_qrcode },
+          { label: "détections", value: merged.detections_count },
+          { label: "pages scannées", value: merged.pages_scanned }
+        ])}
+        ${pages.length ? `<div class="visual-page-stack">${pages.map((page) => renderVisualPageComparison(page)).join("")}</div>` : ""}
+        ${asArray(structure.visual_marks).length ? renderRawDetails(structure.visual_marks, "Détections visuelles") : ""}
+      `;
+    }
+
+    function documentLabelMap(result) {
+      const map = new Map();
+      resultDocuments(result).forEach((row, index) => {
+        const doc = asObject(row);
+        const file = asObject(doc.file);
+        const id = String(doc.document_id || "").trim();
+        const label = String(file.name || doc.document_id || `document_${index + 1}`).trim();
+        if (id) map.set(id, label);
+      });
+      return map;
+    }
+
+    function renderInterDocLinks(doc, result) {
+      const cross = asObject(doc.cross_document);
+      const currentId = String(doc.document_id || "").trim();
+      const currentName = String(asObject(doc.file).name || currentId || "document").trim();
+      const labels = documentLabelMap(result);
+      const linked = asArray(cross.link_ids)
+        .map((value) => String(value || "").trim())
+        .filter(Boolean)
+        .map((id) => labels.get(id) || id);
+      const relationLine = linked.length
+        ? `${currentName} = ${linked.join(", ")}`
+        : `${currentName} = aucun document lié`;
+      return `
+        <div class="demo-block">
+          <div class="demo-title">
+            <span>Liaison document</span>
+          </div>
+          <div class="text-preview">${escapeHtml(relationLine)}</div>
+        </div>
+      `;
+    }
+
+    function renderInterDoc(doc, result, data) {
+      const cross = asObject(doc.cross_document);
+      const global = asObject(result.cross_document_analysis);
+      const labels = documentLabelMap(result);
+      const linkedNames = asArray(cross.link_ids)
+        .map((value) => String(value || "").trim())
+        .filter(Boolean)
+        .map((id) => labels.get(id) || id)
+        .join(", ");
+      return `
+        ${renderKpis([
+          { label: "liens document", value: linkedNames || cross.linked_documents_count },
+          { label: "ids liés", value: asArray(cross.link_ids).join(", ") },
+          { label: "liens globaux", value: asArray(global.links).length || data.links_count_total },
+          { label: "méthode", value: data.method || global.method }
+        ])}
+        ${renderInterDocLinks(doc, result)}
+        ${renderRawDetails(global, "Analyse inter-documents")}
+      `;
+    }
+
+    function renderElasticsearch(doc, data) {
+      return renderKpis([
+        { label: "enabled", value: data.enabled },
+        { label: "available", value: data.available },
+        { label: "url", value: data.es_url },
+        { label: "index", value: data.es_index },
+        { label: "doc_id", value: data.doc_id },
+        { label: "nlp synced", value: data.nlp_docs_synced },
+        { label: "tokens synced", value: data.nlp_tokens_synced }
+      ]);
+    }
+
+    function renderGenericComponent(data) {
+      return renderKeyValueGrid(data, 10);
+    }
+
+    function componentPurpose(key) {
+      const keyNorm = normalizeName(key);
+      if (keyNorm.includes("pretraitement")) return "Démontre comment le fichier est reconnu: chemin, extension, MIME, type texte/image et métadonnées de préparation.";
+      if (keyNorm.includes("si_image")) return "Démontre le routage: document déjà textuel ou image à préparer avant OCR.";
+      if (keyNorm.includes("output_txt")) return "Démontre l'extraction de texte: méthode native/OCR, nombre de pages et texte brut récupéré.";
+      if (keyNorm.includes("clasification") || keyNorm.includes("classification")) return "Démontre la décision documentaire: scores par type, seuil, statut et mots forts/moyens/faibles.";
+      if (keyNorm.includes("tokenisation")) return "Démontre le découpage du document: pages, phrases, chunks, langues, topics et vecteurs si disponibles.";
+      if (keyNorm.includes("atripusion") || keyNorm.includes("attribution") || keyNorm.includes("grammatical")) return "Démontre l'analyse grammaticale: chaque mot est annoté avec POS, lemme et entité NER quand disponible.";
+      if (keyNorm.includes("table_extraction")) return "Démontre les lignes de tableau utiles: produit, quantité, prix unitaire, total et statut de validation.";
+      if (keyNorm.includes("verification_totaux")) return "Démontre les contrôles arithmétiques entre lignes produits et totaux détectés.";
+      if (keyNorm.includes("extraction_regles")) return "Démontre les extractions regex/règles: champs métier, rules appliquées, matches et valeurs.";
+      if (keyNorm.includes("detection_signature") || keyNorm.includes("codebarr")) return "Démontre les indices visuels: signature, cachet, code-barres, QR-code et zones détectées.";
+      if (keyNorm.includes("liaison_inter_docs")) return "Démontre les liens entre documents: similarité, topics et relations trouvées.";
+      if (keyNorm.includes("elasticsearch")) return "Démontre l'état d'indexation: disponibilité ES, index cible, documents et tokens synchronisés.";
+      if (keyNorm.includes("fusion_resultats")) return "Démontre la fusion finale qui réunit les sorties des composants dans un JSON global.";
+      if (keyNorm.includes("api_output")) return "Démontre la sortie API finale envoyée au consommateur externe.";
+      return "Composant détecté automatiquement: les champs principaux sont affichés et le JSON brut complet reste consultable.";
+    }
+
+    function componentTitle(key, component) {
+      const name = component.component_name || component.name || key;
+      return String(name || key).replaceAll("_", " ");
+    }
+
+    function renderComponentCard(key, component, doc, result, orderIndex = 0, options = {}) {
+      const comp = asObject(component);
+      const data = componentData(comp);
+      const keyNorm = normalizeName(key);
+      const title = componentTitle(key, comp);
+      const status = comp.status || data.status || "available";
+      const showRaw = Boolean(options.showRaw);
+      let body = "";
+
+      if (keyNorm.includes("pretraitement")) {
+        body = renderPreprocessing(doc, data);
+      } else if (keyNorm.includes("si_image")) {
+        body = renderRouting(doc, data);
+      } else if (keyNorm.includes("output_txt")) {
+        body = renderOutputTextSummary(doc, data);
+      } else if (keyNorm.includes("clasification") || keyNorm.includes("classification")) {
+        body = renderClassification(doc, data);
+      } else if (keyNorm.includes("tokenisation")) {
+        body = renderTokenisation(doc, data);
+      } else if (keyNorm.includes("atripusion") || keyNorm.includes("attribution") || keyNorm.includes("grammatical")) {
+        body = renderGrammar(doc, data, comp);
+      } else if (keyNorm.includes("table_extraction")) {
+        body = renderTableExtraction(doc, data);
+      } else if (keyNorm.includes("verification_totaux")) {
+        body = renderTotals(doc, data);
+      } else if (keyNorm.includes("extraction_regles")) {
+        body = renderRegex(doc, data);
+      } else if (keyNorm.includes("detection_signature") || keyNorm.includes("codebarr")) {
+        body = renderVisualMarks(doc, data);
+      } else if (keyNorm.includes("liaison_inter_docs")) {
+        body = renderInterDoc(doc, result, data);
+      } else if (keyNorm.includes("elasticsearch")) {
+        body = renderElasticsearch(doc, data);
+      } else {
+        body = renderGenericComponent(data);
+      }
+
+      return `
+        <article class="component-card">
+          <div class="component-head">
+            <div>
+              <div class="component-title-row">
+                <span class="component-number">${escapeHtml(String(orderIndex + 1).padStart(2, "0"))}</span>
+                <h4>${escapeHtml(title)}</h4>
+              </div>
+              <p class="component-purpose">${escapeHtml(componentPurpose(key))}</p>
+              <p>${escapeHtml(comp.summary || comp.script || comp.component_script || "")}</p>
+            </div>
+            <span class="badge ${statusBadge(status)}">${escapeHtml(status)}</span>
+          </div>
+          <div class="component-body">
+            ${body}
+            ${showRaw ? renderRawDetails(comp, "JSON brut") : ""}
+          </div>
+        </article>
+      `;
+    }
+
+    function componentGroupId(key) {
+      const keyNorm = normalizeName(key);
+      if (keyNorm.includes("pretraitement") || keyNorm.includes("si_image")) return "preprocessing";
+      if (keyNorm.includes("output_txt")) return "text";
+      if (keyNorm.includes("clasification") || keyNorm.includes("classification")) return "classification";
+      if (keyNorm.includes("tokenisation") || keyNorm.includes("atripusion") || keyNorm.includes("attribution") || keyNorm.includes("grammatical")) return "nlp";
+      if (keyNorm.includes("table_extraction") || keyNorm.includes("verification_totaux") || keyNorm.includes("extraction_regles")) return "business";
+      if (keyNorm.includes("detection_signature") || keyNorm.includes("codebarr")) return "visual";
+      if (keyNorm.includes("liaison_inter_docs")) return "links";
+      if (keyNorm.includes("elasticsearch") || keyNorm.includes("fusion_resultats") || keyNorm.includes("api_output")) return "system";
+      return "other";
+    }
+
+    function activePipelineProfile(result) {
+      const pipeline = asObject(asObject(result).pipeline);
+      return normalizeName(pipeline.profile || state.lastStatus?.pipeline_profile || refs.pipelineSelect.value || "");
+    }
+
+    function profileSuffix(key) {
+      const keyNorm = normalizeName(key);
+      if (keyNorm.includes("100ml")) return "pipeline100ml";
+      if (keyNorm.includes("50ml")) return "pipeline50ml";
+      if (keyNorm.includes("0ml")) return "pipeline0ml";
+      return "";
+    }
+
+    function canonicalComponentKey(key) {
+      let value = normalizeName(key)
+        .replace(/[-\s]+/g, "_")
+        .replace(/_100ml$/g, "")
+        .replace(/_50ml$/g, "")
+        .replace(/_0ml$/g, "");
+      if (value.includes("clasification") || value.includes("classification")) return "classification";
+      if (value.includes("atripusion") || value.includes("attribution") || value.includes("grammatical")) return "attribution_grammaticale";
+      if (value.includes("tokenisation")) return "tokenisation_layout";
+      if (value.includes("table_extraction")) return "table_extraction";
+      if (value.includes("extraction_regles")) return "extraction_regles";
+      if (value.includes("verification_totaux")) return "verification_totaux";
+      if (value.includes("detection_signature") || value.includes("codebarr")) return "detection_signature_chachet_codebarr";
+      if (value.includes("pretraitement")) return "pretraitement_de_docs";
+      if (value.includes("si_image")) return "si_image_pretraiter";
+      if (value.includes("output_txt")) return "output_txt";
+      if (value.includes("liaison_inter_docs")) return "liaison_inter_docs";
+      if (value.includes("elasticsearch")) return "elasticsearch";
+      if (value.includes("fusion_resultats")) return "fusion_resultats";
+      if (value.includes("api_output")) return "api_output";
+      return value;
+    }
+
+    function meaningfulValueScore(value, depth = 0) {
+      if (depth > 4) return 0;
+      if (value === null || value === undefined || value === "" || value === "[circular-reference]") return 0;
+      if (typeof value === "boolean") return value ? 2 : 0;
+      if (typeof value === "number") return Number.isFinite(value) && value !== 0 ? 2 : 0;
+      if (typeof value === "string") return value.trim() ? 1 : 0;
+      if (Array.isArray(value)) {
+        if (!value.length) return 0;
+        return Math.min(30, value.reduce((sum, item) => sum + meaningfulValueScore(item, depth + 1), 0) + 1);
+      }
+      if (typeof value === "object") {
+        return Math.min(40, Object.entries(value).reduce((sum, [key, item]) => {
+          if (String(key).startsWith("_dynamic")) return sum;
+          if (key === "_one_of") return sum;
+          return sum + meaningfulValueScore(item, depth + 1);
+        }, 0));
+      }
+      return 0;
+    }
+
+    function componentEntryScore(key, comp, activeProfile) {
+      const suffix = profileSuffix(key);
+      const normalizedProfile = normalizeName(activeProfile);
+      const obj = asObject(comp);
+      const data = componentData(obj);
+      let score = meaningfulValueScore(data);
+      if (obj.status) score += 18;
+      if (obj.summary) score += 8;
+      if (obj.component_name || obj.script || obj.component_script) score += 4;
+      if (suffix && suffix === normalizedProfile) score += 500;
+      if (suffix && suffix !== normalizedProfile) score -= 500;
+      if (!suffix) score += 20;
+      return score;
+    }
+
+    function indexedComponentEntries(components, result) {
+      const activeProfile = activePipelineProfile(result);
+      const byCanonical = new Map();
+      Object.entries(asObject(components)).forEach(([key, comp], originalIndex) => {
+        const canonical = canonicalComponentKey(key);
+        const score = componentEntryScore(key, comp, activeProfile);
+        if (score <= 0) return;
+        const existing = byCanonical.get(canonical);
+        if (!existing || score > existing.score) {
+          byCanonical.set(canonical, { key, comp, originalIndex, score, canonical });
+        }
+      });
+      return Array.from(byCanonical.values())
+        .sort((a, b) => a.originalIndex - b.originalIndex)
+        .map((entry, index) => ({ ...entry, index }));
+    }
+
+    function entriesForGroup(entries, groupId) {
+      return entries.filter((entry) => componentGroupId(entry.key) === groupId);
+    }
+
+    function findEntry(entries, matcher) {
+      return entries.find((entry) => matcher(normalizeName(entry.key), asObject(entry.comp))) || null;
+    }
+
+    function renderComponentList(entries, doc, result) {
+      if (!entries.length) {
+        return `<div class="empty">Aucun composant disponible pour cette partie.</div>`;
+      }
+      return `<div class="chapter-components">${entries.map((entry) => (
+        renderComponentCard(entry.key, entry.comp, doc, result, entry.index)
+      )).join("")}</div>`;
+    }
+
+    function renderDocChapter(number, title, subtitle, body) {
+      return `
+        <section class="doc-chapter">
+          <div class="doc-chapter-head">
+            <span class="chapter-index">${escapeHtml(number)}</span>
+            <div>
+              <h4>${escapeHtml(title)}</h4>
+              <p>${escapeHtml(subtitle)}</p>
+            </div>
+          </div>
+          <div class="doc-chapter-body">${body}</div>
+        </section>
+      `;
+    }
+
+    function renderDocumentIdentity(doc, file, languages, componentEntries) {
+      const filename = file.name || doc.document_id || "document";
+      const localUrl = getLocalPreviewUrl(filename);
+      const preview = localUrl
+        ? `<img src="${escapeHtml(localUrl)}" alt="Aperçu document">`
+        : `<div class="placeholder">Aperçu visuel non disponible.<br>${escapeHtml(filename)}</div>`;
+      const content = asObject(doc.content);
+      const structure = asObject(doc.document_structure);
+      return `
+        <div class="doc-summary-grid">
+          <div class="document-preview">${preview}</div>
+          <div class="chapter-focus">
+            ${renderKpis([
+              { label: "nom fichier", value: filename },
+              { label: "id document", value: doc.document_id },
+              { label: "taille", value: formatBytes(file.size) },
+              { label: "pages", value: file.page_count },
+              { label: "type documentaire", value: doc.doc_type || asObject(doc.classification).doc_type },
+              { label: "langues détectées", value: Array.from(languages).join(", ") },
+              { label: "composants", value: componentEntries.length },
+              { label: "texte brut", value: asObject(doc.text).text_raw ? `${asObject(doc.text).text_raw.length} caractères` : "non disponible" }
+            ])}
+            <div class="chip-row">
+              ${chip(`content_type: ${valueOrDash(content.content_type)}`)}
+              ${chip(`document_kind: ${valueOrDash(content.document_kind)}`)}
+              ${chip(`pages_meta: ${asArray(structure.pages_meta).length}`)}
+              ${chip(`pages: ${asArray(structure.pages).length}`)}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderDocumentTextChapter(doc, textEntries, result) {
+      const text = asObject(doc.text);
+      const extraction = asObject(doc.extraction);
+      const raw = text.text_raw || asObject(text.search).full_text || "";
+      const search = asObject(text.search);
+      const keywords = extractReadableKeywords(doc);
+      const pageTexts = extractPageTexts(doc);
+      const pagesBody = pageTexts.length > 1
+        ? pageTexts.map((row) => `
+          <details class="raw-details">
+            <summary>Page ${escapeHtml(row.page_index)}</summary>
+            <div class="text-preview">${escapeHtml(row.text)}</div>
+          </details>
+        `).join("")
+        : `<div class="text-preview">${escapeHtml(raw || pageTexts[0]?.text || "Aucun texte brut disponible.")}</div>`;
+      return `
+        ${renderDemoBlock("Texte extrait lisible", `
+          ${renderKpis([
+            { label: "méthode", value: extraction.method },
+            { label: "titre", value: search.title },
+            { label: "caractères", value: raw.length },
+            { label: "keywords", value: keywords.join(", ") || null }
+          ])}
+          ${pagesBody}
+        `)}
+        ${renderComponentList(textEntries, doc, result)}
+      `;
+    }
+
+    function renderGroupedDetails(entries, doc, result) {
+      const groups = [
+        ["preprocessing", "Prétraitement"],
+        ["text", "Texte / OCR"],
+        ["classification", "Classification"],
+        ["nlp", "Tokenisation / NLP"],
+        ["business", "Extractions métier"],
+        ["visual", "Visuel"],
+        ["links", "Liaisons inter-docs"],
+        ["system", "Système / API"],
+        ["other", "Autres composants"]
+      ];
+      const html = groups.map(([groupId, label]) => {
+        const rows = entriesForGroup(entries, groupId);
+        if (!rows.length) return "";
+        return `
+          <div class="component-group">
+            <div class="component-group-title">
+              <span>${escapeHtml(label)}</span>
+              <span class="badge accent">${rows.length} composant(s)</span>
+            </div>
+            ${rows.map((entry) => renderComponentCard(entry.key, entry.comp, doc, result, entry.index, { showRaw: true })).join("")}
+          </div>
+        `;
+      }).filter(Boolean).join("");
+      return html || `<div class="empty">Aucun détail composant.</div>`;
+    }
+
+    function renderDocument(doc, index, result) {
+      const d = asObject(doc);
+      const file = asObject(d.file);
+      const nlp = asObject(d.nlp);
+      const components = asObject(d.components);
+      const componentEntries = indexedComponentEntries(components, result);
+      const languages = new Set([
+        ...normalizeLangDisplay(nlp.language),
+        ...asArray(nlp.languages).flatMap(normalizeLangDisplay),
+        ...asArray(asObject(nlp.summary).languages).flatMap(normalizeLangDisplay),
+        ...asArray(asObject(d.content).detected_languages),
+        ...asArray(asObject(d.document_structure).pages).map((p) => asObject(p).lang)
+      ].flatMap(normalizeLangDisplay).filter(Boolean));
+      const preprocessingEntries = entriesForGroup(componentEntries, "preprocessing");
+      const textEntries = entriesForGroup(componentEntries, "text");
+      const classificationEntries = entriesForGroup(componentEntries, "classification");
+      const nlpEntries = entriesForGroup(componentEntries, "nlp");
+      const businessEntries = entriesForGroup(componentEntries, "business");
+      const visualEntries = [
+        ...entriesForGroup(componentEntries, "visual"),
+        ...entriesForGroup(componentEntries, "links")
+      ];
+      const systemEntries = [
+        ...entriesForGroup(componentEntries, "system"),
+        ...entriesForGroup(componentEntries, "other")
+      ];
+
+      return `
+        <article class="document-card">
+          <div class="doc-header">
+            <div class="doc-title">
+              <span class="eyebrow">Document ${index + 1}</span>
+              <h3>${escapeHtml(file.name || d.document_id || `Document ${index + 1}`)}</h3>
+              <p>${escapeHtml(d.document_id || "")}</p>
+            </div>
+            <div class="badge-row">
+              ${badge("Type", d.doc_type || asObject(d.classification).doc_type || "inconnu", "accent")}
+              ${badge("Status", asObject(d.classification).status || "n/a", statusBadge(asObject(d.classification).status))}
+            </div>
+          </div>
+
+          <div class="document-map">
+            ${chip("01 Fiche document")}
+            ${chip("02 Prétraitement")}
+            ${chip("03 Texte / OCR")}
+            ${chip("04 Classification")}
+            ${chip("05 NLP")}
+            ${chip("06 Extractions")}
+            ${chip("07 Visuel / liens")}
+            ${chip("08 Détails techniques")}
+          </div>
+
+          <div class="doc-chapters">
+            ${renderDocChapter(
+              "01",
+              "Fiche document",
+              "Résumé propre du document avant de regarder les composants.",
+              renderDocumentIdentity(d, file, languages, componentEntries)
+            )}
+            ${renderDocChapter(
+              "02",
+              "Prétraitement",
+              "Reconnaissance du fichier et préparation avant extraction.",
+              renderComponentList(preprocessingEntries, d, result)
+            )}
+            ${renderDocChapter(
+              "03",
+              "Texte extrait / OCR",
+              "Texte réellement récupéré par le backend, séparé du reste.",
+              renderDocumentTextChapter(d, textEntries, result)
+            )}
+            ${renderDocChapter(
+              "04",
+              "Classification",
+              "Scores, type documentaire choisi et mots qui justifient la décision.",
+              renderComponentList(classificationEntries, d, result)
+            )}
+            ${renderDocChapter(
+              "05",
+              "Tokenisation et attribution grammaticale",
+              "Découpage, langues, topics, POS, lemmes et entités affichés visuellement.",
+              renderComponentList(nlpEntries, d, result)
+            )}
+            ${renderDocChapter(
+              "06",
+              "Extractions métier",
+              "Tableaux, totaux, règles regex et champs structurés du document.",
+              renderComponentList(businessEntries, d, result)
+            )}
+            ${renderDocChapter(
+              "07",
+              "Visuel et liens",
+              "Signature, cachet, codes-barres, QR-code et relations entre documents.",
+              renderComponentList(visualEntries, d, result)
+            )}
+            ${renderDocChapter(
+              "08",
+              "Détails techniques de la pipeline",
+              "Elasticsearch, fusion, sortie API et autres composants techniques, séparés du rendu métier.",
+              renderGroupedDetails(systemEntries, d, result)
+            )}
+          </div>
+        </article>
+      `;
+    }
+
+    function renderResult(result) {
+      const resolvedResult = resolveResultPayload(result);
+      state.result = resolvedResult;
+      refs.resultSection.classList.remove("hidden");
+      refs.downloadJsonBtn.disabled = false;
+
+      const pipeline = asObject(resolvedResult.pipeline);
+      const docs = resultDocuments(resolvedResult);
+      refs.resultBadges.innerHTML = [
+        badge("Documents", resolvedResult.documents_count ?? docs.length, docs.length ? "ok" : "warn"),
+        badge("Pipeline", pipeline.profile || state.lastStatus?.pipeline_profile || refs.pipelineSelect.value, "accent"),
+        badge("Schema", resolvedResult.schema_version || "n/a")
+      ].join("");
+
+      refs.documentsRoot.innerHTML = docs.length
+        ? docs.map((doc, index) => renderDocument(doc, index, resolvedResult)).join("")
+        : `
+          <div class="panel">
+            <div class="empty">
+              Aucun document trouvé dans le résultat API. Le JSON brut est affiché plus bas pour diagnostic.
+            </div>
+          </div>
+        `;
+
+      refs.rawJsonPreview.textContent = jsonPreview(resolvedResult, 120000);
+      renderPipelineTimeline(state.lastStatus, resolvedResult);
+      refs.resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    async function fetchResult(jobId, resultUrl) {
+      const finalUrl = normalizeApiUrl(resultUrl || (jobId ? `/api/result/${encodeURIComponent(jobId)}` : ""));
+      if (!finalUrl) throw new Error("URL résultat absente.");
       const response = await fetch(finalUrl);
       let payload = null;
       try {
         payload = await response.json();
       } catch (error) {
-        throw new Error("Le resultat recu n'est pas un JSON valide.");
+        throw new Error("Le résultat reçu n'est pas un JSON valide.");
       }
-
       if (!response.ok) {
         throw new Error(payload && payload.error ? payload.error : `HTTP ${response.status}`);
       }
-
-      const blob = new Blob(
-        [JSON.stringify(payload, null, 2)],
-        { type: "application/json;charset=utf-8" }
-      );
-      const objectUrl = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = objectUrl;
-      link.download = `dms-output-${jobId || "result"}.json`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(objectUrl);
-    }
-
-    function setLoader(active) {
-      loaderWrap.classList.toggle("active", Boolean(active));
-    }
-
-    function stopPolling() {
-      if (statusTimer) {
-        clearInterval(statusTimer);
-        statusTimer = null;
-      }
+      return payload;
     }
 
     async function refreshJobStatus() {
       try {
         const response = await fetch(`${API_BASE}/api/status`);
         const data = await response.json();
-        if (!data || data.status === "idle") {
-          return;
-        }
+        state.lastStatus = data;
 
-        if (data.job_id) {
-          activeJobId = data.job_id;
-        }
+        const status = String(data.status || "idle");
+        if (data.job_id) state.jobId = data.job_id;
         if (data.result_url || data.result_route) {
-          activeResultUrl = normalizeApiUrl(data.result_url || data.result_route);
+          state.resultUrl = normalizeApiUrl(data.result_url || data.result_route);
         }
+        setProgress(data.progress_percent || 0);
+        renderPipelineTimeline(data, state.result);
 
-        if (data.status === "running") {
-          isRunning = true;
-          launchBtn.disabled = true;
-          setLoader(true);
-          status.textContent = `Traitement en cours... job=${data.job_id}`;
-          progressDetail.textContent = data.current_step
-            ? `Traitement en cours via ${data.current_step}...`
-            : "Traitement en cours...";
+        if (status === "idle") {
+          if (!state.running) return;
+          setMessage("API prête.", `Backend: ${API_BASE}`);
           return;
         }
-        if (data.status === "completed") {
-          if (!data.result_available) {
-            isRunning = true;
-            launchBtn.disabled = true;
-            setLoader(true);
-            status.textContent = `Traitement terminé. job=${data.job_id}`;
-            progressDetail.textContent = "Résultat en préparation...";
-            return;
-          }
 
-          const completedJobId = data.job_id || activeJobId;
-          try {
-            if (completedJobId && !downloadedJobs.has(completedJobId)) {
-              status.textContent = `Traitement terminé. job=${completedJobId}`;
-              progressDetail.textContent = "Résultat reçu, téléchargement du JSON...";
-              await downloadResultJson(completedJobId, activeResultUrl || data.result_url || data.result_route);
-              downloadedJobs.add(completedJobId);
+        if (status === "running") {
+          setRunning(true);
+          setMessage(
+            `Traitement en cours... job=${data.job_id || state.jobId || "inconnu"}`,
+            data.current_step ? `Composant actif: ${data.current_step}` : "Pipeline en cours..."
+          );
+          return;
+        }
+
+        if (status === "completed") {
+          setProgress(100);
+          setMessage(
+            `Traitement terminé. job=${data.job_id || state.jobId}`,
+            data.result_available ? "Chargement du JSON API..." : "Résultat en préparation..."
+          );
+          if (!data.result_available && !state.result) return;
+          if (state.fetchingResult) return;
+          if (!state.result) {
+            state.fetchingResult = true;
+            stopPolling();
+            try {
+              const payload = await fetchResult(data.job_id || state.jobId, data.result_url || data.result_route || state.resultUrl);
+              renderResult(payload);
+            } finally {
+              state.fetchingResult = false;
             }
-            isRunning = false;
-            setLoader(false);
-            status.textContent = `Traitement terminé. job=${completedJobId}`;
-            progressDetail.textContent = "Le JSON final a été téléchargé.";
-            launchBtn.disabled = selectedFiles.length === 0;
-            stopPolling();
-          } catch (error) {
-            isRunning = false;
-            setLoader(false);
-            status.textContent = `Traitement terminé mais téléchargement impossible. job=${completedJobId}`;
-            progressDetail.textContent = error.message || "Le téléchargement du JSON a échoué.";
-            launchBtn.disabled = selectedFiles.length === 0;
-            stopPolling();
           }
+          setRunning(false);
+          stopPolling();
+          setMessage(`Traitement terminé. job=${data.job_id || state.jobId}`, "Résultat affiché dans la page.");
           return;
         }
-        if (data.status === "failed") {
-          isRunning = false;
-          setLoader(false);
-          status.textContent = `Traitement terminé en erreur (code ${data.returncode}). job=${data.job_id}`;
-          progressDetail.textContent = data.last_log_line || "Le traitement a échoué.";
-          launchBtn.disabled = selectedFiles.length === 0;
+
+        if (status === "failed") {
+          setRunning(false);
           stopPolling();
+          setMessage(
+            `Erreur pipeline. job=${data.job_id || state.jobId}`,
+            data.last_log_line || data.error || "Le backend a retourné une erreur."
+          );
+          renderPipelineTimeline(data, state.result);
         }
       } catch (error) {
-        isRunning = false;
-        setLoader(false);
-        status.textContent = `API locale indisponible: ${error.message}`;
-        progressDetail.textContent = `Backend attendu sur ${API_BASE}`;
-        launchBtn.disabled = selectedFiles.length === 0;
+        setRunning(false);
         stopPolling();
+        setMessage(`API locale indisponible: ${error.message}`, `Backend attendu: ${API_BASE}`);
       }
     }
 
-    function renderFiles() {
-      filesList.innerHTML = "";
-      selectedFiles.forEach((file) => {
-        const item = document.createElement("li");
-        item.textContent = `${file.name} (${file.size} octets)`;
-        filesList.appendChild(item);
-      });
-      launchBtn.disabled = selectedFiles.length === 0 || isRunning;
-      if (!isRunning) {
-        status.textContent = selectedFiles.length
-          ? `${selectedFiles.length} document(s) prêt(s).`
-          : "Aucun document sélectionné.";
-      }
-      if (!selectedFiles.length && !isRunning) {
-        setLoader(false);
-        progressDetail.textContent = "";
-      }
-    }
-
-    function setFiles(fileList) {
-      selectedFiles = Array.from(fileList || []);
-      renderFiles();
-    }
-
-    input.addEventListener("change", () => setFiles(input.files));
-
-    ["dragenter", "dragover"].forEach((eventName) => {
-      dropzone.addEventListener(eventName, (event) => {
-        event.preventDefault();
-        dropzone.classList.add("dragover");
-      });
-    });
-
-    ["dragleave", "drop"].forEach((eventName) => {
-      dropzone.addEventListener(eventName, (event) => {
-        event.preventDefault();
-        dropzone.classList.remove("dragover");
-      });
-    });
-
-    dropzone.addEventListener("drop", (event) => {
-      setFiles(event.dataTransfer.files);
-    });
-
-    launchBtn.addEventListener("click", async () => {
-      if (!selectedFiles.length) {
-        return;
-      }
+    async function launchPipeline() {
+      if (!state.files.length || state.running) return;
 
       try {
         const statusResponse = await fetch(`${API_BASE}/api/status`);
-        if (!statusResponse.ok) {
-          throw new Error(`HTTP ${statusResponse.status}`);
-        }
+        if (!statusResponse.ok) throw new Error(`HTTP ${statusResponse.status}`);
       } catch (error) {
-        status.textContent = `API locale indisponible: ${error.message}`;
-        progressDetail.textContent = `Backend attendu sur ${API_BASE}`;
+        setMessage(`API locale indisponible: ${error.message}`, `Backend attendu: ${API_BASE}`);
         return;
       }
 
       const formData = new FormData();
-      selectedFiles.forEach((file) => {
+      for (const file of state.files) {
         formData.append("files", file, file.name);
-      });
+      }
+      formData.append("pipeline", refs.pipelineSelect.value || "default");
 
-      isRunning = true;
-      launchBtn.disabled = true;
-      setLoader(true);
-      activeJobId = null;
-      activeResultUrl = "";
-      status.textContent = `Upload et lancement de ${selectedFiles.length} document(s)...`;
-      progressDetail.textContent = "Traitement en cours...";
+      state.result = null;
+      state.jobId = "";
+      state.resultUrl = "";
+      state.fetchingResult = false;
+      refs.resultSection.classList.add("hidden");
+      refs.documentsRoot.innerHTML = "";
+      refs.rawJsonPreview.textContent = "";
+      refs.downloadJsonBtn.disabled = true;
+
+      setRunning(true);
+      setProgress(0);
+      setMessage(`Upload de ${state.files.length} document(s)...`, `Pipeline demandée: ${refs.pipelineSelect.value}`);
 
       try {
         const response = await fetch(`${API_BASE}/api/run`, {
@@ -426,32 +3004,65 @@
         });
         const payload = await response.json();
         if (!response.ok || !payload.ok) {
-          throw new Error(payload.error || "Echec du lancement");
+          throw new Error(payload.error || `HTTP ${response.status}`);
         }
-        activeJobId = payload.job && payload.job.job_id ? payload.job.job_id : null;
-        activeResultUrl = normalizeApiUrl(
-          payload.job && (payload.job.result_url || payload.job.result_route)
-            ? (payload.job.result_url || payload.job.result_route)
-            : ""
-        );
-        if (activeJobId) {
-          downloadedJobs.delete(activeJobId);
-        }
-        setLoader(true);
-        status.textContent = `Pipeline lancé. job=${activeJobId || "inconnu"}`;
-        progressDetail.textContent = "Traitement en cours...";
+        const job = asObject(payload.job);
+        state.jobId = job.job_id || "";
+        state.resultUrl = normalizeApiUrl(job.result_url || job.result_route || "");
+        state.lastStatus = job;
+        renderPipelineTimeline(job, null);
+        setMessage(`Pipeline lancée. job=${state.jobId || "inconnu"}`, "Suivi des composants en cours...");
         stopPolling();
-        statusTimer = setInterval(refreshJobStatus, 1500);
+        state.timer = setInterval(refreshJobStatus, 1000);
         refreshJobStatus();
       } catch (error) {
-        isRunning = false;
-        setLoader(false);
-        status.textContent = `Erreur: ${error.message}`;
-        progressDetail.textContent = `Requête envoyée vers ${API_BASE}`;
-      } finally {
-        renderFiles();
+        setRunning(false);
+        setProgress(0);
+        setMessage(`Erreur: ${error.message}`, `Requête envoyée vers ${API_BASE}/api/run`);
       }
+    }
+
+    function downloadCurrentJson() {
+      if (!state.result) return;
+      const blob = new Blob([JSON.stringify(state.result, null, 2)], {
+        type: "application/json;charset=utf-8"
+      });
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = `dms-demo-output-${state.jobId || "result"}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(objectUrl);
+    }
+
+    refs.input.addEventListener("change", () => setFiles(refs.input.files));
+    refs.launchBtn.addEventListener("click", launchPipeline);
+    refs.downloadJsonBtn.addEventListener("click", downloadCurrentJson);
+
+    ["dragenter", "dragover"].forEach((eventName) => {
+      refs.dropzone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        refs.dropzone.classList.add("dragover");
+      });
     });
+
+    ["dragleave", "drop"].forEach((eventName) => {
+      refs.dropzone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        refs.dropzone.classList.remove("dragover");
+      });
+    });
+
+    refs.dropzone.addEventListener("drop", (event) => {
+      setFiles(event.dataTransfer.files);
+    });
+
+    window.addEventListener("beforeunload", revokeFileUrls);
+
+    renderFiles();
+    refreshJobStatus();
   </script>
 </body>
 </html>

@@ -45,10 +45,20 @@ DEFAULT_PIPELINE_ARGS = [
     "--es-nlp-index",
     "dms_nlp_tokens",
 ]
+API_OFFLINE_ENV_VARS = ("LANG_PIPE_OFFLINE", "HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE")
 
 LOGGER = logging.getLogger(__name__)
 JOB_CACHE_LOCK = threading.Lock()
 JOB_CACHE: Dict[str, Dict[str, Any]] = {}
+
+
+def _env_true(name: str, default: str = "0") -> bool:
+    raw = str(os.environ.get(name, default) or "").strip().lower()
+    return raw in {"1", "true", "yes", "on"}
+
+
+def _api_offline_mode_enabled() -> bool:
+    return _env_true("DMS_API_OFFLINE_MODE", default="1")
 
 
 def _active_pipeline_profile() -> str:
@@ -183,7 +193,7 @@ def _mark_job_result_delivered(job_id: str, *, mode: str, reason: str) -> Dict[s
         }
     updates = {
         "manifest": manifest or cached.get("manifest") or {},
-        "result": None,
+        "result": cached.get("result") if isinstance(cached.get("result"), dict) else None,
         "documents": [],
         "result_delivered": True,
         "result_delivery_mode": mode,
@@ -826,6 +836,9 @@ class LauncherState:
             env["DMS_API_CALLBACK_URL"] = callback_url or ""
             env["DMS_API_CALLBACK_TOKEN"] = callback_token or ""
             env["PIPELINE_PROFILE"] = requested_profile
+            if _api_offline_mode_enabled():
+                for name in API_OFFLINE_ENV_VARS:
+                    env[name] = "1"
             process = subprocess.Popen(
                 command,
                 cwd=str(REPO_ROOT),

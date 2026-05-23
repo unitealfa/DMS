@@ -3,6 +3,7 @@ import pickle
 import math
 from collections import Counter
 from pathlib import Path
+import sys
 try:
     import nltk
 except Exception:
@@ -23,10 +24,17 @@ if "TEXT_DOCS" not in globals():
     TEXT_DOCS = None  # type: ignore
 
 try:
-    import sys
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 except Exception:
     pass
+
+CORE_DIR = Path(__file__).resolve().parents[2]
+if str(CORE_DIR) not in sys.path:
+    sys.path.insert(0, str(CORE_DIR))
+try:
+    from component.language_detection import detect_lang as _detect_lang_shared
+except Exception:
+    _detect_lang_shared = None
 
 # ==================== Reglages ====================
 TARGET = None
@@ -55,7 +63,7 @@ def _ensure_nltk():
 
 _ensure_nltk()
 
-# ==================== Dtection langue (simple) ====================
+# ==================== Detection langue ====================
 _AR_RE = re.compile(r"[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]")
 _WORD_RE = re.compile(r"[A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]+", flags=re.UNICODE)
 
@@ -63,9 +71,13 @@ _FR_HINT = {"le","la","les","des","une","un","est","avec","pour","dans","sur","f
 _EN_HINT = {"the","and","to","of","in","is","for","with","invoice","date","total","vat","amount"}
 
 def detect_lang(text: str) -> str:
+    if _detect_lang_shared is not None:
+        lang = _detect_lang_shared(text, default="unknown")
+        if lang != "unknown":
+            return lang
     t = text or ""
     if not t.strip():
-        return "en"
+        return "unknown"
 
     ar_chars = len(_AR_RE.findall(t))
     total_chars = max(1, len(t))
@@ -85,7 +97,9 @@ def detect_lang(text: str) -> str:
     if re.search(r"[\u00E8\u00E9\u00EA\u00EB\u00E0\u00F9\u00E7\u00F4\u00EE\u00EF]", t.lower()):
         fr_score += 1
 
-    return "fr" if fr_score >= en_score else "en"
+    if fr_score == en_score == 0:
+        return "unknown"
+    return "fr" if fr_score > en_score else "en"
 
 # ==================== Sentence split "layout" (fallback) ====================
 _AR_END_RE = re.compile(r"([.!?]+)(\s+|$)", flags=re.UNICODE)
@@ -1392,7 +1406,8 @@ for doc in DOC_PACK:
         doc_chars_total += len(page_text)
 
         lang = detect_lang(page_text)
-        doc_lang_counter[lang] += 1
+        if lang != "unknown":
+            doc_lang_counter[lang] += 1
 
         items = layout_items(page_text, lang, extraction=extraction)
         recompose_ok = False if any(it.get("layout_kind") in ("multicol_col", "multicol_grid", "table", "header") for it in items) else True
@@ -1405,7 +1420,8 @@ for doc in DOC_PACK:
             start = int(it.get("start", 0))
             end = int(it.get("end", start + len(chunk)))
             chunk_lang = detect_lang(chunk) if str(chunk or "").strip() else lang
-            doc_lang_counter[chunk_lang] += 1
+            if chunk_lang != "unknown":
+                doc_lang_counter[chunk_lang] += 1
 
             line, col = _line_col_from_offset(page_text, start)
             nonspace = _nonspace_len(chunk)
@@ -1589,5 +1605,3 @@ if not selected:
 else:
     for doc in selected:
         print_one_doc(doc)
-
-

@@ -9,10 +9,26 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
+CORE_DIR = BASE_DIR.parents[1]
+if str(CORE_DIR) not in sys.path:
+    sys.path.insert(0, str(CORE_DIR))
+try:
+    from component.language_detection import detect_lang as _detect_lang_shared
+except Exception:
+    _detect_lang_shared = None
 
 # Mode offline : forcer ici (MANUAL_OFFLINE=True) ou via l'env LANG_PIPE_OFFLINE=1
 MANUAL_OFFLINE = False
-OFFLINE = MANUAL_OFFLINE or (os.environ.get("LANG_PIPE_OFFLINE", "0").lower() in {"1", "true", "yes", "on"})
+_TRUE_VALUES = {"1", "true", "yes", "on"}
+def _env_true(name: str) -> bool:
+    return str(os.environ.get(name) or "").strip().lower() in _TRUE_VALUES
+
+OFFLINE = (
+    MANUAL_OFFLINE
+    or _env_true("LANG_PIPE_OFFLINE")
+    or _env_true("HF_HUB_OFFLINE")
+    or _env_true("TRANSFORMERS_OFFLINE")
+)
 if OFFLINE:
     print("[info] Mode offline: NER désactivé (eng/fr).")
 
@@ -58,9 +74,13 @@ def _normalize_token_fields(token: object, pos_value: object, lemma_value: objec
     return tok, pos_txt, lemma_txt
 
 def detect_lang(text: str) -> str:
+    if _detect_lang_shared is not None:
+        lang = _detect_lang_shared(text, default="unknown")
+        if lang != "unknown":
+            return lang
     t = (text or "").strip()
     if not t:
-        return "en"
+        return "unknown"
 
     if _AR_RE.search(t):
         return "ar"
@@ -90,6 +110,8 @@ def detect_lang(text: str) -> str:
         fr_score += 2
 
     # égalité => ne plus favoriser le FR
+    if fr_score == en_score == 0:
+        return "unknown"
     if fr_score > en_score:
         return "fr"
     return "en"
@@ -199,7 +221,9 @@ all_sentences = []
 for doc_name, page_idx, sent_idx, sent in iter_sentences_from_input(data):
     sent = (sent or "").strip()
     if sent:
-        all_sentences.append((doc_name, page_idx, sent_idx, sent, detect_lang(sent)))
+        lang = detect_lang(sent)
+        if lang != "unknown":
+            all_sentences.append((doc_name, page_idx, sent_idx, sent, lang))
 
 has_en = any(lang == "en" for _, _, _, _, lang in all_sentences)
 has_fr = any(lang == "fr" for _, _, _, _, lang in all_sentences)
@@ -235,7 +259,8 @@ _lang_counter = Counter()
 
 for row in NLP_ANALYSES:
     lang = str(row.get("lang") or "unknown")
-    _lang_counter[lang] += 1
+    if lang != "unknown":
+        _lang_counter[lang] += 1
     sent_text = str(row.get("text") or "")
     filename = row.get("filename") or row.get("doc")
     page_index = row.get("page_index")

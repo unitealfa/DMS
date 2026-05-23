@@ -31,6 +31,21 @@ SEPARATORS = [":", "=", "-", "–", "—", "؛"]
 AMOUNT_ALLOWED = set("0123456789٠١٢٣٤٥٦٧٨٩.,'٬٫ +-")
 EMAIL_RE = re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}")
 URL_RE = re.compile(r"(?:https?://|www\.)[^\s<>\"]+", re.IGNORECASE)
+PHONE_CANDIDATE_RE = re.compile(
+    r"(?<![A-Za-z0-9])(?:\+|00)?[0-9٠-٩](?:[0-9٠-٩ \t()./\-]{7,28}[0-9٠-٩])"
+)
+PHONE_POSITIVE_CONTEXT_RE = re.compile(
+    r"\b(?:tel|t[eé]l(?:[ée]phone)?|telephone|phone|mobile|mob|gsm|whatsapp|contact)\b|"
+    r"(?:هاتف|الهاتف|جوال|نقال|موبايل|واتساب)",
+    re.IGNORECASE | re.UNICODE,
+)
+PHONE_NEGATIVE_CONTEXT_RE = re.compile(
+    r"\b(?:iban|swift|bic|rib|account|bank|compte|numero\s+de\s+commande|num[eé]ro\s+de\s+commande|"
+    r"order\s+number|purchase\s+order|commande|reference|r[eé]f[eé]rence|invoice|facture|"
+    r"siret|siren|tva|vat|client\s+id|customer\s+id)\b|"
+    r"(?:رقم\s+(?:الطلب|الحساب|الايبان|الإيبان)|ايبان|إيبان|مرجع|مرجعية|فاتورة|طلب\s+شراء)",
+    re.IGNORECASE | re.UNICODE,
+)
 
 _MONTH_TOKENS = [
     "janvier",
@@ -88,28 +103,42 @@ DATE_WORD_MDY_RE = re.compile(
     re.IGNORECASE,
 )
 
-_CURRENCY_ALIASES: List[Tuple[str, str]] = [
-    ("eur", "EUR"),
-    ("euro", "EUR"),
-    ("euros", "EUR"),
-    ("€", "EUR"),
-    ("usd", "USD"),
-    ("dollar", "USD"),
-    ("dollars", "USD"),
-    ("$", "USD"),
-    ("gbp", "GBP"),
-    ("pound", "GBP"),
-    ("£", "GBP"),
-    ("dzd", "DZD"),
-    ("da", "DZD"),
-    ("d.a", "DZD"),
-    ("دج", "DZD"),
-    ("د.ج", "DZD"),
-    ("دينار", "DZD"),
-    ("دينار جزائري", "DZD"),
-    ("aed", "AED"),
-    ("sar", "SAR"),
+_CURRENCY_ALIAS_DEFS: List[Tuple[str, str, int]] = [
+    ("DZD", r"(?<![A-Za-z0-9])(?:DZD|D\s*\.?\s*A\.?|DA)(?![A-Za-z0-9])", 95),
+    ("DZD", r"(?:د\s*\.?\s*ج\.?|دج)", 95),
+    ("DZD", r"\b(?:dinars?\s+alg(?:e|é)riens?|algerian\s+dinars?)\b", 90),
+    ("DZD", r"(?:دينار\s+جزائري|الدينار\s+الجزائري)", 90),
+    ("DZD", r"\b(?:dinars?)\b", 58),
+    ("DZD", r"(?:\bدينار\b|\bدنانير\b)", 58),
+    ("EUR", r"(?<![A-Za-z0-9])(?:EUR|€)(?![A-Za-z0-9])", 92),
+    ("EUR", r"\b(?:euros?)\b", 70),
+    ("EUR", r"\b(?:يورو)\b", 70),
+    ("USD", r"(?<![A-Za-z0-9])(?:USD|\$)(?![A-Za-z0-9])", 92),
+    ("USD", r"\b(?:US\s*dollars?|dollars?\s*US|dollars?)\b", 70),
+    ("USD", r"(?:دولار\s+أمريكي|دولار\s+امريكي|دولارات|دولار)", 70),
+    ("GBP", r"(?<![A-Za-z0-9])(?:GBP|£)(?![A-Za-z0-9])", 88),
+    ("GBP", r"\b(?:pounds?\s+sterling|sterling|pounds?)\b", 62),
+    ("AED", r"(?<![A-Za-z0-9])AED(?![A-Za-z0-9])", 86),
+    ("SAR", r"(?<![A-Za-z0-9])SAR(?![A-Za-z0-9])", 86),
 ]
+_CURRENCY_ALIAS_PATTERNS: List[Tuple[str, re.Pattern, int]] = [
+    (code, re.compile(pattern, re.IGNORECASE | re.UNICODE), priority)
+    for code, pattern, priority in _CURRENCY_ALIAS_DEFS
+]
+_CURRENCY_LABEL_RE = re.compile(
+    r"\b(?:devise|currency|monnaie)\b|(?:العملة|عملة)",
+    re.IGNORECASE | re.UNICODE,
+)
+_CURRENCY_TOTAL_RE = re.compile(
+    r"\b(?:montant\s*ttc|total\s*ttc|net\s*[àa]\s*payer|total\s*[àa]\s*payer|"
+    r"amount\s*due|balance\s*due|total\s*due|grand\s*total)\b|"
+    r"(?:المبلغ\s*الإجمالي|المبلغ\s*الاجمالي|المبلغ\s*المستحق|الصافي\s*للدفع|الواجب\s*دفعه)",
+    re.IGNORECASE | re.UNICODE,
+)
+_AMOUNT_NEAR_RE = re.compile(
+    r"(?:[0-9٠-٩]{1,3}(?:[ \u00A0\u202F.,'٬][0-9٠-٩]{3})+|[0-9٠-٩]+)(?:[.,٫][0-9٠-٩]{1,4})?",
+    re.UNICODE,
+)
 
 
 def _load_yaml(path: Path) -> Dict[str, Any]:
@@ -299,11 +328,59 @@ def _normalize_phone_value(raw_value: str) -> str:
     text = _normalize_digits(_strip_control_and_escapes(raw_value))
     if not text:
         return ""
-    has_plus = "+" in text
-    digits = "".join(ch for ch in text if ch.isdigit())
-    if not (10 <= len(digits) <= 15):
+    if re.search(r"[A-Za-z]", text):
         return ""
+    # Supprime les extensions fax/poste/etc si elles polluent la fin.
+    text = re.split(r"(?i)\b(?:ext|poste|poste\.?|extension|fax)\b", text, maxsplit=1)[0].strip()
+    has_plus = text.lstrip().startswith("+")
+    digits = "".join(ch for ch in text if ch.isdigit())
+    if not (9 <= len(digits) <= 15):
+        return ""
+    if len(digits) >= 16:
+        return ""
+    if digits.startswith("00"):
+        digits = digits[2:]
+        has_plus = True
+    if digits.startswith("33") and len(digits) == 11:
+        return f"+{digits}"
+    if digits.startswith("213") and len(digits) == 12:
+        return f"+{digits}"
+    if len(digits) == 10 and digits.startswith("0") and digits[1] in "123456789":
+        return digits
+    if len(digits) == 9 and digits[0] in "123456789":
+        return digits
     return f"+{digits}" if has_plus else digits
+
+
+def _phone_context_score(source: str, start: int, end: int) -> int:
+    before = source[max(0, start - 36):start]
+    after = source[end:min(len(source), end + 18)]
+    window = f"{before} {after}"
+    score = 0
+    if PHONE_POSITIVE_CONTEXT_RE.search(window):
+        score += 3
+    if PHONE_NEGATIVE_CONTEXT_RE.search(window):
+        score -= 6
+    return score
+
+
+def _looks_like_phone_by_shape(raw_chunk: str, normalized: str) -> bool:
+    digits = "".join(ch for ch in str(normalized or "") if ch.isdigit())
+    raw = str(raw_chunk or "")
+    if not digits:
+        return False
+    if len(digits) == 10 and digits.startswith("0"):
+        return True
+    if len(digits) == 11 and digits.startswith("33"):
+        return True
+    if len(digits) == 12 and digits.startswith("213"):
+        return True
+    sep_count = sum(1 for ch in raw if ch in " .-/()")
+    if normalized.startswith("+") and 9 <= len(digits) <= 15:
+        return True
+    if 9 <= len(digits) <= 12 and sep_count >= 2:
+        return True
+    return False
 
 
 def _first_non_empty_line(lines: List[str], start: int, max_lookahead: int) -> str:
@@ -415,12 +492,83 @@ def _extract_amount_value(text: str) -> str:
     return _clean_value(best)
 
 
+def _currency_context_score(line: str, start: int, end: int) -> int:
+    score = 0
+    if _CURRENCY_LABEL_RE.search(line):
+        score += 220
+    if _CURRENCY_TOTAL_RE.search(line):
+        score += 110
+
+    window = line[max(0, start - 32): min(len(line), end + 32)]
+    if _AMOUNT_NEAR_RE.search(window):
+        score += 28
+    elif _AMOUNT_NEAR_RE.search(line):
+        score += 12
+    return score
+
+
+def _currency_candidates(text: str) -> List[Dict[str, Any]]:
+    source = _strip_control_and_escapes(text)
+    candidates: List[Dict[str, Any]] = []
+    offset = 0
+    lines = source.splitlines() or [source]
+    for raw_line in lines:
+        line = raw_line.strip()
+        if not line:
+            offset += len(raw_line) + 1
+            continue
+        for code, regex, priority in _CURRENCY_ALIAS_PATTERNS:
+            for match in regex.finditer(line):
+                raw = match.group(0)
+                start = match.start()
+                end = match.end()
+                score = priority + _currency_context_score(line, start, end)
+                candidates.append(
+                    {
+                        "code": code,
+                        "raw": raw,
+                        "score": score,
+                        "position": offset + start,
+                        "line": line,
+                    }
+                )
+        offset += len(raw_line) + 1
+    return candidates
+
+
 def _extract_currency_value(text: str) -> str:
-    low = _norm_text(text)
-    for alias, code in _CURRENCY_ALIASES:
-        if _norm_text(alias) in low:
-            return code
-    return ""
+    candidates = _currency_candidates(text)
+    if not candidates:
+        return ""
+    candidates.sort(key=lambda row: (-int(row.get("score") or 0), int(row.get("position") or 0)))
+    return str(candidates[0].get("code") or "")
+
+
+def _detect_currency_values(text: str) -> List[str]:
+    candidates = _currency_candidates(text)
+    candidates.sort(key=lambda row: (-int(row.get("score") or 0), int(row.get("position") or 0)))
+    out: List[str] = []
+    seen = set()
+    for row in candidates:
+        code = str(row.get("code") or "")
+        if not code or code in seen:
+            continue
+        seen.add(code)
+        out.append(code)
+    return out
+
+
+def _line_has_strong_currency_context(text: str) -> bool:
+    return bool(_CURRENCY_LABEL_RE.search(text) or _CURRENCY_TOTAL_RE.search(text))
+
+
+def _best_currency_score_for_value(text: str, code: str) -> int:
+    scores = [
+        int(row.get("score") or 0)
+        for row in _currency_candidates(text)
+        if str(row.get("code") or "") == str(code or "")
+    ]
+    return max(scores) if scores else 0
 
 
 def _detect_emails(text: str) -> List[str]:
@@ -449,19 +597,18 @@ def _detect_urls(text: str) -> List[str]:
 
 def _detect_phones(text: str) -> List[str]:
     out: List[str] = []
-    buf: List[str] = []
-    allowed = set("0123456789٠١٢٣٤٥٦٧٨٩+ .-()/")
     src = _normalize_digits(_strip_control_and_escapes(text))
-    for ch in src + " ":
-        if ch in allowed:
-            buf.append(ch)
+    for match in PHONE_CANDIDATE_RE.finditer(src):
+        chunk = str(match.group(0) or "").strip()
+        val = _normalize_phone_value(chunk)
+        if not val:
             continue
-        if buf:
-            chunk = "".join(buf).strip()
-            buf = []
-            val = _normalize_phone_value(chunk)
-            if val:
-                out.append(val)
+        context_score = _phone_context_score(src, match.start(), match.end())
+        if context_score < 0:
+            continue
+        if context_score == 0 and not _looks_like_phone_by_shape(chunk, val):
+            continue
+        out.append(val)
     return _unique_keep_order(out)
 
 
@@ -480,8 +627,7 @@ def _detect_values_by_type(value_type: str, text: str) -> List[str]:
         val = _extract_amount_value(text)
         return [val] if val else []
     if t == "currency":
-        val = _extract_currency_value(text)
-        return [val] if val else []
+        return _detect_currency_values(text)
     return []
 
 
@@ -625,11 +771,16 @@ def _apply_extractor_to_page(page_text: str, page_index: Any, cfg: Dict[str, Any
         norm_value = _normalize_value_by_type(value_type, value)
         if not norm_value:
             continue
+        if value_type.lower() == "currency" and not _line_has_strong_currency_context(line):
+            continue
         if len(norm_value) < min_chars or len(norm_value) > max_chars:
             continue
 
-        matches.append(_make_match(page_text, norm_value, page_index, line))
-        if not many:
+        match_obj = _make_match(page_text, norm_value, page_index, line)
+        if value_type.lower() == "currency":
+            match_obj["currency_score"] = _best_currency_score_for_value(line, norm_value)
+        matches.append(match_obj)
+        if not many and value_type.lower() != "currency":
             break
 
     # Fallback detecteur pour types techniques si aucune valeur trouvee par labels.
@@ -637,9 +788,17 @@ def _apply_extractor_to_page(page_text: str, page_index: Any, cfg: Dict[str, Any
         for val in _detect_values_by_type(value_type, page_text):
             if len(val) < min_chars or len(val) > max_chars:
                 continue
-            matches.append(_make_match(page_text, val, page_index, val))
+            match_obj = _make_match(page_text, val, page_index, val)
+            if value_type.lower() == "currency":
+                match_obj["currency_score"] = _best_currency_score_for_value(page_text, val)
+            matches.append(match_obj)
             if not many:
                 break
+
+    if value_type.lower() == "currency" and matches:
+        matches.sort(key=lambda row: (-int(row.get("currency_score") or 0), int(row.get("start") or 0)))
+        if not many:
+            return matches[:1]
 
     return matches
 
@@ -771,6 +930,11 @@ def run() -> List[Dict[str, Any]]:
         # Dedup des valeurs par champ
         for name, field in fields.items():
             raw_matches = field.get("matches") or []
+            if str(field.get("type") or "").lower() == "currency":
+                raw_matches = sorted(
+                    raw_matches,
+                    key=lambda row: (-int(row.get("currency_score") or 0), int(row.get("start") or 0)),
+                )
             unique_vals = _unique_keep_order([str(m.get("value") or "") for m in raw_matches if m.get("value")])
             dedup_matches: List[Dict[str, Any]] = []
             for val in unique_vals:

@@ -157,7 +157,7 @@ extractors:
     rule_id: INV_CURRENCY_YAML_01
     type: currency
     strategy: label_value
-    many: true
+    many: false
     lookahead_lines: 1
     labels:
       - "devise"
@@ -167,5 +167,16 @@ extractors:
       - "عملة"
       - "montant ttc"
       - "total ttc"
+      - "net a payer"
+      - "net à payer"
+      - "total a payer"
+      - "total à payer"
       - "amount due"
+      - "balance due"
       - "total due"
+      - "grand total"
+      - "المبلغ الإجمالي"
+      - "المبلغ الاجمالي"
+      - "المبلغ المستحق"
+      - "الصافي للدفع"
+      - "الواجب دفعه"
